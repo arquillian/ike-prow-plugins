@@ -1,0 +1,8 @@
+plugins:
+  bartoszmajsak/wfswarm-booster-pipeline-test:
+  - size
+
+external_plugins:
+  bartoszmajsak/wfswarm-booster-pipeline-test:
+  - name: test-keeper
+  - name: label-sanitizer

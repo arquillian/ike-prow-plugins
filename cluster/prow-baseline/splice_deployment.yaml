@@ -1,0 +1,26 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: splice
+  labels:
+    app: splice
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: splice
+    spec:
+      containers:
+      - name: splice
+        args:
+        - --always-run=pull-kubernetes-cross
+        image: gcr.io/k8s-prow/splice:v20180215-1281b60f7
+        volumeMounts:
+        - name: config
+          mountPath: /etc/config
+          readOnly: true
+      volumes:
+      - name: config
+        configMap:
+          name: config

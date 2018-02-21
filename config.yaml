@@ -1,0 +1,3 @@
+prowjob_namespace: prow-spike
+pod_namespace: prow-spike
+log_level: debug
