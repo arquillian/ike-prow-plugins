@@ -19,7 +19,7 @@ GO_VERSION=go1.9.4
 
 echo -e "${CLEAR}${LIGHT_GREEN}Installing GVM${CLEAR}"
 curl -s -S -L https://raw.githubusercontent.com/moovweb/gvm/master/binscripts/gvm-installer | sh
-[[ -s "$GVM_ROOT/scripts/gvm" ]] && source "$GVM_ROOT/scripts/gvm" # otherwise gvm use will not be recognized
+[[ -s "$GVM_ROOT/scripts/gvm" ]] && source $GVM_ROOT/scripts/gvm || source ~/scripts/gvm # otherwise gvm use will not be recognized
 
 echo -e "${CLEAR}${LIGHT_GREEN}Installing Go 1.4 first - see ${CLEAR}https://github.com/moovweb/gvm/issues/124${CLEAR}"
 gvm install go1.4 --binary
