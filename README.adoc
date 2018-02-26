@@ -19,7 +19,7 @@ Assuming that you have all the link:https://golang.org/doc/install[Golang prereq
 
 [source,bash]
 ----
-$ git clone https://github.com/arquillian/ike-prow-plugins  $GOPATH/src/github.com/arquillian/ike-prow-plugins
+$ git clone https://github.com/arquillian/ike-prow-plugins $GOPATH/src/github.com/arquillian/ike-prow-plugins
 ----
 
 NOTE: Have a look how link:https://github.com/moovweb/gvm[Go Version Manager] can help you simplifying configuration and
@@ -54,19 +54,18 @@ For this purpose use `oc-init` target which will:
 
 * Create new project named `ike-prow-plugins`
 * Add config maps for Prow configuration (`config.yaml`) and its plugins (`plugins.yaml`)
-* Add required secrets (see
+* Add required secrets (see <<gh-settings>> for details)
 * Apply `cluster/starter.yaml` with basic Prow infra.
 
-The key piece of this deployment is `hook` service which listens to GitHub events and dispatch them to relevant plugins.
+The key piece of this deployment is the `hook` service which listens to GitHub events and dispatches them to relevant plugins.
 
 You will have to create a route for this service. Go to `Applications -> Services -> hook` and click `Create Route`.
 Set `/hook` as a path and click `Create`.
 
 ===== Pushing to local MiniShift repository
 
-To speed up development cycle (and avoid pushing work-in-progress) images to Docker Hub you can use built-in docker repository
-available in MiniShift. `Makefile` and templates are adjusted to use it, so the only thing you have to do is to set up
-few environment variables.
+To speed up development cycle (and avoid pushing work-in-progress) images to Docker Hub you can use built-in docker repository available in MiniShift.
+`Makefile` and templates are adjusted to use it, so the only thing you have to do is to set up few environment variables.
 
 [source,bash]
 ----
@@ -77,7 +76,7 @@ export DOCKER_REPO=$(oc get project --show-all=false -o name | cut -d'/' -f 2)
 ----
 
 IMPORTANT: Before executing `docker login` make sure you are logged in using token, as that's what is required returned
-by `oc whoam -t`. To do that open Openshift Console (e.g. `xdg-open https://$(minishift ip):8443/console &>/dev/null'`),
+by `oc whoam -t`. To do that open OpenShift Console (e.g. `xdg-open https://$(minishift ip):8443/console &>/dev/null'`),
 click on your username in the upper-right corner and then `Copy Login Command`. Use it to login from the terminal and
 you are ready to go.
 
@@ -106,7 +105,7 @@ plugin in `/bin` directory in the root of the project.
 To deploy plugins use `make oc-apply`. This will build images, push them to the repository, generate deployments and apply
 them on the cluster. This target builds all plugins at once.
 
-IMPORTANT: You have to be logged in to cluster first.
+IMPORTANT: You have to be logged in to the cluster first.
 
 === Developing new plugin
 
