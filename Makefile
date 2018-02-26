@@ -1,7 +1,7 @@
 PROJECT_NAME=ike-prow-plugins
 PACKAGE_NAME := github.com/arquillian/ike-prow-plugins
 
-PLUGINS=test-keeper label-sanitizer
+PLUGINS=test-keeper pr-sanitizer
 BINARIES=$(patsubst %,binaries-%, $(PLUGINS))
 
 BINARY_DIR=${PWD}/bin

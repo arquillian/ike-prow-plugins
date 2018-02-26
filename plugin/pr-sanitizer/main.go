@@ -21,7 +21,7 @@ import (
 	. "github.com/arquillian/ike-prow-plugins/plugin/utils"
 )
 
-const ProwPluginName = "label-sanitizer"
+const ProwPluginName = "pr-sanitizer"
 
 var (
 	port              = flag.Int("port", 8888, "Port to listen on.")
@@ -103,7 +103,7 @@ func (gh *GitHubLabelsEventsHandler) HandleEvent(eventType, eventGUID string, pa
 
 func helpProvider(enabledRepos []string) (*pluginhelp.PluginHelp, error) {
 	return &pluginhelp.PluginHelp{
-		Description: `Label Sanitizer plugin`,
+		Description: `PR Sanitizer plugin`,
 	},
 		nil
 }
