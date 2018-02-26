@@ -22,7 +22,7 @@ DOCKER?=$(if $(or $(in_docker_group),$(is_root)),docker,sudo docker)
 .DEFAULT_GOAL := all
 
 .PHONY: all
-all: clean install compile build-images push-images oc-apply ## (default) Performs clean build  and container packaging
+all: clean install build build-images push-images oc-apply ## (default) Performs clean build  and container packaging
 
 help: ## Hey! That's me!
 	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-10s\033[0m %s\n", $$1, $$2}'
@@ -42,6 +42,9 @@ up: ## Updates all dependencies defined for glide
 
 .PHONY: compile
 compile: $(BINARIES) ## Compiles all plugins and puts them in the bin/ folder
+
+.PHONY: build
+build: compile
 
 # Build configuration
 BUILD_TIME=$(shell date -u '+%Y-%m-%dT%H:%M:%SZ')
