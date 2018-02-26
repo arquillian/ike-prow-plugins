@@ -29,7 +29,7 @@ var (
 	githubEndpoint    = flag.String("github-endpoint", "https://api.github.com", "GitHub's API endpoint.")
 	githubTokenFile   = flag.String("github-token-file", "/etc/github/oauth", "Path to the file containing the GitHub OAuth secret.")
 	webhookSecretFile = flag.String("hmac-secret-file", "/etc/webhook/hmac", "Path to the file containing the GitHub HMAC secret.")
-	log 			  = logrus.StandardLogger().WithField("ike-plugins", plugin.ProwPluginName)
+	log               = logrus.StandardLogger().WithField("ike-plugins", plugin.ProwPluginName)
 )
 
 func main() {
@@ -68,22 +68,19 @@ func main() {
 
 	s := &server.Server{
 		GitHubEventHandler: testKeeperEvents,
-		HmacSecret: webhookSecret,
-		Log: log,
+		HmacSecret:         webhookSecret,
+		Log:                log,
 	}
 
 	log.Infof("Starting server on port %s", strconv.Itoa(*port))
 
 	http.Handle("/", s)
 	externalplugins.ServeExternalPluginHelp(http.DefaultServeMux, log, helpProvider)
-	logrus.Fatal(http.ListenAndServe(":" + strconv.Itoa(*port), nil))
+	logrus.Fatal(http.ListenAndServe(":"+strconv.Itoa(*port), nil))
 }
 
 func helpProvider(enabledRepos []string) (*pluginhelp.PluginHelp, error) {
 	return &pluginhelp.PluginHelp{
 		Description: `Test Keeper plugin`,
-	},
-		nil
+	}, nil
 }
-
-

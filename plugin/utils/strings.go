@@ -17,7 +17,6 @@ func Contains(s interface{}, e interface{}) bool {
 	return false
 }
 
-
 // convertSliceToInterface takes a slice passed in as an interface{}
 // then converts the slice to a slice of interfaces
 func convertSliceToInterface(s interface{}) (slice []interface{}) {

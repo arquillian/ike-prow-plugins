@@ -1,7 +1,6 @@
 package main
 
 import (
-
 	"flag"
 	"syscall"
 	"os/signal"
@@ -30,14 +29,14 @@ var (
 	githubEndpoint    = flag.String("github-endpoint", "https://api.github.com", "GitHub's API endpoint.")
 	githubTokenFile   = flag.String("github-token-file", "/etc/github/oauth", "Path to the file containing the GitHub OAuth secret.")
 	webhookSecretFile = flag.String("hmac-secret-file", "/etc/webhook/hmac", "Path to the file containing the GitHub HMAC secret.")
-	log 			  = logrus.StandardLogger().WithField("ike-plugins", ProwPluginName)
+	log               = logrus.StandardLogger().WithField("ike-plugins", ProwPluginName)
 )
 
 // GitHubLabelsEventsHandler is the event handler for the plugin.
 // Implements server.GitHubEventHandler interface which contains the logic for incoming GitHub events
 type GitHubLabelsEventsHandler struct {
 	Client *github.Client
-	log *logrus.Entry
+	log    *logrus.Entry
 }
 
 func main() {
@@ -84,7 +83,7 @@ func main() {
 
 	http.Handle("/", s)
 	externalplugins.ServeExternalPluginHelp(http.DefaultServeMux, log, helpProvider)
-	logrus.Fatal(http.ListenAndServe(":" + strconv.Itoa(*port), nil))
+	logrus.Fatal(http.ListenAndServe(":"+strconv.Itoa(*port), nil))
 }
 
 // HandleEvent is an entry point for the plugin logic. This method is invoked by the Server when
@@ -104,7 +103,5 @@ func (gh *GitHubLabelsEventsHandler) HandleEvent(eventType, eventGUID string, pa
 func helpProvider(enabledRepos []string) (*pluginhelp.PluginHelp, error) {
 	return &pluginhelp.PluginHelp{
 		Description: `PR Sanitizer plugin`,
-	},
-		nil
+	}, nil
 }
-

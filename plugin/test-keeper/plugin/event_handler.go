@@ -15,13 +15,13 @@ import (
 // Implements server.GitHubEventHandler interface which contains the logic for incoming GitHub events
 type GitHubTestEventsHandler struct {
 	Client *github.Client
-	log *logrus.Entry
+	log    *logrus.Entry
 }
 
 const ProwPluginName = "test-keeper"
 
 var (
-	handledPrActions = []string{"opened", "closed", "reopened", "synchronize", "edited"}
+	handledPrActions      = []string{"opened", "closed", "reopened", "synchronize", "edited"}
 	handledCommentActions = []string{"created", "deleted"}
 )
 
@@ -35,33 +35,33 @@ func (gh *GitHubTestEventsHandler) HandleEvent(eventType, eventGUID string, payl
 		},
 	)
 	switch eventType {
-		case "pull_request":
-			gh.log .Info("Pull request received")
-			var event github.PullRequestEvent
-			if err := json.Unmarshal(payload, &event); err != nil {
-				return err
+	case "pull_request":
+		gh.log.Info("Pull request received")
+		var event github.PullRequestEvent
+		if err := json.Unmarshal(payload, &event); err != nil {
+			return err
+		}
+
+		go func() {
+			if err := gh.handlePrEvent(&event); err != nil {
+				gh.log.Error("Error handling event.")
 			}
+		}()
 
-			go func() {
-				if err := gh.handlePrEvent(&event); err != nil {
-					gh.log.Error("Error handling event.")
-				}
-			}()
+	case "issue_comment":
+		gh.log.Info("Handling issue comment event.")
+		var event github.IssueCommentEvent
+		if err := json.Unmarshal(payload, &event); err != nil {
+			return err
+		}
 
-		case "issue_comment":
-			gh.log.Info("Handling issue comment event.")
-			var event github.IssueCommentEvent
-			if err := json.Unmarshal(payload, &event); err != nil {
-				return err
+		go func() {
+			if err := gh.handlePrComment(&event); err != nil {
+				gh.log.Error("Error handling event.")
 			}
-
-			go func() {
-				if err := gh.handlePrComment(&event); err != nil {
-					gh.log.Error("Error handling event.")
-				}
-			}()
-		default:
-			gh.log.Infof("received an event of type %q but didn't ask for it", eventType)
+		}()
+	default:
+		gh.log.Infof("received an event of type %q but didn't ask for it", eventType)
 	}
 	return nil
 }
@@ -79,7 +79,8 @@ func (gh *GitHubTestEventsHandler) handlePrEvent(prEvent *github.PullRequestEven
 func (gh *GitHubTestEventsHandler) checkTests(org, name, sha *string, prNumber *int) error {
 
 	gh.log.Infof("Checking for tests")
-	files, _, e := gh.Client.PullRequests.ListFiles(context.Background(), *org, *name, *prNumber, nil); if e != nil {
+	files, _, e := gh.Client.PullRequests.ListFiles(context.Background(), *org, *name, *prNumber, nil);
+	if e != nil {
 		gh.log.Fatal(e)
 		return e
 	}
@@ -96,8 +97,8 @@ func (gh *GitHubTestEventsHandler) checkTests(org, name, sha *string, prNumber *
 	}
 
 	if _, _, err := gh.Client.Repositories.CreateStatus(context.Background(), *org, *name, *sha, &github.RepoStatus{
-		State: &status,
-		Context: String("alien-ike/prow-spike"),
+		State:       &status,
+		Context:     String("alien-ike/prow-spike"),
 		Description: &reason,
 	}); err != nil {
 		gh.log.Info("Error handling event.", err)
@@ -130,7 +131,7 @@ func (gh *GitHubTestEventsHandler) handlePrComment(prComment *github.IssueCommen
 
 	comment := strings.TrimSpace(*prComment.Comment.Body)
 
-	if comment != "/ok-without-tests"  {
+	if comment != "/ok-without-tests" {
 		gh.log.Infof("'%q' is not a supported comment", comment)
 		return nil
 	}

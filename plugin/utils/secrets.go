@@ -18,4 +18,3 @@ func LoadSecret(secretFilename string) []byte {
 	}
 	return bytes.TrimSpace(rawSecret)
 }
-
