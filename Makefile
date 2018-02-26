@@ -56,6 +56,10 @@ $(BINARIES): binaries-%: %
 	@echo "Building $< binary"
 	@cd ./plugin/$< && CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -ldflags ${LDFLAGS} -o ${BINARY_DIR}/$<
 
+.PHONY: check
+check: ## Concurrently runs a whole bunch of static analysis tools
+	gometalinter --vendor --deadline 100s ./...
+
 .PHONY: oc-generate-deployments
 oc-generate-deployments: $(OC_DEPLOYMENTS) ## Creates openshift deployments for ike-prow plugins
 
