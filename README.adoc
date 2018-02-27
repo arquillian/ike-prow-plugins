@@ -59,7 +59,7 @@ kubernetes v1.7.6
 
 Before you start developing new plugins or evolving existing ones you need to deploy set of basic Prow services and configuration.
 
-For this purpose use `oc-init` target which will:
+For this purpose use login to your Openshift cluster using `oc login` and execute `make oc-init` target which will:
 
 * Create new project named `ike-prow-plugins`
 * Add config maps for Prow configuration (`config.yaml`) and its plugins (`plugins.yaml`)
