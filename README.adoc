@@ -46,6 +46,15 @@ targets rely on them.
 You can use Minishift for developing plugins locally.
 Follow link:https://docs.openshift.org/latest/minishift/getting-started/installing.html#installing-instructions[official installation guide] to set it up.
 
+This setup is based on following versions:
+
+[source,bash]
+----
+minishift v1.13.1
+openshift v3.7.1
+kubernetes v1.7.6
+----
+
 ===== Initial setup
 
 Before you start developing new plugins or evolving existing ones you need to deploy set of basic Prow services and configuration.
