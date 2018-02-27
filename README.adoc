@@ -1,0 +1,126 @@
+== Ike Prow Plugins
+
+This repository is home for GitHub / PR automation plugins for Arquillian projects living in this organization. Those
+plugins are based on link:https://github.com/kubernetes/test-infra/tree/master/prow[Prow] sub project of
+Kubernetes Test Infrastructure.
+
+=== Prerequisites
+
+==== Tooling
+
+You need to have following packages in place:
+
+* `git`
+* `make`
+* `go` (>= v1.9.4)
+* link:https://glide.sh/[`glide`] for dependency management
+
+Assuming that you have all the link:https://golang.org/doc/install[Golang prerequisites] in place (such as `$GOPATH`), clone the repository first:
+
+[source,bash]
+----
+$ git clone https://github.com/arquillian/ike-prow-plugins $GOPATH/src/github.com/arquillian/ike-prow-plugins
+----
+
+NOTE: Have a look how link:https://github.com/moovweb/gvm[Go Version Manager] can help you simplifying configuration and
+management of different versions of Go.
+
+NOTE: You can also use `setup.sh` which takes care of all of the above
+
+==== GitHub settings [[gh-settings]]
+
+You will need two secrets to be able to integrate with GitHub. The `hmac.token` file should contain the token that
+you give to GitHub for validating webhooks. You can generate it using any reasonable randomness-generator, for example
+link:http://random.org[random.org].
+
+The `oauth.token` is an OAuth2 token that has read and write access to the GitHub account. Generate it from
+link:https://github.com/settings/tokens/new[here].
+
+NOTE: Both of these files are ignored by git (see `.gitignore`) so you can keep them in your repository, as some `make`
+targets rely on them.
+
+=== Local Setup
+
+==== Minishift
+
+You can use Minishift for developing plugins locally.
+Follow link:https://docs.openshift.org/latest/minishift/getting-started/installing.html#installing-instructions[official installation guide] to set it up.
+
+This setup is based on following versions:
+
+[source,bash]
+----
+minishift v1.13.1
+openshift v3.7.1
+kubernetes v1.7.6
+----
+
+===== Initial setup
+
+Before you start developing new plugins or evolving existing ones you need to deploy set of basic Prow services and configuration.
+
+For this purpose use login to your Openshift cluster using `oc login` and execute `make oc-init` target which will:
+
+* Create new project named `ike-prow-plugins`
+* Add config maps for Prow configuration (`config.yaml`) and its plugins (`plugins.yaml`)
+* Add required secrets (see <<gh-settings>> for details)
+* Apply `cluster/starter.yaml` with basic Prow infra.
+
+The key piece of this deployment is the `hook` service which listens to GitHub events and dispatches them to relevant plugins.
+
+You will have to create a route for this service. Go to `Applications -> Services -> hook` and click `Create Route`.
+Set `/hook` as a path and click `Create`.
+
+===== Pushing to local Minishift repository
+
+To speed up development cycle (and avoid pushing work-in-progress) images to Docker Hub you can use built-in docker repository available in Minishift.
+`Makefile` and templates are adjusted to use it, so the only thing you have to do is to set up few environment variables.
+
+IMPORTANT: Before executing `docker login` make sure you are logged in using token instead of regular password. That's returned
+by `oc whoami -t` and is used as password by Docker daemon. To do that open OpenShift Console (e.g. `xdg-open https://$(minishift ip):8443/console &>/dev/null`),
+click on your username in the upper-right corner and then `Copy Login Command`. Use it to login from the terminal and
+you are ready to go.
+
+[source,bash]
+----
+eval $(minishift docker-env)
+docker login -u $(oc whoami) -p $(oc whoami -t) $(minishift openshift registry)
+export REGISTRY=$(minishift openshift registry)
+export DOCKER_REPO=$(oc get project --show-all=false -o name | cut -d'/' -f 2)
+----
+
+
+NOTE: If you are using `zsh` you can take a look at link:https://github.com/kennethreitz/autoenv[autoenv] or
+link:https://direnv.net/[direnv] to automate this setup every time you access project's directory.
+
+=== Testing hooks
+
+You can consume GitHub events through webhook pointing to your local cluster. For this purpose use
+link:http://www.ultrahook.com/[`ultrahook`]. After registering your own API key simply run following command and you
+are all set:
+
+[source,bash]
+----
+ultrahook github http://hook-$(oc get project --show-all=false -o name | grep 'prow' | cut -d'/' -f 2).$(minishift ip).nip.io/hook
+----
+
+Having this set up you will start seeing events trigger by your actions in the repository coming in and
+corresponding plugins reacting on them. Have a look at pods logs to verify if everything is working expected.
+
+=== Building
+
+In order to compile the project simply execute `make build` target. This will compile, run tests and put binaries of each
+plugin in `/bin` directory in the root of the project.
+
+To deploy plugins use `make oc-apply`. This will build images, push them to the repository, generate deployments and apply
+them on the cluster. This target builds all plugins at once.
+
+IMPORTANT: You have to be logged in to the cluster first.
+
+=== Developing new plugin
+
+Besides creating new folders/packages in `plugin` folder you will have to register your plugin in the `Makefile`. Simply
+add its name to link:https://github.com/arquillian/ike-prow-plugins/blob/308909d88c7bee02b96236121fd25d4e9d08d88b/Makefile#L4[this list] and you should be good.
+
+IMPORTANT: By convention internal `PluginName`, the directory where the code is located and name of the service are assumed to
+be the same.
