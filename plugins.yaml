@@ -5,4 +5,4 @@ plugins:
 external_plugins:
   bartoszmajsak/wfswarm-booster-pipeline-test:
   - name: test-keeper
-  - name: label-sanitizer
+  - name: pr-sanitizer
