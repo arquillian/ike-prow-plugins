@@ -69,7 +69,7 @@ oc-generate-deployments: $(OC_DEPLOYMENTS) ## Creates openshift deployments for 
 .PHONY: oc-init
 oc-init:
 	@echo "Setting cluster project"
-	@oc new-project prow-spike
+	@oc new-project ike-prow-plugins
 	@oc create configmap plugins && oc create configmap config
 	@oc create secret generic hmac-token --from-file=hmac=hmac.token && oc create secret generic oauth-token --from-file=oauth=oauth.token
 	@oc create configmap plugins --from-file=plugins=plugins.yaml --dry-run -o yaml | oc replace configmap plugins -f -
