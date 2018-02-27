@@ -76,6 +76,11 @@ Set `/hook` as a path and click `Create`.
 To speed up development cycle (and avoid pushing work-in-progress) images to Docker Hub you can use built-in docker repository available in Minishift.
 `Makefile` and templates are adjusted to use it, so the only thing you have to do is to set up few environment variables.
 
+IMPORTANT: Before executing `docker login` make sure you are logged in using token, as that's what is required returned
+by `oc whoami -t`. To do that open OpenShift Console (e.g. `xdg-open https://$(minishift ip):8443/console &>/dev/null`),
+click on your username in the upper-right corner and then `Copy Login Command`. Use it to login from the terminal and
+you are ready to go.
+
 [source,bash]
 ----
 eval $(minishift docker-env)
@@ -84,10 +89,6 @@ export REGISTRY=$(minishift openshift registry)
 export DOCKER_REPO=$(oc get project --show-all=false -o name | cut -d'/' -f 2)
 ----
 
-IMPORTANT: Before executing `docker login` make sure you are logged in using token, as that's what is required returned
-by `oc whoami -t`. To do that open OpenShift Console (e.g. `xdg-open https://$(minishift ip):8443/console &>/dev/null`),
-click on your username in the upper-right corner and then `Copy Login Command`. Use it to login from the terminal and
-you are ready to go.
 
 NOTE: If you are using `zsh` you can take a look at link:https://github.com/kennethreitz/autoenv[autoenv] or
 link:https://direnv.net/[direnv] to automate this setup every time you access project's directory.
