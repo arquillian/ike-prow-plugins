@@ -1,7 +1,7 @@
 == Ike Prow Plugins
 
 This repository is home for GitHub / PR automation plugins for Arquillian projects living in this organization. Those
-plugins are based on link:https://github.com/kubernetes/test-infra/tree/master/prow[Prow] subproject of
+plugins are based on link:https://github.com/kubernetes/test-infra/tree/master/prow[Prow] sub project of
 Kubernetes Test Infrastructure.
 
 === Prerequisites
@@ -41,7 +41,7 @@ targets rely on them.
 
 === Local Setup
 
-==== MiniShift
+==== Minishift
 
 You can use Minishift for developing plugins locally.
 Follow link:https://docs.openshift.org/latest/minishift/getting-started/installing.html#installing-instructions[official installation guide] to set it up.
@@ -62,9 +62,9 @@ The key piece of this deployment is the `hook` service which listens to GitHub e
 You will have to create a route for this service. Go to `Applications -> Services -> hook` and click `Create Route`.
 Set `/hook` as a path and click `Create`.
 
-===== Pushing to local MiniShift repository
+===== Pushing to local Minishift repository
 
-To speed up development cycle (and avoid pushing work-in-progress) images to Docker Hub you can use built-in docker repository available in MiniShift.
+To speed up development cycle (and avoid pushing work-in-progress) images to Docker Hub you can use built-in docker repository available in Minishift.
 `Makefile` and templates are adjusted to use it, so the only thing you have to do is to set up few environment variables.
 
 [source,bash]
