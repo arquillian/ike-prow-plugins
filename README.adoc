@@ -101,7 +101,7 @@ are all set:
 
 [source,bash]
 ----
-ultrahook github http://hook-prow-spike.$(minishift ip).nip.io/hook
+ultrahook github http://hook-$(oc get project --show-all=false -o name | grep 'prow' | cut -d'/' -f 2).$(minishift ip).nip.io/hook
 ----
 
 Having this set up you will start seeing events trigger by your actions in the repository coming in and
