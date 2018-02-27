@@ -76,7 +76,7 @@ export DOCKER_REPO=$(oc get project --show-all=false -o name | cut -d'/' -f 2)
 ----
 
 IMPORTANT: Before executing `docker login` make sure you are logged in using token, as that's what is required returned
-by `oc whoam -t`. To do that open OpenShift Console (e.g. `xdg-open https://$(minishift ip):8443/console &>/dev/null'`),
+by `oc whoami -t`. To do that open OpenShift Console (e.g. `xdg-open https://$(minishift ip):8443/console &>/dev/null'`),
 click on your username in the upper-right corner and then `Copy Login Command`. Use it to login from the terminal and
 you are ready to go.
 
