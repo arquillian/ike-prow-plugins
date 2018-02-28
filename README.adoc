@@ -40,8 +40,8 @@ external_plugins:
   organization/repository <2>
   - name: label-sanitizer
 ----
-<1> The `test-keeper` plugin will be applied to every repository in your organization
-<2> You can also specify plugins only for certain repositories
+<1> The `test-keeper` plugin will be applied to every repository in your organization.
+<2> You can also specify plugins only for certain repositories (be aware however, that adding an external plugin both to the repository and its organization link:https://github.com/kubernetes/test-infra/blob/7de525b1f6943e5d08d9a127b0b668cec404c665/prow/plugins/plugins_test.go#L143[will result in an error]).
 
 
 ==== GitHub settings [[gh-settings]]
