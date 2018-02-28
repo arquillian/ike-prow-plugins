@@ -27,6 +27,23 @@ management of different versions of Go.
 
 NOTE: You can also use `setup.sh` which takes care of all of the above
 
+=== Plugin settings
+
+In order to enable certain plugin for your repository or organization, you should edit `plugins.yaml` file adding:
+
+
+[source,bash]
+----
+external_plugins:
+  organization:
+  - name: test-keeper <1>
+  organization/repository <2>
+  - name: label-sanitizer
+----
+<1> The `test-keeper` plugin will be applied to every repository in your organization
+<2> You can also specify plugins only for certain repositories
+
+
 ==== GitHub settings [[gh-settings]]
 
 You will need two secrets to be able to integrate with GitHub. The `hmac.token` file should contain the token that
@@ -34,10 +51,24 @@ you give to GitHub for validating webhooks. You can generate it using any reason
 link:http://random.org[random.org].
 
 The `oauth.token` is an OAuth2 token that has read and write access to the GitHub account. Generate it from
-link:https://github.com/settings/tokens/new[here].
+link:https://github.com/settings/tokens/new[here]. Depending on your plugin needs the scopes might vary,
+but it is important to have following scopes enabled: `admin:org_hook` and `admin:repo_hook`.
 
 NOTE: Both of these files are ignored by git (see `.gitignore`) so you can keep them in your repository, as some `make`
 targets rely on them.
+
+==== Setting up the web hook [[webhook]]
+
+In order to setup webhook for your repository go to `https://github.com/[org]/[repo]/settings/hooks/new` and provide:
+
+* payload URL
+* content type needs to be `application-json`
+* secret the same as defined in `hmac.token` file
+* customize types of hooks you would like to receive (or use all to start)
+
+For hints how to test web hook against your local setup head over to <<testing-hooks>> section.
+
+NOTE: More details about GitHub hooks can be found in the link:https://developer.github.com/webhooks/[official developer documentation].
 
 === Local Setup
 
@@ -93,7 +124,7 @@ export DOCKER_REPO=$(oc get project --show-all=false -o name | cut -d'/' -f 2)
 NOTE: If you are using `zsh` you can take a look at link:https://github.com/kennethreitz/autoenv[autoenv] or
 link:https://direnv.net/[direnv] to automate this setup every time you access project's directory.
 
-=== Testing hooks
+=== Testing hooks [[testing-hooks]]
 
 You can consume GitHub events through webhook pointing to your local cluster. For this purpose use
 link:http://www.ultrahook.com/[`ultrahook`]. After registering your own API key simply run following command and you
@@ -104,7 +135,9 @@ are all set:
 ultrahook github http://hook-$(oc get project --show-all=false -o name | grep 'prow' | cut -d'/' -f 2).$(minishift ip).nip.io/hook
 ----
 
-Having this set up you will start seeing events trigger by your actions in the repository coming in and
+NOTE: If not done before add ultrahook URL as payload URL for webhook configuration (see <<webhook>>).
+
+Having this set up you will start seeing events triggered by your actions in the repository and
 corresponding plugins reacting on them. Have a look at pods logs to verify if everything is working expected.
 
 === Building
