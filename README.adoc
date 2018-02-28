@@ -59,7 +59,7 @@ targets rely on them.
 
 ==== Setting up the web hook [[webhook]]
 
-In order to setup webhook for your repository go to `https://github.com/[org]/[repo]/settings/hooks/new` and provide:
+In order to setup webhook for your repository go to `https://github.com/{org}/{repo}/settings/hooks/new` and provide:
 
 * payload URL
 * content type needs to be `application-json`
