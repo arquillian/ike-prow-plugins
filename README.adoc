@@ -122,7 +122,7 @@ export DOCKER_REPO=$(oc get project --show-all=false -o name | cut -d'/' -f 2)
 
 
 NOTE: If you are using `zsh` you can take a look at link:https://github.com/kennethreitz/autoenv[autoenv] or
-link:https://direnv.net/[direnv] to automate this setup every time you access project's directory.
+link:https://direnv.net/[direnv] to automate this setup every time you access project's directory. Just make sure to add it to your global `.gitignore` to avoid sharing it through PRs (e.g. `git config --global core.excludesfile ~/.gitignore`).
 
 === Testing hooks [[testing-hooks]]
 
