@@ -33,3 +33,6 @@ oauth.token
 
 # Generated files
 cluster/generated/
+
+# autoenv config file
+.env
