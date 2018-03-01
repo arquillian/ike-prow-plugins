@@ -7,6 +7,8 @@ import (
 	"net/http"
 )
 
+// GitHubEventHandler is a type which keeps the logic of handling GitHub events for the given plugin implementation.
+// It is used by Server implementation to handle incoming events.
 type GitHubEventHandler interface {
 	HandleEvent(eventType, eventGUID string, payload []byte) error
 }
@@ -27,7 +29,9 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	fmt.Fprint(w, "Event received. Have a nice day.")
+	if _, err := fmt.Fprint(w, "Event received. Have a nice day."); err != nil {
+		s.Log.WithError(err).Error("Failed writing message to buffer.")
+	}
 
 	if err := s.GitHubEventHandler.HandleEvent(eventType, eventGUID, payload); err != nil {
 		s.Log.WithError(err).Error("Error parsing event.")
