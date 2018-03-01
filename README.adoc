@@ -12,7 +12,7 @@ You need to have following packages in place:
 
 * `git`
 * `make`
-* `go` (>= v1.9.4)
+* `go` (`>= v1.9.4`)
 * link:https://glide.sh/[`glide`] for dependency management
 
 Assuming that you have all the link:https://golang.org/doc/install[Golang prerequisites] in place (such as `$GOPATH`), clone the repository first:
