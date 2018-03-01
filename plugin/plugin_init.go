@@ -28,12 +28,12 @@ var (
 	webhookSecretFile = flag.String("hmac-secret-file", "/etc/webhook/hmac", "Path to the file containing the GitHub HMAC secret.")
 )
 
+type EventHandlerCreator func(client *github.Client) server.GitHubEventHandler
+type ServerCreator func(hmacSecret []byte, testKeeperEvents server.GitHubEventHandler) *server.Server
+
 // InitPlugin instantiates logger, loads the secrets from the flags, sets context to background and starts server with
 // the attached event handler.
-func InitPlugin(
-	log *logrus.Entry,
-	createHandler func(Client *github.Client) server.GitHubEventHandler,
-	createServer func(HmacSecret []byte, testKeeperEvents server.GitHubEventHandler) *server.Server,
+func InitPlugin(log *logrus.Entry, eventHandlerCreator EventHandlerCreator, serverCreator ServerCreator,
 	helpProvider externalplugins.ExternalPluginHelpProvider) {
 
 	flag.Parse()
@@ -64,8 +64,8 @@ func InitPlugin(
 	)
 	githubClient := github.NewClient(oauth2.NewClient(ctx, token))
 
-	handler := createHandler(githubClient)
-	server := createServer(webhookSecret, handler)
+	handler := eventHandlerCreator(githubClient)
+	server := serverCreator(webhookSecret, handler)
 
 	log.Infof("Starting server on port %s", strconv.Itoa(*port))
 
