@@ -9,7 +9,7 @@ import (
 	"encoding/json"
 	"context"
 	"strings"
-	github_events "github.com/arquillian/ike-prow-plugins/plugin/github"
+	"github.com/arquillian/ike-prow-plugins/plugin/github"
 )
 
 // GitHubTestEventsHandler is the event handler for the plugin.
@@ -22,7 +22,7 @@ type GitHubTestEventsHandler struct {
 // ProwPluginName is an external prow plugin name used to register this service
 const (
 	ProwPluginName = "test-keeper"
-	SkipComment    = "/ok-without-test"
+	SkipComment    = "/ok-without-tests"
 )
 
 var (
@@ -32,39 +32,39 @@ var (
 
 // HandleEvent is an entry point for the plugin logic. This method is invoked by the Server when
 // events are dispatched from the /hook service
-func (gh *GitHubTestEventsHandler) HandleEvent(eventType github_events.EventType, eventGUID string, payload []byte) error {
-	gh.Log = logrus.StandardLogger().WithField("ike-plugins", ProwPluginName).WithFields(
-		logrus.Fields{
-			"event-type": eventType,
-			"event-GUID": eventGUID,
-		},
-	)
+func (gh *GitHubTestEventsHandler) HandleEvent(eventType githubevents.EventType, eventGUID string, payload []byte) error {
+	if gh.Log == nil {
+		gh.Log = logrus.StandardLogger().WithField("ike-plugins", ProwPluginName).WithFields(
+			logrus.Fields{
+				"event-type": eventType,
+				"event-GUID": eventGUID,
+			},
+		)
+	}
 	switch eventType {
-	case github_events.PullRequest:
+	case githubevents.PullRequest:
 		gh.Log.Info("Pull request received")
 		var event github.PullRequestEvent
 		if err := json.Unmarshal(payload, &event); err != nil {
+			gh.Log.Info("JSON: ", event)
 			return err
 		}
 
-		go func() {
-			if err := gh.handlePrEvent(&event); err != nil {
-				gh.Log.Error("Error handling event.")
-			}
-		}()
+		if err := gh.handlePrEvent(&event); err != nil {
+			gh.Log.Error("Error handling event.")
+		}
 
-	case github_events.IssueComment:
-		gh.Log.Info("Handling issue comment event.")
+	case githubevents.IssueComment:
+		gh.Log.Info("Issue comment event.")
 		var event github.IssueCommentEvent
 		if err := json.Unmarshal(payload, &event); err != nil {
 			return err
 		}
 
-		go func() {
-			if err := gh.handlePrComment(&event); err != nil {
-				gh.Log.Error("Error handling event.")
-			}
-		}()
+		if err := gh.handlePrComment(&event); err != nil {
+			gh.Log.Error("Error handling event.")
+		}
+
 	default:
 		gh.Log.Infof("received an event of type %q but didn't ask for it", eventType)
 	}
@@ -72,8 +72,8 @@ func (gh *GitHubTestEventsHandler) HandleEvent(eventType github_events.EventType
 }
 
 func (gh *GitHubTestEventsHandler) handlePrEvent(prEvent *github.PullRequestEvent) error {
-	gh.Log.Infof("PR Event %q", *prEvent.Action)
 	if !utils.Contains(handledPrActions, *prEvent.Action) {
+		gh.Log.Info("No proper action", *prEvent.Action)
 		return nil
 	}
 
@@ -83,8 +83,7 @@ func (gh *GitHubTestEventsHandler) handlePrEvent(prEvent *github.PullRequestEven
 // TODO refactor to its own testable component
 func (gh *GitHubTestEventsHandler) checkTests(org, name, sha *string, prNumber *int) error {
 
-	gh.Log.Infof("Checking for tests")
-	files, _, e := gh.Client.PullRequests.ListFiles(context.Background(), *org, *name, *prNumber, nil);
+	files, _, e := gh.Client.PullRequests.ListFiles(context.Background(), *org, *name, *prNumber, nil)
 	if e != nil {
 		gh.Log.Fatal(e)
 		return e
@@ -93,7 +92,6 @@ func (gh *GitHubTestEventsHandler) checkTests(org, name, sha *string, prNumber *
 	var status = "failure"
 	var reason = "No tests in this PR :("
 	for _, file := range files {
-		gh.Log.Infof("%q: %q", *file.Filename, *file.Status)
 		// TODO status must be added or changed
 		if regexp.MustCompile(`.+(IT\.java|Test.java)$`).MatchString(*file.Filename) {
 			status = "success"
@@ -114,13 +112,14 @@ func (gh *GitHubTestEventsHandler) checkTests(org, name, sha *string, prNumber *
 
 func (gh *GitHubTestEventsHandler) handlePrComment(prComment *github.IssueCommentEvent) error {
 	if !utils.Contains(handledCommentActions, *prComment.Action) {
+		gh.Log.Info("No proper action", *prComment.Action)
 		return nil
 	}
 
 	org := prComment.Repo.Owner.Login
 	name := prComment.Repo.Name
 	prNumber := prComment.Issue.Number
-	gh.Log.Infof("Received event, %q, %q, %q", *org, *name, *prNumber)
+	gh.Log.Infof("Received event, %q, %q, %d", *org, *name, *prNumber)
 
 	sender := prComment.Sender.Login
 	permissionLevel, _, e := gh.Client.Repositories.GetPermissionLevel(context.Background(), *org, *name, *sender)

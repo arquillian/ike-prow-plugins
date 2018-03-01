@@ -44,7 +44,7 @@ func serverCreator(webhookSecret []byte, eventHandler server.GitHubEventHandler)
 
 // HandleEvent is an entry point for the plugin logic. This method is invoked by the Server when
 // events are dispatched from the /hook service
-func (gh *GitHubLabelsEventsHandler) HandleEvent(eventType github_events.EventType, eventGUID string, payload []byte) error {
+func (gh *GitHubLabelsEventsHandler) HandleEvent(eventType githubevents.EventType, eventGUID string, payload []byte) error {
 	gh.log = logrus.StandardLogger().WithField("ike-plugins", ProwPluginName).WithFields(
 		logrus.Fields{
 			"event-type": eventType,
