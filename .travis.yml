@@ -9,6 +9,7 @@ install:
   - mkdir -p $HOME/bin
   - tar -vxz -C $HOME/bin --strip=1 -f glide-$GLIDE_VERSION-linux-amd64.tar.gz
   - export PATH="$HOME/bin:$PATH"
+  - go get -u github.com/alecthomas/gometalinter && gometalinter --install
 
 script:
   - make build

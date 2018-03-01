@@ -9,6 +9,7 @@ import (
 	pluginBootstrap "github.com/arquillian/ike-prow-plugins/plugin"
 )
 
+// ProwPluginName is an external prow plugin name used to register this service
 const ProwPluginName = "pr-sanitizer"
 
 var (

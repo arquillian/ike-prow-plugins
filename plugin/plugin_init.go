@@ -12,7 +12,7 @@ import (
 	"github.com/google/go-github/github"
 	"k8s.io/test-infra/prow/plugins"
 	"github.com/arquillian/ike-prow-plugins/plugin/server"
-	. "github.com/arquillian/ike-prow-plugins/plugin/utils"
+	"github.com/arquillian/ike-prow-plugins/plugin/utils"
 	"k8s.io/test-infra/prow/pluginhelp/externalplugins"
 	"strconv"
 
@@ -21,15 +21,18 @@ import (
 
 var (
 	port              = flag.Int("port", 8888, "Port to listen on.")
-	dryRun            = flag.Bool("dry-run", true, "Dry run for testing. Uses API tokens but does not mutate.")
 	pluginConfig      = flag.String("ike-plugins-config", "/etc/plugins/plugins", "Path to ike-plugins config file.")
 	githubEndpoint    = flag.String("github-endpoint", "https://api.github.com", "GitHub's API endpoint.")
 	githubTokenFile   = flag.String("github-token-file", "/etc/github/oauth", "Path to the file containing the GitHub OAuth secret.")
 	webhookSecretFile = flag.String("hmac-secret-file", "/etc/webhook/hmac", "Path to the file containing the GitHub HMAC secret.")
 )
 
+// EventHandlerCreator is a func type that creates server.GitHubEventHandler instance which is the central point for
+// the plugin logic
 type EventHandlerCreator func(client *github.Client) server.GitHubEventHandler
-type ServerCreator func(hmacSecret []byte, testKeeperEvents server.GitHubEventHandler) *server.Server
+
+// ServerCreator is a func type that wires Server and server.GitHubEventHandler together
+type ServerCreator func(hmacSecret []byte, evenHandler server.GitHubEventHandler) *server.Server
 
 // InitPlugin instantiates logger, loads the secrets from the flags, sets context to background and starts server with
 // the attached event handler.
@@ -45,8 +48,8 @@ func InitPlugin(log *logrus.Entry, eventHandlerCreator EventHandlerCreator, serv
 	// We'll get SIGTERM first and then SIGKILL after our graceful termination deadline.
 	signal.Ignore(syscall.SIGTERM)
 
-	webhookSecret := LoadSecret(*webhookSecretFile)
-	oauthSecret := string(LoadSecret(*githubTokenFile))
+	webhookSecret := utils.LoadSecret(*webhookSecretFile)
+	oauthSecret := string(utils.LoadSecret(*githubTokenFile))
 
 	_, err := url.Parse(*githubEndpoint)
 	if err != nil {
@@ -65,11 +68,11 @@ func InitPlugin(log *logrus.Entry, eventHandlerCreator EventHandlerCreator, serv
 	githubClient := github.NewClient(oauth2.NewClient(ctx, token))
 
 	handler := eventHandlerCreator(githubClient)
-	server := serverCreator(webhookSecret, handler)
+	pluginServer := serverCreator(webhookSecret, handler)
 
 	log.Infof("Starting server on port %s", strconv.Itoa(*port))
 
-	http.Handle("/", server)
+	http.Handle("/", pluginServer)
 	externalplugins.ServeExternalPluginHelp(http.DefaultServeMux, log, helpProvider)
 	logrus.Fatal(http.ListenAndServe(":"+strconv.Itoa(*port), nil))
 }

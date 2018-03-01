@@ -4,7 +4,7 @@ import (
 	"github.com/sirupsen/logrus"
 	"regexp"
 	"fmt"
-	. "github.com/arquillian/ike-prow-plugins/plugin/utils"
+	"github.com/arquillian/ike-prow-plugins/plugin/utils"
 	"github.com/google/go-github/github"
 	"encoding/json"
 	"context"
@@ -18,6 +18,7 @@ type GitHubTestEventsHandler struct {
 	log    *logrus.Entry
 }
 
+// ProwPluginName is an external prow plugin name used to register this service
 const ProwPluginName = "test-keeper"
 
 var (
@@ -68,7 +69,7 @@ func (gh *GitHubTestEventsHandler) HandleEvent(eventType, eventGUID string, payl
 
 func (gh *GitHubTestEventsHandler) handlePrEvent(prEvent *github.PullRequestEvent) error {
 	gh.log.Infof("PR Event %q", *prEvent.Action)
-	if !Contains(handledPrActions, *prEvent.Action) {
+	if !utils.Contains(handledPrActions, *prEvent.Action) {
 		return nil
 	}
 
@@ -90,7 +91,7 @@ func (gh *GitHubTestEventsHandler) checkTests(org, name, sha *string, prNumber *
 	for _, file := range files {
 		gh.log.Infof("%q: %q", *file.Filename, *file.Status)
 		// TODO status must be added or changed
-		if regexp.MustCompile(`.+(IT\.java|Test.java)$`).MatchString(*file.Filename) == true {
+		if regexp.MustCompile(`.+(IT\.java|Test.java)$`).MatchString(*file.Filename) {
 			status = "success"
 			reason = "There are some tests :)"
 		}
@@ -98,7 +99,7 @@ func (gh *GitHubTestEventsHandler) checkTests(org, name, sha *string, prNumber *
 
 	if _, _, err := gh.Client.Repositories.CreateStatus(context.Background(), *org, *name, *sha, &github.RepoStatus{
 		State:       &status,
-		Context:     String("alien-ike/prow-spike"),
+		Context:     utils.String("alien-ike/prow-spike"),
 		Description: &reason,
 	}); err != nil {
 		gh.log.Info("Error handling event.", err)
@@ -108,7 +109,7 @@ func (gh *GitHubTestEventsHandler) checkTests(org, name, sha *string, prNumber *
 }
 
 func (gh *GitHubTestEventsHandler) handlePrComment(prComment *github.IssueCommentEvent) error {
-	if !Contains(handledCommentActions, *prComment.Action) {
+	if !utils.Contains(handledCommentActions, *prComment.Action) {
 		return nil
 	}
 
@@ -150,9 +151,9 @@ func (gh *GitHubTestEventsHandler) handlePrComment(prComment *github.IssueCommen
 	// TODO add comment mentioning lack of tests
 
 	if _, _, err := gh.Client.Repositories.CreateStatus(context.Background(), *org, *name, *sha, &github.RepoStatus{
-		State:       String("success"),
-		Context:     String("alien-ike/prow-spike"),
-		Description: String(fmt.Sprintf("PR is fine without tests says @%s", *sender)),
+		State:       utils.String("success"),
+		Context:     utils.String("alien-ike/prow-spike"),
+		Description: utils.String(fmt.Sprintf("PR is fine without tests says @%s", *sender)),
 	}); err != nil {
 		gh.log.Info("Error handling event.", err)
 	}
