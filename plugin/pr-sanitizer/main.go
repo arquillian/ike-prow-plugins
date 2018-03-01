@@ -6,7 +6,7 @@ import (
 	"k8s.io/test-infra/prow/pluginhelp"
 
 	"github.com/arquillian/ike-prow-plugins/plugin/server"
-	commonPlugin "github.com/arquillian/ike-prow-plugins/plugin"
+	pluginBootstrap "github.com/arquillian/ike-prow-plugins/plugin"
 )
 
 const ProwPluginName = "pr-sanitizer"
@@ -23,7 +23,7 @@ type GitHubLabelsEventsHandler struct {
 }
 
 func main() {
-	commonPlugin.InitPlugin(log, handlerCreator, serverCreator, helpProvider)
+	pluginBootstrap.InitPlugin(log, handlerCreator, serverCreator, helpProvider)
 }
 
 func handlerCreator(githubClient *github.Client) server.GitHubEventHandler {

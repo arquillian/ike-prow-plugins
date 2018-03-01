@@ -8,7 +8,7 @@ import (
 	"github.com/arquillian/ike-prow-plugins/plugin/server"
 	"github.com/arquillian/ike-prow-plugins/plugin/test-keeper/plugin"
 
-	commonPlugin "github.com/arquillian/ike-prow-plugins/plugin"
+	pluginBootstrap "github.com/arquillian/ike-prow-plugins/plugin"
 )
 
 var (
@@ -16,7 +16,7 @@ var (
 )
 
 func main() {
-	commonPlugin.InitPlugin(log, handlerCreator, serverCreator, helpProvider)
+	pluginBootstrap.InitPlugin(log, handlerCreator, serverCreator, helpProvider)
 }
 
 func handlerCreator(githubClient *github.Client) server.GitHubEventHandler {
