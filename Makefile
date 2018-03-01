@@ -44,7 +44,7 @@ up: ## Updates all dependencies defined for glide
 compile: up $(BINARIES) ## Compiles all plugins and puts them in the bin/ folder
 
 .PHONY: build
-build: compile
+build: check compile
 
 # Build configuration
 BUILD_TIME=$(shell date -u '+%Y-%m-%dT%H:%M:%SZ')
