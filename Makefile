@@ -61,7 +61,7 @@ $(BINARIES): binaries-%: %
 
 .PHONY: check
 check: ## Concurrently runs a whole bunch of static analysis tools
-	gometalinter --vendor --deadline 100s ./...
+	gometalinter --vendor --deadline 300s ./...
 
 .PHONY: oc-generate-deployments
 oc-generate-deployments: $(OC_DEPLOYMENTS) ## Creates openshift deployments for ike-prow plugins
