@@ -99,7 +99,7 @@ var _ = Describe("Test Keeper Plugin features", func() {
 			gock.New("https://api.github.com").
 				Get("/repos/bartoszmajsak/wfswarm-booster-pipeline-test/collaborators/bartoszmajsak/permission").
 				Reply(200).
-				Body(fromJson("test_fixtures/github_calls/collaborators_bartoszmajsak_permission.json"))
+				Body(fromJson("test_fixtures/github_calls/collaborators_repo-admin_permission.json"))
 
 			toHaveSuccessState := func(statusPayload map[string]interface{}) (bool) {
 				return Expect(statusPayload["state"]).To(Equal("success"))
@@ -126,7 +126,7 @@ var _ = Describe("Test Keeper Plugin features", func() {
 			gock.New("https://api.github.com").
 				Get("/repos/bartoszmajsak/wfswarm-booster-pipeline-test/collaborators/bartoszmajsak-test/permission").
 				Reply(200).
-				Body(fromJson("test_fixtures/github_calls/collaborators_bartoszmajsak-test_permission.json"))
+				Body(fromJson("test_fixtures/github_calls/collaborators_external-user_permission.json"))
 
 			toHaveFailureState := func(statusPayload map[string]interface{}) (bool) {
 				return Expect(statusPayload["state"]).To(Equal("failure"))
