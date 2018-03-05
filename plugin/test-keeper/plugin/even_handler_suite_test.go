@@ -11,5 +11,5 @@ func TestTestKeeper(t *testing.T) {
 	RunSpecs(t, "Prow Event Handler Test Keeper Plugin Suite")
 	// TODO configure .gitignore or store in different folder
 	//junitReporter := reporters.NewJUnitReporter("junit.xml")
-	//RunSpecsWithDefaultAndCustomReporters(t, "Build Tool Detectors Suite", []Reporter{junitReporter})
+	//RunSpecsWithDefaultAndCustomReporters(t, "Prow Event Handler Test Keeper Plugin Suite", []Reporter{junitReporter})
 }
