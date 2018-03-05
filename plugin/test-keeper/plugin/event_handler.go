@@ -46,12 +46,12 @@ func (gh *GitHubTestEventsHandler) HandleEvent(eventType githubevents.EventType,
 		gh.Log.Info("Pull request received")
 		var event github.PullRequestEvent
 		if err := json.Unmarshal(payload, &event); err != nil {
-			gh.Log.Info("Failed while parsing "+githubevents.PullRequest+" payload: ", event)
+			gh.Log.Errorf("Failed while parsing '%q' event with payload: %q. Cause: %q", githubevents.PullRequest, event, err)
 			return err
 		}
 
 		if err := gh.handlePrEvent(&event); err != nil {
-			gh.Log.Error("Error handling "+githubevents.PullRequest+" event.", err)
+			gh.Log.Errorf("Error handling '%q' event with payload %q. Cause: %q", githubevents.PullRequest, event, err)
 			return err
 		}
 
@@ -59,12 +59,12 @@ func (gh *GitHubTestEventsHandler) HandleEvent(eventType githubevents.EventType,
 		gh.Log.Info("Issue comment event.")
 		var event github.IssueCommentEvent
 		if err := json.Unmarshal(payload, &event); err != nil {
-			gh.Log.Info("Failed while parsing "+githubevents.IssueComment+" payload: ", event)
+			gh.Log.Errorf("Failed while parsing '%q' event with payload: %q. Cause: %q", githubevents.IssueComment, event, err)
 			return err
 		}
 
 		if err := gh.handlePrComment(&event); err != nil {
-			gh.Log.Error("Error handling "+githubevents.IssueComment+" event.", err)
+			gh.Log.Errorf("Error handling '%q' event with payload %q. Cause: %q", githubevents.IssueComment, event, err)
 			return err
 		}
 
