@@ -46,23 +46,26 @@ func (gh *GitHubTestEventsHandler) HandleEvent(eventType githubevents.EventType,
 		gh.Log.Info("Pull request received")
 		var event github.PullRequestEvent
 		if err := json.Unmarshal(payload, &event); err != nil {
-			gh.Log.Info("JSON: ", event)
+			gh.Log.Info("Failed while parsing "+githubevents.PullRequest+" payload: ", event)
 			return err
 		}
 
 		if err := gh.handlePrEvent(&event); err != nil {
-			gh.Log.Error("Error handling event.")
+			gh.Log.Error("Error handling "+githubevents.PullRequest+" event.", err)
+			return err
 		}
 
 	case githubevents.IssueComment:
 		gh.Log.Info("Issue comment event.")
 		var event github.IssueCommentEvent
 		if err := json.Unmarshal(payload, &event); err != nil {
+			gh.Log.Info("Failed while parsing "+githubevents.IssueComment+" payload: ", event)
 			return err
 		}
 
 		if err := gh.handlePrComment(&event); err != nil {
-			gh.Log.Error("Error handling event.")
+			gh.Log.Error("Error handling "+githubevents.IssueComment+" event.", err)
+			return err
 		}
 
 	default:
