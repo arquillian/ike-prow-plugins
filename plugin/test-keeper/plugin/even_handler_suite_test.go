@@ -9,7 +9,4 @@ import (
 func TestTestKeeper(t *testing.T) {
 	RegisterFailHandler(Fail)
 	RunSpecs(t, "Prow Event Handler Test Keeper Plugin Suite")
-	// TODO configure .gitignore or store in different folder
-	//junitReporter := reporters.NewJUnitReporter("junit.xml")
-	//RunSpecsWithDefaultAndCustomReporters(t, "Prow Event Handler Test Keeper Plugin Suite", []Reporter{junitReporter})
 }
