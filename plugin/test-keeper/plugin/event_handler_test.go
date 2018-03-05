@@ -24,7 +24,7 @@ var _ = Describe("Test Keeper Plugin features", func() {
 
 	BeforeSuite(func() {
 		nullLogger := logrus.New()
-		nullLogger.Out = ioutil.Discard
+		nullLogger.Out = ioutil.Discard // TODO rethink if we want to discard logging entirely
 		logger = logrus.NewEntry(nullLogger)
 	})
 
@@ -47,7 +47,7 @@ var _ = Describe("Test Keeper Plugin features", func() {
 			gock.New("https://api.github.com").
 				Get("/repos/bartoszmajsak/wfswarm-booster-pipeline-test/pulls/2/files").
 				Reply(200).
-				Body(fromJson("test_fixtures/github_calls/pr_2_with_tests.json"))
+				Body(fromJson("test_fixtures/github_calls/prs/with_tests/changes.json"))
 
 			toHaveSuccessState := func(statusPayload map[string]interface{}) (bool) {
 				return Expect(statusPayload["state"]).To(Equal("success"))
@@ -59,7 +59,7 @@ var _ = Describe("Test Keeper Plugin features", func() {
 				Reply(201) // This way we implicitly verify that call happened after `HandleEvent` call
 
 			// when
-			handler.HandleEvent(githubevents.PullRequest, eventGUID, eventPayload("test_fixtures/github_calls/pr_2_opened_status.json"))
+			handler.HandleEvent(githubevents.PullRequest, eventGUID, eventPayload("test_fixtures/github_calls/prs/with_tests/status_opened.json"))
 
 			// then - implicit verification of /statuses call occurrence with proper payload
 		})
@@ -70,7 +70,7 @@ var _ = Describe("Test Keeper Plugin features", func() {
 			gock.New("https://api.github.com").
 				Get("/repos/bartoszmajsak/wfswarm-booster-pipeline-test/pulls/1/files").
 				Reply(200).
-				Body(fromJson("test_fixtures/github_calls/pr_1_without_tests.json"))
+				Body(fromJson("test_fixtures/github_calls/prs/without_tests/changes.json"))
 
 
 			toHaveFailureState := func(statusPayload map[string]interface{}) (bool) {
@@ -83,7 +83,7 @@ var _ = Describe("Test Keeper Plugin features", func() {
 				Reply(201) // This way we implicitly verify that call happened after `HandleEvent` call
 
 			// when
-			handler.HandleEvent(githubevents.PullRequest, eventGUID, eventPayload("test_fixtures/github_calls/pr_1_opened_status.json"))
+			handler.HandleEvent(githubevents.PullRequest, eventGUID, eventPayload("test_fixtures/github_calls/prs/without_tests/status_opened.json"))
 
 			// then - implicit verification of /statuses call occurrence with proper payload
 		})
@@ -94,7 +94,7 @@ var _ = Describe("Test Keeper Plugin features", func() {
 			gock.New("https://api.github.com").
 				Get("/repos/bartoszmajsak/wfswarm-booster-pipeline-test/pulls/1").
 				Reply(200).
-				Body(fromJson("test_fixtures/github_calls/pr_1_content.json"))
+				Body(fromJson("test_fixtures/github_calls/prs/without_tests/pr_details.json"))
 
 			gock.New("https://api.github.com").
 				Get("/repos/bartoszmajsak/wfswarm-booster-pipeline-test/collaborators/bartoszmajsak/permission").
@@ -111,7 +111,7 @@ var _ = Describe("Test Keeper Plugin features", func() {
 				Reply(201) // This way we implicitly verify that call happened after `HandleEvent` call
 
 			// when
-			handler.HandleEvent(githubevents.IssueComment, eventGUID, eventPayload("test_fixtures/github_calls/pr_1_skip_comment_by_admin.json"))
+			handler.HandleEvent(githubevents.IssueComment, eventGUID, eventPayload("test_fixtures/github_calls/prs/without_tests/skip_comment_by_admin.json"))
 
 			// then - implicit verification of /statuses call occurrence with proper payload
 		})
@@ -121,7 +121,7 @@ var _ = Describe("Test Keeper Plugin features", func() {
 			gock.New("https://api.github.com").
 				Get("/repos/bartoszmajsak/wfswarm-booster-pipeline-test/pulls/1").
 				Reply(200).
-				Body(fromJson("test_fixtures/github_calls/pr_1_content.json"))
+				Body(fromJson("test_fixtures/github_calls/prs/without_tests/pr_details.json"))
 
 			gock.New("https://api.github.com").
 				Get("/repos/bartoszmajsak/wfswarm-booster-pipeline-test/collaborators/bartoszmajsak-test/permission").
@@ -138,7 +138,7 @@ var _ = Describe("Test Keeper Plugin features", func() {
 				Reply(201) // This way we implicitly verify that call happened after `HandleEvent` call
 
 			// when
-			handler.HandleEvent(githubevents.IssueComment, eventGUID, eventPayload("test_fixtures/github_calls/pr_1_skip_comment_by_external.json"))
+			handler.HandleEvent(githubevents.IssueComment, eventGUID, eventPayload("test_fixtures/github_calls/prs/without_tests/skip_comment_by_external.json"))
 
 			// then - implicit verification of /statuses call occurrence with proper payload
 		})
