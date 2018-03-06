@@ -125,7 +125,46 @@ export DOCKER_REPO=$(oc get project --show-all=false -o name | cut -d'/' -f 2)
 NOTE: If you are using `zsh` you can take a look at link:https://github.com/kennethreitz/autoenv[autoenv] or
 link:https://direnv.net/[direnv] to automate this setup every time you access project's directory. Just make sure to add it to your global `.gitignore` to avoid sharing it through PRs (e.g. `git config --global core.excludesfile ~/.gitignore`).
 
-=== Testing hooks [[testing-hooks]]
+=== Development
+
+=== Building
+
+In order to compile the project simply execute `make build` target. This will compile, run tests and put binaries of each
+plugin in `/bin` directory in the root of the project.
+
+To deploy plugins use `make oc-apply`. This will build images, push them to the repository, generate deployments and apply
+them on the cluster. This target builds all plugins at once.
+
+IMPORTANT: You have to be logged in to the cluster first.
+
+==== Developing new plugin
+
+Besides creating new folders/packages in `plugin` folder you will have to register your plugin in the `Makefile`. Simply
+add its name to link:https://github.com/arquillian/ike-prow-plugins/blob/308909d88c7bee02b96236121fd25d4e9d08d88b/Makefile#L4[this list] and you should be good.
+
+IMPORTANT: By convention internal `PluginName`, the directory where the code is located and name of the service are assumed to
+be the same.
+
+==== Testing
+
+We use link:https://onsi.github.io/ginkgo/[Ginkgo] testing framework and link:https://onsi.github.io/gomega/[Gomega] assertion library for writing tests.
+
+Make sure you have both installed locally in order to execute tests from the CLI:
+
+[source,bash]
+----
+go get -u github.com/onsi/ginkgo/ginkgo
+go get -u github.com/onsi/gomega
+----
+
+==== Testing hints
+
+* To run all tests at once execute `ginkgo -r` on the root of the project.
+* `ginkgo watch -r` will watch on tests changes recursively starting from the directory the command was invoked. It will re-run the tests whenever change in the code occurs
+* In order to execute one test rename `It` function to `FIt`. Ginkgo runner will only execute given test (focused) instead of the whole test suite. This also works with `Context` and `Describe` blocks.
+* To exclude prefix any of the blocks with `X`.
+
+==== Testing hooks [[testing-hooks]]
 
 You can consume GitHub events through webhook pointing to your local cluster. For this purpose use
 link:http://www.ultrahook.com/[`ultrahook`]. After registering your own API key simply run following command and you
@@ -140,21 +179,3 @@ NOTE: If not done before add ultrahook URL as payload URL for webhook configurat
 
 Having this set up you will start seeing events triggered by your actions in the repository and
 corresponding plugins reacting on them. Have a look at pods logs to verify if everything is working expected.
-
-=== Building
-
-In order to compile the project simply execute `make build` target. This will compile, run tests and put binaries of each
-plugin in `/bin` directory in the root of the project.
-
-To deploy plugins use `make oc-apply`. This will build images, push them to the repository, generate deployments and apply
-them on the cluster. This target builds all plugins at once.
-
-IMPORTANT: You have to be logged in to the cluster first.
-
-=== Developing new plugin
-
-Besides creating new folders/packages in `plugin` folder you will have to register your plugin in the `Makefile`. Simply
-add its name to link:https://github.com/arquillian/ike-prow-plugins/blob/308909d88c7bee02b96236121fd25d4e9d08d88b/Makefile#L4[this list] and you should be good.
-
-IMPORTANT: By convention internal `PluginName`, the directory where the code is located and name of the service are assumed to
-be the same.

@@ -43,8 +43,12 @@ up: ## Updates all dependencies defined for glide
 .PHONY: compile
 compile: up $(BINARIES) ## Compiles all plugins and puts them in the bin/ folder
 
+.PHONY: test
+test:
+	ginkgo -r
+
 .PHONY: build
-build: compile check
+build: compile test check
 
 # Build configuration
 BUILD_TIME=$(shell date -u '+%Y-%m-%dT%H:%M:%SZ')
