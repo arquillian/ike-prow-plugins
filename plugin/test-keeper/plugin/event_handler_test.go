@@ -5,7 +5,6 @@ import (
 	. "github.com/onsi/gomega"
 	"github.com/arquillian/ike-prow-plugins/plugin/test-keeper/plugin"
 	"gopkg.in/h2non/gock.v1"
-	"github.com/sirupsen/logrus"
 	"github.com/arquillian/ike-prow-plugins/plugin/github"
 	"os"
 	"io/ioutil"
@@ -20,14 +19,6 @@ const eventGUID = "event-guid"
 
 var _ = Describe("Test Keeper Plugin features", func() {
 
-	var logger *logrus.Entry
-
-	BeforeSuite(func() {
-		nullLogger := logrus.New()
-		nullLogger.Out = ioutil.Discard // TODO rethink if we want to discard logging entirely
-		logger = logrus.NewEntry(nullLogger)
-	})
-
 	Context("Pull Request handling", func() {
 
 		var handler *plugin.GitHubTestEventsHandler
@@ -38,7 +29,7 @@ var _ = Describe("Test Keeper Plugin features", func() {
 			client := github.NewClient(nil) // TODO with hoverfly/go-vcr we might want to use tokens instead to capture real traffic
 			handler = &plugin.GitHubTestEventsHandler{
 				Client: client,
-				Log:    logger,
+				Log:    Logger,
 			}
 		})
 

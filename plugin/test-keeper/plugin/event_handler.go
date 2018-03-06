@@ -83,12 +83,12 @@ func (gh *GitHubTestEventsHandler) handlePrEvent(prEvent *github.PullRequestEven
 	return gh.checkTests(gh.createGitPR(prEvent.Repo, prEvent.PullRequest))
 }
 
-func (gh *GitHubTestEventsHandler) checkTests(pr *scm.CommitScmService) error {
+func (gh *GitHubTestEventsHandler) checkTests(pr scm.CommitScmService) error {
 	checker := TestChecker{
-		log:           gh.Log,
-		commitService: pr,
+		Log:           gh.Log,
+		CommitService: pr,
 	}
-	ok, e := checker.isAnyTestPresent()
+	ok, e := checker.IsAnyTestPresent()
 	if e != nil {
 		gh.Log.Fatal(e)
 		return e
@@ -149,6 +149,6 @@ func (gh *GitHubTestEventsHandler) handlePrComment(prComment *github.IssueCommen
 	return nil
 }
 
-func (gh *GitHubTestEventsHandler) createGitPR(repo *github.Repository, pullRequest *github.PullRequest) *scm.CommitScmService {
+func (gh *GitHubTestEventsHandler) createGitPR(repo *github.Repository, pullRequest *github.PullRequest) scm.CommitScmService {
 	return scm.CreateScmCommitService(gh.Client, gh.Log, repo, *pullRequest.Head.SHA)
 }

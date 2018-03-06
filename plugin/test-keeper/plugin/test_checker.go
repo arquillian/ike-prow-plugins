@@ -5,32 +5,31 @@ import (
 	"github.com/arquillian/ike-prow-plugins/scm"
 )
 
-
 // TestChecker is using plugin.TestMatcher to figure out if the given commit affects any test file
 // The plugin.TestMatcher is loaded either from test-keeper.yaml file or from set of default matchers based on the languages using in the related project
 type TestChecker struct {
-	log           *logrus.Entry
-	commitService *scm.CommitScmService
+	Log           *logrus.Entry
+	CommitService scm.CommitScmService
 }
 
 const configFile = "test-keeper.yaml"
 
-// isAnyTestPresent checks if a commit affects any test file
-func (checker *TestChecker) isAnyTestPresent() (bool, error) {
+// IsAnyTestPresent checks if a commit affects any test file
+func (checker *TestChecker) IsAnyTestPresent() (bool, error) {
 
 	matchers := checker.loadMatchers()
 
-	checker.log.Infof("Checking for tests")
-	files, e := checker.commitService.GetAffectedFiles()
+	checker.Log.Infof("Checking for tests")
+	files, e := checker.CommitService.GetAffectedFiles()
 	if e != nil {
 		return false, e
 	}
 
 	for _, matcher := range matchers {
 		for _, file := range files {
-			checker.log.Infof("%q: %q", file.Name, file.Status)
+			checker.Log.Infof("%q: %q", file.Name, file.Status)
 
-			if matcher.isTest(file.Name) {
+			if matcher.IsTest(file.Name) {
 				return true, nil
 			}
 		}
@@ -42,20 +41,20 @@ func (checker *TestChecker) isAnyTestPresent() (bool, error) {
 func (checker *TestChecker) loadMatchers() []TestMatcher {
 	var matchers []TestMatcher
 
-	config := checker.commitService.GetRawFile(configFile)
+	config := checker.CommitService.GetRawFile(configFile)
 	if config != nil {
-		matcher := loadMatcherFromConfig(checker.log, config)
+		matcher := LoadMatcherFromConfig(checker.Log, config)
 		if matcher.TestRegex != "" {
 			matchers = append(matchers, matcher)
 		}
 	}
 
 	if len(matchers) == 0 {
-		languages, e := checker.commitService.RepoService.GetRepoLanguages()
+		languages, e := checker.CommitService.GetRepoService().GetRepoLanguages()
 		if e != nil {
-			matchers = append(matchers, defaultMatcher)
+			matchers = append(matchers, DefaultMatcher)
 		} else {
-			matchers = loadTestMatchers(languages)
+			matchers = LoadTestMatchers(languages)
 		}
 	}
 	return matchers
