@@ -147,7 +147,7 @@ be the same.
 
 ==== Testing
 
-We use link:https://onsi.github.io/ginkgo/[Ginkgo] testing framework and link:link:https://onsi.github.io/gomega/[Gomega] assertion library for writing tests.
+We use link:https://onsi.github.io/ginkgo/[Ginkgo] testing framework and link:https://onsi.github.io/gomega/[Gomega] assertion library for writing tests.
 
 Make sure you have both installed locally in order to execute tests from the CLI:
 
@@ -161,7 +161,7 @@ go get -u github.com/onsi/gomega
 
 * To run all tests at once execute `ginkgo -r` on the root of the project.
 * `ginkgo watch -r` will watch on tests changes recursively starting from the directory the command was invoked. It will re-run the tests whenever change in the code occurs
-* In order to execute on test rename `It` function to `FIt`. Ginkgo runner will only execute given test (focused) instead of the whole test suite. This also works with `Context` and `Describe` blocks.
+* In order to execute one test rename `It` function to `FIt`. Ginkgo runner will only execute given test (focused) instead of the whole test suite. This also works with `Context` and `Describe` blocks.
 * To exclude prefix any of the blocks with `X`.
 
 ==== Testing hooks [[testing-hooks]]
