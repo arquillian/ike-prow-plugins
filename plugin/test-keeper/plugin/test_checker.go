@@ -57,9 +57,6 @@ func (checker *TestChecker) loadMatchers() []TestMatcher {
 		} else {
 			matchers = loadTestMatchers(languages)
 		}
-		logrus.Info("Using test matchers: ", matchers)
-	} else {
-		logrus.Info("Using test matcher from file: ", matchers)
 	}
 	return matchers
 }
