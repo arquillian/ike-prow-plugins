@@ -90,7 +90,7 @@ func (gh *GitHubTestEventsHandler) checkTests(pr scm.CommitScmService) error {
 	}
 	ok, e := checker.IsAnyTestPresent()
 	if e != nil {
-		gh.Log.Fatal(e)
+		gh.Log.Error(e)
 		return e
 	}
 	if ok {
