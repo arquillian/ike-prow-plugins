@@ -50,8 +50,10 @@ var _ = Describe("Test Keeper Plugin features", func() {
 				SetMatcher(ExpectStatusCall(toHaveSuccessState)).
 				Reply(201) // This way we implicitly verify that call happened after `HandleEvent` call
 
+			statusPayload := LoadFromFile("test_fixtures/github_calls/prs/with_tests/status_opened.json")
+
 			// when
-			err := handler.HandleEvent(githubevents.PullRequest, eventGUID, EventPayload("test_fixtures/github_calls/prs/with_tests/status_opened.json"))
+			err := handler.HandleEvent(githubevents.PullRequest, eventGUID, statusPayload)
 
 			// then - implicit verification of /statuses call occurrence with proper payload
 			Expect(err).To(BeNil())
@@ -74,8 +76,10 @@ var _ = Describe("Test Keeper Plugin features", func() {
 				SetMatcher(ExpectStatusCall(toHaveFailureState)).
 				Reply(201) // This way we implicitly verify that call happened after `HandleEvent` call
 
+			statusPayload := LoadFromFile("test_fixtures/github_calls/prs/without_tests/status_opened.json")
+
 			// when
-			err := handler.HandleEvent(githubevents.PullRequest, eventGUID, EventPayload("test_fixtures/github_calls/prs/without_tests/status_opened.json"))
+			err := handler.HandleEvent(githubevents.PullRequest, eventGUID, statusPayload)
 
 			// then - implicit verification of /statuses call occurrence with proper payload
 			Expect(err).To(BeNil())
@@ -103,8 +107,10 @@ var _ = Describe("Test Keeper Plugin features", func() {
 				SetMatcher(ExpectStatusCall(toHaveSuccessState)).
 				Reply(201) // This way we implicitly verify that call happened after `HandleEvent` call
 
+			statusPayload := LoadFromFile("test_fixtures/github_calls/prs/without_tests/skip_comment_by_admin.json")
+
 			// when
-			err := handler.HandleEvent(githubevents.IssueComment, eventGUID, EventPayload("test_fixtures/github_calls/prs/without_tests/skip_comment_by_admin.json"))
+			err := handler.HandleEvent(githubevents.IssueComment, eventGUID, statusPayload)
 
 			// then - implicit verification of /statuses call occurrence with proper payload
 			Expect(err).To(BeNil())
@@ -131,8 +137,10 @@ var _ = Describe("Test Keeper Plugin features", func() {
 				SetMatcher(ExpectStatusCall(toHaveFailureState)).
 				Reply(201) // This way we implicitly verify that call happened after `HandleEvent` call
 
+			statusPayload := LoadFromFile("test_fixtures/github_calls/prs/without_tests/skip_comment_by_external.json")
+
 			// when
-			err := handler.HandleEvent(githubevents.IssueComment, eventGUID, EventPayload("test_fixtures/github_calls/prs/without_tests/skip_comment_by_external.json"))
+			err := handler.HandleEvent(githubevents.IssueComment, eventGUID, statusPayload)
 
 			// then - implicit verification of /statuses call occurrence with proper payload
 			Expect(err).To(BeNil())

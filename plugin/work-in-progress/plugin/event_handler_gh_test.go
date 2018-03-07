@@ -43,8 +43,10 @@ var _ = Describe("Test Keeper Plugin features", func() {
 				SetMatcher(ExpectStatusCall(toHaveSuccessState)).
 				Reply(201) // This way we implicitly verify that call happened after `HandleEvent` call
 
+			statusPayload := LoadFromFile("test_fixtures/github_calls/ready_pr_opened.json")
+
 			// when
-			err := handler.HandleEvent(githubevents.PullRequest, "random", EventPayload("test_fixtures/github_calls/ready_pr_opened.json"))
+			err := handler.HandleEvent(githubevents.PullRequest, "random", statusPayload)
 
 			// then - implicit verification of /statuses call occurrence with proper payload
 			Expect(err).To(BeNil())
@@ -61,8 +63,10 @@ var _ = Describe("Test Keeper Plugin features", func() {
 				SetMatcher(ExpectStatusCall(toHaveFailureState)).
 				Reply(201) // This way we implicitly verify that call happened after `HandleEvent` call
 
+			statusPayload := LoadFromFile("test_fixtures/github_calls/wip_pr_opened.json")
+
 			// when
-			err := handler.HandleEvent(githubevents.PullRequest, "random", EventPayload("test_fixtures/github_calls/wip_pr_opened.json"))
+			err := handler.HandleEvent(githubevents.PullRequest, "random", statusPayload)
 
 			// then - implicit verification of /statuses call occurrence with proper payload
 			Expect(err).To(BeNil())
@@ -79,8 +83,10 @@ var _ = Describe("Test Keeper Plugin features", func() {
 				SetMatcher(ExpectStatusCall(toHaveFailureState)).
 				Reply(201) // This way we implicitly verify that call happened after `HandleEvent` call
 
+			statusPayload := LoadFromFile("test_fixtures/github_calls/pr_edited_wip_added.json")
+
 			// when
-			err := handler.HandleEvent(githubevents.PullRequest, "random", EventPayload("test_fixtures/github_calls/pr_edited_wip_added.json"))
+			err := handler.HandleEvent(githubevents.PullRequest, "random", statusPayload)
 
 			// then - implicit verification of /statuses call occurrence with proper payload
 			Expect(err).To(BeNil())
@@ -98,8 +104,10 @@ var _ = Describe("Test Keeper Plugin features", func() {
 				SetMatcher(ExpectStatusCall(toHaveSuccessState)).
 				Reply(201) // This way we implicitly verify that call happened after `HandleEvent` call
 
+			statusPayload := LoadFromFile("test_fixtures/github_calls/pr_edited_wip_removed.json")
+
 			// when
-			err := handler.HandleEvent(githubevents.PullRequest, "random", EventPayload("test_fixtures/github_calls/pr_edited_wip_removed.json"))
+			err := handler.HandleEvent(githubevents.PullRequest, "random", statusPayload)
 
 			// then - implicit verification of /statuses call occurrence with proper payload
 			Expect(err).To(BeNil())
