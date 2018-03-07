@@ -66,8 +66,8 @@ var _ = Describe("Test Checker features", func() {
 			bool, err := checker.IsAnyTestPresent()
 
 			// then
-			Expect(err).Should(BeNil())
-			Expect(bool).Should(BeTrue())
+			Expect(err).To(BeNil())
+			Expect(bool).To(BeTrue())
 		})
 
 		It("should return false when no test file is affected within a commit", func() {
@@ -84,8 +84,8 @@ var _ = Describe("Test Checker features", func() {
 			bool, err := checker.IsAnyTestPresent()
 
 			// then
-			Expect(err).Should(BeNil())
-			Expect(bool).Should(BeFalse())
+			Expect(err).To(BeNil())
+			Expect(bool).To(BeFalse())
 		})
 
 		It("should return true when test file is matched using custom config", func() {
@@ -101,8 +101,8 @@ var _ = Describe("Test Checker features", func() {
 			bool, err := checker.IsAnyTestPresent()
 
 			// then
-			Expect(err).Should(BeNil())
-			Expect(bool).Should(BeTrue())
+			Expect(err).To(BeNil())
+			Expect(bool).To(BeTrue())
 		})
 
 		It("should return false when test file is not matched using custom config", func() {
@@ -118,8 +118,8 @@ var _ = Describe("Test Checker features", func() {
 			bool, err := checker.IsAnyTestPresent()
 
 			// then
-			Expect(err).Should(BeNil())
-			Expect(bool).Should(BeFalse())
+			Expect(err).To(BeNil())
+			Expect(bool).To(BeFalse())
 		})
 	})
 

@@ -53,7 +53,7 @@ var _ = Describe("Test Keeper Plugin features", func() {
 			err := handler.HandleEvent(githubevents.PullRequest, eventGUID, eventPayload("test_fixtures/github_calls/prs/with_tests/status_opened.json"))
 
 			// then - implicit verification of /statuses call occurrence with proper payload
-			Expect(err).Should(BeNil())
+			Expect(err).To(BeNil())
 		})
 
 		It("should block newly created pull request when no tests are included", func() {
@@ -77,7 +77,7 @@ var _ = Describe("Test Keeper Plugin features", func() {
 			err := handler.HandleEvent(githubevents.PullRequest, eventGUID, eventPayload("test_fixtures/github_calls/prs/without_tests/status_opened.json"))
 
 			// then - implicit verification of /statuses call occurrence with proper payload
-			Expect(err).Should(BeNil())
+			Expect(err).To(BeNil())
 		})
 
 		It("should skip test existence check when "+plugin.SkipComment+" command is used by admin user", func() {
@@ -106,7 +106,7 @@ var _ = Describe("Test Keeper Plugin features", func() {
 			err := handler.HandleEvent(githubevents.IssueComment, eventGUID, eventPayload("test_fixtures/github_calls/prs/without_tests/skip_comment_by_admin.json"))
 
 			// then - implicit verification of /statuses call occurrence with proper payload
-			Expect(err).Should(BeNil())
+			Expect(err).To(BeNil())
 		})
 
 		It("should ignore "+plugin.SkipComment+" when used by non-admin user", func() {
@@ -134,7 +134,7 @@ var _ = Describe("Test Keeper Plugin features", func() {
 			err := handler.HandleEvent(githubevents.IssueComment, eventGUID, eventPayload("test_fixtures/github_calls/prs/without_tests/skip_comment_by_external.json"))
 
 			// then - implicit verification of /statuses call occurrence with proper payload
-			Expect(err).Should(BeNil())
+			Expect(err).To(BeNil())
 		})
 
 	})
