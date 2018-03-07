@@ -2,7 +2,6 @@ package plugin
 
 import (
 	"github.com/sirupsen/logrus"
-	"regexp"
 	"fmt"
 	"github.com/arquillian/ike-prow-plugins/plugin/utils"
 	"github.com/google/go-github/github"
@@ -10,6 +9,7 @@ import (
 	"context"
 	"strings"
 	"github.com/arquillian/ike-prow-plugins/plugin/github"
+	"github.com/arquillian/ike-prow-plugins/scm"
 )
 
 // GitHubTestEventsHandler is the event handler for the plugin.
@@ -80,36 +80,24 @@ func (gh *GitHubTestEventsHandler) handlePrEvent(prEvent *github.PullRequestEven
 		return nil
 	}
 
-	return gh.checkTests(prEvent.Repo.Owner.Login, prEvent.Repo.Name, prEvent.PullRequest.Head.SHA, prEvent.Number)
+	return gh.checkTests(gh.createGitPR(prEvent.Repo, prEvent.PullRequest))
 }
 
-// TODO refactor to its own testable component
-func (gh *GitHubTestEventsHandler) checkTests(org, name, sha *string, prNumber *int) error {
-
-	files, _, e := gh.Client.PullRequests.ListFiles(context.Background(), *org, *name, *prNumber, nil)
+func (gh *GitHubTestEventsHandler) checkTests(pr scm.CommitScmService) error {
+	checker := TestChecker{
+		Log:           gh.Log,
+		CommitService: pr,
+	}
+	ok, e := checker.IsAnyTestPresent()
 	if e != nil {
-		gh.Log.Fatal(e)
+		gh.Log.Error(e)
 		return e
 	}
-
-	var status = "failure"
-	var reason = "No tests in this PR :("
-	for _, file := range files {
-		// TODO status must be added or changed
-		if regexp.MustCompile(`.+(IT\.java|Test.java)$`).MatchString(*file.Filename) {
-			status = "success"
-			reason = "There are some tests :)"
-		}
+	if ok {
+		pr.Success("There are some tests :)")
+	} else {
+		pr.Fail("No tests in this PR :(")
 	}
-
-	if _, _, err := gh.Client.Repositories.CreateStatus(context.Background(), *org, *name, *sha, &github.RepoStatus{
-		State:       &status,
-		Context:     utils.String("alien-ike/prow-spike"),
-		Description: &reason,
-	}); err != nil {
-		gh.Log.Info("Error handling event.", err)
-	}
-
 	return nil
 }
 
@@ -148,21 +136,19 @@ func (gh *GitHubTestEventsHandler) handlePrComment(prComment *github.IssueCommen
 		gh.Log.Fatal(err)
 		return err
 	}
-	sha := pullRequest.Head.SHA
+
+	pr := gh.createGitPR(prComment.Repo, pullRequest)
 
 	if comment == SkipComment && *prComment.Action == "deleted" {
-		return gh.checkTests(org, name, sha, prNumber)
+		return gh.checkTests(pr)
 	}
 
 	// TODO add comment mentioning lack of tests
-
-	if _, _, err := gh.Client.Repositories.CreateStatus(context.Background(), *org, *name, *sha, &github.RepoStatus{
-		State:       utils.String("success"),
-		Context:     utils.String("alien-ike/prow-spike"),
-		Description: utils.String(fmt.Sprintf("PR is fine without tests says @%s", *sender)),
-	}); err != nil {
-		gh.Log.Info("Error handling event.", err)
-	}
+	pr.Success(fmt.Sprintf("PR is fine without tests says @%s", *sender))
 
 	return nil
+}
+
+func (gh *GitHubTestEventsHandler) createGitPR(repo *github.Repository, pullRequest *github.PullRequest) scm.CommitScmService {
+	return scm.CreateScmCommitService(gh.Client, gh.Log, repo, *pullRequest.Head.SHA)
 }
