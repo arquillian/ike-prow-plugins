@@ -14,7 +14,7 @@ import (
 
 const eventGUID = "event-guid"
 
-var _ = Describe("WIP Plugin features", func() {
+var _ = Describe("Test Keeper Plugin features", func() {
 
 	Context("Pull Request handling", func() {
 

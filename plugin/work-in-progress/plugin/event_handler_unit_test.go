@@ -11,7 +11,7 @@ import (
 	"github.com/google/go-github/github"
 )
 
-var _ = Describe("Test Keeper Plugin features", func() {
+var _ = Describe("Work-in-progress Plugin features", func() {
 
 	Context("Title verifier", func() {
 
