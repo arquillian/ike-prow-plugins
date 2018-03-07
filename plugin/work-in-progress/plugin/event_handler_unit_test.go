@@ -36,7 +36,7 @@ var _ = Describe("Work-in-progress Plugin features", func() {
 				Expect(handler.IsWorkInProgress(&title)).To(BeTrue())
 			},
 			Entry("Uppercase WIP prefix", "WIP fix(#1): off-by one bug"),
-			Entry("lowercase WIP prefix", "wip fix(#1): off-by one bug"),
+			Entry("Lowercase WIP prefix", "wip fix(#1): off-by one bug"),
 			Entry("Wip prefix", "Wip fix(#1): off-by one bug"),
 		)
 
@@ -45,7 +45,7 @@ var _ = Describe("Work-in-progress Plugin features", func() {
 				Expect(handler.IsWorkInProgress(&title)).To(BeFalse())
 			},
 			Entry("regular PR title", "fix(#1): off-by one bug"),
-			Entry("not a regular wip prefix", "wip-fix off-by one bug"),
+			Entry("not a supported wip prefix", "wip-fix off-by one bug"),
 			Entry("empty title", ""),
 			Entry("nil title", nil),
 		)

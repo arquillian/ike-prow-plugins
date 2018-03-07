@@ -44,9 +44,10 @@ var _ = Describe("Test Keeper Plugin features", func() {
 				Reply(201) // This way we implicitly verify that call happened after `HandleEvent` call
 
 			// when
-			handler.HandleEvent(githubevents.PullRequest, "random", EventPayload("test_fixtures/github_calls/ready_pr_opened.json"))
+			err := handler.HandleEvent(githubevents.PullRequest, "random", EventPayload("test_fixtures/github_calls/ready_pr_opened.json"))
 
 			// then - implicit verification of /statuses call occurrence with proper payload
+			Expect(err).To(BeNil())
 		})
 
 		It("should mark opened PR as work-in-progress when prefixed with WIP", func() {
@@ -61,9 +62,10 @@ var _ = Describe("Test Keeper Plugin features", func() {
 				Reply(201) // This way we implicitly verify that call happened after `HandleEvent` call
 
 			// when
-			handler.HandleEvent(githubevents.PullRequest, "random", EventPayload("test_fixtures/github_calls/wip_pr_opened.json"))
+			err := handler.HandleEvent(githubevents.PullRequest, "random", EventPayload("test_fixtures/github_calls/wip_pr_opened.json"))
 
 			// then - implicit verification of /statuses call occurrence with proper payload
+			Expect(err).To(BeNil())
 		})
 
 		It("should mark status as failed (thus block PR merge) when title updated to contain WIP", func() {
@@ -78,9 +80,10 @@ var _ = Describe("Test Keeper Plugin features", func() {
 				Reply(201) // This way we implicitly verify that call happened after `HandleEvent` call
 
 			// when
-			handler.HandleEvent(githubevents.PullRequest, "random", EventPayload("test_fixtures/github_calls/pr_edited_wip_added.json"))
+			err := handler.HandleEvent(githubevents.PullRequest, "random", EventPayload("test_fixtures/github_calls/pr_edited_wip_added.json"))
 
 			// then - implicit verification of /statuses call occurrence with proper payload
+			Expect(err).To(BeNil())
 
 		})
 
@@ -96,9 +99,10 @@ var _ = Describe("Test Keeper Plugin features", func() {
 				Reply(201) // This way we implicitly verify that call happened after `HandleEvent` call
 
 			// when
-			handler.HandleEvent(githubevents.PullRequest, "random", EventPayload("test_fixtures/github_calls/pr_edited_wip_removed.json"))
+			err := handler.HandleEvent(githubevents.PullRequest, "random", EventPayload("test_fixtures/github_calls/pr_edited_wip_removed.json"))
 
 			// then - implicit verification of /statuses call occurrence with proper payload
+			Expect(err).To(BeNil())
 		})
 
 	})
