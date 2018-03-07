@@ -7,7 +7,7 @@ import (
 	"github.com/arquillian/ike-prow-plugins/plugin/github"
 	"encoding/json"
 	"github.com/arquillian/ike-prow-plugins/plugin/utils"
-	"context"
+	"github.com/arquillian/ike-prow-plugins/scm"
 )
 
 // ProwPluginName is an external prow plugin name used to register this service
@@ -51,19 +51,11 @@ func (gh *GitHubWIPPRHandler) HandleEvent(eventType githubevents.EventType, even
 			return nil
 		}
 
-		status := "success"
-		reason := "PR is ready for review and merge"
+		head := scm.CreateScmCommitService(gh.Client, gh.Log, event.Repo, *event.PullRequest.Head.SHA)
 		if gh.IsWorkInProgress(event.PullRequest.Title) {
-			status = "failure"
-			reason = "PR is in progress and can't be merged yet. You might want to wait with review as well"
-		}
-
-		if _, _, err := gh.Client.Repositories.CreateStatus(context.Background(), *event.Repo.Owner.Login, *event.Repo.Name, *event.PullRequest.Head.SHA, &github.RepoStatus{
-			State:       &status,
-			Context:     utils.String("alien-ike/" + ProwPluginName),
-			Description: &reason,
-		}); err != nil {
-			gh.Log.Info("Error handling event.", err)
+			head.Fail("PR is in progress and can't be merged yet. You might want to wait with review as well")
+		} else {
+			head.Success("PR is ready for review and merge")
 		}
 
 	default:
