@@ -20,14 +20,10 @@ var _ = Describe("Work-in-progress Plugin features", func() {
 		BeforeEach(func() {
 			defer gock.Off()
 
-			nullLogger := logrus.New()
-			nullLogger.Out = ioutil.Discard
-			logger := logrus.NewEntry(nullLogger)
-
 			client := github.NewClient(nil) // TODO with hoverfly/go-vcr we might want to use tokens instead to capture real traffic
 			handler = &plugin.GitHubWIPPRHandler{
 				Client: client,
-				Log:    logger,
+				Log:    Logger,
 			}
 		})
 
