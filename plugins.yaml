@@ -6,3 +6,4 @@ external_plugins:
   bartoszmajsak/wfswarm-booster-pipeline-test:
   - name: test-keeper
   - name: pr-sanitizer
+  - name: work-in-progress

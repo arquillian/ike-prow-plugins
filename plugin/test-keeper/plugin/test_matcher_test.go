@@ -6,6 +6,7 @@ import (
 	"fmt"
 	. "github.com/arquillian/ike-prow-plugins/plugin/test-keeper/plugin"
 	"github.com/onsi/ginkgo/extensions/table"
+	"github.com/arquillian/ike-prow-plugins/plugin/internal/test"
 )
 
 var _ = Describe("Test Matcher features", func() {
@@ -14,7 +15,7 @@ var _ = Describe("Test Matcher features", func() {
 
 		It("should load test matcher from config", func() {
 			// when
-			matcher := LoadMatcherFromConfig(Logger, []byte("tests_pattern: .*my*.|test.go|pattern.js"))
+			matcher := LoadMatcherFromConfig(test.CreateNullLogger(), []byte("tests_pattern: .*my*.|test.go|pattern.js"))
 
 			// then
 			Expect(matcher.TestRegex).To(Equal(".*my*.|test.go|pattern.js"))
