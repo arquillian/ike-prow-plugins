@@ -21,12 +21,12 @@ var DefaultMatcher = TestMatcher{
 
 // JavaMatcher matches Java test files
 var JavaMatcher = TestMatcher{
-	TestRegex: `(((Test[^/]*)|IT|Test(x)?|TestCase)\.java)$`,
+	TestRegex: `(Test[^/]*|IT|TestCase)\.java`,
 }
 
 // GoMatcher matches Go test files
 var GoMatcher = TestMatcher{
-	TestRegex: `(_test.go)$`,
+	TestRegex: `_test\.go$`,
 }
 
 // JavaScriptMatcher matches JavaScript test files
@@ -41,12 +41,12 @@ var TypeScriptMatcher = TestMatcher{
 
 // PythonMatcher matches Python test files
 var PythonMatcher = TestMatcher{
-	TestRegex: `(test[^/]*|test).py$`,
+	TestRegex: `test[^/]*\.py$`,
 }
 
 // GroovyMatcher matches Groovy test files. The regex is similar to the one in JavaMatcher
 var GroovyMatcher = TestMatcher{
-	TestRegex: `(((Test[^/]*)|IT|Test(x)?|TestCase)\.groovy)$`,
+	TestRegex: `(Test[^/]*|IT|TestCase)\.groovy$`,
 }
 
 var langMatchers = map[string]TestMatcher{
