@@ -50,10 +50,6 @@ var _ = Describe("Work-in-progress Plugin features", func() {
 			Entry("nil title", nil),
 		)
 
-		It("should not recognize PR as work-in-progress if title doesn't start with WIP", func() {
-
-		})
-
 	})
 
 })
