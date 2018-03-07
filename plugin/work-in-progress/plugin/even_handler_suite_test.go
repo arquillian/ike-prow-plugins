@@ -6,7 +6,7 @@ import (
 	. "github.com/onsi/gomega"
 )
 
-func TestTestKeeper(t *testing.T) {
+func TestSuiteWorkInProgressPlugin(t *testing.T) {
 	RegisterFailHandler(Fail)
-	RunSpecs(t, "Prow Event Handler WIP Plugin Suite")
+	RunSpecs(t, "Prow Event Handler Work-in-progress Plugin Suite")
 }
