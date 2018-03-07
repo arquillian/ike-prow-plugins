@@ -45,7 +45,7 @@ var _ = Describe("Work-in-progress Plugin features", func() {
 				Expect(handler.IsWorkInProgress(&title)).To(BeFalse())
 			},
 			Entry("regular PR title", "fix(#1): off-by one bug"),
-			Entry("wip", "wip-fix off-by one bug"),
+			Entry("not a regular wip prefix", "wip-fix off-by one bug"),
 			Entry("empty title", ""),
 			Entry("nil title", nil),
 		)
