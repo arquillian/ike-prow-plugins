@@ -54,12 +54,12 @@ var _ = Describe("Test Keeper Plugin features", func() {
 		})
 
 		It("should block newly created pull request when no tests are included", func() {
-
 			// given
 			gock.New("https://api.github.com").
 				Get("/repos/bartoszmajsak/wfswarm-booster-pipeline-test/commits/5d6e9b25da90edfc19f488e595e0645c081c1575").
 				Reply(200).
 				Body(FromJson("test_fixtures/github_calls/prs/without_tests/changes.json"))
+
 			toHaveFailureState := func(statusPayload map[string]interface{}) (bool) {
 				return Expect(statusPayload["state"]).To(Equal("failure"))
 			}
@@ -79,7 +79,6 @@ var _ = Describe("Test Keeper Plugin features", func() {
 		})
 
 		It("should skip test existence check when "+plugin.SkipComment+" command is used by admin user", func() {
-
 			// given
 			gock.New("https://api.github.com").
 				Get("/repos/bartoszmajsak/wfswarm-booster-pipeline-test/pulls/1").
