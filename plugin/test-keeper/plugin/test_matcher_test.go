@@ -5,6 +5,7 @@ import (
 	. "github.com/onsi/gomega"
 	"fmt"
 	. "github.com/arquillian/ike-prow-plugins/plugin/test-keeper/plugin"
+	"github.com/onsi/ginkgo/extensions/table"
 )
 
 var _ = Describe("Test Matcher features", func() {
@@ -42,90 +43,112 @@ var _ = Describe("Test Matcher features", func() {
 
 	Context("Predefined matchers regex check", func() {
 
-		It("DefaultMatcher should return true for files that contains word \"test\"", func() {
+		table.DescribeTable("DefaultMatcher should return true for files that contains word \"test\"",
+			func(matcher TestMatcher, file string, shouldMatch bool) {
+				Expect(matcher.IsTest(file)).To(Equal(shouldMatch))
+			},
 			// when non test file then false
-			verifyThatMatcherMatchesCorrectFile(JavaMatcher, "/path/to/MyAssertion.java", false)
-			verifyThatMatcherMatchesCorrectFile(JavaMatcher, "/path/test/MyAssertions.java", false)
+			createEntry(DefaultMatcher, "/path/to/MyAssertion.java", false),
 
 			// when test file then true
-			verifyThatMatcherMatchesCorrectFile(JavaMatcher, "/path/test/TestAnything.java", true)
-			verifyThatMatcherMatchesCorrectFile(JavaMatcher, "/path/test/MyTest.java", true)
-			verifyThatMatcherMatchesCorrectFile(JavaMatcher, "/path/test/MyTests.java", true)
-			verifyThatMatcherMatchesCorrectFile(JavaMatcher, "/path/test/MyTestCase.java", true)
-		})
+			createEntry(DefaultMatcher, "/path/test/TestAnything.java", true),
+			createEntry(DefaultMatcher, "/path/to/my_test.go", true),
+			createEntry(DefaultMatcher, "/path/to/my.test.js", true),
+			createEntry(DefaultMatcher, "/path/test/any.test.tsx", true),
+			createEntry(DefaultMatcher, "/path/to/my_test.py", true),
+			createEntry(DefaultMatcher, "/path/test/MyTestCase.groovy", true),
+		)
 
-		It("JavaMatcher should return true only when matches Java test file", func() {
+		table.DescribeTable("JavaMatcher should return true only when matches Java test file",
+			func(matcher TestMatcher, file string, shouldMatch bool) {
+				Expect(matcher.IsTest(file)).To(Equal(shouldMatch))
+			},
 			// when non test file then false
-			verifyThatMatcherMatchesCorrectFile(JavaMatcher, "/path/to/MyAssertion.java", false)
-			verifyThatMatcherMatchesCorrectFile(JavaMatcher, "/path/test/MyAssertions.java", false)
+			createEntry(JavaMatcher, "/path/to/MyAssertion.java", false),
+			createEntry(JavaMatcher, "/path/test/MyAssertions.java", false),
 
 			// when test file then true
-			verifyThatMatcherMatchesCorrectFile(JavaMatcher, "/path/test/TestAnything.java", true)
-			verifyThatMatcherMatchesCorrectFile(JavaMatcher, "/path/test/MyTest.java", true)
-			verifyThatMatcherMatchesCorrectFile(JavaMatcher, "/path/test/MyTests.java", true)
-			verifyThatMatcherMatchesCorrectFile(JavaMatcher, "/path/test/MyTestCase.java", true)
-		})
+			createEntry(JavaMatcher, "/path/test/TestAnything.java", true),
+			createEntry(JavaMatcher, "/path/test/MyTest.java", true),
+			createEntry(JavaMatcher, "/path/test/MyTests.java", true),
+			createEntry(JavaMatcher, "/path/test/MyTestCase.java", true),
+		)
 
-		It("GoMatcher should return true only when matches Go test file", func() {
+		table.DescribeTable("GoMatcher should return true only when matches Go test file",
+			func(matcher TestMatcher, file string, shouldMatch bool) {
+				Expect(matcher.IsTest(file)).To(Equal(shouldMatch))
+			},
 			// when non test file then false
-			verifyThatMatcherMatchesCorrectFile(GoMatcher, "/path/to/my_assertion.go", false)
-			verifyThatMatcherMatchesCorrectFile(GoMatcher, "/path/test/my_assertion.go", false)
-			verifyThatMatcherMatchesCorrectFile(GoMatcher, "/path/test/test_anything.go", false)
-			verifyThatMatcherMatchesCorrectFile(GoMatcher, "/path/test/anytest.go", false)
+			createEntry(GoMatcher, "/path/to/my_assertion.go", false),
+			createEntry(GoMatcher, "/path/test/my_assertion.go", false),
+			createEntry(GoMatcher, "/path/test/test_anything.go", false),
+			createEntry(GoMatcher, "/path/test/anytest.go", false),
 
 			// when test file then true
-			verifyThatMatcherMatchesCorrectFile(GoMatcher, "/path/to/my_test.go", true)
-		})
+			createEntry(GoMatcher, "/path/to/my_test.go", true),
+		)
 
-		It("JavaScriptMatcher should return true only when matches JavaScript test file", func() {
+		table.DescribeTable("JavaScriptMatcher should return true only when matches JavaScript test file",
+			func(matcher TestMatcher, file string, shouldMatch bool) {
+				Expect(matcher.IsTest(file)).To(Equal(shouldMatch))
+			},
 			// when non test file then false
-			verifyThatMatcherMatchesCorrectFile(JavaScriptMatcher, "/path/to/my.assertion.js", false)
-			verifyThatMatcherMatchesCorrectFile(JavaScriptMatcher, "/path/test/my.assertion.js", false)
-			verifyThatMatcherMatchesCorrectFile(JavaScriptMatcher, "/path/test/test.anything.js", false)
+			createEntry(JavaScriptMatcher, "/path/to/my.assertion.js", false),
+			createEntry(JavaScriptMatcher, "/path/test/my.assertion.js", false),
+			createEntry(JavaScriptMatcher, "/path/test/test.anything.js", false),
 
 			// when test file then true
-			verifyThatMatcherMatchesCorrectFile(JavaScriptMatcher, "/path/test/any.test.js", true)
-			verifyThatMatcherMatchesCorrectFile(JavaScriptMatcher, "/path/to/my.test.js", true)
-			verifyThatMatcherMatchesCorrectFile(JavaScriptMatcher, "/path/to/my.spec.js", true)
-		})
+			createEntry(JavaScriptMatcher, "/path/test/any.test.js", true),
+			createEntry(JavaScriptMatcher, "/path/to/my.test.js", true),
+			createEntry(JavaScriptMatcher, "/path/to/my.spec.js", true),
+		)
 
-		It("TypeScriptMatcher should return true only when matches TypeScript test file", func() {
+		table.DescribeTable("TypeScriptMatcher should return true only when matches TypeScript test file",
+			func(matcher TestMatcher, file string, shouldMatch bool) {
+				Expect(matcher.IsTest(file)).To(Equal(shouldMatch))
+			},
 			// when non test file then false
-			verifyThatMatcherMatchesCorrectFile(TypeScriptMatcher, "/path/to/my.assertion.ts", false)
-			verifyThatMatcherMatchesCorrectFile(TypeScriptMatcher, "/path/test/my.assertion.tsx", false)
-			verifyThatMatcherMatchesCorrectFile(TypeScriptMatcher, "/path/test/test.anything.ts", false)
+			createEntry(TypeScriptMatcher, "/path/to/my.assertion.ts", false),
+			createEntry(TypeScriptMatcher, "/path/test/my.assertion.tsx", false),
+			createEntry(TypeScriptMatcher, "/path/test/test.anything.ts", false),
 
 			// when test file then true
-			verifyThatMatcherMatchesCorrectFile(TypeScriptMatcher, "/path/test/any.test.tsx", true)
-			verifyThatMatcherMatchesCorrectFile(TypeScriptMatcher, "/path/to/my.test.ts", true)
-			verifyThatMatcherMatchesCorrectFile(TypeScriptMatcher, "/path/to/my.spec.ts", true)
-		})
+			createEntry(TypeScriptMatcher, "/path/test/any.test.tsx", true),
+			createEntry(TypeScriptMatcher, "/path/to/my.test.ts", true),
+			createEntry(TypeScriptMatcher, "/path/to/my.spec.ts", true),
+		)
 
-		It("PythonMatcher should return true only when matches Python test file", func() {
+		table.DescribeTable("PythonMatcher should return true only when matches Python test file",
+			func(matcher TestMatcher, file string, shouldMatch bool) {
+				Expect(matcher.IsTest(file)).To(Equal(shouldMatch))
+			},
 			// when non test file then false
-			verifyThatMatcherMatchesCorrectFile(PythonMatcher, "/path/to/my_assertion.py", false)
-			verifyThatMatcherMatchesCorrectFile(PythonMatcher, "/path/test/my_assertion.py", false)
+			createEntry(PythonMatcher, "/path/to/my_assertion.py", false),
+			createEntry(PythonMatcher, "/path/test/my_assertion.py", false),
 
 			// when test file then true
-			verifyThatMatcherMatchesCorrectFile(PythonMatcher, "/path/test/test_anything.py", true)
-			verifyThatMatcherMatchesCorrectFile(PythonMatcher, "/path/to/my_test.py", true)
-		})
+			createEntry(PythonMatcher, "/path/test/test_anything.py", true),
+			createEntry(PythonMatcher, "/path/to/my_test.py", true),
+		)
 
-		It("GroovyMatcher should return true only when matches Groovy test file", func() {
+		table.DescribeTable("GroovyMatcher should return true only when matches Groovy test file",
+			func(matcher TestMatcher, file string, shouldMatch bool) {
+				Expect(matcher.IsTest(file)).To(Equal(shouldMatch))
+			},
 			// when non test file then false
-			verifyThatMatcherMatchesCorrectFile(GroovyMatcher, "/path/to/MyAssertion.groovy", false)
-			verifyThatMatcherMatchesCorrectFile(GroovyMatcher, "/path/test/MyAssertions.groovy", false)
+			createEntry(GroovyMatcher, "/path/to/MyAssertion.groovy", false),
+			createEntry(GroovyMatcher, "/path/test/MyAssertions.groovy", false),
 
 			// when test file then true
-			verifyThatMatcherMatchesCorrectFile(GroovyMatcher, "/path/test/TestAnything.groovy", true)
-			verifyThatMatcherMatchesCorrectFile(GroovyMatcher, "/path/test/MyTest.groovy", true)
-			verifyThatMatcherMatchesCorrectFile(GroovyMatcher, "/path/test/MyTests.groovy", true)
-			verifyThatMatcherMatchesCorrectFile(GroovyMatcher, "/path/test/MyTestCase.groovy", true)
-		})
+			createEntry(GroovyMatcher, "/path/test/TestAnything.groovy", true),
+			createEntry(GroovyMatcher, "/path/test/MyTest.groovy", true),
+			createEntry(GroovyMatcher, "/path/test/MyTests.groovy", true),
+			createEntry(GroovyMatcher, "/path/test/MyTestCase.groovy", true),
+		)
 	})
 })
 
-func verifyThatMatcherMatchesCorrectFile(matcher TestMatcher, file string, shouldMatch bool) {
+func createEntry(matcher TestMatcher, file string, shouldMatch bool) table.TableEntry {
 	msg := "Test matcher should%s match the file %s, but it did%s."
 	if shouldMatch {
 		msg = fmt.Sprintf(msg, "", file, " NOT")
@@ -133,5 +156,5 @@ func verifyThatMatcherMatchesCorrectFile(matcher TestMatcher, file string, shoul
 		msg = fmt.Sprintf(msg, " NOT", file, "")
 	}
 
-	Expect(matcher.IsTest(file)).To(Equal(shouldMatch), msg)
+	return table.Entry(msg, matcher, file, shouldMatch)
 }
