@@ -24,7 +24,7 @@ var _ = Describe("Test Keeper Plugin features", func() {
 			client := github.NewClient(nil) // TODO with hoverfly/go-vcr we might want to use tokens instead to capture real traffic
 			handler = &plugin.GitHubTestEventsHandler{
 				Client: client,
-				Log:    Logger,
+				Log:    CreateNullLogger(),
 			}
 		})
 

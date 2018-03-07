@@ -4,10 +4,9 @@ import (
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	. "github.com/onsi/ginkgo/extensions/table"
+	. "github.com/arquillian/ike-prow-plugins/plugin/internal/test"
 	"github.com/arquillian/ike-prow-plugins/plugin/work-in-progress/plugin"
 	"gopkg.in/h2non/gock.v1"
-	"github.com/sirupsen/logrus"
-	"io/ioutil"
 	"github.com/google/go-github/github"
 )
 
@@ -23,7 +22,7 @@ var _ = Describe("Work-in-progress Plugin features", func() {
 			client := github.NewClient(nil) // TODO with hoverfly/go-vcr we might want to use tokens instead to capture real traffic
 			handler = &plugin.GitHubWIPPRHandler{
 				Client: client,
-				Log:    Logger,
+				Log:    CreateNullLogger(),
 			}
 		})
 

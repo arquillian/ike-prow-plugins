@@ -7,10 +7,8 @@ import (
 
 	"github.com/arquillian/ike-prow-plugins/plugin/work-in-progress/plugin"
 	"gopkg.in/h2non/gock.v1"
-	"github.com/sirupsen/logrus"
 	"github.com/google/go-github/github"
 	"github.com/arquillian/ike-prow-plugins/plugin/github"
-	"io/ioutil"
 )
 
 var _ = Describe("Test Keeper Plugin features", func() {
@@ -24,7 +22,7 @@ var _ = Describe("Test Keeper Plugin features", func() {
 			client := github.NewClient(nil) // TODO with hoverfly/go-vcr we might want to use tokens instead to capture real traffic
 			handler = &plugin.GitHubWIPPRHandler{
 				Client: client,
-				Log:    Logger,
+				Log:    CreateNullLogger(),
 			}
 		})
 

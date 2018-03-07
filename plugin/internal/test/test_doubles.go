@@ -9,6 +9,7 @@ import (
 	"io/ioutil"
 	"github.com/onsi/ginkgo"
 	"encoding/json"
+	"github.com/sirupsen/logrus"
 )
 
 // This package is intended to keep helper functions used across the tests. Shouldn't be used for production code
@@ -46,4 +47,11 @@ func ExpectStatusCall(payloadAssert func(statusPayload map[string]interface{}) (
 		return payloadExpectations, err
 	})
 	return matcher
+}
+
+// nolint
+func CreateNullLogger() *logrus.Entry {
+	nullLogger := logrus.New()
+	nullLogger.Out = ioutil.Discard // TODO rethink if we want to discard logging entirely
+	return logrus.NewEntry(nullLogger)
 }

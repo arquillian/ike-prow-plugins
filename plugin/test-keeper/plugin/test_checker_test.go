@@ -5,6 +5,7 @@ import (
 	. "github.com/onsi/gomega"
 	. "github.com/arquillian/ike-prow-plugins/scm"
 	"github.com/arquillian/ike-prow-plugins/plugin/test-keeper/plugin"
+	"github.com/arquillian/ike-prow-plugins/plugin/internal/test"
 )
 
 type StubCommitScmService struct {
@@ -60,7 +61,7 @@ var _ = Describe("Test Checker features", func() {
 					"path/to/page.html",
 					"path/to/test/AnythingTestCase.java"))
 
-			checker := plugin.TestChecker{Log: Logger, CommitService: stub}
+			checker := plugin.TestChecker{Log: test.CreateNullLogger(), CommitService: stub}
 
 			// when
 			bool, err := checker.IsAnyTestPresent()
@@ -78,7 +79,7 @@ var _ = Describe("Test Checker features", func() {
 					"path/to/page.html",
 					"path/to/js/something.in.js"))
 
-			checker := plugin.TestChecker{Log: Logger, CommitService: stub}
+			checker := plugin.TestChecker{Log: test.CreateNullLogger(), CommitService: stub}
 
 			// when
 			bool, err := checker.IsAnyTestPresent()
@@ -95,7 +96,7 @@ var _ = Describe("Test Checker features", func() {
 					"path/to/page.html",
 					"path/to/custom.tezt.my"))
 
-			checker := plugin.TestChecker{Log: Logger, CommitService: stub}
+			checker := plugin.TestChecker{Log: test.CreateNullLogger(), CommitService: stub}
 
 			// when
 			bool, err := checker.IsAnyTestPresent()
@@ -112,7 +113,7 @@ var _ = Describe("Test Checker features", func() {
 					"path/to/MyTestCase.java",
 					"path/to/another_test.go"))
 
-			checker := plugin.TestChecker{Log: Logger, CommitService: stub}
+			checker := plugin.TestChecker{Log: test.CreateNullLogger(), CommitService: stub}
 
 			// when
 			bool, err := checker.IsAnyTestPresent()
