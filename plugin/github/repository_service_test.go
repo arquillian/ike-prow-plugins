@@ -4,7 +4,7 @@ import (
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	"gopkg.in/h2non/gock.v1"
-	"github.com/arquillian/ike-prow-plugins/scm"
+	"github.com/arquillian/ike-prow-plugins/plugin/scm"
 	gogh "github.com/google/go-github/github"
 	"github.com/arquillian/ike-prow-plugins/plugin/github"
 	"github.com/arquillian/ike-prow-plugins/plugin/internal/test"

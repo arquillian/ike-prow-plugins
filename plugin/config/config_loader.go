@@ -1,7 +1,7 @@
 package config
 
 import (
-	"github.com/arquillian/ike-prow-plugins/scm"
+	"github.com/arquillian/ike-prow-plugins/plugin/scm"
 	"fmt"
 	"net/http"
 	"io/ioutil"

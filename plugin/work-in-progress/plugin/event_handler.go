@@ -7,7 +7,7 @@ import (
 	"github.com/arquillian/ike-prow-plugins/plugin/github"
 	"encoding/json"
 	"github.com/arquillian/ike-prow-plugins/plugin/utils"
-	"github.com/arquillian/ike-prow-plugins/scm"
+	"github.com/arquillian/ike-prow-plugins/plugin/scm"
 )
 
 // ProwPluginName is an external prow plugin name used to register this service

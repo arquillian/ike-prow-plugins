@@ -4,7 +4,7 @@ import (
 	"github.com/sirupsen/logrus"
 	"fmt"
 	"github.com/google/go-github/github"
-	"github.com/arquillian/ike-prow-plugins/scm"
+	"github.com/arquillian/ike-prow-plugins/plugin/scm"
 	"context"
 )
 

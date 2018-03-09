@@ -7,7 +7,7 @@ import (
 	"gopkg.in/h2non/gock.v1"
 	"github.com/arquillian/ike-prow-plugins/plugin/config"
 	"github.com/arquillian/ike-prow-plugins/plugin/test-keeper/plugin"
-	"github.com/arquillian/ike-prow-plugins/scm"
+	"github.com/arquillian/ike-prow-plugins/plugin/scm"
 )
 
 var _ = Describe("Config loader features", func() {

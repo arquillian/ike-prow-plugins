@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"github.com/google/go-github/github"
 	"context"
-	"github.com/arquillian/ike-prow-plugins/scm"
+	"github.com/arquillian/ike-prow-plugins/plugin/scm"
 )
 
 // StatusService

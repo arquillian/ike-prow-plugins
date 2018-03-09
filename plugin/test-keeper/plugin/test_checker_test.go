@@ -2,7 +2,7 @@ package plugin_test
 
 import (
 	. "github.com/onsi/ginkgo"
-	"github.com/arquillian/ike-prow-plugins/scm"
+	"github.com/arquillian/ike-prow-plugins/plugin/scm"
 )
 
 var _ = Describe("Test Checker features", func() {

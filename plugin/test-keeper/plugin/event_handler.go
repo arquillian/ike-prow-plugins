@@ -9,7 +9,7 @@ import (
 	"context"
 	"strings"
 	"github.com/arquillian/ike-prow-plugins/plugin/github"
-	"github.com/arquillian/ike-prow-plugins/scm"
+	"github.com/arquillian/ike-prow-plugins/plugin/scm"
 	"github.com/arquillian/ike-prow-plugins/plugin/config"
 )
 
