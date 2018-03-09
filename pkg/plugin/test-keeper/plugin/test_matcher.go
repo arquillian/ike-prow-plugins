@@ -6,6 +6,8 @@ import (
 	"fmt"
 )
 
+// TestKeeperConfiguration defines inclusion and exclusion patterns set of files will be matched against
+// It's unmarshaled from test-keeper.yml configuration file 
 type TestKeeperConfiguration struct {
 	Inclusion string `yaml:"test_pattern,omitempty"`
 }
@@ -65,7 +67,10 @@ func (matcher *FileNameMatcher) Matches(file string) bool {
 	return regexp.MustCompile(matcher.Regex).MatchString(file)
 }
 
-func LoadMatchers(config TestKeeperConfiguration, getLanguages func() []string) []FileNameMatcher {
+type languageProvider func() []string
+
+// LoadMatchers loads list of FileNameMatcher either from the provided configuration or from languages retrieved from the given function
+func LoadMatchers(config TestKeeperConfiguration, getLanguages languageProvider) []FileNameMatcher {
 	var matchers []FileNameMatcher
 
 	if config.Inclusion != "" {
@@ -75,7 +80,6 @@ func LoadMatchers(config TestKeeperConfiguration, getLanguages func() []string) 
 	}
 	return matchers
 }
-
 
 // LoadTestMatchers takes the given list of languages and for every supported language returns corresponding FileNameMatcher.
 // If none of the given languages is supported, then the DefaultMatcher is returned

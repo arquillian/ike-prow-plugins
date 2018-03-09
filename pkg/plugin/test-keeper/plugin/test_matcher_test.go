@@ -1,8 +1,9 @@
-package plugin
+package plugin_test
 
 import (
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
+	. "github.com/arquillian/ike-prow-plugins/pkg/plugin/test-keeper/plugin"
 	"github.com/onsi/ginkgo/extensions/table"
 	"fmt"
 )
@@ -12,10 +13,14 @@ var _ = Describe("Test Matcher features", func() {
 	Context("Test matcher loading", func() {
 
 		It("should load test matchers for java, go and typescript", func() {
-			// when
-			matchers := LoadMatchers(TestKeeperConfiguration{}, func() []string {
+			// given
+			emptyConfiguration := TestKeeperConfiguration{}
+			multipleLanguages := func() []string {
 				return []string{"HTML", "Java", "Go", "TypeScript"}
-			})
+			}
+
+			// when
+			matchers := LoadMatchers(emptyConfiguration, multipleLanguages)
 
 			// then
 			Expect(matchers).To(HaveLen(3))
@@ -23,14 +28,36 @@ var _ = Describe("Test Matcher features", func() {
 		})
 
 		It("should load default matcher when no supported language is set", func() {
-			// when
-			matchers := LoadMatchers(TestKeeperConfiguration{}, func() []string {
+			// given
+			unsupportedLanguages := func() []string {
 				return []string{"html, bash, haskel"}
-			})
+			}
+			emptyConfiguration := TestKeeperConfiguration{}
+
+			// when
+			matchers := LoadMatchers(emptyConfiguration, unsupportedLanguages)
 
 			// then
 			Expect(matchers).To(HaveLen(1))
 			Expect(matchers).To(ContainElement(DefaultMatcher))
+		})
+
+		It("should load defined inclusion pattern without default language specific matchers", func() {
+			// given
+			configurationWithInclusionPattern := TestKeeperConfiguration{Inclusion: `*IT.java|*TestCase.java`}
+			onlyJava := func() []string {
+				return []string{"HTML", "Java", "Go", "TypeScript"}
+			}
+			firstRegex := func(matchers []FileNameMatcher) string {
+				return matchers[0].Regex
+			}
+
+			// when
+			matchers := LoadMatchers(configurationWithInclusionPattern, onlyJava)
+
+			// then
+			Expect(matchers).To(HaveLen(1))
+			Expect(matchers).To(WithTransform(firstRegex, Equal("*IT.java|*TestCase.java")))
 		})
 	})
 

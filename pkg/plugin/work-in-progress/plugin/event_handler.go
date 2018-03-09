@@ -59,11 +59,9 @@ func (gh *GitHubWIPPRHandler) HandleEvent(eventType github.EventType, eventGUID 
 		statusContext := github.StatusContext{BotName: "ike-plugins", PluginName: ProwPluginName}
 		statusService := github.NewStatusService(gh.Client, gh.Log, change, statusContext)
 		if gh.IsWorkInProgress(event.PullRequest.Title) {
-			statusService.Failure("PR is in progress and can't be merged yet. You might want to wait with review as well")
-		} else {
-			statusService.Success("PR is ready for review and merge")
+			return statusService.Failure("PR is in progress and can't be merged yet. You might want to wait with review as well")
 		}
-
+		return statusService.Success("PR is ready for review and merge")
 
 	default:
 		gh.Log.Infof("received an event of type %q but didn't ask for it", eventType)

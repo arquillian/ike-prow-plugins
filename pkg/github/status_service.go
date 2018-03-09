@@ -8,7 +8,7 @@ import (
 	"github.com/arquillian/ike-prow-plugins/pkg/scm"
 )
 
-// StatusService
+// StatusService is a struct
 type StatusService struct {
 	client        *github.Client
 	log           *logrus.Entry
@@ -16,7 +16,7 @@ type StatusService struct {
 	change        scm.RepositoryChange
 }
 
-// Creates an instance of GitHub StatusService
+// NewStatusService creates an instance of GitHub StatusService
 func NewStatusService(client *github.Client, log *logrus.Entry, change scm.RepositoryChange, context StatusContext) scm.StatusService {
 	return &StatusService{
 		client:        client,

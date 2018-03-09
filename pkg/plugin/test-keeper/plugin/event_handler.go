@@ -2,7 +2,6 @@ package plugin
 
 import (
 	"github.com/sirupsen/logrus"
-	"fmt"
 	"github.com/arquillian/ike-prow-plugins/pkg/utils"
 	gogh "github.com/google/go-github/github"
 	"encoding/json"
@@ -87,21 +86,17 @@ func (gh *GitHubTestEventsHandler) handlePrEvent(event *gogh.PullRequestEvent) e
 		Hash:     *event.PullRequest.Head.SHA,
 	}
 
-	ok, e := gh.checkTests(change, *event.PullRequest.Number)
+	testsExist, e := gh.checkTests(change, *event.PullRequest.Number)
 	if e != nil {
 		return e
 	}
 
-	statusContext := github.StatusContext{BotName: "ike-plugins", PluginName: ProwPluginName}
-	statusService := github.NewStatusService(gh.Client, gh.Log, change, statusContext)
-	var err error
-	if ok {
-		err = statusService.Success("There are some tests :)")
-	} else {
-		err = statusService.Failure("No tests in this PR :(")
-	}
+	statusService := gh.newTestStatusService(change)
 
-	return err
+	if testsExist {
+		return statusService.testsExist()
+	}
+	return statusService.noTests()
 }
 
 func (gh *GitHubTestEventsHandler) handlePrComment(prComment *gogh.IssueCommentEvent) error {
@@ -145,54 +140,52 @@ func (gh *GitHubTestEventsHandler) handlePrComment(prComment *gogh.IssueCommentE
 		RepoName: *prComment.Repo.Name,
 		Hash:     *pullRequest.Head.SHA,
 	}
-	statusContext := github.StatusContext{BotName: "ike-plugins", PluginName: ProwPluginName}
-	statusService := github.NewStatusService(gh.Client, gh.Log, change, statusContext)
+	statusService := gh.newTestStatusService(change)
 
 	if comment == SkipComment && *prComment.Action == "deleted" {
-		ok, _ := gh.checkTests(change, *prNumber)
-		if ok {
-			statusService.Success("There are some tests :)")
-		} else {
-			statusService.Failure("No tests in this PR :(")
+		testsExist, err := gh.checkTests(change, *prNumber)
+		if err != nil {
+			return err
 		}
+		if testsExist {
+			return statusService.testsExist()
+		}
+
+		return statusService.noTests()
 	}
 
-	// TODO add comment mentioning lack of tests
-	statusService.Success(fmt.Sprintf("PR is fine without tests says @%s", *sender))
-
-	return nil
+	return statusService.okWithoutTests(*sender)
 }
 
 func (gh *GitHubTestEventsHandler) checkTests(change scm.RepositoryChange, prNumber int) (bool, error) {
-	configLoader := config.PluginConfigLoader{
-		PluginName: ProwPluginName,
-		Change:     change,
-	}
+	configLoader := config.PluginConfigLoader{PluginName: ProwPluginName, Change: change}
 
 	configuration := TestKeeperConfiguration{}
-	configLoader.Load(&configuration)
+	err := configLoader.Load(&configuration)
+	if err != nil {
+		gh.Log.Warnf("Config file was not loaded. Cause: %", err)
+	}
 
-	matchers := LoadMatchers(configuration, func() []string {
-		repositoryService := &github.RepositoryService{
-			Client: gh.Client,
-			Change: change,
-		}
+	var languageProvider = func() []string {
+		repositoryService := &github.RepositoryService{Client: gh.Client, Change: change}
 		languages, e := repositoryService.UsedLanguages()
 		if e != nil {
-			gh.Log.Warnf("No languages found for %s", change)
+			gh.Log.Warnf("No languages found for %s. Cause: %s", change, e)
 			return []string{}
 		}
 
 		return languages
-	})
-
-	checker := TestChecker{
-		log: gh.Log,
-		testMatchers: matchers,
 	}
 
-	files, _, err := gh.Client.PullRequests.ListFiles(context.Background(), change.Owner, change.RepoName, prNumber, nil)
+	matchers := LoadMatchers(configuration, languageProvider)
 
+	checker := TestChecker{Log: gh.Log, TestMatchers: matchers}
+
+	files, _, err := gh.Client.PullRequests.ListFiles(context.Background(), change.Owner, change.RepoName, prNumber, nil)
+	if err != nil {
+		gh.Log.Error(err)
+		return false, nil
+	}
 	testsExist, err := checker.IsAnyTestPresent(asChangedFiles(files))
 	if err != nil {
 		gh.Log.Error(err)
@@ -201,6 +194,7 @@ func (gh *GitHubTestEventsHandler) checkTests(change scm.RepositoryChange, prNum
 
 	return testsExist, nil
 }
+
 func asChangedFiles(files []*gogh.CommitFile) []scm.ChangedFile {
 	changedFiles := make([]scm.ChangedFile, len(files))
 	for _, file := range files {
@@ -209,5 +203,3 @@ func asChangedFiles(files []*gogh.CommitFile) []scm.ChangedFile {
 
 	return changedFiles
 }
-
-

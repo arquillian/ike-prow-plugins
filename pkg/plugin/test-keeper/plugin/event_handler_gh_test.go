@@ -142,6 +142,9 @@ var _ = Describe("Test Keeper Plugin features", func() {
 			Ω(err).ShouldNot(HaveOccurred())
 		})
 
+		// TODO mock languages call
+		// TODO config file
+
 	})
 
 })
