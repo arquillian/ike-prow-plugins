@@ -21,7 +21,7 @@ _cache
 *.iws
 /out/
 
-.floo*
+.floo
 
 # Crashlytics ike-plugins (for Android Studio and IntelliJ)
 com_crashlytics_export_strings.xml
