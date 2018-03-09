@@ -1,5 +1,5 @@
-hash: a31eb52fc69f6e94f2824d20c0020823a621d782e3496808ccc47be45d56dd89
-updated: 2018-03-05T22:14:44.221206113+01:00
+hash: ec3067ba2979635aee5b80bdce2ccc4a8d454756b61cce5de3d2c8aa0e0a6819
+updated: 2018-03-09T10:41:11.957264626+01:00
 imports:
 - name: github.com/bazelbuild/buildtools
   version: c98ff0c6395f09b1942e6f7c42bf3ec15e3b9ca7
@@ -283,4 +283,13 @@ imports:
   - prow/plugins/yuks
   - prow/repoowners
   - prow/slack
-testImports: []
+testImports:
+- name: github.com/arquillian/ike-prow-plugins
+  version: 9c483d7bd570eed80d05f27e81d45147dcf68869
+  subpackages:
+  - plugin/github
+  - plugin/internal/test
+  - plugin/test-keeper/plugin
+  - plugin/utils
+  - plugin/work-in-progress/plugin
+  - scm
