@@ -1,0 +1,26 @@
+[
+  {
+    "sha": "47d837aec9fb804e8e5eb4244331c35c5181464c",
+    "filename": "Jenkinsfile",
+    "status": "modified",
+    "additions": 3,
+    "deletions": 3,
+    "changes": 6,
+    "blob_url": "https://github.com/bartoszmajsak/wfswarm-booster-pipeline-test/blob/7a4d81ec7579fa508ef0abd97c5c5141b0fe5740/Jenkinsfile",
+    "raw_url": "https://github.com/bartoszmajsak/wfswarm-booster-pipeline-test/raw/7a4d81ec7579fa508ef0abd97c5c5141b0fe5740/Jenkinsfile",
+    "contents_url": "https://api.github.com/repos/bartoszmajsak/wfswarm-booster-pipeline-test/contents/Jenkinsfile?ref=7a4d81ec7579fa508ef0abd97c5c5141b0fe5740",
+    "patch": "@@ -1,6 +1,6 @@\n #!/usr/bin/groovy\n-@Library('github.com/bartoszmajsak/fabric8-pipeline-library@openshift-it')\n-def canaryVersion = \"1.0.${env.BUILD_NUMBER}\"\n+@Library('github.com/fabric8io/fabric8-pipeline-library@master')\n+def canaryVersion = \"1.1.${env.BUILD_NUMBER}\"\n def utils = new io.fabric8.Utils()\n def stashName = \"buildpod.${env.JOB_NAME}.${env.BUILD_NUMBER}\".replace('-', '_').replace('/', '_')\n def envStage = utils.environmentNamespace('stage')\n@@ -32,4 +32,4 @@ mavenNode {\n       }\n     }\n   }\n-}\n\\ No newline at end of file\n+}"
+  },
+  {
+    "sha": "f6568e22176678175e5db4a375db26c60f9c2041",
+    "filename": "README.adoc",
+    "status": "modified",
+    "additions": 2,
+    "deletions": 2,
+    "changes": 4,
+    "blob_url": "https://github.com/bartoszmajsak/wfswarm-booster-pipeline-test/blob/7a4d81ec7579fa508ef0abd97c5c5141b0fe5740/README.adoc",
+    "raw_url": "https://github.com/bartoszmajsak/wfswarm-booster-pipeline-test/raw/7a4d81ec7579fa508ef0abd97c5c5141b0fe5740/README.adoc",
+    "contents_url": "https://api.github.com/repos/bartoszmajsak/wfswarm-booster-pipeline-test/contents/README.adoc?ref=7a4d81ec7579fa508ef0abd97c5c5141b0fe5740",
+    "patch": "@@ -1,6 +1,6 @@\n = REST API Level 0 - WildFly Swarm Booster\n \n-IMPORTANT: This booster requires Java 8 JDK or greater and Maven 3.3.x.\n+IMPORTANT: This booster requires Java 8 JDK or greater and Maven `3.3.x`.\n \n IMPORTANT: As part of the process of creating this booster, launch.openshift.io set up a project with a CI/CD deployment of this booster. You can see the status of this deployment in your Single-node OpenShift Cluster or OpenShift Online Web Console. \n \n@@ -57,4 +57,4 @@ $ mvn clean fabric8:deploy -Popenshift\n ----\n \n == More Information\n-You can learn more about this booster and rest of the WildFly Swarm runtime in the link:http://appdev.openshift.io/docs/wf-swarm-runtime.html[WildFly Swarm Runtime Guide].\n\\ No newline at end of file\n+You can learn more about this booster and rest of the WildFly Swarm runtime in the link:http://appdev.openshift.io/docs/wf-swarm-runtime.html[WildFly Swarm Runtime Guide]."
+  }
+]

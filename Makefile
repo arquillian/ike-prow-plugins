@@ -41,7 +41,10 @@ up: ## Updates all dependencies defined for glide
 	glide up -v
 
 .PHONY: compile
-compile: up $(BINARIES) ## Compiles all plugins and puts them in the bin/ folder
+compile: up compile-only ## Compiles all plugins and puts them in the bin/ folder (calls up target)
+
+.PHONY: compile-only
+compile-only: $(BINARIES)
 
 .PHONY: test
 test:
@@ -61,7 +64,7 @@ LDFLAGS="-X main.Commit=${COMMIT} -X main.BuildTime=${BUILD_TIME}"
 
 $(BINARIES): binaries-%: %
 	@echo "Building $< binary"
-	@cd ./plugin/$< && CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -ldflags ${LDFLAGS} -o ${BINARY_DIR}/$<
+	@cd ./pkg/plugin/$< && CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -ldflags ${LDFLAGS} -o ${BINARY_DIR}/$<
 
 .PHONY: check
 check: ## Concurrently runs a whole bunch of static analysis tools
