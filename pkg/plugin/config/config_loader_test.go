@@ -3,7 +3,6 @@ package config
 import (
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
-	. "github.com/arquillian/ike-prow-plugins/pkg/internal/test"
 	"gopkg.in/h2non/gock.v1"
 	"github.com/arquillian/ike-prow-plugins/pkg/scm"
 )
@@ -25,7 +24,7 @@ var _ = Describe("Config loader features", func() {
 			gock.New("https://raw.githubusercontent.com").
 				Get("owner/repo/46cb8fac44709e4ccaae97448c65e8f7320cfea7/sample-config.yml").
 				Reply(200).
-				Body(FromFile("test_fixtures/sample-config.yml"))
+				BodyString(`test_pattern: (.*my|test\.go|pattern\.js)$`)
 
 			loader := PluginConfigLoader{
 				PluginName: "sample-config",
@@ -43,8 +42,7 @@ var _ = Describe("Config loader features", func() {
 			
 			// then
 			Ω(err).ShouldNot(HaveOccurred())
-			Expect(configuration.Inclusion).To(Equal(".*my|test.go|pattern.js"))
+			Expect(configuration.Inclusion).To(Equal(`(.*my|test\.go|pattern\.js)$`))
 		})
-
 	})
 })

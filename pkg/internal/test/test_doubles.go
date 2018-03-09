@@ -29,7 +29,6 @@ func FromFile(filePath string) io.Reader {
 	if err != nil {
 		ginkgo.Fail(fmt.Sprintf("Unable to load test fixture. Reason: %q", err))
 	}
-
 	return file
 }
 

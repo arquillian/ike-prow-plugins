@@ -25,7 +25,7 @@ var DefaultMatcher = FileNameMatcher{
 
 // JavaMatcher matches Java test files
 var JavaMatcher = FileNameMatcher{
-	Regex: `(Test[^/]*|IT|TestCase)\.java`,
+	Regex: `(Test[^/]*|IT|TestCase)\.java$`,
 }
 
 // GoMatcher matches Go test files
