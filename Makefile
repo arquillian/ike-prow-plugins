@@ -41,7 +41,10 @@ up: ## Updates all dependencies defined for glide
 	glide up -v
 
 .PHONY: compile
-compile: up $(BINARIES) ## Compiles all plugins and puts them in the bin/ folder
+compile: up compile-only ## Compiles all plugins and puts them in the bin/ folder (calls up target)
+
+.PHONY: compile-only
+compile-only: $(BINARIES)
 
 .PHONY: test
 test:

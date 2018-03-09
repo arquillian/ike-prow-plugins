@@ -38,7 +38,7 @@ type ServerCreator func(hmacSecret []byte, evenHandler server.GitHubEventHandler
 
 // InitPlugin instantiates logger, loads the secrets from the flags, sets context to background and starts server with
 // the attached event handler.
-func InitPlugin(log *logrus.Entry, eventHandlerCreator EventHandlerCreator, serverCreator ServerCreator,
+func InitPlugin(log *logrus.Entry, newEventHandler EventHandlerCreator, newServer ServerCreator,
 	helpProvider externalplugins.ExternalPluginHelpProvider) {
 
 	flag.Parse()
@@ -69,8 +69,8 @@ func InitPlugin(log *logrus.Entry, eventHandlerCreator EventHandlerCreator, serv
 	)
 	githubClient := github.NewClient(oauth2.NewClient(ctx, token))
 
-	handler := eventHandlerCreator(githubClient)
-	pluginServer := serverCreator(webhookSecret, handler)
+	handler := newEventHandler(githubClient)
+	pluginServer := newServer(webhookSecret, handler)
 
 	log.Infof("Starting server on port %s", strconv.Itoa(*port))
 

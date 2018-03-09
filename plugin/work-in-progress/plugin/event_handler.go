@@ -2,7 +2,7 @@ package plugin
 
 import (
 	"github.com/sirupsen/logrus"
-	"github.com/google/go-github/github"
+	gogh "github.com/google/go-github/github"
 	"strings"
 	"github.com/arquillian/ike-prow-plugins/plugin/github"
 	"encoding/json"
@@ -15,7 +15,7 @@ const ProwPluginName = "work-in-progress"
 
 // GitHubWIPPRHandler handles PR events and updates status of the PR based on work-in-progress indicator
 type GitHubWIPPRHandler struct {
-	Client *github.Client
+	Client *gogh.Client
 	Log    *logrus.Entry
 }
 
@@ -25,7 +25,7 @@ var (
 
 // HandleEvent is an entry point for the plugin logic. This method is invoked by the Server when
 // events are dispatched from the /hook service
-func (gh *GitHubWIPPRHandler) HandleEvent(eventType githubevents.EventType, eventGUID string, payload []byte) error {
+func (gh *GitHubWIPPRHandler) HandleEvent(eventType github.EventType, eventGUID string, payload []byte) error {
 	if gh.Log == nil {
 		gh.Log = logrus.StandardLogger().WithField("ike-plugins", ProwPluginName).WithFields(
 			logrus.Fields{
@@ -38,11 +38,11 @@ func (gh *GitHubWIPPRHandler) HandleEvent(eventType githubevents.EventType, even
 	gh.Log.Info("Handling title change event.")
 
 	switch eventType {
-	case githubevents.PullRequest:
+	case github.PullRequest:
 		gh.Log.Info("Pull request received")
-		var event github.PullRequestEvent
+		var event gogh.PullRequestEvent
 		if err := json.Unmarshal(payload, &event); err != nil {
-			gh.Log.Errorf("Failed while parsing '%q' event with payload: %q. Cause: %q", githubevents.PullRequest, event, err)
+			gh.Log.Errorf("Failed while parsing '%q' event with payload: %q. Cause: %q", github.PullRequest, event, err)
 			return err
 		}
 
@@ -51,12 +51,19 @@ func (gh *GitHubWIPPRHandler) HandleEvent(eventType githubevents.EventType, even
 			return nil
 		}
 
-		head := scm.CreateScmCommitService(gh.Client, gh.Log, event.Repo, *event.PullRequest.Head.SHA)
-		if gh.IsWorkInProgress(event.PullRequest.Title) {
-			head.Fail("PR is in progress and can't be merged yet. You might want to wait with review as well")
-		} else {
-			head.Success("PR is ready for review and merge")
+		change := scm.RepositoryChange{
+			Owner:    *event.Repo.Owner.Login,
+			RepoName: *event.Repo.Name,
+			Hash:     *event.PullRequest.Head.SHA,
 		}
+		statusContext := github.StatusContext{BotName: "ike-plugins", PluginName: ProwPluginName}
+		statusService := github.NewStatusService(gh.Client, gh.Log, change, statusContext)
+		if gh.IsWorkInProgress(event.PullRequest.Title) {
+			statusService.Failure("PR is in progress and can't be merged yet. You might want to wait with review as well")
+		} else {
+			statusService.Success("PR is ready for review and merge")
+		}
+
 
 	default:
 		gh.Log.Infof("received an event of type %q but didn't ask for it", eventType)

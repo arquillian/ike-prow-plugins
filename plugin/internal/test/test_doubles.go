@@ -24,7 +24,7 @@ func LoadFromFile(filePath string) []byte {
 }
 
 // nolint
-func FromJson(filePath string) io.Reader {
+func FromFile(filePath string) io.Reader {
 	file, err := os.Open(filePath)
 	if err != nil {
 		ginkgo.Fail(fmt.Sprintf("Unable to load test fixture. Reason: %q", err))
@@ -52,6 +52,6 @@ func ExpectStatusCall(payloadAssert func(statusPayload map[string]interface{}) (
 // nolint
 func CreateNullLogger() *logrus.Entry {
 	nullLogger := logrus.New()
-	nullLogger.Out = ioutil.Discard // TODO rethink if we want to discard logging entirely
+	nullLogger.Out =  ioutil.Discard // TODO rethink if we want to discard logging entirely
 	return logrus.NewEntry(nullLogger)
 }

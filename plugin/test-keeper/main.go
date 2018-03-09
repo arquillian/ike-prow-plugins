@@ -16,16 +16,16 @@ var (
 )
 
 func main() {
-	pluginBootstrap.InitPlugin(log, handlerCreator, serverCreator, helpProvider)
+	pluginBootstrap.InitPlugin(log, eventHandler, eventServer, helpProvider)
 }
 
-func handlerCreator(githubClient *github.Client) server.GitHubEventHandler {
+func eventHandler(githubClient *github.Client) server.GitHubEventHandler {
 	return &plugin.GitHubTestEventsHandler{
 		Client: githubClient,
 	}
 }
 
-func serverCreator(webhookSecret []byte, eventHandler server.GitHubEventHandler) (*server.Server) {
+func eventServer(webhookSecret []byte, eventHandler server.GitHubEventHandler) (*server.Server) {
 	return &server.Server{
 		GitHubEventHandler: eventHandler,
 		HmacSecret:         webhookSecret,
