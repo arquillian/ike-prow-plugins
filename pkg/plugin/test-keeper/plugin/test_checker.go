@@ -3,29 +3,32 @@ package plugin
 import (
 	"github.com/sirupsen/logrus"
 	"github.com/arquillian/ike-prow-plugins/pkg/scm"
+	"errors"
 )
 
-// TestChecker is using plugin.FileNameMatcher to figure out if the given commit affects any test file
-// The plugin.FileNameMatcher is loaded either from test-keeper.yaml file or from set of default matchers based on the languages using in the related project
+// TestChecker is using plugin.FileNamePattern to figure out if the given commit affects any test file
+// The plugin.FileNamePattern is loaded either from test-keeper.yaml file or from set of default matchers based on the languages using in the related project
 type TestChecker struct {
-	Log          *logrus.Entry
-	TestMatchers []FileNameMatcher
+	Log               *logrus.Entry
+	TestKeeperMatcher TestMatcher
 }
 
-// IsAnyTestPresent checks if a commit affects any test file
-func (checker *TestChecker) IsAnyTestPresent(files []scm.ChangedFile) (bool, error) {
-
+// IsAnyNotExcludedFileTest checks if a commit affects any test file
+func (checker *TestChecker) IsAnyNotExcludedFileTest(files []scm.ChangedFile) (bool, error) {
 	checker.Log.Infof("Checking for tests")
 
-	for _, matcher := range checker.TestMatchers {
-		for _, file := range files {
-			checker.Log.Infof("%q: %q", file.Name, file.Status)
-
-			if matcher.Matches(file.Name) {
+	remainingNoTestFiles := false
+	for _, file := range files {
+		if file.Name == "" {
+			return false, errors.New("can't have empty file name")
+		}
+		excluded := checker.TestKeeperMatcher.MatchesExclusion(file.Name)
+		if !excluded {
+			if checker.TestKeeperMatcher.MatchesInclusion(file.Name) {
 				return true, nil
 			}
+			remainingNoTestFiles = true
 		}
 	}
-
-	return false, nil
+	return !remainingNoTestFiles, nil
 }
