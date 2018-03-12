@@ -1,12 +1,28 @@
-== Ike Prow Plugins
+= Ike Prow Plugins
+:asciidoctor-source: https://raw.githubusercontent.com/arquillian/ike-prow-plugins/master/docs
+:numbered:
+:sectlink:
+:sectanchors:
+:sectid:
+:source-language: java
+:source-highlighter: coderay
+:sectnums:
+:icons: font
+:toc: left
+:data-uri:
+:imagesdir: docs/images
+
+ifndef::generated-doc[]
 
 This repository is home for GitHub / PR automation plugins for Arquillian projects living in this organization. Those
 plugins are based on link:https://github.com/kubernetes/test-infra/tree/master/prow[Prow] sub project of
 Kubernetes Test Infrastructure.
 
-=== Prerequisites
+endif::generated-doc[]
 
-==== Tooling
+== Prerequisites
+
+=== Tooling
 
 You need to have following packages in place:
 
@@ -71,9 +87,9 @@ For hints how to test web hook against your local setup head over to <<testing-h
 
 NOTE: More details about GitHub hooks can be found in the link:https://developer.github.com/webhooks/[official developer documentation].
 
-=== Local Setup
+== Development
 
-==== Minishift
+=== Local Setup using Minishift
 
 You can use Minishift for developing plugins locally.
 Follow link:https://docs.openshift.org/latest/minishift/getting-started/installing.html#installing-instructions[official installation guide] to set it up.
@@ -87,7 +103,7 @@ openshift v3.7.1
 kubernetes v1.7.6
 ----
 
-===== Initial setup
+==== Initial setup
 
 Before you start developing new plugins or evolving existing ones you need to deploy set of basic Prow services and configuration.
 
@@ -103,7 +119,7 @@ The key piece of this deployment is the `hook` service which listens to GitHub e
 You will have to create a route for this service. Go to `Applications -> Services -> hook` and click `Create Route`.
 Set `/hook` as a path and click `Create`.
 
-===== Pushing to local Minishift repository
+==== Pushing to local Minishift repository
 
 To speed up development cycle (and avoid pushing work-in-progress) images to Docker Hub you can use built-in docker repository available in Minishift.
 `Makefile` and templates are adjusted to use it, so the only thing you have to do is to set up few environment variables.
@@ -125,7 +141,6 @@ export DOCKER_REPO=$(oc get project --show-all=false -o name | cut -d'/' -f 2)
 NOTE: If you are using `zsh` you can take a look at link:https://github.com/kennethreitz/autoenv[autoenv] or
 link:https://direnv.net/[direnv] to automate this setup every time you access project's directory. Just make sure to add it to your global `.gitignore` to avoid sharing it through PRs (e.g. `git config --global core.excludesfile ~/.gitignore`).
 
-=== Development
 
 === Building
 
@@ -137,7 +152,7 @@ them on the cluster. This target builds all plugins at once.
 
 IMPORTANT: You have to be logged in to the cluster first.
 
-==== Developing new plugin
+=== Developing new plugin
 
 Besides creating new folders/packages in `plugin` folder you will have to register your plugin in the `Makefile`. Simply
 add its name to link:https://github.com/arquillian/ike-prow-plugins/blob/308909d88c7bee02b96236121fd25d4e9d08d88b/Makefile#L4[this list] and you should be good.
@@ -145,7 +160,7 @@ add its name to link:https://github.com/arquillian/ike-prow-plugins/blob/308909d
 IMPORTANT: By convention internal `PluginName`, the directory where the code is located and name of the service are assumed to
 be the same.
 
-==== Testing
+=== Testing
 
 We use link:https://onsi.github.io/ginkgo/[Ginkgo] testing framework and link:https://onsi.github.io/gomega/[Gomega] assertion library for writing tests.
 
@@ -179,3 +194,30 @@ NOTE: If not done before add ultrahook URL as payload URL for webhook configurat
 
 Having this set up you will start seeing events triggered by your actions in the repository and
 corresponding plugins reacting on them. Have a look at pods logs to verify if everything is working expected.
+
+ifndef::generated-doc[]
+[discrete]
+== Documentation
+
+You can generate it locally. All you need to have in place is https://docs.docker.com/engine/installation/[Docker].
+Simply execute
+
+```
+$ ./.asciidoctor/generate.sh
+```
+and you are set. You will find generated documentation in the `gh-pages` folder.
+
+On Linux you can combine it with following command:
+
+```
+./.asciidoctor/generate.sh && xdg-open gh-pages/index.html &>/dev/null
+```
+
+This will generate the documentation and open it in the browser.
+endif::generated-doc[]
+
+ifdef::generated-doc[]
+
+include::{asciidoctor-source}/test-keeper.adoc[]
+
+endif::generated-doc[]

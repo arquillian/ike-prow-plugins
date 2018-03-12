@@ -26,7 +26,7 @@ const (
 )
 
 var (
-	handledPrActions      = []string{"opened", "closed", "reopened", "synchronize", "edited"}
+	handledPrActions      = []string{"opened", "reopened", "synchronize"}
 	handledCommentActions = []string{"created", "deleted"}
 )
 
@@ -160,43 +160,32 @@ func (gh *GitHubTestEventsHandler) handlePrComment(prComment *gogh.IssueCommentE
 func (gh *GitHubTestEventsHandler) checkTests(change scm.RepositoryChange, prNumber int) (bool, error) {
 	configLoader := config.PluginConfigLoader{PluginName: ProwPluginName, Change: change}
 
-	configuration := TestKeeperConfiguration{}
+	configuration := TestKeeperConfiguration{Combine: true}
 	err := configLoader.Load(&configuration)
 	if err != nil {
 		gh.Log.Warnf("Config file was not loaded. Cause: %", err)
 	}
 
-	var languageProvider = func() []string {
-		repositoryService := &github.RepositoryService{Client: gh.Client, Change: change}
-		languages, e := repositoryService.UsedLanguages()
-		if e != nil {
-			gh.Log.Warnf("No languages found for %s. Cause: %s", change, e)
-			return []string{}
-		}
+	matcher := LoadMatcher(configuration)
 
-		return languages
-	}
-
-	matchers := LoadMatchers(configuration, languageProvider)
-
-	checker := TestChecker{Log: gh.Log, TestMatchers: matchers}
+	checker := TestChecker{Log: gh.Log, TestKeeperMatcher: matcher}
 
 	files, _, err := gh.Client.PullRequests.ListFiles(context.Background(), change.Owner, change.RepoName, prNumber, nil)
 	if err != nil {
 		gh.Log.Error(err)
 		return false, nil
 	}
-	testsExist, err := checker.IsAnyTestPresent(asChangedFiles(files))
+
+	testsExist, err := checker.IsAnyNotExcludedFileTest(asChangedFiles(files))
 	if err != nil {
 		gh.Log.Error(err)
-		return false, err
 	}
 
-	return testsExist, nil
+	return testsExist, err
 }
 
 func asChangedFiles(files []*gogh.CommitFile) []scm.ChangedFile {
-	changedFiles := make([]scm.ChangedFile, len(files))
+	changedFiles := make([]scm.ChangedFile, 0, len(files))
 	for _, file := range files {
 		changedFiles = append(changedFiles, scm.ChangedFile{Name: *file.Filename, Status: *file.Status})
 	}
