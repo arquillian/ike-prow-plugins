@@ -3,8 +3,9 @@
 This plugin can help you stick to the rule that every feature you ship comes with automated way of assuring it works - by using automated tests. 
 If it won't find any tests in the Pull Request, it will mark its check as **Failure**, or as **Success** otherwise (see the screenshots below):
 
-image::testkeeper-success.png[Success, title="Success status"]
-image::testkeeper-failure.png[Failure, title="Failure status"]
+image::images/testkeeper-success.png[Success, title="Success status"]
+
+image::images/testkeeper-failure.png[Failure, title="Failure status"]
 
 This check is done based on the file name patterns - for more information head over to <<testkeeper-config>> part.
   
@@ -29,7 +30,6 @@ include::../pkg/plugin/test-keeper/plugin/test_fixtures/github_calls/prs/with_te
 IMPORTANT: The configuration file is always loaded from the `HEAD` of the Pull Request.
 
 ==== Default exclusions
-
 
 We have included few reasonable defaults for verifying if the PR comes with the tests. You can see them link:https://github.com/arquillian/ike-prow-plugins/blob/9ebe5bc5d3daf3bf50d1538fe86c9099624149b0/pkg/plugin/test-keeper/plugin/matchers.go#L53-L95[here].
 

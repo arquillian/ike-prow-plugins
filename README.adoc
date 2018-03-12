@@ -10,7 +10,7 @@
 :icons: font
 :toc: left
 :data-uri:
-:imagesdir: docs/images
+:imagesdir: docs
 
 ifndef::generated-doc[]
 
