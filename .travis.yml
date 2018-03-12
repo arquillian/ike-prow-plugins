@@ -40,6 +40,9 @@ install:
 
 script:
   - make build
+  - 'if [ $GENERATE_DOC -eq 0 ]; then
+        ./.asciidoctor/generate.sh --keep;
+     fi'
 
 after_success:
   - 'if [ $GENERATE_DOC -eq 0 ]; then
