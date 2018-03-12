@@ -17,7 +17,7 @@ before_install:
   - MODIFIED_DOCS=$(git diff --name-only $TRAVIS_COMMIT_RANGE | grep -E 'README.adoc|^docs/.*.adoc$' | wc -l)
   - COMMITS_WITH_FORCED_GEN=$(git log --format=%B  $TRAVIS_COMMIT_RANGE | grep -i "\[gen docs\]" | wc -l)
   - '[ $COMMITS_WITH_FORCED_GEN -gt 0 ] || [ $MODIFIED_DOCS -ge 1 ] && GENERATE_DOC=0 || GENERATE_DOC=1'
-  - '[ "${BRANCH}" == "master" ] && [ "${TRAVIS_REPO_SLUG}" == "arquillian/ike-prow-plugins" ] || [ ! -z "${TRAVIS_PULL_REQUEST// }"  -a "${TRAVIS_PULL_REQUEST}" != "false" ] && GENERATE_DOC=0 || GENERATE_DOC=1'
+  - '[ "${BRANCH}" == "master" ] && GENERATE_DOC=0 || GENERATE_DOC=1'
   - 'if [ $GENERATE_DOC -eq 0 ]; then
       git config user.name "${GH_USER}";
       git config user.email "${GH_EMAIL}";
@@ -46,14 +46,12 @@ script:
 
 after_success:
   - 'if [ $GENERATE_DOC -eq 0 ]; then
-      echo "Publishing documentation to gh-pages"
+      echo "Publishing documentation to gh-pages";
       cd gh-pages;
       git add .;
       git commit -m"docs: publishes new documentation";
+      echo "${GH_REF}";
       git push --quiet "${GH_REF}" gh-pages > /dev/null 2>&1;
-      if [ ! -z "${TRAVIS_PULL_REQUEST// }" ] && [ "${TRAVIS_PULL_REQUEST}" != "false" ]; then
-        curl https://api.github.com/repos/${TRAVIS_REPO_SLUG}/issues/${TRAVIS_PULL_REQUEST}/comments -H "Authorization:token ${GH_TOKEN}" -X POST -d "{ \"body\": \"Greeting earthlings! Documentation is ready for preview at http://arquillian.org/ike-prow-plugins/pr/${TRAVIS_PULL_REQUEST}. Just be patient. It might take a few minutes for the changes to show up.\"}";
-      fi;
     fi'
 
 after_error:
