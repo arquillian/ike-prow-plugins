@@ -193,10 +193,10 @@ var _ = Describe("Test Checker features", func() {
 			Expect(legitChangeSet).To(BeTrue())
 		})
 
-		It("should accept changeset containing configured overlapping exclusion and exclusion", func() {
+		It("should accept changeset containing configured overlapping exclusion and inclusion", func() {
 			// given
 			matcher := LoadMatcher(TestKeeperConfiguration{
-				Inclusion:	`test\.txt`,
+				Inclusion: `test\.txt`,
 				Exclusion: `(\.txt|\.svg|\.png)$`,
 			})
 
@@ -205,6 +205,52 @@ var _ = Describe("Test Checker features", func() {
 				"path/to/README.txt",
 				"meme.svg",
 				"test.png")
+
+			checker := TestChecker{Log: test.CreateNullLogger(), TestKeeperMatcher: matcher}
+
+			// when
+			legitChangeSet, err := checker.IsAnyNotExcludedFileTest(changedFiles)
+
+			// then
+			Ω(err).ShouldNot(HaveOccurred())
+			Expect(legitChangeSet).To(BeTrue())
+		})
+
+		It("should accept changeset containing exclusion combined with default excluded files", func() {
+			// given
+			matcher := LoadMatcher(TestKeeperConfiguration{
+				Exclusion: `.svg$`,
+				Combine:   true,
+			})
+
+			changedFiles := changedFilesSet(
+				"test.svg",
+				"path/to/README.adoc",
+				"pom.xml",
+				".travis.yml")
+
+			checker := TestChecker{Log: test.CreateNullLogger(), TestKeeperMatcher: matcher}
+
+			// when
+			legitChangeSet, err := checker.IsAnyNotExcludedFileTest(changedFiles)
+
+			// then
+			Ω(err).ShouldNot(HaveOccurred())
+			Expect(legitChangeSet).To(BeTrue())
+		})
+
+		It("should accept changeset containing inclusion combined with default included files", func() {
+			// given
+			matcher := LoadMatcher(TestKeeperConfiguration{
+				Inclusion: `FunctionalTest.java$`,
+				Combine:   true,
+			})
+
+			changedFiles := changedFilesSet(
+				"src/test/com/acme/UnitTest.java",
+				"src/test/com/acme/ServiceIT.java",
+				"src/test/com/acme/FancyTestCase.java",
+				"src/test/com/acme/AwesomeFunctionalTest.java")
 
 			checker := TestChecker{Log: test.CreateNullLogger(), TestKeeperMatcher: matcher}
 

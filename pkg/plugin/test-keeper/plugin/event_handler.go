@@ -160,7 +160,7 @@ func (gh *GitHubTestEventsHandler) handlePrComment(prComment *gogh.IssueCommentE
 func (gh *GitHubTestEventsHandler) checkTests(change scm.RepositoryChange, prNumber int) (bool, error) {
 	configLoader := config.PluginConfigLoader{PluginName: ProwPluginName, Change: change}
 
-	configuration := TestKeeperConfiguration{}
+	configuration := TestKeeperConfiguration{Combine: true}
 	err := configLoader.Load(&configuration)
 	if err != nil {
 		gh.Log.Warnf("Config file was not loaded. Cause: %", err)

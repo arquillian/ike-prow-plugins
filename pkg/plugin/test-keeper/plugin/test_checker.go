@@ -38,7 +38,7 @@ func (checker *TestChecker) IsAnyNotExcludedFileTest(files []scm.ChangedFile) (b
 type TestKeeperConfiguration struct {
 	Inclusion string `yaml:"test_pattern,omitempty"`
 	Exclusion string `yaml:"exclusion,omitempty"`
-	// TODO combine_defaults: *true|false
+	Combine   bool   `yaml:"combine_defaults,omitempty"`
 }
 
 // LoadMatcher loads list of FileNamePattern either from the provided configuration or from languages retrieved from the given function
@@ -47,10 +47,16 @@ func LoadMatcher(config TestKeeperConfiguration) TestMatcher {
 
 	if config.Inclusion != "" {
 		matcher.Inclusion = []FileNamePattern{{Regex: config.Inclusion}}
+		if config.Combine {
+			matcher.Inclusion = append(matcher.Inclusion, DefaultMatchers.Inclusion...)
+		}
 	}
 
 	if config.Exclusion != "" {
 		matcher.Exclusion = []FileNamePattern{{Regex: config.Exclusion}}
+		if config.Combine {
+			matcher.Exclusion = append(matcher.Exclusion, DefaultMatchers.Exclusion...)
+		}
 	}
 
 	return matcher

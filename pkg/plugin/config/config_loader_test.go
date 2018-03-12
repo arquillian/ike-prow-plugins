@@ -10,6 +10,7 @@ import (
 type sampleConfiguration struct {
 	Inclusion string `yaml:"test_pattern,omitempty"`
 	Exclusion string `yaml:"exclusion,omitempty"`
+	Combine   bool   `yaml:"combine_defaults,omitempty"`
 }
 
 var _ = Describe("Config loader features", func() {
@@ -25,10 +26,8 @@ var _ = Describe("Config loader features", func() {
 			gock.New("https://raw.githubusercontent.com").
 				Get("owner/repo/46cb8fac44709e4ccaae97448c65e8f7320cfea7/sample-config.yml").
 				Reply(200).
-				BodyString(`{
-					test_pattern: (.*my|test\.go|pattern\.js)$,
-					exclusion: pom\.xml|*\.adoc
-				}`)
+				BodyString(`test_pattern: '(.*my|test\.go|pattern\.js)$' 
+exclusion: 'pom\.xml|*\.adoc'`)
 
 			loader := PluginConfigLoader{
 				PluginName: "sample-config",
@@ -39,7 +38,9 @@ var _ = Describe("Config loader features", func() {
 				},
 			}
 
-			configuration := sampleConfiguration{}
+			configuration := sampleConfiguration{
+				Combine: true,
+			}
 
 			// when
 			err := loader.Load(&configuration)
@@ -48,6 +49,7 @@ var _ = Describe("Config loader features", func() {
 			Ω(err).ShouldNot(HaveOccurred())
 			Expect(configuration.Inclusion).To(Equal(`(.*my|test\.go|pattern\.js)$`))
 			Expect(configuration.Exclusion).To(Equal(`pom\.xml|*\.adoc`))
+			Expect(configuration.Combine).To(BeTrue())
 		})
 	})
 })
