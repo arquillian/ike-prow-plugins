@@ -94,14 +94,17 @@ var groovyTests = FileNamePattern{
 	Regex: `(Test[^/]*|IT|TestCase)\.groovy$`,
 }
 
+// TODO add more patterns
 var buildToolsFileNameMatcher = FileNamePattern{
 	Regex: `pom\.xml|mvnw[\.cmd]?|\.mvn|package\.json|glide\.yaml|build\.gradle|gradlew[\.bat]?|gradle/|Makefile`,
 }
 
+// TODO add more patterns
 var ciToolsFileNameMatcher = FileNamePattern{
 	Regex: `\.travis\.yml|Jenkinsfile|\.gitlab-ci\.yml`,
 }
 
+// TODO add more patterns
 var textAssetsFileNameMatcher = FileNamePattern{
 	Regex: `(\.md|\.adoc|LICENSE)$`,
 }

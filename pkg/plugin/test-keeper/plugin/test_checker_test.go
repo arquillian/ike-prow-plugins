@@ -150,6 +150,7 @@ var _ = Describe("Test Checker features", func() {
 			Expect(testsExist).To(BeTrue())
 		})
 
+		// TODO rename to more meaningful scenario
 		It("should exclude all changed files", func() {
 			// given
 			changedFiles := changedFilesSet(
