@@ -65,13 +65,13 @@ var _ = Describe("Test Keeper Plugin features", func() {
 			Ω(err).ShouldNot(HaveOccurred())
 		})
 
-		It("should approve opened pull request when tests included based on configured pattern", func() {
+		It("should approve opened pull request when tests included based on configured pattern and defaults (implicitly combined)", func() {
 			// given
 			gock.New("https://raw.githubusercontent.com").
 				Get(repositoryName + "/5d6e9b25da90edfc19f488e595e0645c081c1575/test-keeper.yml").
 				Reply(200).
-				BodyString(`test_pattern: (test\.go)$
-								exclusion:  README.adoc`)
+				BodyString("test_pattern: '(__test\\.go)$'\n" +
+								 "skip_validation_for: 'README.adoc'")
 
 			gock.New("https://api.github.com").
 				Get("/repos/" + repositoryName + "/pulls/2/files").
@@ -81,6 +81,32 @@ var _ = Describe("Test Keeper Plugin features", func() {
 			gock.New("https://api.github.com").
 				Post("/repos/" + repositoryName + "/statuses").
 				SetMatcher(ExpectStatusCall(toHaveSuccessState)).
+				Reply(201) // This way we implicitly verify that call happened after `HandleEvent` call
+
+			statusPayload := LoadFromFile("test_fixtures/github_calls/prs/with_tests/status_opened.json")
+
+			// when
+			err := handler.HandleEvent(github.PullRequest, eventGUID, statusPayload)
+
+			// then - implicit verification of /statuses call occurrence with proper payload
+			Ω(err).ShouldNot(HaveOccurred())
+		})
+
+		It("should reject opened pull request when no tests are matching defined pattern with no defaults implictly combined", func() {
+			// given
+			gock.New("https://raw.githubusercontent.com").
+				Get(repositoryName + "/5d6e9b25da90edfc19f488e595e0645c081c1575/test-keeper.yml").
+				Reply(200).
+				Body(FromFile("test_fixtures/github_calls/prs/with_tests/test-keeper.yml"))
+
+			gock.New("https://api.github.com").
+				Get("/repos/" + repositoryName + "/pulls/2/files").
+				Reply(200).
+				Body(FromFile("test_fixtures/github_calls/prs/with_tests/changes_go_files.json"))
+
+			gock.New("https://api.github.com").
+				Post("/repos/" + repositoryName + "/statuses").
+				SetMatcher(ExpectStatusCall(toHaveFailureState)).
 				Reply(201) // This way we implicitly verify that call happened after `HandleEvent` call
 
 			statusPayload := LoadFromFile("test_fixtures/github_calls/prs/with_tests/status_opened.json")

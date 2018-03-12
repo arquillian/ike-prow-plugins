@@ -26,7 +26,7 @@ const (
 )
 
 var (
-	handledPrActions      = []string{"opened", "closed", "reopened", "synchronize", "edited"}
+	handledPrActions      = []string{"opened", "reopened", "synchronize"}
 	handledCommentActions = []string{"created", "deleted"}
 )
 

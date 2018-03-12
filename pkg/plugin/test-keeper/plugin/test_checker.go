@@ -37,7 +37,7 @@ func (checker *TestChecker) IsAnyNotExcludedFileTest(files []scm.ChangedFile) (b
 // It's unmarshaled from test-keeper.yml configuration file
 type TestKeeperConfiguration struct {
 	Inclusion string `yaml:"test_pattern,omitempty"`
-	Exclusion string `yaml:"exclusion,omitempty"`
+	Exclusion string `yaml:"skip_validation_for,omitempty"`
 	Combine   bool   `yaml:"combine_defaults,omitempty"`
 }
 

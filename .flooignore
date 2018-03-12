@@ -35,3 +35,6 @@ oauth.token
 
 # Generated files
 cluster/generated/
+
+#GH pages
+gh-pages/
