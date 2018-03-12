@@ -22,7 +22,7 @@ before_install:
       git config user.name "${GH_USER}";
       git config user.email "${GH_EMAIL}";
       git config remote.origin.fetch +refs/heads/*:refs/remotes/origin/*;
-      git fetch --unshallow origin gh-pages;
+      git fetch origin gh-pages;
       git worktree add -b gh-pages gh-pages origin/gh-pages;
       GH_REF=$(git remote get-url origin | awk "{sub(/https:\/\//,\"https://${GH_TOKEN}@\")}; 1" | awk "{sub(/\.git/, \"\")} 1");
       docker pull rochdev/alpine-asciidoctor:mini;
@@ -46,6 +46,7 @@ script:
 
 after_success:
   - 'if [ $GENERATE_DOC -eq 0 ]; then
+      echo "Publishing documentation to gh-pages"
       cd gh-pages;
       git add .;
       git commit -m"docs: publishes new documentation";
