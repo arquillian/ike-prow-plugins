@@ -70,7 +70,8 @@ var _ = Describe("Test Keeper Plugin features", func() {
 			gock.New("https://raw.githubusercontent.com").
 				Get(repositoryName + "/5d6e9b25da90edfc19f488e595e0645c081c1575/test-keeper.yml").
 				Reply(200).
-				BodyString(`test_pattern: (test\.go)$`)
+				BodyString(`test_pattern: (test\.go)$
+								exclusion:  README.adoc`)
 
 			gock.New("https://api.github.com").
 				Get("/repos/" + repositoryName + "/pulls/2/files").
@@ -112,7 +113,7 @@ var _ = Describe("Test Keeper Plugin features", func() {
 			Ω(err).ShouldNot(HaveOccurred())
 		})
 
-		It("should not block newly created pull request when documentation and build files are only changes", func() {
+		It("should not block newly created pull request when documentation and build files are the only changes", func() {
 			// given
 			gock.New("https://api.github.com").
 				Get("/repos/" + repositoryName + "/pulls/1/files").

@@ -12,7 +12,7 @@ var _ = Describe("Test Checker features", func() {
 
 	Context("Detecting tests within file changeset", func() {
 
-		It("should find tests in the Java file set when matchers for Java are explicitly defined", func() {
+		It("should accept changeset containing Java file set when based on predefined matchers", func() {
 			// given
 			changedFiles := changedFilesSet(
 				"path/to/Anything.java",
@@ -29,39 +29,7 @@ var _ = Describe("Test Checker features", func() {
 			Expect(testsExist).To(BeTrue())
 		})
 
-		It("should find Go and Java tests using predefined matchers based on languages in repository", func() {
-			// given
-			changedFiles := changedFilesSet(
-				"path/to/JavaTest.java",
-				"path/to/golang/main_test.go")
-
-			checker := TestChecker{Log: test.CreateNullLogger(), TestKeeperMatcher: DefaultMatchers}
-
-			// when
-			testsExist, err := checker.IsAnyNotExcludedFileTest(changedFiles)
-
-			// then
-			Ω(err).ShouldNot(HaveOccurred())
-			Expect(testsExist).To(BeTrue())
-		})
-
-		It("should find Java tests using predefined matchers based on languages in repository", func() {
-			// given
-			changedFiles := changedFilesSet(
-				"src/test/java/JavaTest.java",
-				"path/to/golang/main_test.go")
-
-			checker := TestChecker{Log: test.CreateNullLogger(), TestKeeperMatcher: DefaultMatchers}
-
-			// when
-			testsExist, err := checker.IsAnyNotExcludedFileTest(changedFiles)
-
-			// then
-			Ω(err).ShouldNot(HaveOccurred())
-			Expect(testsExist).To(BeTrue())
-		})
-
-		It("should find Go tests using predefined matchers based on languages in repository", func() {
+		It("should accept changeset containing Go tests using predefined matchers", func() {
 			// given
 			changedFiles := changedFilesSet(
 				"pkg/plugin/test-keeper/plugin/test_checker.go",
@@ -77,8 +45,23 @@ var _ = Describe("Test Checker features", func() {
 			Expect(testsExist).To(BeTrue())
 		})
 
-		// This test is failing ;)
-		It("should not detect any tests when files are not matching predefined language patterns", func() {
+		It("should accept changeset containing Go and Java tests using predefined matchers", func() {
+			// given
+			changedFiles := changedFilesSet(
+				"path/to/JavaTest.java",
+				"path/to/golang/main_test.go")
+
+			checker := TestChecker{Log: test.CreateNullLogger(), TestKeeperMatcher: DefaultMatchers}
+
+			// when
+			testsExist, err := checker.IsAnyNotExcludedFileTest(changedFiles)
+
+			// then
+			Ω(err).ShouldNot(HaveOccurred())
+			Expect(testsExist).To(BeTrue())
+		})
+
+		It("should not accept changeset when files are not matching predefined language test patterns", func() {
 			// given
 			changedFiles := changedFilesSet(
 				"path/to/Anything.java",
@@ -103,22 +86,22 @@ var _ = Describe("Test Checker features", func() {
 			checker := TestChecker{Log: test.CreateNullLogger(), TestKeeperMatcher: DefaultMatchers}
 
 			// when
-			testsExist, err := checker.IsAnyNotExcludedFileTest(changedFiles)
+			legitChangset, err := checker.IsAnyNotExcludedFileTest(changedFiles)
 
 			// then
 			Ω(err).ShouldNot(HaveOccurred())
-			Expect(testsExist).To(BeTrue())
+			Expect(legitChangset).To(BeTrue())
 		})
 
-		It("should find tests using inclusion in the configuration", func() {
+		It("should accept changeset based on configured inclusion", func() {
 			// given
-			matchers := LoadMatcher(TestKeeperConfiguration{Inclusion: `_test\.rb$`})
+			matcher := LoadMatcher(TestKeeperConfiguration{Inclusion: `_test\.rb$`})
 
 			changedFiles := changedFilesSet(
 				"path/to/github_service.rb",
 				"path/to/github_service_test.rb")
 
-			checker := TestChecker{Log: test.CreateNullLogger(), TestKeeperMatcher: matchers}
+			checker := TestChecker{Log: test.CreateNullLogger(), TestKeeperMatcher: matcher}
 
 			// when
 			testsExist, err := checker.IsAnyNotExcludedFileTest(changedFiles)
@@ -128,9 +111,9 @@ var _ = Describe("Test Checker features", func() {
 			Expect(testsExist).To(BeTrue())
 		})
 
-		It("should find tests using inclusion in the configuration", func() {
+		It("should accept changeset using inclusion in the configuration", func() {
 			// given
-			matchers := LoadMatcher(TestKeeperConfiguration{
+			matcher := LoadMatcher(TestKeeperConfiguration{
 				Inclusion: `(Test\.java|TestCase\.java|_test\.go)$`,
 			})
 
@@ -140,7 +123,7 @@ var _ = Describe("Test Checker features", func() {
 				"path/to/JavaTestCase.java",
 				"path/to/golang/main_test.go")
 
-			checker := TestChecker{Log: test.CreateNullLogger(), TestKeeperMatcher: matchers}
+			checker := TestChecker{Log: test.CreateNullLogger(), TestKeeperMatcher: matcher}
 
 			// when
 			testsExist, err := checker.IsAnyNotExcludedFileTest(changedFiles)
@@ -150,12 +133,12 @@ var _ = Describe("Test Checker features", func() {
 			Expect(testsExist).To(BeTrue())
 		})
 
-		// TODO rename to more meaningful scenario
-		It("should exclude all changed files", func() {
+		It("should accept changeset containing default exclusion such as documentation, ci and build files", func() {
 			// given
 			changedFiles := changedFilesSet(
 				"path/to/README.adoc",
-				"pom.xml")
+				"pom.xml",
+				".travis.yml")
 
 			checker := TestChecker{Log: test.CreateNullLogger(), TestKeeperMatcher: DefaultMatchers}
 
@@ -166,6 +149,73 @@ var _ = Describe("Test Checker features", func() {
 			Ω(err).ShouldNot(HaveOccurred())
 			Expect(legitChangeSet).To(BeTrue())
 		})
+
+		It("should accept changeset containing configured exclusion and one test matched by default inclusion", func() {
+			// given
+			matcher := LoadMatcher(TestKeeperConfiguration{
+				Exclusion: `(\.txt|\.svg|\.png)$`,
+			})
+
+			changedFiles := changedFilesSet(
+				"src/test/java/org/my/CoolTestCase.java",
+				"path/to/README.txt",
+				"meme.svg",
+				"test.png")
+
+			checker := TestChecker{Log: test.CreateNullLogger(), TestKeeperMatcher: matcher}
+
+			// when
+			legitChangeSet, err := checker.IsAnyNotExcludedFileTest(changedFiles)
+
+			// then
+			Ω(err).ShouldNot(HaveOccurred())
+			Expect(legitChangeSet).To(BeTrue())
+		})
+
+		It("should accept changeset containing configured exclusion", func() {
+			// given
+			matcher := LoadMatcher(TestKeeperConfiguration{
+				Exclusion: `(\.txt|\.svg|\.png)$`,
+			})
+
+			changedFiles := changedFilesSet(
+				"path/to/README.txt",
+				"meme.svg",
+				"test.png")
+
+			checker := TestChecker{Log: test.CreateNullLogger(), TestKeeperMatcher: matcher}
+
+			// when
+			legitChangeSet, err := checker.IsAnyNotExcludedFileTest(changedFiles)
+
+			// then
+			Ω(err).ShouldNot(HaveOccurred())
+			Expect(legitChangeSet).To(BeTrue())
+		})
+
+		It("should accept changeset containing configured overlapping exclusion and exclusion", func() {
+			// given
+			matcher := LoadMatcher(TestKeeperConfiguration{
+				Inclusion:	`test\.txt`,
+				Exclusion: `(\.txt|\.svg|\.png)$`,
+			})
+
+			changedFiles := changedFilesSet(
+				"path/to/my_test.txt",
+				"path/to/README.txt",
+				"meme.svg",
+				"test.png")
+
+			checker := TestChecker{Log: test.CreateNullLogger(), TestKeeperMatcher: matcher}
+
+			// when
+			legitChangeSet, err := checker.IsAnyNotExcludedFileTest(changedFiles)
+
+			// then
+			Ω(err).ShouldNot(HaveOccurred())
+			Expect(legitChangeSet).To(BeTrue())
+		})
+
 	})
 
 })

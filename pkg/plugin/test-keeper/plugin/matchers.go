@@ -4,11 +4,14 @@ import (
 	"regexp"
 )
 
-// TestKeeperConfiguration defines inclusion and exclusion patterns set of files will be matched against
-// It's unmarshaled from test-keeper.yml configuration file
-type TestKeeperConfiguration struct {
-	Inclusion string `yaml:"test_pattern,omitempty"`
-	Exclusion string `yaml:"exclusion,omitempty"`
+// FileNamePattern contains regex that matches a test file
+type FileNamePattern struct {
+	Regex string
+}
+
+// Matches checks if the given string (representing path to a file) contains a substring that matches Regex stored in this matcher
+func (matcher *FileNamePattern) Matches(filename string) bool {
+	return regexp.MustCompile(matcher.Regex).MatchString(filename)
 }
 
 // TestMatcher holds definitions of patterns considered as test filenames (inclusions) and those which shouldn't be
@@ -16,23 +19,6 @@ type TestKeeperConfiguration struct {
 type TestMatcher struct {
 	Inclusion []FileNamePattern
 	Exclusion []FileNamePattern
-}
-
-// FileNamePattern contains regex that matches a test file
-type FileNamePattern struct {
-	Regex string
-}
-
-// DefaultMatchers is used when no other matcher is loaded
-// It matches any string that contains either "test" or "Test"
-var DefaultMatchers = TestMatcher{
-	Inclusion: []FileNamePattern{javaTests, goTests, javascriptTests, typescriptTests, pythonTests, groovyTests},
-	Exclusion: []FileNamePattern{buildToolsFileNameMatcher, ciToolsFileNameMatcher, textAssetsFileNameMatcher},
-}
-
-// Matches checks if the given string (representing path to a file) contains a substring that matches Regex stored in this matcher
-func (matcher *FileNamePattern) Matches(filename string) bool {
-	return regexp.MustCompile(matcher.Regex).MatchString(filename)
 }
 
 // MatchesInclusion checks if file name matches defined inclusion patterns
@@ -57,17 +43,11 @@ func Matches(matchers []FileNamePattern, filename string) bool {
 	return false
 }
 
-// LoadMatcher loads list of FileNamePattern either from the provided configuration or from languages retrieved from the given function
-func LoadMatcher(config TestKeeperConfiguration) TestMatcher {
-	var matcher TestMatcher
-
-	if config.Inclusion != "" {
-		matcher = TestMatcher{Inclusion: []FileNamePattern{{Regex: config.Inclusion}}}
-	} else {
-		matcher = DefaultMatchers
-	}
-
-	return matcher
+// DefaultMatchers is used when no other matcher is loaded
+// It matches any string that contains either "test" or "Test"
+var DefaultMatchers = TestMatcher{
+	Inclusion: []FileNamePattern{javaTests, goTests, javascriptTests, typescriptTests, pythonTests, groovyTests},
+	Exclusion: []FileNamePattern{buildToolsFileNameMatcher, ciToolsFileNameMatcher, textAssetsFileNameMatcher},
 }
 
 var javaTests = FileNamePattern{
