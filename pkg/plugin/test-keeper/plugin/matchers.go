@@ -47,7 +47,7 @@ func Matches(matchers []FileNamePattern, filename string) bool {
 // It matches any string that contains either "test" or "Test"
 var DefaultMatchers = TestMatcher{
 	Inclusion: []FileNamePattern{javaTests, goTests, javascriptTests, typescriptTests, pythonTests, groovyTests},
-	Exclusion: []FileNamePattern{buildToolsFileNameMatcher, ciToolsFileNameMatcher, textAssetsFileNameMatcher},
+	Exclusion: []FileNamePattern{buildToolsFileNameMatcher, buildToolsDirectoryNameMatcher, ciToolsFileNameMatcher, textAssetsFileNameMatcher, settingsFileNameMatcher},
 }
 
 var javaTests = FileNamePattern{
@@ -74,17 +74,22 @@ var groovyTests = FileNamePattern{
 	Regex: `(Test[^/]*|IT|TestCase)\.groovy$`,
 }
 
-// TODO add more patterns
 var buildToolsFileNameMatcher = FileNamePattern{
-	Regex: `pom\.xml|mvnw[\.cmd]?|\.mvn|package\.json|glide\.yaml|build\.gradle|gradlew[\.bat]?|gradle/|Makefile`,
+	Regex: `(glide\.yaml|glide\.lock|pom\.xml|mvnw(\.cmd|\.bat)?|package\.json|glide\.yaml|build\.gradle|gradlew[\.bat]?|Makefile|gulpfile\.js|(G|g)emfile|requirements\.(in|txt))$`,
 }
 
-// TODO add more patterns
+var buildToolsDirectoryNameMatcher = FileNamePattern{
+	Regex: `gradle/|vendor/|.mvn/`,
+}
+
 var ciToolsFileNameMatcher = FileNamePattern{
-	Regex: `\.travis\.yml|Jenkinsfile|\.gitlab-ci\.yml`,
+	Regex: `\.travis\.yml|Jenkinsfile|\.gitlab-ci\.yml,|wercker\.yml|circle\.yml$`,
 }
 
-// TODO add more patterns
 var textAssetsFileNameMatcher = FileNamePattern{
-	Regex: `(\.md|\.adoc|LICENSE)$`,
+	Regex: `(\.md|\.asciidoc|\.adoc|LICENSE|CODEOWNERS)$`,
+}
+
+var settingsFileNameMatcher = FileNamePattern{
+	Regex: `(karma\.conf\.js|protractor.*\.conf(ig)?\.js|\..+ignore|\.editorconfig|\..+rc|tsconfig.*\.json|karma\.conf\.js|\.codecov\.yml|pylint\.rc)$`,
 }

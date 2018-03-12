@@ -45,20 +45,50 @@ var _ = Describe("Test Matcher features", func() {
 
 	Context("Predefined exclusion regex check", func() {
 
-		table.DescribeTable("DefaultMatchers should return true for files that contain word 'test'",
+		table.DescribeTable("DefaultMatchers should exclude common build tools",
 			assertFileMatchers,
-			// when non test file then false
-			createEntry(DefaultMatchers.Exclusion, "/path/to/Test.java/MyAssertion.java", false),
 
-			// when test file then true
 			createEntry(DefaultMatchers.Exclusion, "src/github.com/arquillian/ike-prow-plugins/Makefile", true),
 			createEntry(DefaultMatchers.Exclusion, "src/main/java/pom.xml", true),
 			createEntry(DefaultMatchers.Exclusion, "mvnw", true),
 			createEntry(DefaultMatchers.Exclusion, "mvnw.cmd", true),
-			createEntry(DefaultMatchers.Exclusion, "mvnw.wrapper", true),
+			createEntry(DefaultMatchers.Exclusion, "mvnw.bat", true),
 			createEntry(DefaultMatchers.Exclusion, "build.gradle", true),
-			createEntry(DefaultMatchers.Exclusion, "build.gradle", true),
+			createEntry(DefaultMatchers.Exclusion, "gulpfile.js", true),
+		)
+
+		table.DescribeTable("DefaultMatchers should exclude common config files",
+			assertFileMatchers,
+
+			createEntry(DefaultMatchers.Exclusion, ".nvmrc", true),
+			createEntry(DefaultMatchers.Exclusion, ".htmlhintrc", true),
+			createEntry(DefaultMatchers.Exclusion, ".stylelintrc", true),
+			createEntry(DefaultMatchers.Exclusion, ".editorconfig", true),
+			createEntry(DefaultMatchers.Exclusion, "protractor.config.js", true),
+			createEntry(DefaultMatchers.Exclusion, "protractorEE.config.js", true),
+			createEntry(DefaultMatchers.Exclusion, "project/js/config/karma.conf.js", true),
+			createEntry(DefaultMatchers.Exclusion, "project/js/config/tsconfig.json", true),
+			createEntry(DefaultMatchers.Exclusion, "requirements.txt", true),
+			createEntry(DefaultMatchers.Exclusion, "gulpfile.js", true),
+			createEntry(DefaultMatchers.Exclusion, "vendor/github.com/arquillian/ike-prow-pugins/plugin_test.go", true),
+		)
+
+		table.DescribeTable("DefaultMatchers should exclude common .ignore files",
+			assertFileMatchers,
+
+			createEntry(DefaultMatchers.Exclusion, ".gitignore", true),
+			createEntry(DefaultMatchers.Exclusion, ".dockerignore", true),
+			createEntry(DefaultMatchers.Exclusion, ".stylelintignore", true),
+		)
+
+		table.DescribeTable("DefaultMatchers should exclude common documentation files",
+			assertFileMatchers,
+
 			createEntry(DefaultMatchers.Exclusion, "README.adoc", true),
+			createEntry(DefaultMatchers.Exclusion, "README.asciidoc", true),
+			createEntry(DefaultMatchers.Exclusion, "testing.md", true),
+			createEntry(DefaultMatchers.Exclusion, "LICENSE", true),
+			createEntry(DefaultMatchers.Exclusion, "CODEOWNERS", true),
 		)
 	})
 
