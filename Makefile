@@ -32,6 +32,14 @@ clean: ## Removes binary, cache folder and docker images
 	@rm -rf ${BINARY_DIR}
 	@rm -rf $(PLUGIN_DEPLOYMENTS_DIR)
 
+.PHONY: tools
+tools: ## Installs required go tools
+	@go get -u github.com/alecthomas/gometalinter
+	@go get -u github.com/alecthomas/gometalinter && gometalinter --install
+	@go get -u github.com/onsi/ginkgo/ginkgo
+	@go get -u github.com/onsi/gomega
+	@go get -u golang.org/x/tools/cmd/goimports
+
 .PHONY: install
 install: ## Fetches all dependencies using Glide
 	glide install -v
