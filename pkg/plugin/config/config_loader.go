@@ -1,10 +1,11 @@
 package config
 
 import (
-	"github.com/arquillian/ike-prow-plugins/pkg/scm"
 	"fmt"
-	"net/http"
 	"io/ioutil"
+	"net/http"
+
+	"github.com/arquillian/ike-prow-plugins/pkg/scm"
 	"gopkg.in/yaml.v2"
 )
 

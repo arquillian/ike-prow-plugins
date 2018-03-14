@@ -1,11 +1,12 @@
 package server
 
 import (
-	"github.com/sirupsen/logrus"
 	"fmt"
-	"k8s.io/test-infra/prow/hook"
 	"net/http"
+
 	"github.com/arquillian/ike-prow-plugins/pkg/github"
+	"github.com/sirupsen/logrus"
+	"k8s.io/test-infra/prow/hook"
 )
 
 // GitHubEventHandler is a type which keeps the logic of handling GitHub events for the given plugin implementation.

@@ -1,20 +1,22 @@
 package plugin
 
 import (
-	"flag"
-	"syscall"
-	"os/signal"
-	"net/url"
-	"golang.org/x/oauth2"
 	"context"
+	"flag"
+	"net/url"
+	"os/signal"
+	"syscall"
 
-	"github.com/sirupsen/logrus"
-	"github.com/google/go-github/github"
-	"k8s.io/test-infra/prow/plugins"
+	"golang.org/x/oauth2"
+
+	"strconv"
+
 	"github.com/arquillian/ike-prow-plugins/pkg/plugin/server"
 	"github.com/arquillian/ike-prow-plugins/pkg/utils"
+	"github.com/google/go-github/github"
+	"github.com/sirupsen/logrus"
 	"k8s.io/test-infra/prow/pluginhelp/externalplugins"
-	"strconv"
+	"k8s.io/test-infra/prow/plugins"
 
 	"net/http"
 )

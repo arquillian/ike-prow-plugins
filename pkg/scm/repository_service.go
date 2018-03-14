@@ -10,5 +10,3 @@ type ChangedFile struct {
 	Name   string
 	Status string
 }
-
-

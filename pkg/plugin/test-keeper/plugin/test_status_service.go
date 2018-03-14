@@ -1,9 +1,10 @@
 package plugin
 
 import (
-	"github.com/arquillian/ike-prow-plugins/pkg/scm"
 	"fmt"
+
 	"github.com/arquillian/ike-prow-plugins/pkg/github"
+	"github.com/arquillian/ike-prow-plugins/pkg/scm"
 )
 
 type testStatusService struct {
@@ -29,4 +30,3 @@ func (ts *testStatusService) noTests() error {
 func (ts *testStatusService) okWithoutTests(approvedBy string) error {
 	return ts.statusService.Success(fmt.Sprintf("PR is fine without tests says @%s", approvedBy))
 }
-

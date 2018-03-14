@@ -1,13 +1,14 @@
 package plugin
 
 import (
-	"github.com/sirupsen/logrus"
-	gogh "github.com/google/go-github/github"
-	"strings"
-	"github.com/arquillian/ike-prow-plugins/pkg/github"
 	"encoding/json"
-	"github.com/arquillian/ike-prow-plugins/pkg/utils"
+	"strings"
+
+	"github.com/arquillian/ike-prow-plugins/pkg/github"
 	"github.com/arquillian/ike-prow-plugins/pkg/scm"
+	"github.com/arquillian/ike-prow-plugins/pkg/utils"
+	gogh "github.com/google/go-github/github"
+	"github.com/sirupsen/logrus"
 )
 
 // ProwPluginName is an external prow plugin name used to register this service

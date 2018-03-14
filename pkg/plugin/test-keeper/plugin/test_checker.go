@@ -1,9 +1,10 @@
 package plugin
 
 import (
-	"github.com/sirupsen/logrus"
-	"github.com/arquillian/ike-prow-plugins/pkg/scm"
 	"errors"
+
+	"github.com/arquillian/ike-prow-plugins/pkg/scm"
+	"github.com/sirupsen/logrus"
 )
 
 // TestChecker is using plugin.FileNamePattern to figure out if the given commit affects any test file

@@ -1,8 +1,8 @@
 package main
 
 import (
-	"github.com/sirupsen/logrus"
 	"github.com/google/go-github/github"
+	"github.com/sirupsen/logrus"
 	"k8s.io/test-infra/prow/pluginhelp"
 
 	pluginBootstrap "github.com/arquillian/ike-prow-plugins/pkg/plugin"
@@ -24,7 +24,7 @@ func handlerCreator(githubClient *github.Client) server.GitHubEventHandler {
 	}
 }
 
-func serverCreator(webhookSecret []byte, eventHandler server.GitHubEventHandler) (*server.Server) {
+func serverCreator(webhookSecret []byte, eventHandler server.GitHubEventHandler) *server.Server {
 	return &server.Server{
 		GitHubEventHandler: eventHandler,
 		HmacSecret:         webhookSecret,

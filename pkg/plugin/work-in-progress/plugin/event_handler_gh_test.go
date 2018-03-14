@@ -1,28 +1,28 @@
 package plugin
 
 import (
+	"github.com/arquillian/ike-prow-plugins/pkg/github"
+	. "github.com/arquillian/ike-prow-plugins/pkg/internal/test"
+	gogh "github.com/google/go-github/github"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
-	. "github.com/arquillian/ike-prow-plugins/pkg/internal/test"
-	"gopkg.in/h2non/gock.v1"
-	gogh "github.com/google/go-github/github"
-	"github.com/arquillian/ike-prow-plugins/pkg/github"
+	gock "gopkg.in/h2non/gock.v1"
 )
 
 var _ = Describe("Test Keeper Plugin features", func() {
 
-Context("Pull Request title change trigger", func() {
+	Context("Pull Request title change trigger", func() {
 
 		var handler *GitHubWIPPRHandler
 
-		toHaveSuccessState := func(statusPayload map[string]interface{}) (bool) {
+		toHaveSuccessState := func(statusPayload map[string]interface{}) bool {
 			return Expect(statusPayload).To(SatisfyAll(
 				HaveState("success"),
 				HaveDescription("PR is ready for review and merge"),
 			))
 		}
 
-		toHaveFailureState := func(statusPayload map[string]interface{}) (bool) {
+		toHaveFailureState := func(statusPayload map[string]interface{}) bool {
 			return Expect(statusPayload).To(SatisfyAll(
 				HaveState("failure"),
 				HaveDescription("PR is in progress and can't be merged yet. You might want to wait with review as well"),
