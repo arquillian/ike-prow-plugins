@@ -34,7 +34,6 @@ clean: ## Removes binary, cache folder and docker images
 
 .PHONY: tools
 tools: ## Installs required go tools
-	@go get -u github.com/alecthomas/gometalinter
 	@go get -u github.com/alecthomas/gometalinter && gometalinter --install
 	@go get -u github.com/onsi/ginkgo/ginkgo
 	@go get -u github.com/onsi/gomega
