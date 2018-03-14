@@ -61,6 +61,10 @@ test:
 .PHONY: build
 build: compile test check
 
+.PHONY: imports ## Removes unneeded imports and formats source code
+imports:
+	@goimports -l -w pkg
+
 # Build configuration
 BUILD_TIME=$(shell date -u '+%Y-%m-%dT%H:%M:%SZ')
 COMMIT=$(shell git rev-parse --short HEAD)
