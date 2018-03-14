@@ -3,19 +3,13 @@ package utils
 import (
 	"bytes"
 	"io/ioutil"
-
-	"github.com/sirupsen/logrus"
-)
-
-var (
-	log = logrus.StandardLogger().WithField("ike-plugins", "secrets-loader")
 )
 
 // LoadSecret reads bytes from the file
-func LoadSecret(secretFilename string) []byte {
+func LoadSecret(secretFilename string) ([]byte, error) {
 	rawSecret, err := ioutil.ReadFile(secretFilename)
 	if err != nil {
-		log.WithError(err).Fatalf("Could not read %q secret file.", secretFilename)
+		return nil, err
 	}
-	return bytes.TrimSpace(rawSecret)
+	return bytes.TrimSpace(rawSecret), nil
 }

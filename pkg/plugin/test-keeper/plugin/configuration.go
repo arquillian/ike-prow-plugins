@@ -3,7 +3,7 @@ package plugin
 import (
 	"github.com/arquillian/ike-prow-plugins/pkg/plugin/config"
 	"github.com/arquillian/ike-prow-plugins/pkg/scm"
-	"github.com/sirupsen/logrus"
+	"github.com/arquillian/ike-prow-plugins/pkg/log"
 )
 
 // TestKeeperConfiguration defines inclusion and exclusion patterns set of files will be matched against
@@ -17,7 +17,7 @@ type TestKeeperConfiguration struct {
 }
 
 // LoadTestKeeperConfig loads a TestKeeperConfiguration for the given change
-func LoadTestKeeperConfig(log *logrus.Entry, change scm.RepositoryChange) TestKeeperConfiguration {
+func LoadTestKeeperConfig(log log.Logger, change scm.RepositoryChange) TestKeeperConfiguration {
 	configLoader := config.NewPluginConfigLoader(ProwPluginName, change)
 
 	configuration := TestKeeperConfiguration{Combine: true}

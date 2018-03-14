@@ -14,7 +14,6 @@ import (
 )
 
 const (
-	eventGUID      = "event-guid"
 	repositoryName = "bartoszmajsak/wfswarm-booster-pipeline-test"
 )
 
@@ -23,6 +22,8 @@ var _ = Describe("Test Keeper Plugin features", func() {
 	Context("Pull Request handling", func() {
 
 		var handler *keeper.GitHubTestEventsHandler
+
+		log := CreateNullLogger()
 
 		toHaveSuccessState := func(statusPayload map[string]interface{}) bool {
 			return Expect(statusPayload).To(SatisfyAll(
@@ -49,10 +50,7 @@ var _ = Describe("Test Keeper Plugin features", func() {
 			gock.Off()
 
 			client := gogh.NewClient(nil) // TODO with hoverfly/go-vcr we might want to use tokens instead to capture real traffic
-			handler = &keeper.GitHubTestEventsHandler{
-				Client: client,
-				Log:    CreateNullLogger(),
-			}
+			handler = &keeper.GitHubTestEventsHandler{Client: client}
 		})
 
 		It("should approve opened pull request when tests included", func() {
@@ -70,7 +68,7 @@ var _ = Describe("Test Keeper Plugin features", func() {
 			statusPayload := LoadFromFile("test_fixtures/github_calls/prs/with_tests/status_opened.json")
 
 			// when
-			err := handler.HandleEvent(github.PullRequest, eventGUID, statusPayload)
+			err := handler.HandleEvent(log, github.PullRequest, statusPayload)
 
 			// then - implicit verification of /statuses call occurrence with proper payload
 			Ω(err).ShouldNot(HaveOccurred())
@@ -97,7 +95,7 @@ var _ = Describe("Test Keeper Plugin features", func() {
 			statusPayload := LoadFromFile("test_fixtures/github_calls/prs/with_tests/status_opened.json")
 
 			// when
-			err := handler.HandleEvent(github.PullRequest, eventGUID, statusPayload)
+			err := handler.HandleEvent(log, github.PullRequest, statusPayload)
 
 			// then - implicit verification of /statuses call occurrence with proper payload
 			Ω(err).ShouldNot(HaveOccurred())
@@ -133,7 +131,7 @@ var _ = Describe("Test Keeper Plugin features", func() {
 			statusPayload := LoadFromFile("test_fixtures/github_calls/prs/with_tests/status_opened.json")
 
 			// when
-			err := handler.HandleEvent(github.PullRequest, eventGUID, statusPayload)
+			err := handler.HandleEvent(log, github.PullRequest, statusPayload)
 
 			// then - implicit verification of /statuses call occurrence with proper payload
 			Ω(err).ShouldNot(HaveOccurred())
@@ -164,7 +162,7 @@ var _ = Describe("Test Keeper Plugin features", func() {
 			statusPayload := LoadFromFile("test_fixtures/github_calls/prs/without_tests/status_opened.json")
 
 			// when
-			err := handler.HandleEvent(github.PullRequest, eventGUID, statusPayload)
+			err := handler.HandleEvent(log, github.PullRequest, statusPayload)
 
 			// then - implicit verification of /statuses call occurrence with proper payload
 			Ω(err).ShouldNot(HaveOccurred())
@@ -185,7 +183,7 @@ var _ = Describe("Test Keeper Plugin features", func() {
 			statusPayload := LoadFromFile("test_fixtures/github_calls/prs/without_tests/status_opened.json")
 
 			// when
-			err := handler.HandleEvent(github.PullRequest, eventGUID, statusPayload)
+			err := handler.HandleEvent(log, github.PullRequest, statusPayload)
 
 			// then - implicit verification of /statuses call occurrence with proper payload
 			Ω(err).ShouldNot(HaveOccurred())
@@ -218,7 +216,7 @@ var _ = Describe("Test Keeper Plugin features", func() {
 			statusPayload := LoadFromFile("test_fixtures/github_calls/prs/without_tests/skip_comment_by_admin.json")
 
 			// when
-			err := handler.HandleEvent(github.IssueComment, eventGUID, statusPayload)
+			err := handler.HandleEvent(log, github.IssueComment, statusPayload)
 
 			// then - implicit verification of /statuses call occurrence with proper payload
 			Ω(err).ShouldNot(HaveOccurred())
@@ -244,7 +242,7 @@ var _ = Describe("Test Keeper Plugin features", func() {
 			statusPayload := LoadFromFile("test_fixtures/github_calls/prs/without_tests/skip_comment_by_external.json")
 
 			// when
-			err := handler.HandleEvent(github.IssueComment, eventGUID, statusPayload)
+			err := handler.HandleEvent(log, github.IssueComment, statusPayload)
 
 			// then - implicit verification of /statuses call occurrence with proper payload
 			Ω(err).ShouldNot(HaveOccurred())

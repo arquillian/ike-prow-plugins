@@ -16,6 +16,8 @@ var _ = Describe("Test Keeper Plugin features", func() {
 
 		var handler *wip.GitHubWIPPRHandler
 
+		log := CreateNullLogger()
+
 		toHaveSuccessState := func(statusPayload map[string]interface{}) bool {
 			return Expect(statusPayload).To(SatisfyAll(
 				HaveState("success"),
@@ -33,10 +35,7 @@ var _ = Describe("Test Keeper Plugin features", func() {
 		BeforeEach(func() {
 			defer gock.Off()
 			client := gogh.NewClient(nil) // TODO with hoverfly/go-vcr we might want to use tokens instead to capture real traffic
-			handler = &wip.GitHubWIPPRHandler{
-				Client: client,
-				Log:    CreateNullLogger(),
-			}
+			handler = &wip.GitHubWIPPRHandler{Client: client}
 		})
 
 		It("should mark opened PR as ready for review if not prefixed with WIP", func() {
@@ -49,7 +48,7 @@ var _ = Describe("Test Keeper Plugin features", func() {
 			statusPayload := LoadFromFile("test_fixtures/github_calls/ready_pr_opened.json")
 
 			// when
-			err := handler.HandleEvent(github.PullRequest, "random", statusPayload)
+			err := handler.HandleEvent(log, github.PullRequest, statusPayload)
 
 			// then - implicit verification of /statuses call occurrence with proper payload
 			Ω(err).ShouldNot(HaveOccurred())
@@ -65,7 +64,7 @@ var _ = Describe("Test Keeper Plugin features", func() {
 			statusPayload := LoadFromFile("test_fixtures/github_calls/wip_pr_opened.json")
 
 			// when
-			err := handler.HandleEvent(github.PullRequest, "random", statusPayload)
+			err := handler.HandleEvent(log, github.PullRequest, statusPayload)
 
 			// then - implicit verification of /statuses call occurrence with proper payload
 			Ω(err).ShouldNot(HaveOccurred())
@@ -81,7 +80,7 @@ var _ = Describe("Test Keeper Plugin features", func() {
 			statusPayload := LoadFromFile("test_fixtures/github_calls/pr_edited_wip_added.json")
 
 			// when
-			err := handler.HandleEvent(github.PullRequest, "random", statusPayload)
+			err := handler.HandleEvent(log, github.PullRequest, statusPayload)
 
 			// then - implicit verification of /statuses call occurrence with proper payload
 			Ω(err).ShouldNot(HaveOccurred())
@@ -98,7 +97,7 @@ var _ = Describe("Test Keeper Plugin features", func() {
 			statusPayload := LoadFromFile("test_fixtures/github_calls/pr_edited_wip_removed.json")
 
 			// when
-			err := handler.HandleEvent(github.PullRequest, "random", statusPayload)
+			err := handler.HandleEvent(log, github.PullRequest, statusPayload)
 
 			// then - implicit verification of /statuses call occurrence with proper payload
 			Ω(err).ShouldNot(HaveOccurred())

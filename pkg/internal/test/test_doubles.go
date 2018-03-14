@@ -8,6 +8,7 @@ import (
 	"net/http"
 	"os"
 
+	"github.com/arquillian/ike-prow-plugins/pkg/log"
 	"github.com/onsi/ginkgo"
 	"github.com/sirupsen/logrus"
 	gock "gopkg.in/h2non/gock.v1"
@@ -50,7 +51,7 @@ func ExpectPayload(payloadAssert func(payload map[string]interface{}) bool) gock
 }
 
 // nolint
-func CreateNullLogger() *logrus.Entry {
+func CreateNullLogger() log.Logger {
 	nullLogger := logrus.New()
 	nullLogger.Out = ioutil.Discard // TODO rethink if we want to discard logging entirely
 	return logrus.NewEntry(nullLogger)

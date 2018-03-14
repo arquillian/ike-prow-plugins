@@ -4,19 +4,16 @@ import (
 	"errors"
 
 	"github.com/arquillian/ike-prow-plugins/pkg/scm"
-	"github.com/sirupsen/logrus"
 )
 
 // TestChecker is using plugin.FileNamePattern to figure out if the given commit affects any test file
 // The plugin.FileNamePattern is loaded either from test-keeper.yaml file or from set of default matchers based on the languages using in the related project
 type TestChecker struct {
-	Log               *logrus.Entry
 	TestKeeperMatcher TestMatcher
 }
 
 // IsAnyNotExcludedFileTest checks if a commit affects any test file
 func (checker *TestChecker) IsAnyNotExcludedFileTest(files []scm.ChangedFile) (bool, error) {
-	checker.Log.Infof("Checking for tests")
 
 	remainingNoTestFiles := false
 	for _, file := range files {
