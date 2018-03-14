@@ -11,5 +11,5 @@ type StatusContext struct {
 
 const (
 	IssueComment = EventType("issue_comment") // nolint
-	PullRequest  = EventType("pull_request") // nolint
+	PullRequest  = EventType("pull_request")  // nolint
 )

@@ -1,12 +1,12 @@
 package plugin
 
 import (
+	"github.com/arquillian/ike-prow-plugins/pkg/github"
+	. "github.com/arquillian/ike-prow-plugins/pkg/internal/test"
+	gogh "github.com/google/go-github/github"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
-	. "github.com/arquillian/ike-prow-plugins/pkg/internal/test"
-	"gopkg.in/h2non/gock.v1"
-	"github.com/arquillian/ike-prow-plugins/pkg/github"
-	gogh "github.com/google/go-github/github"
+	gock "gopkg.in/h2non/gock.v1"
 )
 
 const (
@@ -20,14 +20,14 @@ var _ = Describe("Test Keeper Plugin features", func() {
 
 		var handler *GitHubTestEventsHandler
 
-		toHaveSuccessState := func(statusPayload map[string]interface{}) (bool) {
+		toHaveSuccessState := func(statusPayload map[string]interface{}) bool {
 			return Expect(statusPayload).To(SatisfyAll(
 				HaveState("success"),
 				HaveDescription("There are some tests :)"),
 			))
 		}
 
-		toHaveFailureState := func(statusPayload map[string]interface{}) (bool) {
+		toHaveFailureState := func(statusPayload map[string]interface{}) bool {
 			return Expect(statusPayload).To(SatisfyAll(
 				HaveState("failure"),
 				HaveDescription("No tests in this PR :("),
@@ -71,7 +71,7 @@ var _ = Describe("Test Keeper Plugin features", func() {
 				Get(repositoryName + "/5d6e9b25da90edfc19f488e595e0645c081c1575/test-keeper.yml").
 				Reply(200).
 				BodyString("test_pattern: '(__test\\.go)$'\n" +
-								 "skip_validation_for: 'README.adoc'")
+					"skip_validation_for: 'README.adoc'")
 
 			gock.New("https://api.github.com").
 				Get("/repos/" + repositoryName + "/pulls/2/files").
@@ -172,7 +172,7 @@ var _ = Describe("Test Keeper Plugin features", func() {
 				Reply(200).
 				Body(FromFile("test_fixtures/github_calls/collaborators_repo-admin_permission.json"))
 
-			toHaveEnforcedSuccessState := func(statusPayload map[string]interface{}) (bool) {
+			toHaveEnforcedSuccessState := func(statusPayload map[string]interface{}) bool {
 				return Expect(statusPayload).To(SatisfyAll(
 					HaveState("success"),
 					HaveDescription("PR is fine without tests says @bartoszmajsak"),

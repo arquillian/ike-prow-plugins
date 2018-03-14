@@ -1,15 +1,16 @@
 package plugin
 
 import (
-	"github.com/sirupsen/logrus"
+	"context"
+	"encoding/json"
+	"strings"
+
+	"github.com/arquillian/ike-prow-plugins/pkg/github"
+	"github.com/arquillian/ike-prow-plugins/pkg/plugin/config"
+	"github.com/arquillian/ike-prow-plugins/pkg/scm"
 	"github.com/arquillian/ike-prow-plugins/pkg/utils"
 	gogh "github.com/google/go-github/github"
-	"encoding/json"
-	"context"
-	"strings"
-	"github.com/arquillian/ike-prow-plugins/pkg/github"
-	"github.com/arquillian/ike-prow-plugins/pkg/scm"
-	"github.com/arquillian/ike-prow-plugins/pkg/plugin/config"
+	"github.com/sirupsen/logrus"
 )
 
 // GitHubTestEventsHandler is the event handler for the plugin.

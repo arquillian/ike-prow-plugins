@@ -1,11 +1,12 @@
 package github
 
 import (
-	"github.com/sirupsen/logrus"
-	"fmt"
-	"github.com/google/go-github/github"
 	"context"
+	"fmt"
+
 	"github.com/arquillian/ike-prow-plugins/pkg/scm"
+	"github.com/google/go-github/github"
+	"github.com/sirupsen/logrus"
 )
 
 // StatusService is a struct
@@ -40,7 +41,6 @@ func (s *StatusService) Failure(reason string) error {
 func (s *StatusService) Pending(reason string) error {
 	return s.setStatus("pending", reason)
 }
-
 
 // setStatus sets the given status with the given reason to the related commit
 func (s *StatusService) setStatus(status, reason string) error {

@@ -2,8 +2,9 @@ package utils
 
 import (
 	"bytes"
-	"github.com/sirupsen/logrus"
 	"io/ioutil"
+
+	"github.com/sirupsen/logrus"
 )
 
 var (

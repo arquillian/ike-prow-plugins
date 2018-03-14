@@ -1,13 +1,13 @@
 package main
 
 import (
-	"github.com/sirupsen/logrus"
 	gogh "github.com/google/go-github/github"
+	"github.com/sirupsen/logrus"
 	"k8s.io/test-infra/prow/pluginhelp"
 
-	"github.com/arquillian/ike-prow-plugins/pkg/plugin/server"
-	pluginBootstrap "github.com/arquillian/ike-prow-plugins/pkg/plugin"
 	"github.com/arquillian/ike-prow-plugins/pkg/github"
+	pluginBootstrap "github.com/arquillian/ike-prow-plugins/pkg/plugin"
+	"github.com/arquillian/ike-prow-plugins/pkg/plugin/server"
 )
 
 // ProwPluginName is an external prow plugin name used to register this service
@@ -34,7 +34,7 @@ func handlerCreator(githubClient *gogh.Client) server.GitHubEventHandler {
 	}
 }
 
-func serverCreator(webhookSecret []byte, eventHandler server.GitHubEventHandler) (*server.Server) {
+func serverCreator(webhookSecret []byte, eventHandler server.GitHubEventHandler) *server.Server {
 	return &server.Server{
 		GitHubEventHandler: eventHandler,
 		HmacSecret:         webhookSecret,

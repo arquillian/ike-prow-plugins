@@ -1,11 +1,12 @@
 package plugin_test
 
 import (
-	. "github.com/onsi/ginkgo"
-	. "github.com/onsi/gomega"
-	. "github.com/arquillian/ike-prow-plugins/pkg/plugin/test-keeper/plugin"
-	"github.com/onsi/ginkgo/extensions/table"
 	"fmt"
+
+	. "github.com/arquillian/ike-prow-plugins/pkg/plugin/test-keeper/plugin"
+	. "github.com/onsi/ginkgo"
+	"github.com/onsi/ginkgo/extensions/table"
+	. "github.com/onsi/gomega"
 )
 
 var _ = Describe("Test Matcher features", func() {

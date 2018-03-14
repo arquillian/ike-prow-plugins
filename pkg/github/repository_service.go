@@ -1,11 +1,12 @@
 package github
 
 import (
-	"github.com/sirupsen/logrus"
-	"fmt"
-	"github.com/google/go-github/github"
-	"github.com/arquillian/ike-prow-plugins/pkg/scm"
 	"context"
+	"fmt"
+
+	"github.com/arquillian/ike-prow-plugins/pkg/scm"
+	"github.com/google/go-github/github"
+	"github.com/sirupsen/logrus"
 )
 
 // RepositoryService is a concrete implementation of the interface RepositoryService

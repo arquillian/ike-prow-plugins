@@ -30,9 +30,7 @@ gvm install ${GO_VERSION}
 gvm use ${GO_VERSION}
 
 echo -e "${CLEAR}${LIGHT_GREEN}Installing required go packages${CLEAR}"
-go get -u github.com/alecthomas/gometalinter && gometalinter --install
-go get -u github.com/onsi/ginkgo/ginkgo
-go get -u github.com/onsi/gomega
+make tools
 
 echo -e "${CLEAR}${LIGHT_GREEN}Installing glide and project dependencies${CLEAR}"
 curl https://glide.sh/get | sh

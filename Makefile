@@ -32,6 +32,13 @@ clean: ## Removes binary, cache folder and docker images
 	@rm -rf ${BINARY_DIR}
 	@rm -rf $(PLUGIN_DEPLOYMENTS_DIR)
 
+.PHONY: tools
+tools: ## Installs required go tools
+	@go get -u github.com/alecthomas/gometalinter && gometalinter --install
+	@go get -u github.com/onsi/ginkgo/ginkgo
+	@go get -u github.com/onsi/gomega
+	@go get -u golang.org/x/tools/cmd/goimports
+
 .PHONY: install
 install: ## Fetches all dependencies using Glide
 	glide install -v
@@ -52,6 +59,10 @@ test:
 
 .PHONY: build
 build: compile test check
+
+.PHONY: imports ## Removes unneeded imports and formats source code
+imports:
+	@goimports -l -w pkg
 
 # Build configuration
 BUILD_TIME=$(shell date -u '+%Y-%m-%dT%H:%M:%SZ')

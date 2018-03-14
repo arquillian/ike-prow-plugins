@@ -1,12 +1,12 @@
 package plugin
 
 import (
-	. "github.com/onsi/ginkgo"
-	. "github.com/onsi/gomega"
-	. "github.com/onsi/ginkgo/extensions/table"
 	. "github.com/arquillian/ike-prow-plugins/pkg/internal/test"
-	"gopkg.in/h2non/gock.v1"
 	"github.com/google/go-github/github"
+	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/ginkgo/extensions/table"
+	. "github.com/onsi/gomega"
+	gock "gopkg.in/h2non/gock.v1"
 )
 
 var _ = Describe("Work-in-progress Plugin features", func() {
@@ -47,5 +47,3 @@ var _ = Describe("Work-in-progress Plugin features", func() {
 	})
 
 })
-
-

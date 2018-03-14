@@ -1,13 +1,13 @@
 package github
 
 import (
-	. "github.com/onsi/ginkgo"
-	. "github.com/onsi/gomega"
-	"gopkg.in/h2non/gock.v1"
 	"github.com/arquillian/ike-prow-plugins/pkg/scm"
 	gogh "github.com/google/go-github/github"
+	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/gomega"
 
 	"github.com/arquillian/ike-prow-plugins/pkg/internal/test"
+	gock "gopkg.in/h2non/gock.v1"
 )
 
 var _ = Describe("Repository Service", func() {
