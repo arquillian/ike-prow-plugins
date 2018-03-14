@@ -1,22 +1,22 @@
-PROJECT_NAME=ike-prow-plugins
-PACKAGE_NAME := github.com/arquillian/ike-prow-plugins
+PROJECT_NAME:=ike-prow-plugins
+PACKAGE_NAME:=github.com/arquillian/ike-prow-plugins
 
-PLUGINS=test-keeper pr-sanitizer work-in-progress
-BINARIES=$(patsubst %,binaries-%, $(PLUGINS))
+PLUGINS:=test-keeper pr-sanitizer work-in-progress
+BINARIES:=$(patsubst %,binaries-%, $(PLUGINS))
 
 BINARY_DIR=${PWD}/bin
 CLUSTER_DIR?=${PWD}/cluster
 PLUGIN_DEPLOYMENTS_DIR?=$(CLUSTER_DIR)/generated
 
-REGISTRY ?= docker.io
-DOCKER_REPO ?= bartoszmajsak
-BUILD_IMAGES=$(patsubst %,build-%, $(PLUGINS))
-PUSH_IMAGES=$(patsubst %,push-%, $(PLUGINS))
-CLEAN_IMAGES=$(patsubst %,clean-%, $(PLUGINS))
-OC_DEPLOYMENTS=$(patsubst %,oc-%, $(PLUGINS))
+REGISTRY?=docker.io
+DOCKER_REPO?=bartoszmajsak
+BUILD_IMAGES:=$(patsubst %,build-%, $(PLUGINS))
+PUSH_IMAGES:=$(patsubst %,push-%, $(PLUGINS))
+CLEAN_IMAGES:=$(patsubst %,clean-%, $(PLUGINS))
+OC_DEPLOYMENTS:=$(patsubst %,oc-%, $(PLUGINS))
 
-in_docker_group=$(filter docker,$(shell groups))
-is_root=$(filter 0,$(shell id -u))
+in_docker_group:=$(filter docker,$(shell groups))
+is_root:=$(filter 0,$(shell id -u))
 DOCKER?=$(if $(or $(in_docker_group),$(is_root)),docker,sudo docker)
 
 .DEFAULT_GOAL := all
@@ -66,8 +66,9 @@ imports:
 
 # Build configuration
 BUILD_TIME=$(shell date -u '+%Y-%m-%dT%H:%M:%SZ')
-COMMIT=$(shell git rev-parse --short HEAD)
-GITUNTRACKEDCHANGES := $(shell git status --porcelain --untracked-files=no)
+COMMIT:=$(shell git rev-parse --short HEAD)
+TAG:=$(COMMIT)-$(shell date +%s)
+GITUNTRACKEDCHANGES:=$(shell git status --porcelain --untracked-files=no)
 ifneq ($(GITUNTRACKEDCHANGES),)
   COMMIT := $(COMMIT)-dirty
 endif
@@ -110,7 +111,7 @@ $(OC_DEPLOYMENTS): oc-%: %
 		-p REGISTRY=$(REGISTRY) \
 		-p DOCKER_REPO=$(DOCKER_REPO) \
 		-p PLUGIN_NAME=$< \
-		-p VERSION=$(COMMIT) \
+		-p VERSION=$(TAG) \
 		-o yaml > $(PLUGIN_DEPLOYMENTS_DIR)/$<.yaml
 
 	@oc apply -f $(PLUGIN_DEPLOYMENTS_DIR)/$<.yaml
@@ -118,14 +119,14 @@ $(OC_DEPLOYMENTS): oc-%: %
 .PHONY: build-images $(PLUGINS)
 build-images: compile $(BUILD_IMAGES)
 $(BUILD_IMAGES): build-%: %
-	$(DOCKER) build --build-arg PLUGIN_NAME=$< -t $(REGISTRY)/$(DOCKER_REPO)/$<:$(COMMIT) -f Dockerfile.builder .
+	$(DOCKER) build --build-arg PLUGIN_NAME=$< -t $(REGISTRY)/$(DOCKER_REPO)/$<:$(TAG) -f Dockerfile.builder .
 
 .PHONY: clean-images
 clean-images: $(CLEAN_IMAGES)
 $(CLEAN_IMAGES): clean-%: %
-	$(DOCKER) rmi -f $(REGISTRY)/$(DOCKER_REPO)/$<:$(COMMIT)
+	$(DOCKER) rmi -f $(REGISTRY)/$(DOCKER_REPO)/$<:$(TAG)
 
 .PHONY: push-images
 push-images: $(PUSH_IMAGES)
 $(PUSH_IMAGES): push-%: %
-	$(DOCKER) push $(REGISTRY)/$(DOCKER_REPO)/$<:$(COMMIT)
+	$(DOCKER) push $(REGISTRY)/$(DOCKER_REPO)/$<:$(TAG)
