@@ -1,8 +1,8 @@
 hash: a31eb52fc69f6e94f2824d20c0020823a621d782e3496808ccc47be45d56dd89
-updated: 2018-03-09T11:24:17.740862024+01:00
+updated: 2018-03-14T17:16:06.776003703+01:00
 imports:
 - name: github.com/bazelbuild/buildtools
-  version: c98ff0c6395f09b1942e6f7c42bf3ec15e3b9ca7
+  version: 405641a50b8583dc9fe254b7a22ebc2002722d17
   subpackages:
   - build
   - tables
@@ -10,20 +10,8 @@ imports:
   version: 4c0e84591b9aa9e6dcfdf3e020114cd81f89d5f9
   subpackages:
   - quantile
-- name: github.com/emicklei/go-restful
-  version: ff4f55a206334ef123e4f79bbf348980da81ca46
-  subpackages:
-  - log
 - name: github.com/ghodss/yaml
   version: 73d445a93680fa1a78ae23a5839bad48f32ba1ee
-- name: github.com/go-openapi/jsonpointer
-  version: 46af16f9f7b149af66e5d1bd010e3574dc06de98
-- name: github.com/go-openapi/jsonreference
-  version: 13c6e3589ad90f49bd3e3bbe2c2cb3d7a4142272
-- name: github.com/go-openapi/spec
-  version: 6aced65f8501fe1217321abf0749d354824ba2ff
-- name: github.com/go-openapi/swag
-  version: 1d0bd113de87027671077d3c71eb3ac5d7dbba72
 - name: github.com/gogo/protobuf
   version: c0656edd0d9eab7c66d1eb0c568f9039345796f7
   subpackages:
@@ -32,9 +20,9 @@ imports:
 - name: github.com/golang/glog
   version: 44145f04b68cf362d9c4df2182967c2275eaefed
 - name: github.com/golang/lint
-  version: e14d9b0f1d332b1420c1ffa32562ad2dc84d645d
+  version: 837967239b74207656c3f550e9dc6a944866c490
 - name: github.com/golang/protobuf
-  version: 4bd1920723d7b7c925de087aa32e2187708897f7
+  version: bbd03ef6da3a115852eaf24c8a1c46aeb39aa175
   subpackages:
   - proto
 - name: github.com/google/go-github
@@ -52,13 +40,7 @@ imports:
 - name: github.com/gorilla/securecookie
   version: e59506cc896acb7f7bf732d4fdf5e25f7ccd8983
 - name: github.com/gorilla/sessions
-  version: 7087b4d669d1bc3da42fb4e2eda73ae139a24439
-- name: github.com/mailru/easyjson
-  version: d5b7844b561a7bc640052f1b935f7b800330d7e0
-  subpackages:
-  - buffer
-  - jlexer
-  - jwriter
+  version: 7910f5bb5ac86ab08f97d8bda39b476fc117b684
 - name: github.com/matttproud/golang_protobuf_extensions
   version: c12348ce28de40eed0136aa2b644d0ee0650e56c
   subpackages:
@@ -99,7 +81,7 @@ imports:
   - matchers/support/goraph/util
   - types
 - name: github.com/prometheus/client_golang
-  version: e69720d204a4aa3b0c65dc91208645ba0a52b9cd
+  version: c3324c1198cf3374996e9d3098edd46a6b55afc9
   subpackages:
   - prometheus
 - name: github.com/prometheus/client_model
@@ -107,38 +89,34 @@ imports:
   subpackages:
   - go
 - name: github.com/prometheus/common
-  version: 89604d197083d4781071d3c65855d24ecfb0a563
+  version: e4aa40a9169a88835b849a6efb71e05dc04b88f0
   subpackages:
   - expfmt
   - internal/bitbucket.org/ww/goautoneg
   - model
 - name: github.com/prometheus/procfs
-  version: 282c8707aa210456a825798969cc27edda34992a
+  version: 54d17b57dd7d4a3aa092476596b3f8a933bde349
   subpackages:
   - internal/util
   - nfs
   - xfs
-- name: github.com/PuerkitoBio/purell
-  version: 8a290539e2e8629dbc4e6bad948158f790ec31f4
-- name: github.com/PuerkitoBio/urlesc
-  version: 5bd2802263f21d8788851d5305584c82a5c75d7e
 - name: github.com/satori/go.uuid
   version: 879c5887cd475cd7864858769793b2ceb0d44feb
 - name: github.com/shurcooL/githubql
-  version: a82ea8c70b7fd207aeb72ccb10575eed252f2f68
+  version: a3fc26434624c70efdbbf7b2f0b2a146b6f9a952
 - name: github.com/shurcooL/go
   version: 364c5ae8518b51f5fda954762864d6f4d5c30c89
   subpackages:
   - ctxhttp
 - name: github.com/shurcooL/graphql
-  version: d0549edd16dceb6939e538fdb1b4f2ec7ee816cc
+  version: 3d276b9dcc6b1e0adf19557a8de5cb8632c07697
   subpackages:
   - ident
   - internal/jsonutil
 - name: github.com/sirupsen/logrus
   version: 4b6ea7319e214d98c938f12692336f7ca9348d6b
 - name: github.com/spf13/pflag
-  version: 9ff6c6923cfffbcd502984b8e0c80539a94968b7
+  version: 4c012f6dcd9546820e378d0bdda4d8fc772cdfea
 - name: golang.org/x/net
   version: 1c05540f6879653db88113bc4a2b70aec4bd491f
   subpackages:
@@ -152,17 +130,16 @@ imports:
   - idna
   - lex/httplex
 - name: golang.org/x/oauth2
-  version: 543e37812f10c46c622c9575afd7ad22f22a12ba
+  version: 7af32f14d0a25aec7873e0683e8e48dcead159a8
   subpackages:
   - internal
 - name: golang.org/x/sys
-  version: 7ddbeae9ae08c6a06a59597f0c9edbc5ff2444ce
+  version: 932fb2287bee613f2a65e71685c9d9c0020da979
   subpackages:
   - unix
 - name: golang.org/x/text
   version: b19bf474d317b857955b12035d2c5acb57ce8b01
   subpackages:
-  - cases
   - encoding
   - encoding/charmap
   - encoding/htmlindex
@@ -173,20 +150,18 @@ imports:
   - encoding/simplifiedchinese
   - encoding/traditionalchinese
   - encoding/unicode
-  - internal
   - internal/tag
   - internal/utf8internal
   - language
   - runes
   - secure/bidirule
-  - secure/precis
   - transform
   - unicode/bidi
   - unicode/norm
-  - width
 - name: golang.org/x/tools
-  version: 07fd8470d635b985c9c749fa83bdbc2f20b35d42
+  version: c1547a3f90f245aa85784a99580d3f601380cc07
   subpackages:
+  - go/ast/astutil
   - go/gcexportdata
   - go/gcimporter15
 - name: google.golang.org/appengine
@@ -206,13 +181,13 @@ imports:
 - name: gopkg.in/robfig/cron.v2
   version: be2e0b0deed5a68ffee390b4583a13aff8321535
 - name: gopkg.in/yaml.v2
-  version: 53feefa2559fb8dfa8d81baad31be332c97d6c77
+  version: 7f97868eec74b32b0982dd158a51a446d1da7eb5
 - name: k8s.io/api
-  version: 4df58c811fe2e65feb879227b2b245e4dc26e7ad
+  version: fd252c3a3e1debf912ff5b80221a31a6a3c24493
   subpackages:
   - core/v1
 - name: k8s.io/apimachinery
-  version: 019ae5ada31de202164b118aee88ee2d14075c31
+  version: e9ff529c66f83aeac6dff90f11ea0c5b7c4d626a
   subpackages:
   - pkg/api/resource
   - pkg/apis/meta/v1
@@ -226,6 +201,7 @@ imports:
   - pkg/types
   - pkg/util/errors
   - pkg/util/intstr
+  - pkg/util/json
   - pkg/util/net
   - pkg/util/runtime
   - pkg/util/sets
@@ -234,10 +210,6 @@ imports:
   - pkg/util/wait
   - pkg/watch
   - third_party/forked/golang/reflect
-- name: k8s.io/kube-openapi
-  version: 868f2f29720b192240e18284659231b440f9cda5
-  subpackages:
-  - pkg/common
 - name: k8s.io/test-infra
   version: 2e5db16bfe531f0e1b60e9ed6e22f4e06e58f5ee
   subpackages:

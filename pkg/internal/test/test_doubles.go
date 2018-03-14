@@ -34,16 +34,16 @@ func FromFile(filePath string) io.Reader {
 }
 
 // nolint
-func ExpectStatusCall(payloadAssert func(statusPayload map[string]interface{}) bool) gock.Matcher {
+func ExpectPayload(payloadAssert func(payload map[string]interface{}) bool) gock.Matcher {
 	matcher := gock.NewBasicMatcher()
 	matcher.Add(func(req *http.Request, _ *gock.Request) (bool, error) {
 		body, err := ioutil.ReadAll(req.Body)
 		if err != nil {
 			return false, err
 		}
-		var statusPayload map[string]interface{}
-		err = json.Unmarshal(body, &statusPayload)
-		payloadExpectations := payloadAssert(statusPayload)
+		var payload map[string]interface{}
+		err = json.Unmarshal(body, &payload)
+		payloadExpectations := payloadAssert(payload)
 		return payloadExpectations, err
 	})
 	return matcher

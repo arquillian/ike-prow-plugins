@@ -42,7 +42,7 @@ var _ = Describe("Test Keeper Plugin features", func() {
 			// given
 			gock.New("https://api.github.com").
 				Post("/repos/bartoszmajsak/wfswarm-booster-pipeline-test/statuses").
-				SetMatcher(ExpectStatusCall(toHaveSuccessState)).
+				SetMatcher(ExpectPayload(toHaveSuccessState)).
 				Reply(201) // This way we implicitly verify that call happened after `HandleEvent` call
 
 			statusPayload := LoadFromFile("test_fixtures/github_calls/ready_pr_opened.json")
@@ -58,7 +58,7 @@ var _ = Describe("Test Keeper Plugin features", func() {
 			// given
 			gock.New("https://api.github.com").
 				Post("/repos/bartoszmajsak/wfswarm-booster-pipeline-test/statuses").
-				SetMatcher(ExpectStatusCall(toHaveFailureState)).
+				SetMatcher(ExpectPayload(toHaveFailureState)).
 				Reply(201) // This way we implicitly verify that call happened after `HandleEvent` call
 
 			statusPayload := LoadFromFile("test_fixtures/github_calls/wip_pr_opened.json")
@@ -74,7 +74,7 @@ var _ = Describe("Test Keeper Plugin features", func() {
 			// given
 			gock.New("https://api.github.com").
 				Post("/repos/bartoszmajsak/wfswarm-booster-pipeline-test/statuses").
-				SetMatcher(ExpectStatusCall(toHaveFailureState)).
+				SetMatcher(ExpectPayload(toHaveFailureState)).
 				Reply(201) // This way we implicitly verify that call happened after `HandleEvent` call
 
 			statusPayload := LoadFromFile("test_fixtures/github_calls/pr_edited_wip_added.json")
@@ -91,7 +91,7 @@ var _ = Describe("Test Keeper Plugin features", func() {
 			// given
 			gock.New("https://api.github.com").
 				Post("/repos/bartoszmajsak/wfswarm-booster-pipeline-test/statuses").
-				SetMatcher(ExpectStatusCall(toHaveSuccessState)).
+				SetMatcher(ExpectPayload(toHaveSuccessState)).
 				Reply(201) // This way we implicitly verify that call happened after `HandleEvent` call
 
 			statusPayload := LoadFromFile("test_fixtures/github_calls/pr_edited_wip_removed.json")

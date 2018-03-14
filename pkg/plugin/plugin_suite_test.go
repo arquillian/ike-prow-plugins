@@ -1,4 +1,4 @@
-package config_test
+package plugin
 
 import (
 	"testing"
@@ -7,7 +7,7 @@ import (
 	. "github.com/onsi/gomega"
 )
 
-func TestConfig(t *testing.T) {
+func TestSuitePlugin(t *testing.T) {
 	RegisterFailHandler(Fail)
-	RunSpecs(t, "Plugin Config Loader Suite")
+	RunSpecs(t, "Ike Prow Plugins Suite")
 }
