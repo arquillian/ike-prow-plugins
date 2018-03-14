@@ -791,7 +791,24 @@ If you are using <code>zsh</code> you can take a look at <a href="https://github
 <h3 id="_building"><a class="anchor" href="#_building"></a>2.2. Building</h3>
 <div class="paragraph">
 <p>In order to compile the project simply execute <code>make build</code> target. This will compile, run tests and put binaries of each
-plugin in <code>/bin</code> directory in the root of the project.</p>
+plugin in <code>/bin</code> directory in the root of the project. There is also a quick compile option (<code>make compile-only</code>) where
+<code>go build</code> is only invoked, skipping other targets like <code>tests</code> and <code>checks</code></p>
+</div>
+<div class="paragraph">
+<p>You can also automatically format and remove unused imports by invoking <code>goimports</code> tool (<code>make imports</code>).</p>
+</div>
+<div class="admonitionblock important">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-important" title="Important"></i>
+</td>
+<td class="content">
+<code>goimports</code> does not correctly handle import of packages where package name differs from last part of the URL
+provided. For example <code>import "gopkg.in/h2non/gock.v1"</code> will be removed. To overcome this problem name the import <code>import gock "gopkg.in/h2non/gock.v1"</code>. One of the related issues <a href="https://github.com/golang/go/issues/9882">go/issues/9882</a>.
+</td>
+</tr>
+</table>
 </div>
 <div class="paragraph">
 <p>To deploy plugins use <code>make oc-apply</code>. This will build images, push them to the repository, generate deployments and apply
@@ -988,7 +1005,7 @@ If we missed some important patterns feel free to open an <a href="https://githu
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2018-03-12 19:34:13 UTC
+Last updated 2018-03-14 13:33:29 UTC
 </div>
 </div>
 <script>
