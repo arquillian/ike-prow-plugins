@@ -23,7 +23,7 @@ func LoadTestKeeperConfig(log *logrus.Entry, change scm.RepositoryChange) TestKe
 	configuration := TestKeeperConfiguration{Combine: true}
 	err := configLoader.Load(&configuration)
 	if err != nil {
-		log.Warnf("Config file was not loaded. Cause: %", err)
+		log.Warnf("Config file was not loaded. Cause: %s", err)
 		return configuration
 	}
 	configuration.LocationURL = configLoader.CreateConfigFileURL()

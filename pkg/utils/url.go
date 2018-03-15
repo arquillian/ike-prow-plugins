@@ -13,7 +13,7 @@ func GetFileFromURL(url string) ([]byte, error) {
 		return nil, err
 	}
 	if resp.StatusCode < 200 || resp.StatusCode >= 300 {
-		return []byte(""), errors.New("The response's status code wasn't 2xxx, but " + string(resp.StatusCode))
+		return []byte(""), errors.New("The response's status code wasn't 2xx, but " + string(resp.StatusCode))
 	}
 
 	defer func() {
