@@ -11,14 +11,17 @@ import (
 
 const (
 	beginning = "There wasn't found any test file that would be changed in this PR. Please add a test case to this PR.\n" +
-		"If you are an admin and you are sure that no test is needed then you can use command `" + SkipComment + "` as a comment to make the status green.\n"
+		"If you are an admin and you are sure that no test is needed then you can use command `" + SkipComment + "` " +
+		"as a comment to make the status green.\n"
 
-	noConfig = "For more information about the plugin and how to configure it, go to the [documentation](http://arquillian.org/ike-prow-plugins/#_test_keeper_plugin)."
+	noConfig = "For more information about the plugin and how to configure it, go to the " +
+		"[documentation](http://arquillian.org/ike-prow-plugins/#_test_keeper_plugin)."
 
 	withConfig = "To check plugin configuration that is set for your repository, please see the [configuration file](%s)."
 
 	notFoundFileSuffix = "\nIn the configuration file, there is set a path to a file containing a custom comment message, " +
-		"but the plugin wasn't able to retrieve it from the location %s. Check if it is either a valid URL or a relative path to an existing file in this repository."
+		"but the plugin wasn't able to retrieve it from the location %s. Check if it is either a valid URL or a relative " +
+		"path to an existing file in this repository."
 )
 
 // CreateCommentMessage creates a comment message for the test-keeper plugin. If the comment message is set in config then it takes that one, the default otherwise.
