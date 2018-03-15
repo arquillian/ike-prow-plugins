@@ -1,7 +1,7 @@
 package plugin_test
 
 import (
-	"github.com/arquillian/ike-prow-plugins/pkg/internal/test"
+	. "github.com/arquillian/ike-prow-plugins/pkg/internal/test"
 	"github.com/arquillian/ike-prow-plugins/pkg/plugin"
 	"github.com/arquillian/ike-prow-plugins/pkg/scm"
 	"github.com/google/go-github/github"
@@ -38,19 +38,19 @@ var _ = Describe("Config loader features", func() {
 				PluginName: "my-plugin-name",
 				Assignee:   "toAssign",
 			}
-			service := plugin.NewCommentService(client, test.CreateNullLogger(), change, 2, commentContext)
+			service := plugin.NewCommentService(client, CreateNullLogger(), change, 2, commentContext)
 
 			toHaveBodyWithWholePluginsComment := func(statusPayload map[string]interface{}) bool {
 				return Expect(statusPayload).To(SatisfyAll(
-					test.HaveBodyThatContains("### Ike Plugins (my-plugin-name)"),
-					test.HaveBodyThatContains("@toAssign"),
-					test.HaveBodyThatContains("New comment"),
+					HaveBodyThatContains("### Ike Plugins (my-plugin-name)"),
+					HaveBodyThatContains("@toAssign"),
+					HaveBodyThatContains("New comment"),
 				))
 			}
 
 			gock.New("https://api.github.com").
 				Post("/repos/owner/repo/issues/2/comments").
-				SetMatcher(test.ExpectPayload(toHaveBodyWithWholePluginsComment)).
+				SetMatcher(ExpectPayload(toHaveBodyWithWholePluginsComment)).
 				Reply(201)
 
 			// when
@@ -65,7 +65,7 @@ var _ = Describe("Config loader features", func() {
 			gock.New("https://api.github.com").
 				Get("/repos/owner/repo/issues/2/comments").
 				Reply(200).
-				Body(test.FromFile("test_fixtures/github_calls/prs/comments_with_tests_keeper_message.json"))
+				Body(FromFile("test_fixtures/github_calls/prs/comments_with_tests_keeper_message.json"))
 
 			change := scm.RepositoryChange{
 				Owner:    "owner",
@@ -77,7 +77,7 @@ var _ = Describe("Config loader features", func() {
 				Assignee:   "toAssign",
 			}
 
-			service := plugin.NewCommentService(client, test.CreateNullLogger(), change, 2, commentContext)
+			service := plugin.NewCommentService(client, CreateNullLogger(), change, 2, commentContext)
 
 			// when
 			err := service.PluginComment("New comment")
@@ -91,7 +91,7 @@ var _ = Describe("Config loader features", func() {
 			gock.New("https://api.github.com").
 				Get("/repos/owner/repo/issues/2/comments").
 				Reply(200).
-				Body(test.FromFile("test_fixtures/github_calls/prs/comments_with_tests_keeper_message.json"))
+				Body(FromFile("test_fixtures/github_calls/prs/comments_with_tests_keeper_message.json"))
 
 			change := scm.RepositoryChange{
 				Owner:    "owner",
@@ -108,16 +108,16 @@ var _ = Describe("Config loader features", func() {
 
 			toHaveModifiedBody := func(statusPayload map[string]interface{}) bool {
 				return Expect(statusPayload).To(SatisfyAll(
-					test.HaveBody(expContent),
+					HaveBody(expContent),
 				))
 			}
 
 			gock.New("https://api.github.com").
 				Post("/repos/owner/repo/issues/2/comments").
-				SetMatcher(test.ExpectPayload(toHaveModifiedBody)).
+				SetMatcher(ExpectPayload(toHaveModifiedBody)).
 				Reply(200)
 
-			service := plugin.NewCommentService(client, test.CreateNullLogger(), change, 2, commentContext)
+			service := plugin.NewCommentService(client, CreateNullLogger(), change, 2, commentContext)
 
 			// when
 			err := service.PluginComment("New comment")
