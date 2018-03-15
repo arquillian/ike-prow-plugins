@@ -21,15 +21,8 @@ const (
 type CommentService struct {
 	client         *github.Client
 	log            *logrus.Entry
-	issue          RepositoryIssue
+	issue          scm.RepositoryIssue
 	commentContext CommentContext
-}
-
-// RepositoryIssue holds owner name, repository name and an issue number
-type RepositoryIssue struct {
-	Owner    string
-	RepoName string
-	Number   int
 }
 
 // CommentContext holds a plugin name and a assignee to be mentioned in the comment
@@ -43,7 +36,7 @@ func NewCommentService(client *github.Client, log *logrus.Entry, change scm.Repo
 	return &CommentService{
 		client: client,
 		log:    log,
-		issue: RepositoryIssue{
+		issue: scm.RepositoryIssue{
 			Owner:    change.Owner,
 			RepoName: change.RepoName,
 			Number:   issueOrPrNumber,
