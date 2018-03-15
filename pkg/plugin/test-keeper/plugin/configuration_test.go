@@ -24,7 +24,7 @@ var _ = Describe("Test keeper config loader features", func() {
 				Reply(200).
 				BodyString("test_pattern: (.*my|test\\.go|pattern\\.js)$\n" +
 					"skip_validation_for: pom\\.xml|*\\.adoc\n" +
-					"comment_message_file: 'http://my.server.com/message.md'")
+					"plugin_hint: 'http://my.server.com/message.md'")
 
 			change := scm.RepositoryChange{
 				Owner:    "owner",
@@ -40,7 +40,7 @@ var _ = Describe("Test keeper config loader features", func() {
 			Expect(configuration.Inclusion).To(Equal(`(.*my|test\.go|pattern\.js)$`))
 			Expect(configuration.Exclusion).To(Equal(`pom\.xml|*\.adoc`))
 			Expect(configuration.Combine).To(BeTrue())
-			Expect(configuration.CommentMsgFile).To(Equal("http://my.server.com/message.md"))
+			Expect(configuration.PluginHint).To(Equal("http://my.server.com/message.md"))
 		})
 
 		It("should not load test-keeper configuration yaml file and return empty url when config is not accessible", func() {
@@ -59,7 +59,7 @@ var _ = Describe("Test keeper config loader features", func() {
 			Expect(configuration.Inclusion).To(Equal(""))
 			Expect(configuration.Exclusion).To(Equal(""))
 			Expect(configuration.Combine).To(BeTrue())
-			Expect(configuration.CommentMsgFile).To(Equal(""))
+			Expect(configuration.PluginHint).To(Equal(""))
 		})
 	})
 })

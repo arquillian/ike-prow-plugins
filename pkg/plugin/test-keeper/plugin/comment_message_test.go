@@ -15,7 +15,7 @@ var _ = Describe("Test keeper comment message creation", func() {
 		It("should create default message referencing to documentation when url to config is empty", func() {
 			// given
 			url := ""
-			config := plugin.TestKeeperConfiguration{CommentMsgFile: "any-file"}
+			config := plugin.TestKeeperConfiguration{PluginHint: "any-file"}
 
 			// when
 			msg := plugin.CreateCommentMessage(url, config, scm.RepositoryChange{})
@@ -54,7 +54,7 @@ var _ = Describe("Test keeper comment message creation", func() {
 				BodyString("Custom message")
 
 			config := plugin.TestKeeperConfiguration{
-				CommentMsgFile: "path/to/custom_message_file.md",
+				PluginHint: "path/to/custom_message_file.md",
 			}
 
 			url := "http://github.com/my/repo/test-keeper.yaml"
@@ -78,7 +78,7 @@ var _ = Describe("Test keeper comment message creation", func() {
 				Reply(404)
 
 			config := plugin.TestKeeperConfiguration{
-				CommentMsgFile: "path/to/custom_message_file.md",
+				PluginHint: "path/to/custom_message_file.md",
 			}
 
 			url := "http://github.com/my/repo/test-keeper.yaml"
@@ -108,7 +108,7 @@ var _ = Describe("Test keeper comment message creation", func() {
 				BodyString("Custom message")
 
 			config := plugin.TestKeeperConfiguration{
-				CommentMsgFile: "http://my.server.com/path/to/custom_message_file.md",
+				PluginHint: "http://my.server.com/path/to/custom_message_file.md",
 			}
 
 			url := "http://github.com/my/repo/test-keeper.yaml"
@@ -127,7 +127,7 @@ var _ = Describe("Test keeper comment message creation", func() {
 				Reply(404)
 
 			config := plugin.TestKeeperConfiguration{
-				CommentMsgFile: "http://my.server.com/path/to/custom_message_file.md",
+				PluginHint: "http://my.server.com/path/to/custom_message_file.md",
 			}
 
 			url := "http://github.com/my/repo/test-keeper.yaml"
@@ -150,7 +150,7 @@ var _ = Describe("Test keeper comment message creation", func() {
 				Reply(404)
 
 			config := plugin.TestKeeperConfiguration{
-				CommentMsgFile: "http/server.com/custom_message_file.md",
+				PluginHint: "http/server.com/custom_message_file.md",
 			}
 
 			url := "http://github.com/my/repo/test-keeper.yaml"

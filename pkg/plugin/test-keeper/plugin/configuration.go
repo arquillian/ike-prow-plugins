@@ -9,10 +9,10 @@ import (
 // TestKeeperConfiguration defines inclusion and exclusion patterns set of files will be matched against
 // It's unmarshaled from test-keeper.yml configuration file
 type TestKeeperConfiguration struct {
-	Inclusion      string `yaml:"test_pattern,omitempty"`
-	Exclusion      string `yaml:"skip_validation_for,omitempty"`
-	Combine        bool   `yaml:"combine_defaults,omitempty"`
-	CommentMsgFile string `yaml:"comment_message_file,omitempty"`
+	Inclusion  string `yaml:"test_pattern,omitempty"`
+	Exclusion  string `yaml:"skip_validation_for,omitempty"`
+	Combine    bool   `yaml:"combine_defaults,omitempty"`
+	PluginHint string `yaml:"plugin_hint,omitempty"`
 }
 
 // LoadTestKeeperConfig loads a TestKeeperConfiguration for the given change

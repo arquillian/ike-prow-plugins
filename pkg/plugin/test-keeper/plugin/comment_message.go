@@ -26,7 +26,7 @@ func CreateCommentMessage(urlToConfig string, configuration TestKeeperConfigurat
 	if urlToConfig == "" {
 		return beginning + noConfig
 	}
-	if configuration.CommentMsgFile != "" {
+	if configuration.PluginHint != "" {
 		return getMsgFromFile(urlToConfig, configuration, change)
 	}
 	return getMsgWithConfigRef(urlToConfig)
@@ -34,19 +34,19 @@ func CreateCommentMessage(urlToConfig string, configuration TestKeeperConfigurat
 }
 
 func getMsgFromFile(urlToConfig string, configuration TestKeeperConfiguration, change scm.RepositoryChange) string {
-	_, err := url.ParseRequestURI(configuration.CommentMsgFile)
+	_, err := url.ParseRequestURI(configuration.PluginHint)
 
 	var content []byte
 	var ok bool
 	var msgFileURL string
 
 	if err == nil {
-		msgFileURL = configuration.CommentMsgFile
-		content, ok, err = utils.GetFileFromURL(configuration.CommentMsgFile)
+		msgFileURL = configuration.PluginHint
+		content, ok, err = utils.GetFileFromURL(configuration.PluginHint)
 	} else {
 		ghFileService := github.RawFileService{Change: change}
-		msgFileURL = ghFileService.GetRawFileURL(configuration.CommentMsgFile)
-		content, ok, err = ghFileService.GetRawFile(configuration.CommentMsgFile)
+		msgFileURL = ghFileService.GetRawFileURL(configuration.PluginHint)
+		content, ok, err = ghFileService.GetRawFile(configuration.PluginHint)
 	}
 
 	if err != nil || !ok {
