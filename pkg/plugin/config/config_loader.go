@@ -27,15 +27,19 @@ func NewPluginConfigLoader(pluginName string, change scm.RepositoryChange) *Plug
 // Load loads configuration of the plugin stored in the YAML file named after the plugin name
 // It looks it up based on the scm.RepositoryChange hash information and unmarshals content into
 // passed target interface
-func (loader *PluginConfigLoader) Load(target interface{}) (bool, error) {
-	configuration, ok, err := loader.rawFileService.GetRawFile(loader.CreateConfigFileURL())
-	if err != nil || !ok {
-		return false, err
+func (loader *PluginConfigLoader) Load(target interface{}) error {
+	configuration, err := loader.rawFileService.GetRawFile(loader.createConfigFilePath())
+	if err != nil {
+		return err
 	}
-	return true, yaml.Unmarshal(configuration, target)
+	return yaml.Unmarshal(configuration, target)
 }
 
 // CreateConfigFileURL creates a url to the configuration file
 func (loader *PluginConfigLoader) CreateConfigFileURL() string {
-	return loader.rawFileService.GetRawFileURL(fmt.Sprintf("%s.yml", loader.pluginName))
+	return loader.rawFileService.GetRawFileURL(loader.createConfigFilePath())
+}
+
+func (loader *PluginConfigLoader) createConfigFilePath() string {
+	return fmt.Sprintf("%s.yml", loader.pluginName)
 }

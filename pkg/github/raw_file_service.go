@@ -13,7 +13,7 @@ type RawFileService struct {
 }
 
 // GetRawFile retrieves raw file content on the given path from the related GitHub repository change
-func (s *RawFileService) GetRawFile(path string) ([]byte, bool, error) {
+func (s *RawFileService) GetRawFile(path string) ([]byte, error) {
 	return utils.GetFileFromURL(s.GetRawFileURL(path))
 }
 

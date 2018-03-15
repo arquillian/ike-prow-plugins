@@ -44,11 +44,10 @@ var _ = Describe("Config loader features", func() {
 			}
 
 			// when
-			exists, err := loader.Load(&configuration)
+			err := loader.Load(&configuration)
 
 			// then
 			Ω(err).ShouldNot(HaveOccurred())
-			Expect(exists).To(BeTrue())
 			Expect(configuration.Inclusion).To(Equal(`(.*my|test\.go|pattern\.js)$`))
 			Expect(configuration.Exclusion).To(Equal(`pom\.xml|*\.adoc`))
 			Expect(configuration.Combine).To(BeTrue())

@@ -1,18 +1,19 @@
 package utils
 
 import (
+	"errors"
 	"io/ioutil"
 	"net/http"
 )
 
 // GetFileFromURL retrieves the content of the file on the given url
-func GetFileFromURL(url string) ([]byte, bool, error) {
+func GetFileFromURL(url string) ([]byte, error) {
 	resp, err := http.Get(url)
 	if err != nil {
-		return nil, false, err
+		return nil, err
 	}
 	if resp.StatusCode < 200 || resp.StatusCode >= 300 {
-		return []byte(""), false, nil
+		return []byte(""), errors.New("The response's status code wasn't 2xxx, but " + string(resp.StatusCode))
 	}
 
 	defer func() {
@@ -22,8 +23,8 @@ func GetFileFromURL(url string) ([]byte, bool, error) {
 	}()
 	body, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
-		return nil, false, err
+		return nil, err
 	}
 
-	return body, true, nil
+	return body, nil
 }

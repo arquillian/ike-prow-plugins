@@ -37,19 +37,18 @@ func getMsgFromFile(urlToConfig string, configuration TestKeeperConfiguration, c
 	_, err := url.ParseRequestURI(configuration.PluginHint)
 
 	var content []byte
-	var ok bool
 	var msgFileURL string
 
 	if err == nil {
 		msgFileURL = configuration.PluginHint
-		content, ok, err = utils.GetFileFromURL(configuration.PluginHint)
+		content, err = utils.GetFileFromURL(configuration.PluginHint)
 	} else {
 		ghFileService := github.RawFileService{Change: change}
 		msgFileURL = ghFileService.GetRawFileURL(configuration.PluginHint)
-		content, ok, err = ghFileService.GetRawFile(configuration.PluginHint)
+		content, err = ghFileService.GetRawFile(configuration.PluginHint)
 	}
 
-	if err != nil || !ok {
+	if err != nil {
 		return getMsgWithConfigRef(urlToConfig) + fmt.Sprintf(notFoundFileSuffix, msgFileURL)
 	}
 

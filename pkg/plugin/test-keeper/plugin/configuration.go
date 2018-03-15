@@ -20,12 +20,10 @@ func LoadTestKeeperConfig(log *logrus.Entry, change scm.RepositoryChange) (urlIf
 	configLoader := config.NewPluginConfigLoader(ProwPluginName, change)
 
 	configuration := TestKeeperConfiguration{Combine: true}
-	exists, err := configLoader.Load(&configuration)
+	err := configLoader.Load(&configuration)
 	if err != nil {
 		log.Warnf("Config file was not loaded. Cause: %", err)
+		return "", configuration
 	}
-	if exists {
-		return configLoader.CreateConfigFileURL(), configuration
-	}
-	return "", configuration
+	return configLoader.CreateConfigFileURL(), configuration
 }
