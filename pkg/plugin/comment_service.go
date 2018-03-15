@@ -11,8 +11,11 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
-// IkePluginsTitle is a constant containing "Ike Plugins" title with markdown formatting
-const IkePluginsTitle = "### Ike Plugins"
+// PluginTitleTemplate is a constant template containing "Ike Plugins (name-of-plugin)" title with markdown formatting
+const (
+	PluginTitleTemplate     = "### Ike Plugins (%s)"
+	assigneeMentionTemplate = "@%s Please, pay attention to the following message:"
+)
 
 // CommentService is a struct managing plugin comments
 type CommentService struct {
@@ -49,10 +52,9 @@ func NewCommentService(client *github.Client, log *logrus.Entry, change scm.Repo
 	}
 }
 
-// PluginComment checks all present comments in the issue/pull-request. If no comment with IkePluginsTitle is found, then
-// it adds a new comment with IkePluginsTitle, assignee, the plugin tittle and the given commentMsg. If a comment with
-// IkePluginsTitle is found but missing the particular plugin title, then it modifies the comment by adding plugin title
-// with the given commentMsg. If everything is present already, then it does nothing.
+// PluginComment checks all present comments in the issue/pull-request. If no comment with PluginTitleTemplate
+// (with the related plugin) is found, then it adds a new comment with the plugin title, assignee mention
+// and the given commentMsg. If such a comment is present already, then it does nothing.
 func (s *CommentService) PluginComment(commentMsg string) error {
 
 	comments, _, err := s.client.Issues.
@@ -63,16 +65,13 @@ func (s *CommentService) PluginComment(commentMsg string) error {
 
 	for _, com := range comments {
 		content := *com.Body
-		if strings.HasPrefix(content, IkePluginsTitle) {
-			if strings.Contains(content, s.getPluginTitle()) {
-				return nil
-			}
-			return s.appendToComment(commentMsg, com)
+		if strings.HasPrefix(content, s.getPluginTitle()) {
+			return nil
 		}
 	}
 
 	comment := &github.IssueComment{
-		Body: s.append(s.createBeginning(), s.createPluginParagraph(commentMsg)),
+		Body: s.createPluginHint(commentMsg),
 	}
 
 	_, _, err = s.client.Issues.CreateComment(context.Background(), s.issue.Owner, s.issue.RepoName, s.issue.Number, comment)
@@ -80,24 +79,18 @@ func (s *CommentService) PluginComment(commentMsg string) error {
 	return err
 }
 
-func (s *CommentService) appendToComment(commentMsg string, comment *github.IssueComment) error {
-	comment.Body = s.append(*comment.Body, s.createPluginParagraph(commentMsg))
-	_, _, err := s.client.Issues.EditComment(context.Background(), s.issue.Owner, s.issue.RepoName, int(*comment.ID), comment)
-	return err
+func (s *CommentService) append(first, second string) string {
+	return first + "\n\n" + second
 }
 
-func (s *CommentService) append(first, second string) *string {
-	return utils.String(first + "\n\n" + second)
-}
-
-func (s *CommentService) createPluginParagraph(commentMsg string) string {
-	return s.getPluginTitle() + "\n\n" + commentMsg
+func (s *CommentService) createPluginHint(commentMsg string) *string {
+	return utils.String(s.append(s.createBeginning(), commentMsg))
 }
 
 func (s *CommentService) createBeginning() string {
-	return *s.append(IkePluginsTitle, fmt.Sprintf("@%s Please, pay attention to the following message:", s.commentContext.Assignee))
+	return s.append(s.getPluginTitle(), fmt.Sprintf(assigneeMentionTemplate, s.commentContext.Assignee))
 }
 
 func (s *CommentService) getPluginTitle() string {
-	return "#### " + s.commentContext.PluginName
+	return fmt.Sprintf(PluginTitleTemplate, s.commentContext.PluginName)
 }

@@ -42,9 +42,9 @@ var _ = Describe("Config loader features", func() {
 
 			toHaveBodyWithWholePluginsComment := func(statusPayload map[string]interface{}) bool {
 				return Expect(statusPayload).To(SatisfyAll(
-					test.HaveBodyThatContains("#### my-plugin-name\n\nNew comment"),
+					test.HaveBodyThatContains("### Ike Plugins (my-plugin-name)"),
 					test.HaveBodyThatContains("@toAssign"),
-					test.HaveBodyThatContains(plugin.IkePluginsTitle),
+					test.HaveBodyThatContains("New comment"),
 				))
 			}
 
@@ -77,11 +77,6 @@ var _ = Describe("Config loader features", func() {
 				Assignee:   "toAssign",
 			}
 
-			//
-			gock.New("https://api.github.com").
-				Path("/repos/owner/repo/issues/comments/372707978").
-				Reply(400)
-
 			service := plugin.NewCommentService(client, test.CreateNullLogger(), change, 2, commentContext)
 
 			// when
@@ -91,7 +86,7 @@ var _ = Describe("Config loader features", func() {
 			Ω(err).ShouldNot(HaveOccurred())
 		})
 
-		It("should send patch request with modified comment that contains missing plugin message", func() {
+		It("should create a new comment that contains missing plugin hint when different one already exists", func() {
 			// given
 			gock.New("https://api.github.com").
 				Get("/repos/owner/repo/issues/2/comments").
@@ -108,8 +103,8 @@ var _ = Describe("Config loader features", func() {
 				Assignee:   "toAssign",
 			}
 
-			expContent := "### Ike Plugins\n\n@MatousJobanek Please pay attention to the following message:\n\n" +
-				"#### test-keeper\n\nMessage from test-keeper\n\n#### another-plugin\n\nNew comment"
+			expContent := "### Ike Plugins (another-plugin)\n\n@toAssign Please, pay attention to the following message:" +
+				"\n\nNew comment"
 
 			toHaveModifiedBody := func(statusPayload map[string]interface{}) bool {
 				return Expect(statusPayload).To(SatisfyAll(
@@ -118,7 +113,7 @@ var _ = Describe("Config loader features", func() {
 			}
 
 			gock.New("https://api.github.com").
-				Path("/repos/owner/repo/issues/comments/372707978").
+				Post("/repos/owner/repo/issues/2/comments").
 				SetMatcher(test.ExpectPayload(toHaveModifiedBody)).
 				Reply(200)
 

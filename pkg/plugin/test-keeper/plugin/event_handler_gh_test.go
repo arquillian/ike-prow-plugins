@@ -8,6 +8,7 @@ import (
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	gock "gopkg.in/h2non/gock.v1"
+	"fmt"
 )
 
 const (
@@ -37,9 +38,8 @@ var _ = Describe("Test Keeper Plugin features", func() {
 
 		toHaveBodyWithWholePluginsComment := func(statusPayload map[string]interface{}) bool {
 			return Expect(statusPayload).To(SatisfyAll(
-				HaveBodyThatContains(plugin.IkePluginsTitle),
+				HaveBodyThatContains(fmt.Sprintf(plugin.PluginTitleTemplate, ProwPluginName)),
 				HaveBodyThatContains("@bartoszmajsak"),
-				HaveBodyThatContains("#### "+ProwPluginName),
 			))
 		}
 
