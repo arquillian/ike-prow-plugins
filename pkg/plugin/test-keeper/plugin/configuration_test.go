@@ -33,10 +33,10 @@ var _ = Describe("Test keeper config loader features", func() {
 			}
 
 			// when
-			url, configuration := plugin.LoadTestKeeperConfig(test.CreateNullLogger(), change)
+			configuration := plugin.LoadTestKeeperConfig(test.CreateNullLogger(), change)
 
 			// then
-			Expect(url).NotTo(Equal(""))
+			Expect(configuration.LocationURL).NotTo(Equal(""))
 			Expect(configuration.Inclusion).To(Equal(`(.*my|test\.go|pattern\.js)$`))
 			Expect(configuration.Exclusion).To(Equal(`pom\.xml|*\.adoc`))
 			Expect(configuration.Combine).To(BeTrue())
@@ -52,10 +52,10 @@ var _ = Describe("Test keeper config loader features", func() {
 			}
 
 			// when
-			url, configuration := plugin.LoadTestKeeperConfig(test.CreateNullLogger(), change)
+			configuration := plugin.LoadTestKeeperConfig(test.CreateNullLogger(), change)
 
 			// then
-			Expect(url).To(Equal(""))
+			Expect(configuration.LocationURL).To(Equal(""))
 			Expect(configuration.Inclusion).To(Equal(""))
 			Expect(configuration.Exclusion).To(Equal(""))
 			Expect(configuration.Combine).To(BeTrue())

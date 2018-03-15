@@ -141,7 +141,7 @@ func (gh *GitHubTestEventsHandler) handlePrComment(prComment *gogh.IssueCommentE
 }
 
 func (gh *GitHubTestEventsHandler) checkTestsAndSetStatus(change scm.RepositoryChange, pr *gogh.PullRequest) error {
-	url, configuration := LoadTestKeeperConfig(gh.Log, change)
+	configuration := LoadTestKeeperConfig(gh.Log, change)
 	testsExist, err := gh.checkTests(change, configuration, *pr.Number)
 	if err != nil {
 		return err
@@ -160,7 +160,7 @@ func (gh *GitHubTestEventsHandler) checkTestsAndSetStatus(change scm.RepositoryC
 	commentContext := plugin.CommentContext{PluginName: ProwPluginName, Assignee: *pr.User.Login}
 	commentService := plugin.NewCommentService(gh.Client, gh.Log, change, *pr.Number, commentContext)
 
-	cerr := commentService.PluginComment(CreateCommentMessage(url, configuration, change))
+	cerr := commentService.PluginComment(CreateCommentMessage(configuration, change))
 	if cerr != nil {
 		return cerr
 	}

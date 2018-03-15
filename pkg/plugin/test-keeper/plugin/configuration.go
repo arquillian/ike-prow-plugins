@@ -9,21 +9,23 @@ import (
 // TestKeeperConfiguration defines inclusion and exclusion patterns set of files will be matched against
 // It's unmarshaled from test-keeper.yml configuration file
 type TestKeeperConfiguration struct {
-	Inclusion  string `yaml:"test_pattern,omitempty"`
-	Exclusion  string `yaml:"skip_validation_for,omitempty"`
-	Combine    bool   `yaml:"combine_defaults,omitempty"`
-	PluginHint string `yaml:"plugin_hint,omitempty"`
+	LocationURL string
+	Inclusion   string `yaml:"test_pattern,omitempty"`
+	Exclusion   string `yaml:"skip_validation_for,omitempty"`
+	Combine     bool   `yaml:"combine_defaults,omitempty"`
+	PluginHint  string `yaml:"plugin_hint,omitempty"`
 }
 
 // LoadTestKeeperConfig loads a TestKeeperConfiguration for the given change
-func LoadTestKeeperConfig(log *logrus.Entry, change scm.RepositoryChange) (urlIfExists string, conf TestKeeperConfiguration) {
+func LoadTestKeeperConfig(log *logrus.Entry, change scm.RepositoryChange) TestKeeperConfiguration {
 	configLoader := config.NewPluginConfigLoader(ProwPluginName, change)
 
 	configuration := TestKeeperConfiguration{Combine: true}
 	err := configLoader.Load(&configuration)
 	if err != nil {
 		log.Warnf("Config file was not loaded. Cause: %", err)
-		return "", configuration
+		return configuration
 	}
-	return configLoader.CreateConfigFileURL(), configuration
+	configuration.LocationURL = configLoader.CreateConfigFileURL()
+	return configuration
 }

@@ -25,18 +25,18 @@ const (
 )
 
 // CreateCommentMessage creates a comment message for the test-keeper plugin. If the comment message is set in config then it takes that one, the default otherwise.
-func CreateCommentMessage(urlToConfig string, configuration TestKeeperConfiguration, change scm.RepositoryChange) string {
-	if urlToConfig == "" {
+func CreateCommentMessage(configuration TestKeeperConfiguration, change scm.RepositoryChange) string {
+	if configuration.LocationURL == "" {
 		return beginning + noConfig
 	}
 	if configuration.PluginHint != "" {
-		return getMsgFromFile(urlToConfig, configuration, change)
+		return getMsgFromFile(configuration, change)
 	}
-	return getMsgWithConfigRef(urlToConfig)
+	return getMsgWithConfigRef(configuration.LocationURL)
 
 }
 
-func getMsgFromFile(urlToConfig string, configuration TestKeeperConfiguration, change scm.RepositoryChange) string {
+func getMsgFromFile(configuration TestKeeperConfiguration, change scm.RepositoryChange) string {
 	_, err := url.ParseRequestURI(configuration.PluginHint)
 
 	var content []byte
@@ -52,7 +52,7 @@ func getMsgFromFile(urlToConfig string, configuration TestKeeperConfiguration, c
 	}
 
 	if err != nil {
-		return getMsgWithConfigRef(urlToConfig) + fmt.Sprintf(notFoundFileSuffix, msgFileURL)
+		return getMsgWithConfigRef(configuration.LocationURL) + fmt.Sprintf(notFoundFileSuffix, msgFileURL)
 	}
 
 	return string(content)
