@@ -28,7 +28,7 @@ type CommentService struct {
 // CommentContext holds a plugin name and a assignee to be mentioned in the comment
 type CommentContext struct {
 	PluginName string
-	Assignee   string
+	Assignee   string // TODO rethink this naming when plugins will start interacting with issue creators and reviewers
 }
 
 // NewCommentService creates an instance of GitHub CommentService for the given CommentContext
