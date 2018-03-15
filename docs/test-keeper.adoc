@@ -26,7 +26,7 @@ include::../pkg/plugin/test-keeper/plugin/test_fixtures/github_calls/prs/with_te
 <1> Defines set of regular expressions which will be used to match files changeset and determine if Pull Requests comes with any changed test files.
 <2> These regular expressions will be used against changeset in the Pull Requests to exclude files that don't have to be verified by any test. If only such files exists the check will be marked as "Success" as no tests are expected for such a PR.
 <3> Allows you to decide if you want to combine your patterns with predefined defaults (`true` by default).
-<4> Sets either relative path or absolute URL to a file that contains a message to be added to the Pull Request when no test is found (if nothing is set then a default message is used).
+<4> Sets either relative path or absolute URL to a file that contains a message to be added to the Pull Request when no test is found (if nothing is set then a link:https://github.com/arquillian/ike-prow-plugins/tree/master/pkg/plugin/test-keeper/plugin/comment_message.go[default message] is used).
 
 IMPORTANT: The configuration file is always loaded from the `HEAD` of the Pull Request.
 
