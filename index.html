@@ -917,7 +917,7 @@ corresponding plugins reacting on them. Have a look at pods logs to verify if ev
 <div class="sectionbody">
 <div class="paragraph">
 <p>This plugin can help you stick to the rule that every feature you ship comes with automated way of assuring it works - by using automated tests.
-If it won&#8217;t find any tests in the Pull Request, it will mark its check as <strong>Failure</strong>, or as <strong>Success</strong> otherwise (see the screenshots below):</p>
+If it won&#8217;t find any tests in the Pull Request, it adds a comment with a description and marks its check as <strong>Failure</strong>, or as <strong>Success</strong> otherwise (see the screenshots below):</p>
 </div>
 <div class="imageblock">
 <div class="content">
@@ -950,7 +950,8 @@ If the comment will be later removed the check is triggered again.</p>
 <div class="content">
 <pre class="CodeRay highlight"><code data-lang="yml"><span class="key">test_pattern</span>: <span class="string"><span class="content">'(__test\.go)$'             </span></span><i class="conum" data-value="1"></i><b>(1)</b>
 <span class="key">skip_validation_for</span>:  <span class="string"><span class="content">'README.adoc'       </span></span><i class="conum" data-value="2"></i><b>(2)</b>
-<span class="key">combine_defaults</span>: <span class="string"><span class="content">false                   </span></span> <i class="conum" data-value="3"></i><b>(3)</b></code></pre>
+<span class="key">combine_defaults</span>: <span class="string"><span class="content">false                   </span></span><i class="conum" data-value="3"></i><b>(3)</b>
+<span class="key">plugin_hint</span>: <span class="string"><span class="content">plugins/keeper-file-hint.md  </span></span> <i class="conum" data-value="4"></i><b>(4)</b></code></pre>
 </div>
 </div>
 <div class="colist arabic">
@@ -967,6 +968,10 @@ If the comment will be later removed the check is triggered again.</p>
 <td><i class="conum" data-value="3"></i><b>3</b></td>
 <td>Allows you to decide if you want to combine your patterns with predefined defaults (<code>true</code> by default).</td>
 </tr>
+<tr>
+<td><i class="conum" data-value="4"></i><b>4</b></td>
+<td>Sets either relative path or absolute URL to a file that contains a plugin hint to be added to the Pull Request when no test is found (if nothing is set then a <a href="https://github.com/arquillian/ike-prow-plugins/tree/master/pkg/plugin/test-keeper/plugin/comment_message.go">default message</a> is used).</td>
+</tr>
 </table>
 </div>
 <div class="admonitionblock important">
@@ -976,7 +981,7 @@ If the comment will be later removed the check is triggered again.</p>
 <i class="fa icon-important" title="Important"></i>
 </td>
 <td class="content">
-The configuration file is always loaded from the <code>HEAD</code> of the Pull Request.
+Both the configuration file and the file with plugin hint are always loaded from the <code>HEAD</code> of the Pull Request.
 </td>
 </tr>
 </table>
@@ -1005,7 +1010,7 @@ If we missed some important patterns feel free to open an <a href="https://githu
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2018-03-14 20:26:58 UTC
+Last updated 2018-03-15 15:01:09 UTC
 </div>
 </div>
 <script>
