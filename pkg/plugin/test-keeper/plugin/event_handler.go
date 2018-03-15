@@ -6,7 +6,7 @@ import (
 	"strings"
 
 	"github.com/arquillian/ike-prow-plugins/pkg/github"
-	"github.com/arquillian/ike-prow-plugins/pkg/plugin/config"
+	"github.com/arquillian/ike-prow-plugins/pkg/plugin"
 	"github.com/arquillian/ike-prow-plugins/pkg/scm"
 	"github.com/arquillian/ike-prow-plugins/pkg/utils"
 	gogh "github.com/google/go-github/github"
@@ -87,17 +87,7 @@ func (gh *GitHubTestEventsHandler) handlePrEvent(event *gogh.PullRequestEvent) e
 		Hash:     *event.PullRequest.Head.SHA,
 	}
 
-	testsExist, e := gh.checkTests(change, *event.PullRequest.Number)
-	if e != nil {
-		return e
-	}
-
-	statusService := gh.newTestStatusService(change)
-
-	if testsExist {
-		return statusService.testsExist()
-	}
-	return statusService.noTests()
+	return gh.checkTestsAndSetStatus(change, event.PullRequest)
 }
 
 func (gh *GitHubTestEventsHandler) handlePrComment(prComment *gogh.IssueCommentEvent) error {
@@ -141,33 +131,44 @@ func (gh *GitHubTestEventsHandler) handlePrComment(prComment *gogh.IssueCommentE
 		RepoName: *prComment.Repo.Name,
 		Hash:     *pullRequest.Head.SHA,
 	}
-	statusService := gh.newTestStatusService(change)
 
 	if comment == SkipComment && *prComment.Action == "deleted" {
-		testsExist, err := gh.checkTests(change, *prNumber)
-		if err != nil {
-			return err
-		}
-		if testsExist {
-			return statusService.testsExist()
-		}
-
-		return statusService.noTests()
+		return gh.checkTestsAndSetStatus(change, pullRequest)
 	}
 
+	statusService := gh.newTestStatusService(change)
 	return statusService.okWithoutTests(*sender)
 }
 
-func (gh *GitHubTestEventsHandler) checkTests(change scm.RepositoryChange, prNumber int) (bool, error) {
-	configLoader := config.PluginConfigLoader{PluginName: ProwPluginName, Change: change}
-
-	configuration := TestKeeperConfiguration{Combine: true}
-	err := configLoader.Load(&configuration)
+func (gh *GitHubTestEventsHandler) checkTestsAndSetStatus(change scm.RepositoryChange, pr *gogh.PullRequest) error {
+	configuration := LoadTestKeeperConfig(gh.Log, change)
+	testsExist, err := gh.checkTests(change, configuration, *pr.Number)
 	if err != nil {
-		gh.Log.Warnf("Config file was not loaded. Cause: %", err)
+		return err
 	}
 
-	matcher := LoadMatcher(configuration)
+	statusService := gh.newTestStatusService(change)
+	if testsExist {
+		return statusService.testsExist()
+	}
+
+	err = statusService.noTests()
+	if err != nil {
+		gh.Log.Error("There occur an error when the status was being set to PR:", err)
+	}
+
+	commentContext := plugin.CommentContext{PluginName: ProwPluginName, Assignee: *pr.User.Login}
+	commentService := plugin.NewCommentService(gh.Client, gh.Log, change, *pr.Number, commentContext)
+
+	cerr := commentService.PluginComment(CreateCommentMessage(configuration, change))
+	if cerr != nil {
+		return cerr
+	}
+	return err
+}
+
+func (gh *GitHubTestEventsHandler) checkTests(change scm.RepositoryChange, config TestKeeperConfiguration, prNumber int) (bool, error) {
+	matcher := LoadMatcher(config)
 
 	checker := TestChecker{Log: gh.Log, TestKeeperMatcher: matcher}
 

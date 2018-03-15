@@ -34,14 +34,6 @@ func (checker *TestChecker) IsAnyNotExcludedFileTest(files []scm.ChangedFile) (b
 	return !remainingNoTestFiles, nil
 }
 
-// TestKeeperConfiguration defines inclusion and exclusion patterns set of files will be matched against
-// It's unmarshaled from test-keeper.yml configuration file
-type TestKeeperConfiguration struct {
-	Inclusion string `yaml:"test_pattern,omitempty"`
-	Exclusion string `yaml:"skip_validation_for,omitempty"`
-	Combine   bool   `yaml:"combine_defaults,omitempty"`
-}
-
 // LoadMatcher loads list of FileNamePattern either from the provided configuration or from languages retrieved from the given function
 func LoadMatcher(config TestKeeperConfiguration) TestMatcher {
 	var matcher = DefaultMatchers
