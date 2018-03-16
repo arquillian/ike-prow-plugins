@@ -20,7 +20,7 @@ const (
 
 	withConfig = "To check your plugin configuration check [configuration file](%s)."
 
-	notFoundFileSuffix = "\nIn the configuration file you defined custom comment message, " +
+	notFoundFileSuffix = "\nIn the configuration file you pointed to the custom comment file, " +
 		"but the plugin wasn't able to retrieve it from the defined location (%s). Make sure it is either a valid URL or a valid " +
 		"path to an existing file in this repository."
 )
