@@ -44,12 +44,11 @@ func getMsgFromFile(configuration TestKeeperConfiguration, change scm.Repository
 
 	if err == nil {
 		msgFileURL = configuration.PluginHint
-		content, err = utils.GetFileFromURL(configuration.PluginHint)
 	} else {
 		ghFileService := github.RawFileService{Change: change}
 		msgFileURL = ghFileService.GetRawFileURL(configuration.PluginHint)
-		content, err = ghFileService.GetRawFile(configuration.PluginHint)
 	}
+	content, err = utils.GetFileFromURL(msgFileURL)
 
 	if err != nil {
 		return getMsgWithConfigRef(configuration.LocationURL) + fmt.Sprintf(notFoundFileSuffix, msgFileURL)

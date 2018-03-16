@@ -9,6 +9,7 @@ import (
 )
 
 type sampleConfiguration struct {
+	config.PluginConfiguration
 	Inclusion string `yaml:"test_pattern,omitempty"`
 	Exclusion string `yaml:"exclusion,omitempty"`
 	Combine   bool   `yaml:"combine_defaults,omitempty"`
@@ -23,14 +24,14 @@ var _ = Describe("Config loader features", func() {
 
 	Context("Loading configuration file from the repository", func() {
 
-		It("should load configuration yaml file", func() {
+		It("should load configuration yaml file with suffix yml", func() {
 			// given
 			gock.New("https://raw.githubusercontent.com").
 				Get("owner/repo/46cb8fac44709e4ccaae97448c65e8f7320cfea7/sample-plugin.yml").
 				Reply(200).
 				BodyString("test_pattern: (.*my|test\\.go|pattern\\.js)$\n" +
-					"exclusion: pom\\.xml|*\\.adoc\n" +
-					"number: 12345")
+				"exclusion: pom\\.xml|*\\.adoc\n" +
+				"number: 12345")
 
 			loader := config.NewPluginConfigLoader("sample-plugin",
 				scm.RepositoryChange{
@@ -48,17 +49,21 @@ var _ = Describe("Config loader features", func() {
 
 			// then
 			Ω(err).ShouldNot(HaveOccurred())
+			Expect(configuration.LocationURL).To(Equal(
+				"https://raw.githubusercontent.com/owner/repo/46cb8fac44709e4ccaae97448c65e8f7320cfea7/sample-plugin.yml"))
 			Expect(configuration.Inclusion).To(Equal(`(.*my|test\.go|pattern\.js)$`))
 			Expect(configuration.Exclusion).To(Equal(`pom\.xml|*\.adoc`))
 			Expect(configuration.Combine).To(BeTrue())
 			Expect(configuration.AnyNumber).To(Equal(12345))
 		})
-	})
 
-	Context("URL construction", func() {
-
-		It("should create a URL to a configuration file for the given change", func() {
+		It("should load configuration yaml file with suffix yaml", func() {
 			// given
+			gock.New("https://raw.githubusercontent.com").
+				Get("owner/repo/46cb8fac44709e4ccaae97448c65e8f7320cfea7/sample-plugin.yaml").
+				Reply(200).
+				BodyString("combine_defaults: false")
+
 			loader := config.NewPluginConfigLoader("sample-plugin",
 				scm.RepositoryChange{
 					Owner:    "owner",
@@ -66,12 +71,20 @@ var _ = Describe("Config loader features", func() {
 					Hash:     "46cb8fac44709e4ccaae97448c65e8f7320cfea7",
 				})
 
+			configuration := sampleConfiguration{
+				Combine: true,
+			}
+
 			// when
-			url := loader.CreateConfigFileURL()
+			err := loader.Load(&configuration)
 
 			// then
-			Expect(url).To(Equal("https://raw.githubusercontent.com/" +
-				"owner/repo/46cb8fac44709e4ccaae97448c65e8f7320cfea7/sample-plugin.yml"))
+			Ω(err).ShouldNot(HaveOccurred())
+			Expect(configuration.LocationURL).To(Equal(
+				"https://raw.githubusercontent.com/owner/repo/46cb8fac44709e4ccaae97448c65e8f7320cfea7/sample-plugin.yaml"))
+			Expect(configuration.Exclusion).To(Equal(""))
+			Expect(configuration.Combine).To(BeFalse())
+			Expect(configuration.AnyNumber).To(Equal(0))
 		})
 	})
 })

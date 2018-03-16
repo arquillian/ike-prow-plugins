@@ -6,6 +6,7 @@ import (
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	"gopkg.in/h2non/gock.v1"
+	"github.com/arquillian/ike-prow-plugins/pkg/plugin/config"
 )
 
 var _ = Describe("Test keeper comment message creation", func() {
@@ -27,7 +28,7 @@ var _ = Describe("Test keeper comment message creation", func() {
 		It("should create default message referencing to config file when url to config is not empty", func() {
 			// given
 			url := "http://github.com/my/repo/test-keeper.yaml"
-			config := plugin.TestKeeperConfiguration{LocationURL: url}
+			config := plugin.TestKeeperConfiguration{PluginConfiguration: config.PluginConfiguration{LocationURL: url}}
 
 			// when
 			msg := plugin.CreateCommentMessage(config, scm.RepositoryChange{})
@@ -54,8 +55,8 @@ var _ = Describe("Test keeper comment message creation", func() {
 
 			url := "http://github.com/my/repo/test-keeper.yaml"
 			config := plugin.TestKeeperConfiguration{
-				LocationURL: url,
-				PluginHint:  "path/to/custom_message_file.md",
+				PluginConfiguration: config.PluginConfiguration{LocationURL: url},
+				PluginHint:          "path/to/custom_message_file.md",
 			}
 
 			change := scm.RepositoryChange{
@@ -79,8 +80,8 @@ var _ = Describe("Test keeper comment message creation", func() {
 
 			url := "http://github.com/my/repo/test-keeper.yaml"
 			config := plugin.TestKeeperConfiguration{
-				LocationURL: url,
-				PluginHint:  "path/to/custom_message_file.md",
+				PluginConfiguration: config.PluginConfiguration{LocationURL: url},
+				PluginHint:          "path/to/custom_message_file.md",
 			}
 
 			change := scm.RepositoryChange{
@@ -110,8 +111,8 @@ var _ = Describe("Test keeper comment message creation", func() {
 
 			url := "http://github.com/my/repo/test-keeper.yaml"
 			config := plugin.TestKeeperConfiguration{
-				LocationURL: url,
-				PluginHint:  "http://my.server.com/path/to/custom_message_file.md",
+				PluginConfiguration: config.PluginConfiguration{LocationURL: url},
+				PluginHint:          "http://my.server.com/path/to/custom_message_file.md",
 			}
 
 			// when
@@ -129,8 +130,8 @@ var _ = Describe("Test keeper comment message creation", func() {
 
 			url := "http://github.com/my/repo/test-keeper.yaml"
 			config := plugin.TestKeeperConfiguration{
-				LocationURL: url,
-				PluginHint:  "http://my.server.com/path/to/custom_message_file.md",
+				PluginConfiguration: config.PluginConfiguration{LocationURL: url},
+				PluginHint:          "http://my.server.com/path/to/custom_message_file.md",
 			}
 
 			// when
@@ -152,8 +153,8 @@ var _ = Describe("Test keeper comment message creation", func() {
 
 			url := "http://github.com/my/repo/test-keeper.yaml"
 			config := plugin.TestKeeperConfiguration{
-				LocationURL: url,
-				PluginHint:  "http/server.com/custom_message_file.md",
+				PluginConfiguration: config.PluginConfiguration{LocationURL: url},
+				PluginHint:          "http/server.com/custom_message_file.md",
 			}
 
 			change := scm.RepositoryChange{

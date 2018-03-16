@@ -9,7 +9,7 @@ import (
 // TestKeeperConfiguration defines inclusion and exclusion patterns set of files will be matched against
 // It's unmarshaled from test-keeper.yml configuration file
 type TestKeeperConfiguration struct {
-	LocationURL string
+	config.PluginConfiguration
 	Inclusion   string `yaml:"test_pattern,omitempty"`
 	Exclusion   string `yaml:"skip_validation_for,omitempty"`
 	Combine     bool   `yaml:"combine_defaults,omitempty"`
@@ -26,6 +26,5 @@ func LoadTestKeeperConfig(log log.Logger, change scm.RepositoryChange) TestKeepe
 		log.Warnf("Config file was not loaded. Cause: %s", err)
 		return configuration
 	}
-	configuration.LocationURL = configLoader.CreateConfigFileURL()
 	return configuration
 }
