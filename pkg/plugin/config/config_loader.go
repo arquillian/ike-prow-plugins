@@ -7,7 +7,6 @@ import (
 	"github.com/arquillian/ike-prow-plugins/pkg/scm"
 	"gopkg.in/yaml.v2"
 	"github.com/arquillian/ike-prow-plugins/pkg/utils"
-	"errors"
 )
 
 // Configuration is an interface representing a config that contains location URL when it is downloaded
@@ -55,7 +54,7 @@ func (loader *PluginConfigLoader) Load(config Configuration) error {
 		downloadedConfig, yamlErr = utils.GetFileFromURL(configURL)
 
 		if yamlErr != nil {
-			return errors.New(fmt.Sprintf("yml error: %s\nyaml error: %s", ymlErr.Error(), yamlErr.Error()))
+			return fmt.Errorf("yml error: %s\nyaml error: %s", ymlErr.Error(), yamlErr.Error())
 		}
 	}
 
