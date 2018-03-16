@@ -90,11 +90,11 @@ oc-init:
 	@echo "Setting cluster project"
 	@oc new-project ike-prow-plugins
 	@oc create configmap plugins && oc create configmap config
-	@oc create secret generic hmac-token --from-file=hmac=hmac.token && oc create secret generic oauth-token --from-file=oauth=oauth.token
+	@oc create secret generic hmac-token --from-file=hmac=config/hmac.token && oc create secret generic oauth-token --from-file=oauth=config/oauth.token
 	@oc create configmap plugins --from-file=plugins=plugins.yaml --dry-run -o yaml | oc replace configmap plugins -f -
 	@oc create configmap config --from-file=config=config.yaml --dry-run -o yaml | oc replace configmap config -f -
-	@oc create secret generic hmac-token --from-file=hmac=hmac.token --dry-run -o yaml | oc replace secret generic hmac-token  -f -
-	@oc create secret generic oauth-token --from-file=oauth=oauth.token --dry-run -o yaml | oc replace secret generic oauth-token  -f -
+	@oc create secret generic hmac-token --from-file=hmac=config/hmac.token --dry-run -o yaml | oc replace secret generic hmac-token  -f -
+	@oc create secret generic oauth-token --from-file=oauth=config/oauth.token --dry-run -o yaml | oc replace secret generic oauth-token  -f -
 	@oc apply -f cluster/starter.yaml
 
 .PHONY: oc-apply
@@ -102,8 +102,8 @@ oc-apply: build-images push-images oc-generate-deployments
 	@echo "Updating cluster configuration..."
 	@oc create configmap plugins --from-file=plugins=plugins.yaml --dry-run -o yaml | oc replace configmap plugins -f -
 	@oc create configmap config --from-file=config=config.yaml --dry-run -o yaml | oc replace configmap config -f -
-	@oc create secret generic hmac-token --from-file=hmac=hmac.token --dry-run -o yaml | oc replace secret generic hmac-token  -f -
-	@oc create secret generic oauth-token --from-file=oauth=oauth.token --dry-run -o yaml | oc replace secret generic oauth-token  -f -
+	@oc create secret generic hmac-token --from-file=hmac=config/hmac.token --dry-run -o yaml | oc replace secret generic hmac-token  -f -
+	@oc create secret generic oauth-token --from-file=oauth=config/oauth.token --dry-run -o yaml | oc replace secret generic oauth-token  -f -
 
 $(OC_DEPLOYMENTS): oc-%: %
 	@mkdir -p $(PLUGIN_DEPLOYMENTS_DIR)
