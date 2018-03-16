@@ -1,4 +1,4 @@
-package plugin
+package plugin_test
 
 import (
 	. "github.com/arquillian/ike-prow-plugins/pkg/internal/test"
@@ -7,19 +7,20 @@ import (
 	. "github.com/onsi/ginkgo/extensions/table"
 	. "github.com/onsi/gomega"
 	gock "gopkg.in/h2non/gock.v1"
+	wip "github.com/arquillian/ike-prow-plugins/pkg/plugin/work-in-progress/plugin"
 )
 
 var _ = Describe("Work-in-progress Plugin features", func() {
 
 	Context("Title verifier", func() {
 
-		var handler *GitHubWIPPRHandler
+		var handler *wip.GitHubWIPPRHandler
 
 		BeforeEach(func() {
 			defer gock.Off()
 
 			client := github.NewClient(nil) // TODO with hoverfly/go-vcr we might want to use tokens instead to capture real traffic
-			handler = &GitHubWIPPRHandler{
+			handler = &wip.GitHubWIPPRHandler{
 				Client: client,
 				Log:    CreateNullLogger(),
 			}

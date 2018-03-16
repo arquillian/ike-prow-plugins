@@ -1,4 +1,4 @@
-package github
+package github_test
 
 import (
 	"github.com/arquillian/ike-prow-plugins/pkg/scm"
@@ -8,6 +8,7 @@ import (
 
 	"github.com/arquillian/ike-prow-plugins/pkg/internal/test"
 	gock "gopkg.in/h2non/gock.v1"
+	"github.com/arquillian/ike-prow-plugins/pkg/github"
 )
 
 var _ = Describe("Repository Service", func() {
@@ -27,7 +28,7 @@ var _ = Describe("Repository Service", func() {
 					"Shell": 1527,
 					"Ruby": 226
 				}`
-			repositoryService := RepositoryService{
+			repositoryService := github.RepositoryService{
 				Client: gogh.NewClient(nil),
 				Change: scm.RepositoryChange{
 					Owner:    "arquillian",
@@ -52,7 +53,7 @@ var _ = Describe("Repository Service", func() {
 
 		It("should return empty slice when no languages found in the repository", func() {
 			// given
-			repositoryService := RepositoryService{
+			repositoryService := github.RepositoryService{
 				Client: gogh.NewClient(nil),
 				Change: scm.RepositoryChange{
 					Owner:    "arquillian",
