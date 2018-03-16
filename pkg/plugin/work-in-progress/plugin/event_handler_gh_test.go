@@ -1,4 +1,4 @@
-package plugin
+package plugin_test
 
 import (
 	"github.com/arquillian/ike-prow-plugins/pkg/github"
@@ -7,13 +7,14 @@ import (
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	gock "gopkg.in/h2non/gock.v1"
+	wip "github.com/arquillian/ike-prow-plugins/pkg/plugin/work-in-progress/plugin"
 )
 
 var _ = Describe("Test Keeper Plugin features", func() {
 
 	Context("Pull Request title change trigger", func() {
 
-		var handler *GitHubWIPPRHandler
+		var handler *wip.GitHubWIPPRHandler
 
 		toHaveSuccessState := func(statusPayload map[string]interface{}) bool {
 			return Expect(statusPayload).To(SatisfyAll(
@@ -32,7 +33,7 @@ var _ = Describe("Test Keeper Plugin features", func() {
 		BeforeEach(func() {
 			defer gock.Off()
 			client := gogh.NewClient(nil) // TODO with hoverfly/go-vcr we might want to use tokens instead to capture real traffic
-			handler = &GitHubWIPPRHandler{
+			handler = &wip.GitHubWIPPRHandler{
 				Client: client,
 				Log:    CreateNullLogger(),
 			}

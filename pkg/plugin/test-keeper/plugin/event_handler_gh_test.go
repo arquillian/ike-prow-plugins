@@ -1,4 +1,4 @@
-package plugin
+package plugin_test
 
 import (
 	"fmt"
@@ -10,6 +10,7 @@ import (
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	gock "gopkg.in/h2non/gock.v1"
+	keeper "github.com/arquillian/ike-prow-plugins/pkg/plugin/test-keeper/plugin"
 )
 
 const (
@@ -21,7 +22,7 @@ var _ = Describe("Test Keeper Plugin features", func() {
 
 	Context("Pull Request handling", func() {
 
-		var handler *GitHubTestEventsHandler
+		var handler *keeper.GitHubTestEventsHandler
 
 		toHaveSuccessState := func(statusPayload map[string]interface{}) bool {
 			return Expect(statusPayload).To(SatisfyAll(
@@ -39,7 +40,7 @@ var _ = Describe("Test Keeper Plugin features", func() {
 
 		toHaveBodyWithWholePluginsComment := func(statusPayload map[string]interface{}) bool {
 			return Expect(statusPayload).To(SatisfyAll(
-				HaveBodyThatContains(fmt.Sprintf(plugin.PluginTitleTemplate, ProwPluginName)),
+				HaveBodyThatContains(fmt.Sprintf(plugin.PluginTitleTemplate, keeper.ProwPluginName)),
 				HaveBodyThatContains("@bartoszmajsak"),
 			))
 		}
@@ -48,7 +49,7 @@ var _ = Describe("Test Keeper Plugin features", func() {
 			gock.Off()
 
 			client := gogh.NewClient(nil) // TODO with hoverfly/go-vcr we might want to use tokens instead to capture real traffic
-			handler = &GitHubTestEventsHandler{
+			handler = &keeper.GitHubTestEventsHandler{
 				Client: client,
 				Log:    CreateNullLogger(),
 			}
@@ -190,7 +191,7 @@ var _ = Describe("Test Keeper Plugin features", func() {
 			Ω(err).ShouldNot(HaveOccurred())
 		})
 
-		It("should skip test existence check when "+SkipComment+" command is used by admin user", func() {
+		It("should skip test existence check when "+keeper.SkipComment+" command is used by admin user", func() {
 			// given
 			gock.New("https://api.github.com").
 				Get("/repos/" + repositoryName + "/pulls/1").
@@ -223,7 +224,7 @@ var _ = Describe("Test Keeper Plugin features", func() {
 			Ω(err).ShouldNot(HaveOccurred())
 		})
 
-		It("should ignore "+SkipComment+" when used by non-admin user", func() {
+		It("should ignore "+keeper.SkipComment+" when used by non-admin user", func() {
 			// given
 			gock.New("https://api.github.com").
 				Get("/repos/" + repositoryName + "/commits/5d6e9b25da90edfc19f488e595e0645c081c1575").
