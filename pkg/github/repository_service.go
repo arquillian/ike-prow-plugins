@@ -4,15 +4,15 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/arquillian/ike-prow-plugins/pkg/log"
 	"github.com/arquillian/ike-prow-plugins/pkg/scm"
 	"github.com/google/go-github/github"
-	"github.com/sirupsen/logrus"
 )
 
 // RepositoryService is a concrete implementation of the interface RepositoryService
 type RepositoryService struct {
 	Client *github.Client
-	Log    *logrus.Entry
+	Log    log.Logger
 	Change scm.RepositoryChange
 }
 

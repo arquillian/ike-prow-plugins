@@ -16,6 +16,11 @@ import:
   version: 2e5db16bfe531f0e1b60e9ed6e22f4e06e58f5ee
 - package: k8s.io/test-infra/prow/plugins
   version: 2e5db16bfe531f0e1b60e9ed6e22f4e06e58f5ee
+- package: github.com/getsentry/raven-go
+- package: github.com/certifi/gocertifi
+  version: 2018.01.18
+- package: github.com/evalphobia/logrus_sentry
+  version: v0.4.5
 
 # Normally these dependencies should belong to testImport,
 # but as they are used in shared internal packages they have to go as regular ones

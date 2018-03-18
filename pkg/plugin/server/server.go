@@ -1,10 +1,10 @@
 package server
 
 import (
-	"fmt"
 	"net/http"
 
 	"github.com/arquillian/ike-prow-plugins/pkg/github"
+	"github.com/arquillian/ike-prow-plugins/pkg/log"
 	"github.com/sirupsen/logrus"
 	"k8s.io/test-infra/prow/hook"
 )
@@ -12,7 +12,7 @@ import (
 // GitHubEventHandler is a type which keeps the logic of handling GitHub events for the given plugin implementation.
 // It is used by Server implementation to handle incoming events.
 type GitHubEventHandler interface {
-	HandleEvent(eventType github.EventType, eventGUID string, payload []byte) error
+	HandleEvent(log log.Logger, eventType github.EventType, payload []byte) error
 }
 
 // Server implements http.Handler. It validates incoming GitHub webhooks and
@@ -20,7 +20,7 @@ type GitHubEventHandler interface {
 type Server struct {
 	GitHubEventHandler GitHubEventHandler
 	HmacSecret         []byte
-	Log                *logrus.Entry
+	PluginName         string
 }
 
 // ServeHTTP validates an incoming webhook and puts it into the event channel.
@@ -31,11 +31,16 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if _, err := fmt.Fprint(w, "Event received. Have a nice day."); err != nil {
-		s.Log.WithError(err).Error("Failed writing message to buffer.")
-	}
+	l := logrus.StandardLogger().WithFields(
+		logrus.Fields{
+			"ike-plugins": s.PluginName,
+			"event-type":  eventType,
+			"event-GUID":  eventGUID,
+		},
+	)
 
-	if err := s.GitHubEventHandler.HandleEvent(github.EventType(eventType), eventGUID, payload); err != nil {
-		s.Log.WithError(err).Error("Error parsing event.")
+	if err := s.GitHubEventHandler.HandleEvent(l, github.EventType(eventType), payload); err != nil {
+		l.WithError(err).Error("error parsing event.")
+		return
 	}
 }

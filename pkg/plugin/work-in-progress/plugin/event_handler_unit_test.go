@@ -1,12 +1,11 @@
 package plugin_test
 
 import (
-	. "github.com/arquillian/ike-prow-plugins/pkg/internal/test"
 	"github.com/google/go-github/github"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/ginkgo/extensions/table"
 	. "github.com/onsi/gomega"
-	gock "gopkg.in/h2non/gock.v1"
+	"gopkg.in/h2non/gock.v1"
 	wip "github.com/arquillian/ike-prow-plugins/pkg/plugin/work-in-progress/plugin"
 )
 
@@ -20,10 +19,7 @@ var _ = Describe("Work-in-progress Plugin features", func() {
 			defer gock.Off()
 
 			client := github.NewClient(nil) // TODO with hoverfly/go-vcr we might want to use tokens instead to capture real traffic
-			handler = &wip.GitHubWIPPRHandler{
-				Client: client,
-				Log:    CreateNullLogger(),
-			}
+			handler = &wip.GitHubWIPPRHandler{Client: client}
 		})
 
 		DescribeTable("should recognize PR as work-in-progress if title starts with WIP",

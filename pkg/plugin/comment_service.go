@@ -8,7 +8,7 @@ import (
 	"github.com/arquillian/ike-prow-plugins/pkg/scm"
 	"github.com/arquillian/ike-prow-plugins/pkg/utils"
 	"github.com/google/go-github/github"
-	"github.com/sirupsen/logrus"
+	"github.com/arquillian/ike-prow-plugins/pkg/log"
 )
 
 // PluginTitleTemplate is a constant template containing "Ike Plugins (name-of-plugin)" title with markdown formatting
@@ -20,7 +20,7 @@ const (
 // CommentService is a struct managing plugin comments
 type CommentService struct {
 	client         *github.Client
-	log            *logrus.Entry
+	log            log.Logger
 	issue          scm.RepositoryIssue
 	commentContext CommentContext
 }
@@ -32,7 +32,7 @@ type CommentContext struct {
 }
 
 // NewCommentService creates an instance of GitHub CommentService for the given CommentContext
-func NewCommentService(client *github.Client, log *logrus.Entry, change scm.RepositoryChange, issueOrPrNumber int, commentContext CommentContext) *CommentService {
+func NewCommentService(client *github.Client, log log.Logger, change scm.RepositoryChange, issueOrPrNumber int, commentContext CommentContext) *CommentService {
 	return &CommentService{
 		client: client,
 		log:    log,

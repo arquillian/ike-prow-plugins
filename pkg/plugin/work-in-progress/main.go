@@ -2,7 +2,6 @@ package main
 
 import (
 	"github.com/google/go-github/github"
-	"github.com/sirupsen/logrus"
 	"k8s.io/test-infra/prow/pluginhelp"
 
 	pluginBootstrap "github.com/arquillian/ike-prow-plugins/pkg/plugin"
@@ -10,25 +9,18 @@ import (
 	"github.com/arquillian/ike-prow-plugins/pkg/plugin/work-in-progress/plugin"
 )
 
-var (
-	log = logrus.StandardLogger().WithField("ike-plugins", plugin.ProwPluginName)
-)
-
 func main() {
-	pluginBootstrap.InitPlugin(log, handlerCreator, serverCreator, helpProvider)
+	pluginBootstrap.InitPlugin(plugin.ProwPluginName, handlerCreator, serverCreator, helpProvider)
 }
 
 func handlerCreator(githubClient *github.Client) server.GitHubEventHandler {
-	return &plugin.GitHubWIPPRHandler{
-		Client: githubClient,
-	}
+	return &plugin.GitHubWIPPRHandler{Client: githubClient}
 }
 
 func serverCreator(webhookSecret []byte, eventHandler server.GitHubEventHandler) *server.Server {
 	return &server.Server{
 		GitHubEventHandler: eventHandler,
 		HmacSecret:         webhookSecret,
-		Log:                log,
 	}
 }
 

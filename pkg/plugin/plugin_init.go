@@ -19,16 +19,22 @@ import (
 	"k8s.io/test-infra/prow/plugins"
 
 	"net/http"
+
+	"time"
+
+	"github.com/evalphobia/logrus_sentry"
 )
 
 // nolint
 var (
-	port              = flag.Int("port", 8888, "Port to listen on.")
-	dryRun            = flag.Bool("dry-run", true, "Dry run for testing. Uses API tokens but does not mutate.")
-	pluginConfig      = flag.String("ike-plugins-config", "/etc/plugins/plugins", "Path to ike-plugins config file.")
-	githubEndpoint    = flag.String("github-endpoint", "https://api.github.com", "GitHub's API endpoint.")
-	githubTokenFile   = flag.String("github-token-file", "/etc/github/oauth", "Path to the file containing the GitHub OAuth secret.")
-	webhookSecretFile = flag.String("hmac-secret-file", "/etc/webhook/hmac", "Path to the file containing the GitHub HMAC secret.")
+	port                = flag.Int("port", 8888, "Port to listen on.")
+	dryRun              = flag.Bool("dry-run", true, "Dry run for testing. Uses API tokens but does not mutate.")
+	pluginConfig        = flag.String("ike-plugins-config", "/etc/plugins/plugins", "Path to ike-plugins config file.")
+	githubEndpoint      = flag.String("github-endpoint", "https://api.github.com", "GitHub's API endpoint.")
+	githubTokenFile     = flag.String("github-token-file", "/etc/github/oauth", "Path to the file containing the GitHub OAuth secret.")
+	webhookSecretFile   = flag.String("hmac-secret-file", "/etc/webhook/hmac", "Path to the file containing the GitHub HMAC secret.")
+	sentryDsnSecretFile = flag.String("sentry-dsn-file", "/etc/sentry-dsn/sentry", "Path to the file containing the Sentry DSN url.")
+	sentryTimeout       = flag.Int64("sentry-timeout", 1000, "Sentry server timeout in ms. Defaults to 1 second ")
 )
 
 // EventHandlerCreator is a func type that creates server.GitHubEventHandler instance which is the central point for
@@ -40,24 +46,30 @@ type ServerCreator func(hmacSecret []byte, evenHandler server.GitHubEventHandler
 
 // InitPlugin instantiates logger, loads the secrets from the flags, sets context to background and starts server with
 // the attached event handler.
-func InitPlugin(log *logrus.Entry, newEventHandler EventHandlerCreator, newServer ServerCreator,
+func InitPlugin(pluginName string, newEventHandler EventHandlerCreator, newServer ServerCreator,
 	helpProvider externalplugins.ExternalPluginHelpProvider) {
-
-	flag.Parse()
-	logrus.SetFormatter(&logrus.JSONFormatter{})
-	// TODO: Use global option from the prow config.
-	logrus.SetLevel(logrus.InfoLevel)
 
 	// Ignore SIGTERM so that we don't drop hooks when the pod is removed.
 	// We'll get SIGTERM first and then SIGKILL after our graceful termination deadline.
 	signal.Ignore(syscall.SIGTERM)
 
-	webhookSecret := utils.LoadSecret(*webhookSecretFile)
-	oauthSecret := string(utils.LoadSecret(*githubTokenFile))
+	flag.Parse()
 
-	_, err := url.Parse(*githubEndpoint)
+	log := configureLogrus(pluginName)
+
+	webhookSecret, err := utils.LoadSecret(*webhookSecretFile)
 	if err != nil {
-		log.WithError(err).Fatal("Must specify a valid --github-endpoint URL.")
+		log.WithError(err).Fatalf("unable to load webhook secret from %q", *webhookSecretFile)
+	}
+
+	oauthSecret, err := utils.LoadSecret(*githubTokenFile)
+	if err != nil {
+		log.WithError(err).Fatalf("unable to load oauth token from %q", *githubTokenFile)
+	}
+
+	_, err = url.Parse(*githubEndpoint)
+	if err != nil {
+		log.WithError(err).Fatalf("Must specify a valid --github-endpoint URL.")
 	}
 
 	pa := &plugins.PluginAgent{}
@@ -67,16 +79,54 @@ func InitPlugin(log *logrus.Entry, newEventHandler EventHandlerCreator, newServe
 
 	ctx := context.Background()
 	token := oauth2.StaticTokenSource(
-		&oauth2.Token{AccessToken: oauthSecret},
+		&oauth2.Token{AccessToken: string(oauthSecret)},
 	)
 	githubClient := github.NewClient(oauth2.NewClient(ctx, token))
 
 	handler := newEventHandler(githubClient)
 	pluginServer := newServer(webhookSecret, handler)
 
-	log.Infof("Starting server on port %s", strconv.Itoa(*port))
+	port := strconv.Itoa(*port)
+	log.Infof("Starting server on port %s", port)
 
 	http.Handle("/", pluginServer)
 	externalplugins.ServeExternalPluginHelp(http.DefaultServeMux, log, helpProvider)
-	logrus.Fatal(http.ListenAndServe(":"+strconv.Itoa(*port), nil))
+	if err := http.ListenAndServe(":"+port, nil); err != nil {
+		log.WithError(err).Fatalf("failed to start server on port %s", port)
+	}
+}
+
+func configureLogrus(pluginName string) *logrus.Entry {
+	logrus.SetFormatter(&logrus.JSONFormatter{})
+	logrus.SetLevel(logrus.WarnLevel)
+
+	log := logrus.WithField("ike-plugins", pluginName)
+
+	sentryDsn, err := utils.LoadSecret(*sentryDsnSecretFile)
+	if err != nil {
+		log.WithError(err).Errorf("unable to load sentry dsn from %q. No sentry integration enabled", sentryDsnSecretFile)
+	}
+
+	if sentryDsn != nil {
+		tags := map[string]string{
+			"plugin": pluginName,
+		}
+
+		levels := []logrus.Level{
+			logrus.PanicLevel,
+			logrus.FatalLevel,
+			logrus.ErrorLevel,
+		}
+
+		hook, err := logrus_sentry.NewWithTagsSentryHook(string(sentryDsn), tags, levels)
+
+		if err == nil {
+			hook.Timeout = time.Duration(*sentryTimeout) * time.Second
+			logrus.AddHook(hook)
+		} else {
+			log.WithError(err).Error("failed to add sentry hook")
+		}
+	}
+
+	return log
 }

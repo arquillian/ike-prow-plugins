@@ -63,11 +63,11 @@ external_plugins:
 
 ==== GitHub settings [[gh-settings]]
 
-You will need two secrets to be able to integrate with GitHub. The `hmac.token` file should contain the token that
+You will need two secrets to be able to integrate with GitHub. The `config/hmac.token` file should contain the token that
 you give to GitHub for validating webhooks. You can generate it using any reasonable randomness-generator, for example
 link:http://random.org[random.org].
 
-The `oauth.token` is an OAuth2 token that has read and write access to the GitHub account. Generate it from
+The `config/oauth.token` is an OAuth2 token that has read and write access to the GitHub account. Generate it from
 link:https://github.com/settings/tokens/new[here]. Depending on your plugin needs the scopes might vary,
 but it is important to have following scopes enabled: `admin:org_hook` and `admin:repo_hook`.
 
@@ -80,7 +80,7 @@ In order to setup webhook for your repository go to `https://github.com/{org}/{r
 
 * payload URL
 * content type needs to be `application-json`
-* secret the same as defined in `hmac.token` file
+* secret the same as defined in `config/hmac.token` file
 * customize types of hooks you would like to receive (or use all to start)
 
 For hints how to test web hook against your local setup head over to <<testing-hooks>> section.

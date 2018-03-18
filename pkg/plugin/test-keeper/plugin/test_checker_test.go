@@ -1,7 +1,6 @@
 package plugin_test
 
 import (
-	"github.com/arquillian/ike-prow-plugins/pkg/internal/test"
 	. "github.com/arquillian/ike-prow-plugins/pkg/plugin/test-keeper/plugin"
 	"github.com/arquillian/ike-prow-plugins/pkg/scm"
 	. "github.com/onsi/ginkgo"
@@ -19,7 +18,7 @@ var _ = Describe("Test Checker features", func() {
 				"path/to/page.html",
 				"path/to/test/AnythingTestCase.java")
 
-			checker := TestChecker{Log: test.CreateNullLogger(), TestKeeperMatcher: DefaultMatchers}
+			checker := TestChecker{TestKeeperMatcher: DefaultMatchers}
 
 			// when
 			testsExist, err := checker.IsAnyNotExcludedFileTest(changedFiles)
@@ -35,7 +34,7 @@ var _ = Describe("Test Checker features", func() {
 				"pkg/plugin/test-keeper/plugin/test_checker.go",
 				"path/to/golang/main_test.go")
 
-			checker := TestChecker{Log: test.CreateNullLogger(), TestKeeperMatcher: DefaultMatchers}
+			checker := TestChecker{TestKeeperMatcher: DefaultMatchers}
 
 			// when
 			testsExist, err := checker.IsAnyNotExcludedFileTest(changedFiles)
@@ -51,7 +50,7 @@ var _ = Describe("Test Checker features", func() {
 				"path/to/JavaTest.java",
 				"path/to/golang/main_test.go")
 
-			checker := TestChecker{Log: test.CreateNullLogger(), TestKeeperMatcher: DefaultMatchers}
+			checker := TestChecker{TestKeeperMatcher: DefaultMatchers}
 
 			// when
 			testsExist, err := checker.IsAnyNotExcludedFileTest(changedFiles)
@@ -69,7 +68,7 @@ var _ = Describe("Test Checker features", func() {
 				"path/Test.java/js/something.in.js",
 				"path/to/go/another_in.go")
 
-			checker := TestChecker{Log: test.CreateNullLogger(), TestKeeperMatcher: DefaultMatchers}
+			checker := TestChecker{TestKeeperMatcher: DefaultMatchers}
 
 			// when
 			testsExist, err := checker.IsAnyNotExcludedFileTest(changedFiles)
@@ -83,7 +82,7 @@ var _ = Describe("Test Checker features", func() {
 			// given
 			changedFiles := changedFilesSet()
 
-			checker := TestChecker{Log: test.CreateNullLogger(), TestKeeperMatcher: DefaultMatchers}
+			checker := TestChecker{TestKeeperMatcher: DefaultMatchers}
 
 			// when
 			legitChangset, err := checker.IsAnyNotExcludedFileTest(changedFiles)
@@ -101,7 +100,7 @@ var _ = Describe("Test Checker features", func() {
 				"path/to/github_service.rb",
 				"path/to/github_service_test.rb")
 
-			checker := TestChecker{Log: test.CreateNullLogger(), TestKeeperMatcher: matcher}
+			checker := TestChecker{TestKeeperMatcher: matcher}
 
 			// when
 			testsExist, err := checker.IsAnyNotExcludedFileTest(changedFiles)
@@ -123,7 +122,7 @@ var _ = Describe("Test Checker features", func() {
 				"path/to/JavaTestCase.java",
 				"path/to/golang/main_test.go")
 
-			checker := TestChecker{Log: test.CreateNullLogger(), TestKeeperMatcher: matcher}
+			checker := TestChecker{TestKeeperMatcher: matcher}
 
 			// when
 			testsExist, err := checker.IsAnyNotExcludedFileTest(changedFiles)
@@ -140,7 +139,7 @@ var _ = Describe("Test Checker features", func() {
 				"pom.xml",
 				".travis.yml")
 
-			checker := TestChecker{Log: test.CreateNullLogger(), TestKeeperMatcher: DefaultMatchers}
+			checker := TestChecker{TestKeeperMatcher: DefaultMatchers}
 
 			// when
 			legitChangeSet, err := checker.IsAnyNotExcludedFileTest(changedFiles)
@@ -162,7 +161,7 @@ var _ = Describe("Test Checker features", func() {
 				"meme.svg",
 				"test.png")
 
-			checker := TestChecker{Log: test.CreateNullLogger(), TestKeeperMatcher: matcher}
+			checker := TestChecker{TestKeeperMatcher: matcher}
 
 			// when
 			legitChangeSet, err := checker.IsAnyNotExcludedFileTest(changedFiles)
@@ -183,7 +182,7 @@ var _ = Describe("Test Checker features", func() {
 				"meme.svg",
 				"test.png")
 
-			checker := TestChecker{Log: test.CreateNullLogger(), TestKeeperMatcher: matcher}
+			checker := TestChecker{TestKeeperMatcher: matcher}
 
 			// when
 			legitChangeSet, err := checker.IsAnyNotExcludedFileTest(changedFiles)
@@ -206,7 +205,7 @@ var _ = Describe("Test Checker features", func() {
 				"meme.svg",
 				"test.png")
 
-			checker := TestChecker{Log: test.CreateNullLogger(), TestKeeperMatcher: matcher}
+			checker := TestChecker{TestKeeperMatcher: matcher}
 
 			// when
 			legitChangeSet, err := checker.IsAnyNotExcludedFileTest(changedFiles)
@@ -229,7 +228,7 @@ var _ = Describe("Test Checker features", func() {
 				"pom.xml",
 				".travis.yml")
 
-			checker := TestChecker{Log: test.CreateNullLogger(), TestKeeperMatcher: matcher}
+			checker := TestChecker{TestKeeperMatcher: matcher}
 
 			// when
 			legitChangeSet, err := checker.IsAnyNotExcludedFileTest(changedFiles)
@@ -252,7 +251,7 @@ var _ = Describe("Test Checker features", func() {
 				"src/test/com/acme/FancyTestCase.java",
 				"src/test/com/acme/AwesomeFunctionalTest.java")
 
-			checker := TestChecker{Log: test.CreateNullLogger(), TestKeeperMatcher: matcher}
+			checker := TestChecker{TestKeeperMatcher: matcher}
 
 			// when
 			legitChangeSet, err := checker.IsAnyNotExcludedFileTest(changedFiles)
