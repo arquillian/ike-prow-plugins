@@ -1,5 +1,5 @@
-hash: 2a5b4f08167930f048b869fe4329723f0867ef1c84b231282de0f2b09ef774f4
-updated: 2018-03-16T16:46:14.110866323+01:00
+hash: 70a6f8791a2631d9130c7b2562c0cfcadc75a25780d9d7cbe4afc47abbe4cb68
+updated: 2018-03-19T15:23:44.854416536+01:00
 imports:
 - name: github.com/bazelbuild/buildtools
   version: c98ff0c6395f09b1942e6f7c42bf3ec15e3b9ca7
@@ -241,7 +241,7 @@ imports:
   subpackages:
   - pkg/common
 - name: k8s.io/test-infra
-  version: 2e5db16bfe531f0e1b60e9ed6e22f4e06e58f5ee
+  version: 93ade3390d83b5e4d9cd75d5a769b6391137cd1e
   subpackages:
   - prow/commentpruner
   - prow/config
@@ -271,6 +271,7 @@ imports:
   - prow/plugins/label
   - prow/plugins/lgtm
   - prow/plugins/lifecycle
+  - prow/plugins/milestone
   - prow/plugins/milestonestatus
   - prow/plugins/releasenote
   - prow/plugins/requiresig
