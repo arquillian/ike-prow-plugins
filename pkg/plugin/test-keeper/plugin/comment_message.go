@@ -18,7 +18,7 @@ const (
 	noConfig = "For more information about the plugin and how to configure it, go to the " +
 		"[documentation](http://arquillian.org/ike-prow-plugins/#_test_keeper_plugin)."
 
-	withConfig = "To check your plugin configuration check [configuration file](%s)."
+	withConfig = "Your plugin configuration is stored in the [file](%s)."
 
 	notFoundFileSuffix = "\nIn the configuration file you pointed to the custom comment file, " +
 		"but the plugin wasn't able to retrieve it from the defined location (%s). Make sure it is either a valid URL or a valid " +
