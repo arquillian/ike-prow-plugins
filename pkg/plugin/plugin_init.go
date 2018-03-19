@@ -14,15 +14,12 @@ import (
 	"github.com/arquillian/ike-prow-plugins/pkg/plugin/server"
 	"github.com/arquillian/ike-prow-plugins/pkg/utils"
 	"github.com/google/go-github/github"
-	"github.com/sirupsen/logrus"
 	"k8s.io/test-infra/prow/pluginhelp/externalplugins"
 	"k8s.io/test-infra/prow/plugins"
 
 	"net/http"
 
-	"time"
-
-	"github.com/evalphobia/logrus_sentry"
+	"github.com/arquillian/ike-prow-plugins/pkg/log"
 )
 
 // nolint
@@ -34,7 +31,8 @@ var (
 	githubTokenFile     = flag.String("github-token-file", "/etc/github/oauth", "Path to the file containing the GitHub OAuth secret.")
 	webhookSecretFile   = flag.String("hmac-secret-file", "/etc/webhook/hmac", "Path to the file containing the GitHub HMAC secret.")
 	sentryDsnSecretFile = flag.String("sentry-dsn-file", "/etc/sentry-dsn/sentry", "Path to the file containing the Sentry DSN url.")
-	sentryTimeout       = flag.Int64("sentry-timeout", 1000, "Sentry server timeout in ms. Defaults to 1 second ")
+	sentryTimeout       = flag.Int("sentry-timeout", 1000, "Sentry server timeout in ms. Defaults to 1 second ")
+	environment         = flag.String("env", "tenant", "Environment plugin is running in. Used e.g. by Sentry for tagging.")
 )
 
 // EventHandlerCreator is a func type that creates server.GitHubEventHandler instance which is the central point for
@@ -55,26 +53,35 @@ func InitPlugin(pluginName string, newEventHandler EventHandlerCreator, newServe
 
 	flag.Parse()
 
-	log := configureLogrus(pluginName)
+	logger := log.ConfigureLogrus(pluginName)
+	sentryDsn, err := utils.LoadSecret(*sentryDsnSecretFile)
+	if err != nil {
+		logger.WithError(err).Errorf("unable to load sentry dsn from %q. No sentry integration enabled", sentryDsnSecretFile)
+	}
+
+	log.AddSentryHook(logger, log.NewSentryConfiguration(string(sentryDsn), map[string]string{
+		"plugin": pluginName,
+		"environment": *environment,
+	}, *sentryTimeout))
 
 	webhookSecret, err := utils.LoadSecret(*webhookSecretFile)
 	if err != nil {
-		log.WithError(err).Fatalf("unable to load webhook secret from %q", *webhookSecretFile)
+		logger.WithError(err).Fatalf("unable to load webhook secret from %q", *webhookSecretFile)
 	}
 
 	oauthSecret, err := utils.LoadSecret(*githubTokenFile)
 	if err != nil {
-		log.WithError(err).Fatalf("unable to load oauth token from %q", *githubTokenFile)
+		logger.WithError(err).Fatalf("unable to load oauth token from %q", *githubTokenFile)
 	}
 
 	_, err = url.Parse(*githubEndpoint)
 	if err != nil {
-		log.WithError(err).Fatalf("Must specify a valid --github-endpoint URL.")
+		logger.WithError(err).Fatalf("Must specify a valid --github-endpoint URL.")
 	}
 
 	pa := &plugins.PluginAgent{}
 	if err := pa.Start(*pluginConfig); err != nil {
-		log.WithError(err).Fatalf("Error loading ike-plugins config from %q.", *pluginConfig)
+		logger.WithError(err).Fatalf("Error loading ike-plugins config from %q.", *pluginConfig)
 	}
 
 	ctx := context.Background()
@@ -87,46 +94,11 @@ func InitPlugin(pluginName string, newEventHandler EventHandlerCreator, newServe
 	pluginServer := newServer(webhookSecret, handler)
 
 	port := strconv.Itoa(*port)
-	log.Infof("Starting server on port %s", port)
+	logger.Infof("Starting server on port %s", port)
 
 	http.Handle("/", pluginServer)
-	externalplugins.ServeExternalPluginHelp(http.DefaultServeMux, log, helpProvider)
+	externalplugins.ServeExternalPluginHelp(http.DefaultServeMux, logger, helpProvider)
 	if err := http.ListenAndServe(":"+port, nil); err != nil {
-		log.WithError(err).Fatalf("failed to start server on port %s", port)
+		logger.WithError(err).Fatalf("failed to start server on port %s", port)
 	}
-}
-
-func configureLogrus(pluginName string) *logrus.Entry {
-	logrus.SetFormatter(&logrus.JSONFormatter{})
-	logrus.SetLevel(logrus.WarnLevel)
-
-	log := logrus.WithField("ike-plugins", pluginName)
-
-	sentryDsn, err := utils.LoadSecret(*sentryDsnSecretFile)
-	if err != nil {
-		log.WithError(err).Errorf("unable to load sentry dsn from %q. No sentry integration enabled", sentryDsnSecretFile)
-	}
-
-	if sentryDsn != nil {
-		tags := map[string]string{
-			"plugin": pluginName,
-		}
-
-		levels := []logrus.Level{
-			logrus.PanicLevel,
-			logrus.FatalLevel,
-			logrus.ErrorLevel,
-		}
-
-		hook, err := logrus_sentry.NewWithTagsSentryHook(string(sentryDsn), tags, levels)
-
-		if err == nil {
-			hook.Timeout = time.Duration(*sentryTimeout) * time.Second
-			logrus.AddHook(hook)
-		} else {
-			log.WithError(err).Error("failed to add sentry hook")
-		}
-	}
-
-	return log
 }
