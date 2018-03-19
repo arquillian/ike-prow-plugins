@@ -5,12 +5,11 @@ import (
 
 	"github.com/arquillian/ike-prow-plugins/pkg/github"
 	. "github.com/arquillian/ike-prow-plugins/pkg/internal/test"
-	"github.com/arquillian/ike-prow-plugins/pkg/plugin"
+	keeper "github.com/arquillian/ike-prow-plugins/pkg/plugin/test-keeper/plugin"
 	gogh "github.com/google/go-github/github"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	gock "gopkg.in/h2non/gock.v1"
-	keeper "github.com/arquillian/ike-prow-plugins/pkg/plugin/test-keeper/plugin"
 )
 
 const (
@@ -41,7 +40,7 @@ var _ = Describe("Test Keeper Plugin features", func() {
 
 		toHaveBodyWithWholePluginsComment := func(statusPayload map[string]interface{}) bool {
 			return Expect(statusPayload).To(SatisfyAll(
-				HaveBodyThatContains(fmt.Sprintf(plugin.PluginTitleTemplate, keeper.ProwPluginName)),
+				HaveBodyThatContains(fmt.Sprintf(github.PluginTitleTemplate, keeper.ProwPluginName)),
 				HaveBodyThatContains("@bartoszmajsak"),
 			))
 		}

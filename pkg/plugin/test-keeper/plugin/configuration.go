@@ -1,9 +1,9 @@
 package plugin
 
 import (
+	"github.com/arquillian/ike-prow-plugins/pkg/log"
 	"github.com/arquillian/ike-prow-plugins/pkg/plugin/config"
 	"github.com/arquillian/ike-prow-plugins/pkg/scm"
-	"github.com/arquillian/ike-prow-plugins/pkg/log"
 )
 
 // TestKeeperConfiguration defines inclusion and exclusion patterns set of files will be matched against

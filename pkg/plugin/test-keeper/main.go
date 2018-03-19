@@ -3,7 +3,7 @@ package main
 import (
 	"github.com/arquillian/ike-prow-plugins/pkg/plugin/server"
 	"github.com/arquillian/ike-prow-plugins/pkg/plugin/test-keeper/plugin"
-	"github.com/google/go-github/github"
+	gogh"github.com/google/go-github/github"
 	"k8s.io/test-infra/prow/pluginhelp"
 
 	pluginBootstrap "github.com/arquillian/ike-prow-plugins/pkg/plugin"
@@ -13,7 +13,7 @@ func main() {
 	pluginBootstrap.InitPlugin(plugin.ProwPluginName, eventHandler, eventServer, helpProvider)
 }
 
-func eventHandler(githubClient *github.Client) server.GitHubEventHandler {
+func eventHandler(githubClient *gogh.Client) server.GitHubEventHandler {
 	return &plugin.GitHubTestEventsHandler{Client: githubClient}
 }
 

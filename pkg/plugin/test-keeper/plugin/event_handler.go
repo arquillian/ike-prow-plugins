@@ -7,7 +7,6 @@ import (
 
 	"github.com/arquillian/ike-prow-plugins/pkg/github"
 	"github.com/arquillian/ike-prow-plugins/pkg/log"
-	"github.com/arquillian/ike-prow-plugins/pkg/plugin"
 	"github.com/arquillian/ike-prow-plugins/pkg/scm"
 	"github.com/arquillian/ike-prow-plugins/pkg/utils"
 	gogh "github.com/google/go-github/github"
@@ -142,8 +141,8 @@ func (gh *GitHubTestEventsHandler) checkTestsAndSetStatus(log log.Logger, change
 		log.Error("There occur an error when the status was being set to PR:", err)
 	}
 
-	commentContext := plugin.CommentContext{PluginName: ProwPluginName, Assignee: *pr.User.Login}
-	commentService := plugin.NewCommentService(gh.Client, log, change, *pr.Number, commentContext)
+	commentContext := github.CommentContext{PluginName: ProwPluginName, Assignee: *pr.User.Login}
+	commentService := github.NewCommentService(gh.Client, log, change, *pr.Number, commentContext)
 
 	cerr := commentService.PluginComment(CreateCommentMessage(configuration, change))
 	if cerr != nil {

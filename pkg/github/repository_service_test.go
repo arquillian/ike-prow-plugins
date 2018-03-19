@@ -6,9 +6,9 @@ import (
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 
+	"github.com/arquillian/ike-prow-plugins/pkg/github"
 	"github.com/arquillian/ike-prow-plugins/pkg/internal/test"
 	gock "gopkg.in/h2non/gock.v1"
-	"github.com/arquillian/ike-prow-plugins/pkg/github"
 )
 
 var _ = Describe("Repository Service", func() {

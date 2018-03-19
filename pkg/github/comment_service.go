@@ -1,14 +1,14 @@
-package plugin
+package github
 
 import (
 	"context"
 	"fmt"
 	"strings"
 
+	"github.com/arquillian/ike-prow-plugins/pkg/log"
 	"github.com/arquillian/ike-prow-plugins/pkg/scm"
 	"github.com/arquillian/ike-prow-plugins/pkg/utils"
 	"github.com/google/go-github/github"
-	"github.com/arquillian/ike-prow-plugins/pkg/log"
 )
 
 // PluginTitleTemplate is a constant template containing "Ike Plugins (name-of-plugin)" title with markdown formatting
