@@ -17,6 +17,7 @@ import:
 - package: k8s.io/test-infra/prow/plugins
   version: 93ade3390d83b5e4d9cd75d5a769b6391137cd1e
 - package: github.com/getsentry/raven-go
+  version: 563b81fc02b75d664e54da31f787c2cc2186780b
 - package: github.com/certifi/gocertifi
   version: 2018.01.18
 - package: github.com/evalphobia/logrus_sentry

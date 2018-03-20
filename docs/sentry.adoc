@@ -1,0 +1,8 @@
+
+== Sentry Logging
+
+Plugins in this repository can be integrated with link:https://sentry.io/welcome/[Sentry] error tracking tool. Use following flags when starting a plugin service to enable it:
+
+  * `sentry-dsn-file` - path to the file containing complete link:https://docs.sentry.io/quickstart/#configure-the-dsn[Sentry DSN]. Defaults to `/etc/sentry-dsn/sentry`.
+  * `sentry-timeout` - Sentry server timeout in ms. Defaults to 1 second.
+  * `env`  - environment name plugin is running in. Used e.g. by Sentry for tagging.
