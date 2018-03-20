@@ -85,25 +85,37 @@ check: ## Concurrently runs a whole bunch of static analysis tools
 .PHONY: oc-generate-deployments
 oc-generate-deployments: $(OC_DEPLOYMENTS) ## Creates openshift deployments for ike-prow plugins
 
-.PHONY: oc-init
-oc-init:
-	@echo "Setting cluster project"
-	@oc new-project ike-prow-plugins
-	@oc create configmap plugins && oc create configmap config
-	@oc create secret generic hmac-token --from-file=hmac=config/hmac.token && oc create secret generic oauth-token --from-file=oauth=config/oauth.token
-	@oc create configmap plugins --from-file=plugins=plugins.yaml --dry-run -o yaml | oc replace configmap plugins -f -
-	@oc create configmap config --from-file=config=config.yaml --dry-run -o yaml | oc replace configmap config -f -
-	@oc create secret generic hmac-token --from-file=hmac=config/hmac.token --dry-run -o yaml | oc replace secret generic hmac-token  -f -
-	@oc create secret generic oauth-token --from-file=oauth=config/oauth.token --dry-run -o yaml | oc replace secret generic oauth-token  -f -
+define populate_secret ## params: secret filename, secret name, secret key
+	@touch config/$(1)
+	@oc create secret generic $(2) --from-file=$(3)=config/$(1) || true
+	@oc create secret generic $(2) --from-file=$(3)=config/$(1) --dry-run -o yaml | oc replace secret generic $(2) -f -
+endef
+
+define populate_configmap ## params: configmap name, configmap file
+	@oc create configmap $(1) || true
+	@oc create configmap $(1) --from-file=$(1)=$(2) --dry-run -o yaml | oc replace configmap $(1) -f -
+endef
+
+OC_PROJECT_NAME?=ike-prow-plugins
+.PHONY: oc-init-project
+oc-init-project: ## Initializes new project with config maps and secrets
+	@echo "Setting cluster project (ignoring potential errors if entries already exist)"
+	@oc new-project $(OC_PROJECT_NAME) || true
+
+	$(call populate_configmap,plugins,plugins.yaml)
+	$(call populate_configmap,config,config.yaml)
+	$(call populate_secret,oauth.token,oauth-token,oauth)
+	$(call populate_secret,hmac.token,hmac-token,hmac)
+	$(call populate_secret,sentry.dsn,sentry-dsn,sentry)
+
+.PHONY: oc-deploy-starter
+oc-deploy-starter: ## Deploys basic prow infrastructure
+	@echo "Deploying prow infrastructure"
 	@oc apply -f cluster/starter.yaml
 
 .PHONY: oc-apply
-oc-apply: build-images push-images oc-generate-deployments
+oc-apply: oc-init-project build-images push-images oc-generate-deployments
 	@echo "Updating cluster configuration..."
-	@oc create configmap plugins --from-file=plugins=plugins.yaml --dry-run -o yaml | oc replace configmap plugins -f -
-	@oc create configmap config --from-file=config=config.yaml --dry-run -o yaml | oc replace configmap config -f -
-	@oc create secret generic hmac-token --from-file=hmac=config/hmac.token --dry-run -o yaml | oc replace secret generic hmac-token  -f -
-	@oc create secret generic oauth-token --from-file=oauth=config/oauth.token --dry-run -o yaml | oc replace secret generic oauth-token  -f -
 
 $(OC_DEPLOYMENTS): oc-%: %
 	@mkdir -p $(PLUGIN_DEPLOYMENTS_DIR)
