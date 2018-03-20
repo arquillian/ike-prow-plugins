@@ -52,7 +52,7 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	if err := json.Unmarshal(payload, &event); err != nil {
 		l.WithError(err).Warnf("Failed while parsing event with payload: %q.", string(payload))
 	} else {
-		l.WithFields(logrus.Fields{
+		l = l.WithFields(logrus.Fields{
 			github.RepoLogField: event.Repo.URL,
 			github.SenderLogField: event.Sender.URL,
 		})
