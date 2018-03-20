@@ -42,50 +42,9 @@ $ git clone https://github.com/arquillian/ike-prow-plugins $GOPATH/src/github.co
 NOTE: Have a look how link:https://github.com/moovweb/gvm[Go Version Manager] can help you simplifying configuration and
 management of different versions of Go.
 
-NOTE: You can also use `setup.sh` which takes care of all of the above
-
-=== Plugin settings
-
-In order to enable certain plugin for your repository or organization, you should edit `plugins.yaml` file adding:
-
-
-[source,bash]
-----
-external_plugins:
-  organization:
-  - name: test-keeper <1>
-  organization/repository <2>
-  - name: label-sanitizer
-----
-<1> The `test-keeper` plugin will be applied to every repository in your organization.
-<2> You can also specify plugins only for certain repositories (be aware however, that adding an external plugin both to the repository and its organization link:https://github.com/kubernetes/test-infra/blob/7de525b1f6943e5d08d9a127b0b668cec404c665/prow/plugins/plugins_test.go#L143[will result in an error]).
-
-
-==== GitHub settings [[gh-settings]]
-
-You will need two secrets to be able to integrate with GitHub. The `config/hmac.token` file should contain the token that
-you give to GitHub for validating webhooks. You can generate it using any reasonable randomness-generator, for example
-link:http://random.org[random.org].
-
-The `config/oauth.token` is an OAuth2 token that has read and write access to the GitHub account. Generate it from
-link:https://github.com/settings/tokens/new[here]. Depending on your plugin needs the scopes might vary,
-but it is important to have following scopes enabled: `admin:org_hook` and `admin:repo_hook`.
-
-NOTE: Both of these files are ignored by git (see `.gitignore`) so you can keep them in your repository, as some `make`
-targets rely on them.
-
-==== Setting up the web hook [[webhook]]
-
-In order to setup webhook for your repository go to `https://github.com/{org}/{repo}/settings/hooks/new` and provide:
-
-* payload URL
-* content type needs to be `application-json`
-* secret the same as defined in `config/hmac.token` file
-* customize types of hooks you would like to receive (or use all to start)
-
-For hints how to test web hook against your local setup head over to <<testing-hooks>> section.
-
-NOTE: More details about GitHub hooks can be found in the link:https://developer.github.com/webhooks/[official developer documentation].
+NOTE: You can also use link:https://raw.githubusercontent.com/arquillian/ike-prow-plugins/master/setup.sh[`setup.sh`] which takes care of all of the above. Simply execute +
+`$ curl -sSL https://git.io/vxnSk | bash` +
+and you are all set.
 
 == Development
 
@@ -108,14 +67,13 @@ To start your Minishift cluster you can use following command (you might want to
 [source,bash]
 ----
 minishift start --profile prow --memory 8GB --cpus 4
-
 ----
 
 ==== Initial setup
 
 Before you start developing new plugins or evolving existing ones you need to deploy set of basic Prow services and configuration.
 
-For this purpose use login to your Openshift cluster using `oc login` and execute `make oc-init-project` target which will:
+For this purpose use login to your OpenShift cluster using `oc login` and execute `make oc-init-project` target which will:
 
 * Create new project named `ike-prow-plugins`
 * Add config maps for Prow configuration (`config.yaml`) and its plugins (`plugins.yaml`)
@@ -138,17 +96,18 @@ by `oc whoami -t` and is used as password by Docker daemon. To do that open Open
 click on your username in the upper-right corner and then `Copy Login Command`. Use it to login from the terminal and
 you are ready to go.
 
-[source,bash]
-----
-eval $(minishift docker-env)
-docker login -u $(oc whoami) -p $(oc whoami -t) $(minishift openshift registry)
-export REGISTRY=$(minishift openshift registry)
-export DOCKER_REPO=$(oc get project --show-all=false -o name | cut -d'/' -f 2)
-----
-
-
 NOTE: If you are using `zsh` you can take a look at link:https://github.com/kennethreitz/autoenv[autoenv] or
 link:https://direnv.net/[direnv] to automate this setup every time you access project's directory. Just make sure to add it to your global `.gitignore` to avoid sharing it through PRs (e.g. `git config --global core.excludesfile ~/.gitignore`).
+
+[#sample-autoenv]
+[source,bash]
+.Sample shell script with local dev setup
+----
+include::local.sh[]
+----
+<1> Your GitHub Webhook secret. See for more details <<gh-settings>>.
+<2> Your user (or bot account) GitHub OAuth Token. See for more details <<gh-settings>>.
+<3> link:https://docs.sentry.io/quickstart/#about-the-dsn[Sentry DSN] in `+https://<key>:<secret>@<sentry_host>/<project>+` format.
 
 === Building
 
@@ -209,7 +168,48 @@ NOTE: If not done before add ultrahook URL as payload URL for webhook configurat
 Having this set up you will start seeing events triggered by your actions in the repository and
 corresponding plugins reacting on them. Have a look at pods logs to verify if everything is working expected.
 
+== Registering plugins for your repositories
+
+In order to enable certain plugin for your repository or organization, you should edit `plugins.yaml` file adding:
+
+[source,yml]
+----
+include::plugins.yaml[tag="external_plugins"]
+----
+<1> The `test-keeper` plugin will be applied to specified repository. You can also specify plugins only for the whole
+organization. Be aware however, that adding an external plugin both to the repository and its organization link:https://github.com/kubernetes/test-infra/blob/7de525b1f6943e5d08d9a127b0b668cec404c665/prow/plugins/plugins_test.go#L143[will result in an error].
+<2> You can limit events dispatched by hook to your plugin.
+
+
+=== GitHub settings [[gh-settings]]
+
+You will need two secrets to be able to integrate with GitHub. The `config/hmac.token` file should contain the token that
+you give to GitHub for validating webhooks. You can generate it using any reasonable randomness-generator, for example
+link:http://random.org[random.org].
+
+The `config/oauth.token` is an OAuth2 token that has read and write access to the GitHub account. Generate it from
+link:https://github.com/settings/tokens/new[here]. Depending on your plugin needs the scopes might vary,
+but it is important to have following scopes enabled: `admin:org_hook` and `admin:repo_hook`.
+
+NOTE: Both of these files are ignored by git (see `.gitignore`) so you can keep them in your repository, as some `make`
+targets rely on them.
+
+=== Setting up the web hook [[webhook]]
+
+In order to setup webhook for your repository go to `https://github.com/{org}/{repo}/settings/hooks/new` and provide:
+
+* payload URL
+* content type needs to be `application-json`
+* secret the same as defined in `config/hmac.token` file
+* customize types of hooks you would like to receive (or use all to start)
+
+For hints how to test web hook against your local setup head over to <<testing-hooks>> section.
+
+NOTE: More details about GitHub hooks can be found in the link:https://developer.github.com/webhooks/[official developer documentation].
+
+
 ifndef::generated-doc[]
+
 [discrete]
 == Documentation
 
