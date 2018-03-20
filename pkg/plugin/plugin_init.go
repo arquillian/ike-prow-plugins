@@ -20,6 +20,7 @@ import (
 	"net/http"
 
 	"github.com/arquillian/ike-prow-plugins/pkg/log"
+	"github.com/sirupsen/logrus"
 )
 
 // nolint
@@ -53,16 +54,7 @@ func InitPlugin(pluginName string, newEventHandler EventHandlerCreator, newServe
 
 	flag.Parse()
 
-	logger := log.ConfigureLogrus(pluginName)
-	sentryDsn, err := utils.LoadSecret(*sentryDsnSecretFile)
-	if err != nil {
-		logger.WithError(err).Errorf("unable to load sentry dsn from %q. No sentry integration enabled", sentryDsnSecretFile)
-	}
-
-	log.AddSentryHook(logger, log.NewSentryConfiguration(string(sentryDsn), map[string]string{
-		"plugin": pluginName,
-		"environment": *environment,
-	}, *sentryTimeout))
+	logger := configureLogger(pluginName)
 
 	webhookSecret, err := utils.LoadSecret(*webhookSecretFile)
 	if err != nil {
@@ -101,4 +93,20 @@ func InitPlugin(pluginName string, newEventHandler EventHandlerCreator, newServe
 	if err := http.ListenAndServe(":"+port, nil); err != nil {
 		logger.WithError(err).Fatalf("failed to start server on port %s", port)
 	}
+}
+
+func configureLogger(pluginName string) *logrus.Entry {
+	logger := log.ConfigureLogrus(pluginName)
+
+	sentryDsn, err := utils.LoadSecret(*sentryDsnSecretFile)
+	if err != nil {
+		logger.WithError(err).Errorf("unable to load sentry dsn from %q. No sentry integration enabled", sentryDsnSecretFile)
+	} else {
+		log.AddSentryHook(logger, log.NewSentryConfiguration(string(sentryDsn), map[string]string{
+			"plugin":      pluginName,
+			"environment": *environment,
+		}, *sentryTimeout))
+	}
+
+	return logger
 }
