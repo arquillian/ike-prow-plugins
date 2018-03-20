@@ -20,14 +20,14 @@ var _ = Describe("Test Keeper Plugin features", func() {
 
 		toHaveSuccessState := func(statusPayload map[string]interface{}) bool {
 			return Expect(statusPayload).To(SatisfyAll(
-				HaveState("success"),
+				HaveState(github.StatusSuccess),
 				HaveDescription("PR is ready for review and merge"),
 			))
 		}
 
 		toHaveFailureState := func(statusPayload map[string]interface{}) bool {
 			return Expect(statusPayload).To(SatisfyAll(
-				HaveState("failure"),
+				HaveState(github.StatusFailure),
 				HaveDescription("PR is in progress and can't be merged yet. You might want to wait with review as well"),
 			))
 		}
