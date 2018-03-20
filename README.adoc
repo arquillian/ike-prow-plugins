@@ -225,5 +225,6 @@ endif::generated-doc[]
 ifdef::generated-doc[]
 
 include::{asciidoctor-source}/test-keeper.adoc[]
+include::{asciidoctor-source}/sentry.adoc[]
 
 endif::generated-doc[]

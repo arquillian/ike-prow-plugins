@@ -26,14 +26,14 @@ var _ = Describe("Test Keeper Plugin features", func() {
 
 		toHaveSuccessState := func(statusPayload map[string]interface{}) bool {
 			return Expect(statusPayload).To(SatisfyAll(
-				HaveState("success"),
+				HaveState(github.StatusSuccess),
 				HaveDescription("There are some tests :)"),
 			))
 		}
 
 		toHaveFailureState := func(statusPayload map[string]interface{}) bool {
 			return Expect(statusPayload).To(SatisfyAll(
-				HaveState("failure"),
+				HaveState(github.StatusFailure),
 				HaveDescription("No tests in this PR :("),
 			))
 		}
@@ -202,7 +202,7 @@ var _ = Describe("Test Keeper Plugin features", func() {
 
 			toHaveEnforcedSuccessState := func(statusPayload map[string]interface{}) bool {
 				return Expect(statusPayload).To(SatisfyAll(
-					HaveState("success"),
+					HaveState(github.StatusSuccess),
 					HaveDescription("PR is fine without tests says @bartoszmajsak"),
 				))
 			}
