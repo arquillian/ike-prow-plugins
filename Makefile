@@ -99,7 +99,7 @@ oc-init-project: ## Initiliazes new project with config maps and secrets
 	@oc create configmap config --from-file=config=config.yaml --dry-run -o yaml | oc replace configmap config -f -
 	@oc create secret generic hmac-token --from-file=hmac=config/hmac.token --dry-run -o yaml | oc replace secret generic hmac-token  -f -
 	@oc create secret generic oauth-token --from-file=oauth=config/oauth.token --dry-run -o yaml | oc replace secret generic oauth-token  -f -
-	@oc create secret generic sentry-dsn --from-file=sentry=config/sentry.dsn --dry-run -o yaml | oc replace secret generic oauth-token  -f -
+	@oc create secret generic sentry-dsn --from-file=sentry=config/sentry.dsn --dry-run -o yaml | oc replace secret generic sentry-dsn  -f -
 
 .PHONY: oc-deploy-starter
 oc-deploy-starter: ## Deploys basic prow infrastructure
