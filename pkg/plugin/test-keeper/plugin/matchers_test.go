@@ -88,8 +88,23 @@ var _ = Describe("Test Matcher features", func() {
 			createEntry(DefaultMatchers.Exclusion, "README.adoc", true),
 			createEntry(DefaultMatchers.Exclusion, "README.asciidoc", true),
 			createEntry(DefaultMatchers.Exclusion, "testing.md", true),
+			createEntry(DefaultMatchers.Exclusion, "testing.txt", true),
 			createEntry(DefaultMatchers.Exclusion, "LICENSE", true),
 			createEntry(DefaultMatchers.Exclusion, "CODEOWNERS", true),
+		)
+
+		table.DescribeTable("DefaultMatchers should exclude ui assets",
+			assertFileMatchers,
+
+			createEntry(DefaultMatchers.Exclusion, "style.sass", true),
+			createEntry(DefaultMatchers.Exclusion, "style.css", true),
+			createEntry(DefaultMatchers.Exclusion, "style.less", true),
+			createEntry(DefaultMatchers.Exclusion, "style.scss", true),
+			createEntry(DefaultMatchers.Exclusion, "meme.png", true),
+			createEntry(DefaultMatchers.Exclusion, "chart.svg", true),
+			createEntry(DefaultMatchers.Exclusion, "photo.jpg", true),
+			createEntry(DefaultMatchers.Exclusion, "pic.jpeg", true),
+			createEntry(DefaultMatchers.Exclusion, "reaction.gif", true),
 		)
 	})
 
