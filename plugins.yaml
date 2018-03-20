@@ -5,5 +5,12 @@ plugins:
 external_plugins:
   bartoszmajsak/wfswarm-booster-pipeline-test:
   - name: test-keeper
+    events:
+      - pull_request
+      - issue_comment
   - name: pr-sanitizer
+    events:
+      - pull_request
   - name: work-in-progress
+    events:
+      - pull_request
