@@ -47,7 +47,6 @@ func (s *StatusService) Error(reason string) error {
 	return s.setStatus(StatusError, reason)
 }
 
-
 // setStatus sets the given status with the given reason to the related commit
 func (s *StatusService) setStatus(status, reason string) error {
 	c := fmt.Sprintf("%q/%q", s.statusContext.BotName, s.statusContext.PluginName)
