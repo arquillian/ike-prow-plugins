@@ -103,21 +103,30 @@ openshift v3.7.1
 kubernetes v1.7.6
 ----
 
+To start your Minishift cluster you can use following command (you might want to customize CPU and memory limits):
+
+[source,bash]
+----
+minishift start --profile prow --memory 8GB --cpus 4
+
+----
+
 ==== Initial setup
 
 Before you start developing new plugins or evolving existing ones you need to deploy set of basic Prow services and configuration.
 
-For this purpose use login to your Openshift cluster using `oc login` and execute `make oc-init` target which will:
+For this purpose use login to your Openshift cluster using `oc login` and execute `make oc-init-project` target which will:
 
 * Create new project named `ike-prow-plugins`
 * Add config maps for Prow configuration (`config.yaml`) and its plugins (`plugins.yaml`)
 * Add required secrets (see <<gh-settings>> for details)
-* Apply `cluster/starter.yaml` with basic Prow infra.
 
-The key piece of this deployment is the `hook` service which listens to GitHub events and dispatches them to relevant plugins.
+At this point you have new Openshift project created and before you will be able to deploy plugins you can select one of following targets:
 
-You will have to create a route for this service. Go to `Applications -> Services -> hook` and click `Create Route`.
-Set `/hook` as a path and click `Create`.
+. `oc-deploy-hook` will only deploy `hook` service responsible for dispatching incoming GitHub events.
+. `oc-deploy-starter` will deploy key Prow services next to `hook`. For the explanation head over to the link:https://github.com/kubernetes/test-infra/blob/8a2cb8faf150750fd308f6d92a32773c386a3da9/prow/README.md[official documentation].
+
+The key piece of both deployments is the `hook` service which listens to GitHub events and dispatches them to relevant plugins.
 
 ==== Pushing to local Minishift repository
 
@@ -140,7 +149,6 @@ export DOCKER_REPO=$(oc get project --show-all=false -o name | cut -d'/' -f 2)
 
 NOTE: If you are using `zsh` you can take a look at link:https://github.com/kennethreitz/autoenv[autoenv] or
 link:https://direnv.net/[direnv] to automate this setup every time you access project's directory. Just make sure to add it to your global `.gitignore` to avoid sharing it through PRs (e.g. `git config --global core.excludesfile ~/.gitignore`).
-
 
 === Building
 
@@ -193,7 +201,7 @@ are all set:
 
 [source,bash]
 ----
-ultrahook github http://hook-$(oc get project --show-all=false -o name | grep 'prow' | cut -d'/' -f 2).$(minishift ip).nip.io/hook
+ultrahook github http://$(oc get route/hook --no-headers=true -o=custom-columns=HOST:spec.host)/hook
 ----
 
 NOTE: If not done before add ultrahook URL as payload URL for webhook configuration (see <<webhook>>).
