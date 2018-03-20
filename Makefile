@@ -85,25 +85,43 @@ check: ## Concurrently runs a whole bunch of static analysis tools
 .PHONY: oc-generate-deployments
 oc-generate-deployments: $(OC_DEPLOYMENTS) ## Creates openshift deployments for ike-prow plugins
 
-.PHONY: oc-init
-oc-init:
+
+OC_PROJECT_NAME?=ike-prow-plugins
+.PHONY: oc-init-project
+oc-init-project: ## Initiliazes new project with config maps and secrets
 	@echo "Setting cluster project"
-	@oc new-project ike-prow-plugins
+	@oc new-project $(OC_PROJECT_NAME)
 	@oc create configmap plugins && oc create configmap config
-	@oc create secret generic hmac-token --from-file=hmac=config/hmac.token && oc create secret generic oauth-token --from-file=oauth=config/oauth.token
+	@oc create secret generic hmac-token --from-file=hmac=config/hmac.token
+	@oc create secret generic oauth-token --from-file=oauth=config/oauth.token
+	@oc create secret generic sentry-dsn --from-file=sentry=config/sentry.dsn
 	@oc create configmap plugins --from-file=plugins=plugins.yaml --dry-run -o yaml | oc replace configmap plugins -f -
 	@oc create configmap config --from-file=config=config.yaml --dry-run -o yaml | oc replace configmap config -f -
 	@oc create secret generic hmac-token --from-file=hmac=config/hmac.token --dry-run -o yaml | oc replace secret generic hmac-token  -f -
 	@oc create secret generic oauth-token --from-file=oauth=config/oauth.token --dry-run -o yaml | oc replace secret generic oauth-token  -f -
+	@oc create secret generic sentry-dsn --from-file=sentry=config/sentry.dsn --dry-run -o yaml | oc replace secret generic oauth-token  -f -
+
+.PHONY: oc-deploy-starter
+oc-deploy-starter: ## Deploys basic prow infrastructure
+	@echo "Deploying prow infrastructure"
 	@oc apply -f cluster/starter.yaml
 
-.PHONY: oc-apply
+HOOK_VERSION?=v20180316-93ade3390
+.PHONY: oc-deploy-hook
+oc-deploy-hook: ## Deploys hook service only
+	@echo "Deploys hook service ${HOOK_VERSION}"
+	@oc process -f $(CLUSTER_DIR)/hook-template.yaml \
+    		-p VERSION=$(HOOK_VERSION) \
+    		-o yaml | oc apply -f -
+
+.PHONY: oc-apply ## Builds plugin images, updates configuration and deploys new version of ike-plugins
 oc-apply: build-images push-images oc-generate-deployments
 	@echo "Updating cluster configuration..."
 	@oc create configmap plugins --from-file=plugins=plugins.yaml --dry-run -o yaml | oc replace configmap plugins -f -
 	@oc create configmap config --from-file=config=config.yaml --dry-run -o yaml | oc replace configmap config -f -
 	@oc create secret generic hmac-token --from-file=hmac=config/hmac.token --dry-run -o yaml | oc replace secret generic hmac-token  -f -
 	@oc create secret generic oauth-token --from-file=oauth=config/oauth.token --dry-run -o yaml | oc replace secret generic oauth-token  -f -
+	@oc create secret generic sentry-dsn --from-file=sentry=config/sentry.dsn --dry-run -o yaml | oc replace secret generic sentry-dsn  -f -
 
 $(OC_DEPLOYMENTS): oc-%: %
 	@mkdir -p $(PLUGIN_DEPLOYMENTS_DIR)
