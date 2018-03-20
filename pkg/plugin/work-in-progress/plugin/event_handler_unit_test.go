@@ -1,12 +1,12 @@
 package plugin_test
 
 import (
+	wip "github.com/arquillian/ike-prow-plugins/pkg/plugin/work-in-progress/plugin"
 	"github.com/google/go-github/github"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/ginkgo/extensions/table"
 	. "github.com/onsi/gomega"
 	"gopkg.in/h2non/gock.v1"
-	wip "github.com/arquillian/ike-prow-plugins/pkg/plugin/work-in-progress/plugin"
 )
 
 var _ = Describe("Work-in-progress Plugin features", func() {

@@ -47,7 +47,11 @@ func Matches(matchers []FileNamePattern, filename string) bool {
 // It matches any string that contains either "test" or "Test"
 var DefaultMatchers = TestMatcher{
 	Inclusion: []FileNamePattern{javaTests, goTests, javascriptTests, typescriptTests, pythonTests, groovyTests},
-	Exclusion: []FileNamePattern{buildToolsFileNameMatcher, buildToolsDirectoryNameMatcher, ciToolsFileNameMatcher, textAssetsFileNameMatcher, settingsFileNameMatcher},
+	Exclusion: []FileNamePattern{
+		buildToolsFileNameMatcher, buildToolsDirectoryNameMatcher,
+		ciToolsFileNameMatcher, settingsFileNameMatcher,
+		textAssetsFileNameMatcher, uiAssetsFileNameMatcher,
+	},
 }
 
 var javaTests = FileNamePattern{
@@ -86,8 +90,12 @@ var ciToolsFileNameMatcher = FileNamePattern{
 	Regex: `\.travis\.yml|Jenkinsfile|\.gitlab-ci\.yml,|wercker\.yml|circle\.yml$`,
 }
 
+var uiAssetsFileNameMatcher = FileNamePattern{
+	Regex: `(\.jpg|\.jpeg|\.png|\.ico|\.svg|\.gif|\.css|\.scss|\.sass|\.less)$`,
+}
+
 var textAssetsFileNameMatcher = FileNamePattern{
-	Regex: `(\.md|\.asciidoc|\.adoc|LICENSE|CODEOWNERS)$`,
+	Regex: `(\.md|\.txt|\.asciidoc|\.adoc|LICENSE|CODEOWNERS)$`,
 }
 
 var settingsFileNameMatcher = FileNamePattern{

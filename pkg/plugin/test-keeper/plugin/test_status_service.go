@@ -26,8 +26,6 @@ func (ts *testStatusService) noTests() error {
 	return ts.statusService.Failure("No tests in this PR :(")
 }
 
-// TODO add comment mentioning lack of tests
-
 func (ts *testStatusService) okWithoutTests(approvedBy string) error {
 	return ts.statusService.Success(fmt.Sprintf("PR is fine without tests says @%s", approvedBy))
 }

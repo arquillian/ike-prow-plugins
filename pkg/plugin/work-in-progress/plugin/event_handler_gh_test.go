@@ -3,11 +3,11 @@ package plugin_test
 import (
 	"github.com/arquillian/ike-prow-plugins/pkg/github"
 	. "github.com/arquillian/ike-prow-plugins/pkg/internal/test"
+	wip "github.com/arquillian/ike-prow-plugins/pkg/plugin/work-in-progress/plugin"
 	gogh "github.com/google/go-github/github"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	gock "gopkg.in/h2non/gock.v1"
-	wip "github.com/arquillian/ike-prow-plugins/pkg/plugin/work-in-progress/plugin"
 )
 
 var _ = Describe("Test Keeper Plugin features", func() {
