@@ -535,6 +535,7 @@ table.CodeRay td.code>pre{padding:0}
 <li><a href="#testkeeper-config">3.1. Configuration</a></li>
 </ul>
 </li>
+<li><a href="#_sentry_logging">4. Sentry Logging</a></li>
 </ul>
 </div>
 </div>
@@ -1007,10 +1008,31 @@ If we missed some important patterns feel free to open an <a href="https://githu
 </div>
 </div>
 </div>
+<div class="sect1">
+<h2 id="_sentry_logging"><a class="anchor" href="#_sentry_logging"></a>4. Sentry Logging</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Plugins in this repository can be integrated with <a href="https://sentry.io/welcome/">Sentry</a> error tracking tool. Use following flags when starting a plugin service to enable it:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><code>sentry-dsn-file</code> - path to the file containing complete <a href="https://docs.sentry.io/quickstart/#configure-the-dsn">Sentry DSN</a>. Defaults to <code>/etc/sentry-dsn/sentry</code>.</p>
+</li>
+<li>
+<p><code>sentry-timeout</code> - Sentry server timeout in ms. Defaults to 1 second.</p>
+</li>
+<li>
+<p><code>env</code>  - environment name plugin is running in. Used e.g. by Sentry for tagging.</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2018-03-20 11:20:08 UTC
+Last updated 2018-03-20 12:10:59 UTC
 </div>
 </div>
 <script>
