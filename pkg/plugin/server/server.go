@@ -25,7 +25,7 @@ type Server struct {
 	PluginName         string
 }
 
-// repoEvent contains subset of most of the events sent by GitHub such as IssueComment or PullRequest
+// repoEvent is a minimal common subset of most of the events sent by GitHub (such as IssueComment or PullRequest)
 // This information is used for contextual logging
 type repoEvent struct {
 	Repo         *gogh.Repository   `json:"repository,omitempty"`
