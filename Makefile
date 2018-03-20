@@ -88,7 +88,7 @@ oc-generate-deployments: $(OC_DEPLOYMENTS) ## Creates openshift deployments for 
 
 OC_PROJECT_NAME?=ike-prow-plugins
 .PHONY: oc-init-project
-oc-init-project: ## Initiliazes new project with config maps and secrets
+oc-init-project: ## Initializes new project with config maps and secrets
 	@echo "Setting cluster project"
 	@oc new-project $(OC_PROJECT_NAME)
 	@oc create configmap plugins && oc create configmap config
