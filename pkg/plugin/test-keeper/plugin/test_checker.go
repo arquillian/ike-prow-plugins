@@ -12,23 +12,48 @@ type TestChecker struct {
 	TestKeeperMatcher TestMatcher
 }
 
-// IsAnyNotExcludedFileTest checks if a commit affects any test file
-func (checker *TestChecker) IsAnyNotExcludedFileTest(files []scm.ChangedFile) (bool, error) {
+// FileCategories holds information about the total files coming in the changeset, legit files (those which are excluded from test verification)
+// and Tests
+type FileCategories struct {
+	Total, Legit, Tests int
+	Files *[]scm.ChangedFile
+}
 
-	remainingNoTestFiles := false
+// OnlyLegitFiles indicates if changeset contains only files which are excluded from test verification
+func (f *FileCategories) OnlyLegitFiles() bool {
+	return f.Total > 0 && f.Legit == f.Total
+}
+
+// TestsExist answers if any test files are found
+func (f* FileCategories) TestsExist() bool {
+	return f.Tests > 0
+}
+
+// NewFileCategories creates new instance of FileCategories struct with files populated
+func NewFileCategories(files []scm.ChangedFile) FileCategories {
+	return FileCategories{Files:&files, Total: len(files)}
+}
+
+// CategorizeFiles counts files in the changeset which are tests (included files) and should not be considered for
+// verification (excluded). When first test is found it stops, as this is enough to unblock PR
+func (checker *TestChecker) CategorizeFiles(files []scm.ChangedFile) (FileCategories, error) {
+	categories := NewFileCategories(files)
 	for _, file := range files {
 		if file.Name == "" {
-			return false, errors.New("can't have empty file name")
+			return categories, errors.New("can't have empty file name")
 		}
 		excluded := checker.TestKeeperMatcher.MatchesExclusion(file.Name)
 		if !excluded {
 			if checker.TestKeeperMatcher.MatchesInclusion(file.Name) {
-				return true, nil
+				categories.Tests++
+				return categories, nil // As we found the first test and we don't care about the amount of them, we can return
 			}
-			remainingNoTestFiles = true
+
+		} else {
+			categories.Legit++
 		}
 	}
-	return !remainingNoTestFiles, nil
+	return categories, nil
 }
 
 // LoadMatcher loads list of FileNamePattern either from the provided configuration or from languages retrieved from the given function

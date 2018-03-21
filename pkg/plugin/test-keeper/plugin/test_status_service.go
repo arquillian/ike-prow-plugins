@@ -22,6 +22,15 @@ func (ts *testStatusService) testsExist() error {
 	return ts.statusService.Success("There are some tests :)")
 }
 
+func (ts *testStatusService) onlyLegitFiles() error {
+	return ts.statusService.Success("Seems that this PR doesn't need to have tests") // TODO create link to detailed log about the problem
+}
+
+func (ts *testStatusService) reportError() error {
+	return ts.statusService.Error("Failed while check for tests") // TODO create link to detailed log about the problem
+}
+
+
 func (ts *testStatusService) noTests() error {
 	return ts.statusService.Failure("No tests in this PR :(")
 }

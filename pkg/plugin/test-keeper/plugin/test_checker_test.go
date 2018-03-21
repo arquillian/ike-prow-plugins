@@ -21,11 +21,11 @@ var _ = Describe("Test Checker features", func() {
 			checker := TestChecker{TestKeeperMatcher: DefaultMatchers}
 
 			// when
-			testsExist, err := checker.IsAnyNotExcludedFileTest(changedFiles)
+			fileCategories, err := checker.CategorizeFiles(changedFiles)
 
 			// then
 			Ω(err).ShouldNot(HaveOccurred())
-			Expect(testsExist).To(BeTrue())
+			Expect(fileCategories.TestsExist()).To(BeTrue())
 		})
 
 		It("should accept changeset containing Go tests using predefined matchers", func() {
@@ -37,11 +37,11 @@ var _ = Describe("Test Checker features", func() {
 			checker := TestChecker{TestKeeperMatcher: DefaultMatchers}
 
 			// when
-			testsExist, err := checker.IsAnyNotExcludedFileTest(changedFiles)
+			fileCategories, err := checker.CategorizeFiles(changedFiles)
 
 			// then
 			Ω(err).ShouldNot(HaveOccurred())
-			Expect(testsExist).To(BeTrue())
+			Expect(fileCategories.TestsExist()).To(BeTrue())
 		})
 
 		It("should accept changeset containing Go and Java tests using predefined matchers", func() {
@@ -53,11 +53,11 @@ var _ = Describe("Test Checker features", func() {
 			checker := TestChecker{TestKeeperMatcher: DefaultMatchers}
 
 			// when
-			testsExist, err := checker.IsAnyNotExcludedFileTest(changedFiles)
+			fileCategories, err := checker.CategorizeFiles(changedFiles)
 
 			// then
 			Ω(err).ShouldNot(HaveOccurred())
-			Expect(testsExist).To(BeTrue())
+			Expect(fileCategories.TestsExist()).To(BeTrue())
 		})
 
 		It("should not accept changeset when files are not matching predefined language test patterns", func() {
@@ -71,11 +71,11 @@ var _ = Describe("Test Checker features", func() {
 			checker := TestChecker{TestKeeperMatcher: DefaultMatchers}
 
 			// when
-			testsExist, err := checker.IsAnyNotExcludedFileTest(changedFiles)
+			fileCategories, err := checker.CategorizeFiles(changedFiles)
 
 			// then
 			Ω(err).ShouldNot(HaveOccurred())
-			Expect(testsExist).To(BeFalse())
+			Expect(fileCategories.TestsExist()).To(BeFalse())
 		})
 
 		It("should not try to detect any tests when change set is empty", func() {
@@ -85,11 +85,12 @@ var _ = Describe("Test Checker features", func() {
 			checker := TestChecker{TestKeeperMatcher: DefaultMatchers}
 
 			// when
-			legitChangset, err := checker.IsAnyNotExcludedFileTest(changedFiles)
+			fileCategories, err := checker.CategorizeFiles(changedFiles)
 
 			// then
 			Ω(err).ShouldNot(HaveOccurred())
-			Expect(legitChangset).To(BeTrue())
+			Expect(fileCategories.Total).To(Equal(0))
+			Expect(fileCategories.TestsExist()).To(BeFalse())
 		})
 
 		It("should accept changeset based on configured inclusion", func() {
@@ -103,11 +104,11 @@ var _ = Describe("Test Checker features", func() {
 			checker := TestChecker{TestKeeperMatcher: matcher}
 
 			// when
-			testsExist, err := checker.IsAnyNotExcludedFileTest(changedFiles)
+			fileCategories, err := checker.CategorizeFiles(changedFiles)
 
 			// then
 			Ω(err).ShouldNot(HaveOccurred())
-			Expect(testsExist).To(BeTrue())
+			Expect(fileCategories.TestsExist()).To(BeTrue())
 		})
 
 		It("should accept changeset using inclusion in the configuration", func() {
@@ -125,11 +126,11 @@ var _ = Describe("Test Checker features", func() {
 			checker := TestChecker{TestKeeperMatcher: matcher}
 
 			// when
-			testsExist, err := checker.IsAnyNotExcludedFileTest(changedFiles)
+			fileCategories, err := checker.CategorizeFiles(changedFiles)
 
 			// then
 			Ω(err).ShouldNot(HaveOccurred())
-			Expect(testsExist).To(BeTrue())
+			Expect(fileCategories.TestsExist()).To(BeTrue())
 		})
 
 		It("should accept changeset containing default exclusion such as documentation, ci and build files", func() {
@@ -142,11 +143,11 @@ var _ = Describe("Test Checker features", func() {
 			checker := TestChecker{TestKeeperMatcher: DefaultMatchers}
 
 			// when
-			legitChangeSet, err := checker.IsAnyNotExcludedFileTest(changedFiles)
+			fileCategories, err := checker.CategorizeFiles(changedFiles)
 
 			// then
 			Ω(err).ShouldNot(HaveOccurred())
-			Expect(legitChangeSet).To(BeTrue())
+			Expect(fileCategories.OnlyLegitFiles()).To(BeTrue())
 		})
 
 		It("should accept changeset containing configured exclusion and one test matched by default inclusion", func() {
@@ -164,11 +165,11 @@ var _ = Describe("Test Checker features", func() {
 			checker := TestChecker{TestKeeperMatcher: matcher}
 
 			// when
-			legitChangeSet, err := checker.IsAnyNotExcludedFileTest(changedFiles)
+			fileCategories, err := checker.CategorizeFiles(changedFiles)
 
 			// then
 			Ω(err).ShouldNot(HaveOccurred())
-			Expect(legitChangeSet).To(BeTrue())
+			Expect(fileCategories.TestsExist()).To(BeTrue())
 		})
 
 		It("should accept changeset containing configured exclusion", func() {
@@ -185,11 +186,11 @@ var _ = Describe("Test Checker features", func() {
 			checker := TestChecker{TestKeeperMatcher: matcher}
 
 			// when
-			legitChangeSet, err := checker.IsAnyNotExcludedFileTest(changedFiles)
+			fileCategories, err := checker.CategorizeFiles(changedFiles)
 
 			// then
 			Ω(err).ShouldNot(HaveOccurred())
-			Expect(legitChangeSet).To(BeTrue())
+			Expect(fileCategories.OnlyLegitFiles()).To(BeTrue())
 		})
 
 		It("should accept changeset containing configured overlapping exclusion and inclusion", func() {
@@ -208,11 +209,11 @@ var _ = Describe("Test Checker features", func() {
 			checker := TestChecker{TestKeeperMatcher: matcher}
 
 			// when
-			legitChangeSet, err := checker.IsAnyNotExcludedFileTest(changedFiles)
+			fileCategories, err := checker.CategorizeFiles(changedFiles)
 
 			// then
 			Ω(err).ShouldNot(HaveOccurred())
-			Expect(legitChangeSet).To(BeTrue())
+			Expect(fileCategories.OnlyLegitFiles()).To(BeTrue())
 		})
 
 		It("should accept changeset containing exclusion combined with default excluded files", func() {
@@ -231,11 +232,11 @@ var _ = Describe("Test Checker features", func() {
 			checker := TestChecker{TestKeeperMatcher: matcher}
 
 			// when
-			legitChangeSet, err := checker.IsAnyNotExcludedFileTest(changedFiles)
+			fileCategories, err := checker.CategorizeFiles(changedFiles)
 
 			// then
 			Ω(err).ShouldNot(HaveOccurred())
-			Expect(legitChangeSet).To(BeTrue())
+			Expect(fileCategories.OnlyLegitFiles()).To(BeTrue())
 		})
 
 		It("should accept changeset containing inclusion combined with default included files", func() {
@@ -254,11 +255,11 @@ var _ = Describe("Test Checker features", func() {
 			checker := TestChecker{TestKeeperMatcher: matcher}
 
 			// when
-			legitChangeSet, err := checker.IsAnyNotExcludedFileTest(changedFiles)
+			fileCategories, err := checker.CategorizeFiles(changedFiles)
 
 			// then
 			Ω(err).ShouldNot(HaveOccurred())
-			Expect(legitChangeSet).To(BeTrue())
+			Expect(fileCategories.TestsExist()).To(BeTrue())
 		})
 
 	})
