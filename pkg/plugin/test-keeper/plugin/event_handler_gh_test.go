@@ -56,7 +56,7 @@ var _ = Describe("Test Keeper Plugin features", func() {
 
 			gock.New("https://api.github.com").
 				Post("/repos/" + repositoryName + "/statuses").
-				SetMatcher(ExpectPayload(toBe(github.StatusSuccess, keeper.NoTestsMessage))).
+				SetMatcher(ExpectPayload(toBe(github.StatusSuccess, keeper.TestsExistMessage))).
 				Reply(201) // This way we implicitly verify that call happened after `HandleEvent` call
 
 			statusPayload := LoadFromFile("test_fixtures/github_calls/prs/with_tests/status_opened.json")
