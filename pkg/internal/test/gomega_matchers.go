@@ -17,6 +17,12 @@ func HaveDescription(expectedReason string) types.GomegaMatcher {
 	return gomega.WithTransform(func(s map[string]interface{}) interface{} { return s["description"] }, gomega.Equal(expectedReason))
 }
 
+// HaveContext gets "context" key from map[string]interface{} and compares its value with expectedContext
+// This matcher is used to verify status update sent to GitHub API
+func HaveContext(expectedContext string) types.GomegaMatcher {
+	return gomega.WithTransform(func(s map[string]interface{}) interface{} { return s["context"] }, gomega.Equal(expectedContext))
+}
+
 // HaveBody gets "body" key from map[string]interface{} and compares its value with expectedBody
 // This matcher is used to verify body content sent in request to GitHub API
 func HaveBody(expectedBody string) types.GomegaMatcher {

@@ -9,5 +9,5 @@ import (
 
 func TestSuiteTestKeeperPlugin(t *testing.T) {
 	RegisterFailHandler(Fail)
-	RunSpecs(t, "Prow Event Handler Test Keeper Plugin Suite")
+	RunSpecs(t, "Test Keeper Prow Plugin Suite")
 }
