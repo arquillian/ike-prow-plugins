@@ -14,4 +14,5 @@ echo "${SENTRY_DSN}" > config/sentry.dsn # <3>
 # tag::handy_aliases[]
 alias oc-console='xdg-open https://$(minishift ip):8443/console &>/dev/null'
 alias uh="ultrahook github http://$(oc get route/hook --no-headers=true -o=custom-columns=HOST:spec.host)/hook"
+alias gdoc="./.asciidoctor/generate.sh && xdg-open gh-pages/index.html &>/dev/null"
 # end::handy_aliases[]

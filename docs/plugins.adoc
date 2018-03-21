@@ -7,7 +7,7 @@ In order to enable certain plugins for your repository or organization, you shou
 
 [source,yml]
 ----
-include::../plugins.yaml[tag="externalPlugins"]
+include::../plugins.yaml[tag="external_plugins"]
 ----
 <1> The `test-keeper` plugin will be applied to specified repository. You can also specify plugins only for the whole
 organization. Be aware however, that adding an external plugin both to the repository and its organization link:https://github.com/kubernetes/test-infra/blob/7de525b1f6943e5d08d9a127b0b668cec404c665/prow/plugins/plugins_test.go#L143[will result in an error].

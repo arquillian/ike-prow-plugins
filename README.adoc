@@ -57,10 +57,10 @@ ifndef::generated-doc[]
 The complete documentation can be found at http://arquillian.org/ike-prow-plugins.
 
 You can also generate it locally. All you need to have in place is https://docs.docker.com/engine/installation/[Docker].
-Simply execute
+Then simply execute:
 
 ```
-$ ./.asciidoctor/generate.sh
+./.asciidoctor/generate.sh
 ```
 and you are set. You will find generated documentation in the `gh-pages` folder.
 

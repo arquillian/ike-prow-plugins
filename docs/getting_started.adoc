@@ -1,6 +1,6 @@
 == Development
 
-=== Building
+=== Build
 
 In order to compile the project simply execute `make build` target. This will compile, run tests and put binaries of each
 plugin in `/bin` directory in the root of the project. There is also a quick compile option (`make compile-only`) where
