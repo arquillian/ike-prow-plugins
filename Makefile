@@ -147,6 +147,6 @@ $(CLEAN_IMAGES): clean-%: %
 	$(DOCKER) rmi -f $(REGISTRY)/$(DOCKER_REPO)/$<:$(TAG)
 
 .PHONY: push-images
-push-images: $(PUSH_IMAGES)
+push-images: build-images $(PUSH_IMAGES)
 $(PUSH_IMAGES): push-%: %
 	$(DOCKER) push $(REGISTRY)/$(DOCKER_REPO)/$<:$(TAG)
