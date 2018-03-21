@@ -516,26 +516,22 @@ table.CodeRay td.code>pre{padding:0}
 <div id="toc" class="toc2">
 <div id="toctitle">Table of Contents</div>
 <ul class="sectlevel1">
-<li><a href="#_prerequisites">1. Prerequisites</a>
-<ul class="sectlevel2">
-<li><a href="#_tooling">1.1. Tooling</a></li>
-<li><a href="#_plugin_settings">1.2. Plugin settings</a></li>
-</ul>
-</li>
+<li><a href="#_prerequisites">1. Prerequisites</a></li>
 <li><a href="#_development">2. Development</a>
 <ul class="sectlevel2">
-<li><a href="#_local_setup_using_minishift">2.1. Local Setup using Minishift</a></li>
-<li><a href="#_building">2.2. Building</a></li>
-<li><a href="#_developing_new_plugin">2.3. Developing new plugin</a></li>
-<li><a href="#_testing">2.4. Testing</a></li>
+<li><a href="#_build">2.1. Build</a></li>
+<li><a href="#_developing_new_plugin">2.2. Developing new plugin</a></li>
+<li><a href="#_testing">2.3. Testing</a></li>
+<li><a href="#_local_setup_using_minishift">2.4. Local Setup using Minishift</a></li>
+<li><a href="#_sentry_logging">2.5. Sentry Logging</a></li>
 </ul>
 </li>
-<li><a href="#_test_keeper_plugin">3. Test Keeper plugin</a>
+<li><a href="#_plugins">3. Plugins</a>
 <ul class="sectlevel2">
-<li><a href="#testkeeper-config">3.1. Configuration</a></li>
+<li><a href="#_configuration">3.1. Configuration</a></li>
+<li><a href="#_test_keeper_plugin">3.2. Test Keeper plugin</a></li>
 </ul>
 </li>
-<li><a href="#_sentry_logging">4. Sentry Logging</a></li>
 </ul>
 </div>
 </div>
@@ -543,8 +539,6 @@ table.CodeRay td.code>pre{padding:0}
 <div class="sect1">
 <h2 id="_prerequisites"><a class="anchor" href="#_prerequisites"></a>1. Prerequisites</h2>
 <div class="sectionbody">
-<div class="sect2">
-<h3 id="_tooling"><a class="anchor" href="#_tooling"></a>1.1. Tooling</h3>
 <div class="paragraph">
 <p>You need to have following packages in place:</p>
 </div>
@@ -595,101 +589,12 @@ management of different versions of Go.
 <i class="fa icon-note" title="Note"></i>
 </td>
 <td class="content">
-You can also use <code>setup.sh</code> which takes care of all of the above
+You can also use <a href="https://raw.githubusercontent.com/arquillian/ike-prow-plugins/master/setup.sh"><code>setup.sh</code></a> which takes care of all of the above. Simply execute<br>
+<code>$ curl -sSL <a href="https://git.io/vxnSk" class="bare">https://git.io/vxnSk</a> | bash</code><br>
+and you are all set.
 </td>
 </tr>
 </table>
-</div>
-</div>
-<div class="sect2">
-<h3 id="_plugin_settings"><a class="anchor" href="#_plugin_settings"></a>1.2. Plugin settings</h3>
-<div class="paragraph">
-<p>In order to enable certain plugin for your repository or organization, you should edit <code>plugins.yaml</code> file adding:</p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre class="CodeRay highlight"><code data-lang="bash">external_plugins:
-  organization:
-  - name: test-keeper <i class="conum" data-value="1"></i><b>(1)</b>
-  organization/repository <i class="conum" data-value="2"></i><b>(2)</b>
-  - name: label-sanitizer</code></pre>
-</div>
-</div>
-<div class="colist arabic">
-<table>
-<tr>
-<td><i class="conum" data-value="1"></i><b>1</b></td>
-<td>The <code>test-keeper</code> plugin will be applied to every repository in your organization.</td>
-</tr>
-<tr>
-<td><i class="conum" data-value="2"></i><b>2</b></td>
-<td>You can also specify plugins only for certain repositories (be aware however, that adding an external plugin both to the repository and its organization <a href="https://github.com/kubernetes/test-infra/blob/7de525b1f6943e5d08d9a127b0b668cec404c665/prow/plugins/plugins_test.go#L143">will result in an error</a>).</td>
-</tr>
-</table>
-</div>
-<div class="sect3">
-<h4 id="gh-settings"><a class="anchor" href="#gh-settings"></a>1.2.1. GitHub settings</h4>
-<div class="paragraph">
-<p>You will need two secrets to be able to integrate with GitHub. The <code>config/hmac.token</code> file should contain the token that
-you give to GitHub for validating webhooks. You can generate it using any reasonable randomness-generator, for example
-<a href="http://random.org">random.org</a>.</p>
-</div>
-<div class="paragraph">
-<p>The <code>config/oauth.token</code> is an OAuth2 token that has read and write access to the GitHub account. Generate it from
-<a href="https://github.com/settings/tokens/new">here</a>. Depending on your plugin needs the scopes might vary,
-but it is important to have following scopes enabled: <code>admin:org_hook</code> and <code>admin:repo_hook</code>.</p>
-</div>
-<div class="admonitionblock note">
-<table>
-<tr>
-<td class="icon">
-<i class="fa icon-note" title="Note"></i>
-</td>
-<td class="content">
-Both of these files are ignored by git (see <code>.gitignore</code>) so you can keep them in your repository, as some <code>make</code>
-targets rely on them.
-</td>
-</tr>
-</table>
-</div>
-</div>
-<div class="sect3">
-<h4 id="webhook"><a class="anchor" href="#webhook"></a>1.2.2. Setting up the web hook</h4>
-<div class="paragraph">
-<p>In order to setup webhook for your repository go to <code><a href="https://github.com/{org}/{repo}/settings/hooks/new" class="bare">https://github.com/{org}/{repo}/settings/hooks/new</a></code> and provide:</p>
-</div>
-<div class="ulist">
-<ul>
-<li>
-<p>payload URL</p>
-</li>
-<li>
-<p>content type needs to be <code>application-json</code></p>
-</li>
-<li>
-<p>secret the same as defined in <code>config/hmac.token</code> file</p>
-</li>
-<li>
-<p>customize types of hooks you would like to receive (or use all to start)</p>
-</li>
-</ul>
-</div>
-<div class="paragraph">
-<p>For hints how to test web hook against your local setup head over to <a href="#testing-hooks">Testing hooks</a> section.</p>
-</div>
-<div class="admonitionblock note">
-<table>
-<tr>
-<td class="icon">
-<i class="fa icon-note" title="Note"></i>
-</td>
-<td class="content">
-More details about GitHub hooks can be found in the <a href="https://developer.github.com/webhooks/">official developer documentation</a>.
-</td>
-</tr>
-</table>
-</div>
-</div>
 </div>
 </div>
 </div>
@@ -697,99 +602,7 @@ More details about GitHub hooks can be found in the <a href="https://developer.g
 <h2 id="_development"><a class="anchor" href="#_development"></a>2. Development</h2>
 <div class="sectionbody">
 <div class="sect2">
-<h3 id="_local_setup_using_minishift"><a class="anchor" href="#_local_setup_using_minishift"></a>2.1. Local Setup using Minishift</h3>
-<div class="paragraph">
-<p>You can use Minishift for developing plugins locally.
-Follow <a href="https://docs.openshift.org/latest/minishift/getting-started/installing.html#installing-instructions">official installation guide</a> to set it up.</p>
-</div>
-<div class="paragraph">
-<p>This setup is based on following versions:</p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre class="CodeRay highlight"><code data-lang="bash">minishift v1.13.1
-openshift v3.7.1
-kubernetes v1.7.6</code></pre>
-</div>
-</div>
-<div class="sect3">
-<h4 id="_initial_setup"><a class="anchor" href="#_initial_setup"></a>2.1.1. Initial setup</h4>
-<div class="paragraph">
-<p>Before you start developing new plugins or evolving existing ones you need to deploy set of basic Prow services and configuration.</p>
-</div>
-<div class="paragraph">
-<p>For this purpose use login to your Openshift cluster using <code>oc login</code> and execute <code>make oc-init</code> target which will:</p>
-</div>
-<div class="ulist">
-<ul>
-<li>
-<p>Create new project named <code>ike-prow-plugins</code></p>
-</li>
-<li>
-<p>Add config maps for Prow configuration (<code>config.yaml</code>) and its plugins (<code>plugins.yaml</code>)</p>
-</li>
-<li>
-<p>Add required secrets (see <a href="#gh-settings">GitHub settings</a> for details)</p>
-</li>
-<li>
-<p>Apply <code>cluster/starter.yaml</code> with basic Prow infra.</p>
-</li>
-</ul>
-</div>
-<div class="paragraph">
-<p>The key piece of this deployment is the <code>hook</code> service which listens to GitHub events and dispatches them to relevant plugins.</p>
-</div>
-<div class="paragraph">
-<p>You will have to create a route for this service. Go to <code>Applications &#8594; Services &#8594; hook</code> and click <code>Create Route</code>.
-Set <code>/hook</code> as a path and click <code>Create</code>.</p>
-</div>
-</div>
-<div class="sect3">
-<h4 id="_pushing_to_local_minishift_repository"><a class="anchor" href="#_pushing_to_local_minishift_repository"></a>2.1.2. Pushing to local Minishift repository</h4>
-<div class="paragraph">
-<p>To speed up development cycle (and avoid pushing work-in-progress) images to Docker Hub you can use built-in docker repository available in Minishift.
-<code>Makefile</code> and templates are adjusted to use it, so the only thing you have to do is to set up few environment variables.</p>
-</div>
-<div class="admonitionblock important">
-<table>
-<tr>
-<td class="icon">
-<i class="fa icon-important" title="Important"></i>
-</td>
-<td class="content">
-Before executing <code>docker login</code> make sure you are logged in using token instead of regular password. That&#8217;s returned
-by <code>oc whoami -t</code> and is used as password by Docker daemon. To do that open OpenShift Console (e.g. <code>xdg-open <a href="https://$(minishift" class="bare">https://$(minishift</a> ip):8443/console &amp;&gt;/dev/null</code>),
-click on your username in the upper-right corner and then <code>Copy Login Command</code>. Use it to login from the terminal and
-you are ready to go.
-</td>
-</tr>
-</table>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre class="CodeRay highlight"><code data-lang="bash">eval $(minishift docker-env)
-docker login -u $(oc whoami) -p $(oc whoami -t) $(minishift openshift registry)
-export REGISTRY=$(minishift openshift registry)
-export DOCKER_REPO=$(oc get project --show-all=false -o name | cut -d'/' -f 2)</code></pre>
-</div>
-</div>
-<div class="admonitionblock note">
-<table>
-<tr>
-<td class="icon">
-<i class="fa icon-note" title="Note"></i>
-</td>
-<td class="content">
-If you are using <code>zsh</code> you can take a look at <a href="https://github.com/kennethreitz/autoenv">autoenv</a> or
-<a href="https://direnv.net/">direnv</a> to automate this setup every time you access project&#8217;s directory. Just make sure to add it to your global <code>.gitignore</code> to avoid sharing it through PRs (e.g. <code>git config --global core.excludesfile ~/.gitignore</code>).
-</td>
-</tr>
-</table>
-</div>
-</div>
-</div>
-<div class="sect2">
-<h3 id="_building"><a class="anchor" href="#_building"></a>2.2. Building</h3>
+<h3 id="_build"><a class="anchor" href="#_build"></a>2.1. Build</h3>
 <div class="paragraph">
 <p>In order to compile the project simply execute <code>make build</code> target. This will compile, run tests and put binaries of each
 plugin in <code>/bin</code> directory in the root of the project. There is also a quick compile option (<code>make compile-only</code>) where
@@ -829,7 +642,7 @@ You have to be logged in to the cluster first.
 </div>
 </div>
 <div class="sect2">
-<h3 id="_developing_new_plugin"><a class="anchor" href="#_developing_new_plugin"></a>2.3. Developing new plugin</h3>
+<h3 id="_developing_new_plugin"><a class="anchor" href="#_developing_new_plugin"></a>2.2. Developing new plugin</h3>
 <div class="paragraph">
 <p>Besides creating new folders/packages in <code>plugin</code> folder you will have to register your plugin in the <code>Makefile</code>. Simply
 add its name to <a href="https://github.com/arquillian/ike-prow-plugins/blob/308909d88c7bee02b96236121fd25d4e9d08d88b/Makefile#L4">this list</a> and you should be good.</p>
@@ -849,7 +662,7 @@ be the same.
 </div>
 </div>
 <div class="sect2">
-<h3 id="_testing"><a class="anchor" href="#_testing"></a>2.4. Testing</h3>
+<h3 id="_testing"><a class="anchor" href="#_testing"></a>2.3. Testing</h3>
 <div class="paragraph">
 <p>We use <a href="https://onsi.github.io/ginkgo/">Ginkgo</a> testing framework and <a href="https://onsi.github.io/gomega/">Gomega</a> assertion library for writing tests.</p>
 </div>
@@ -863,7 +676,7 @@ go get -u github.com/onsi/gomega</code></pre>
 </div>
 </div>
 <div class="sect3">
-<h4 id="_testing_hints"><a class="anchor" href="#_testing_hints"></a>2.4.1. Testing hints</h4>
+<h4 id="_testing_hints"><a class="anchor" href="#_testing_hints"></a>2.3.1. Testing hints</h4>
 <div class="ulist">
 <ul>
 <li>
@@ -882,7 +695,7 @@ go get -u github.com/onsi/gomega</code></pre>
 </div>
 </div>
 <div class="sect3">
-<h4 id="testing-hooks"><a class="anchor" href="#testing-hooks"></a>2.4.2. Testing hooks</h4>
+<h4 id="testing-hooks"><a class="anchor" href="#testing-hooks"></a>2.3.2. Testing hooks</h4>
 <div class="paragraph">
 <p>You can consume GitHub events through webhook pointing to your local cluster. For this purpose use
 <a href="http://www.ultrahook.com/"><code>ultrahook</code></a>. After registering your own API key simply run following command and you
@@ -890,7 +703,7 @@ are all set:</p>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="bash">ultrahook github http://hook-$(oc get project --show-all=false -o name | grep 'prow' | cut -d'/' -f 2).$(minishift ip).nip.io/hook</code></pre>
+<pre class="CodeRay highlight"><code data-lang="bash">ultrahook github http://$(oc get route/hook --no-headers=true -o=custom-columns=HOST:spec.host)/hook</code></pre>
 </div>
 </div>
 <div class="admonitionblock note">
@@ -911,11 +724,272 @@ corresponding plugins reacting on them. Have a look at pods logs to verify if ev
 </div>
 </div>
 </div>
+<div class="sect2">
+<h3 id="_local_setup_using_minishift"><a class="anchor" href="#_local_setup_using_minishift"></a>2.4. Local Setup using Minishift</h3>
+<div class="paragraph">
+<p>You can use Minishift for developing plugins locally.
+Follow <a href="https://docs.openshift.org/latest/minishift/getting-started/installing.html#installing-instructions">official installation guide</a> to set it up.</p>
+</div>
+<div class="paragraph">
+<p>This setup is based on following versions:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="bash">minishift v1.13.1
+openshift v3.7.1
+kubernetes v1.7.6</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>To start your Minishift cluster you can use following command (you might want to customize CPU and memory limits):</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="bash">minishift start --profile prow --memory 8GB --cpus 4</code></pre>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_initial_setup"><a class="anchor" href="#_initial_setup"></a>2.4.1. Initial setup</h4>
+<div class="paragraph">
+<p>Before you start developing new plugins or evolving existing ones you need to deploy set of basic Prow services and configuration.</p>
+</div>
+<div class="paragraph">
+<p>For this purpose use login to your OpenShift cluster using <code>oc login</code> and execute <code>make oc-init-project</code> target which will:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Create new project named <code>ike-prow-plugins</code></p>
+</li>
+<li>
+<p>Add config maps for Prow configuration (<code>config.yaml</code>) and its plugins (<code>plugins.yaml</code>)</p>
+</li>
+<li>
+<p>Add required secrets (see <a href="#gh-settings">GitHub settings</a> for details)</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>At this point you have new Openshift project created and before you will be able to deploy plugins you can select one of following targets:</p>
+</div>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p><code>oc-deploy-hook</code> will only deploy <code>hook</code> service responsible for dispatching incoming GitHub events.</p>
+</li>
+<li>
+<p><code>oc-deploy-starter</code> will deploy key Prow services next to <code>hook</code>. For the explanation head over to the <a href="https://github.com/kubernetes/test-infra/blob/8a2cb8faf150750fd308f6d92a32773c386a3da9/prow/README.md">official documentation</a>.</p>
+</li>
+</ol>
+</div>
+<div class="paragraph">
+<p>The key piece of both deployments is the <code>hook</code> service which listens to GitHub events and dispatches them to relevant plugins.</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_pushing_to_local_minishift_repository"><a class="anchor" href="#_pushing_to_local_minishift_repository"></a>2.4.2. Pushing to local Minishift repository</h4>
+<div class="paragraph">
+<p>To speed up development cycle (and avoid pushing work-in-progress) images to Docker Hub you can use built-in docker repository available in Minishift.
+<code>Makefile</code> and templates are adjusted to use it, so the only thing you have to do is to set up few environment variables.</p>
+</div>
+<div class="admonitionblock important">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-important" title="Important"></i>
+</td>
+<td class="content">
+Before executing <code>docker login</code> make sure you are logged in using token instead of regular password. That&#8217;s returned
+by <code>oc whoami -t</code> and is used as password by Docker daemon. To do that open OpenShift Console (e.g. <code>xdg-open <a href="https://$(minishift" class="bare">https://$(minishift</a> ip):8443/console &amp;&gt;/dev/null</code>),
+click on your username in the upper-right corner and then <code>Copy Login Command</code>. Use it to login from the terminal and
+you are ready to go.
+</td>
+</tr>
+</table>
+</div>
+<div class="listingblock">
+<div class="title">Setting up Docker to use local Minishift registry</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="bash">eval $(minishift docker-env)
+docker login -u $(oc whoami) -p $(oc whoami -t) $(minishift openshift registry)
+export REGISTRY=$(minishift openshift registry)
+export DOCKER_REPO=$(oc get project --show-all=false -o=custom-columns=HOST:metadata.name --no-headers=true)</code></pre>
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_hints"><a class="anchor" href="#_hints"></a>2.4.3. Hints</h4>
+<div class="paragraph">
+<p>You can simplify your setup by seeding configuration files</p>
+</div>
+<div class="listingblock">
+<div class="title">Seeding tokens</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="bash">echo &quot;${GH_WEBHOOK_SECRET}&quot; &gt; config/hmac.token <i class="conum" data-value="1"></i><b>(1)</b>
+echo &quot;${GH_TOKEN}&quot; &gt; config/oauth.token <i class="conum" data-value="2"></i><b>(2)</b>
+echo &quot;${SENTRY_DSN}&quot; &gt; config/sentry.dsn <i class="conum" data-value="3"></i><b>(3)</b></code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>Your GitHub Webhook secret. See for more details <a href="#gh-settings">GitHub settings</a>.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>Your user (or bot account) GitHub OAuth Token. See for more details <a href="#gh-settings">GitHub settings</a>.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="3"></i><b>3</b></td>
+<td><a href="https://docs.sentry.io/quickstart/#about-the-dsn">Sentry DSN</a> in <code>https://&lt;key&gt;:&lt;secret&gt;@&lt;sentry_host&gt;/&lt;project&gt;</code> format.</td>
+</tr>
+</table>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+If you are using <code>zsh</code> you can take a look at <a href="https://github.com/kennethreitz/autoenv">autoenv</a> or
+<a href="https://direnv.net/">direnv</a> to automate this setup every time you access project&#8217;s directory. Just make sure to add it to your global <code>.gitignore</code> to avoid sharing it through PRs (e.g. <code>git config --global core.excludesfile ~/.gitignore</code>).
+</td>
+</tr>
+</table>
+</div>
+<div class="listingblock">
+<div class="title">Some handy aliases</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="bash">alias oc-console='xdg-open https://$(minishift ip):8443/console &amp;&gt;/dev/null'
+alias uh=&quot;ultrahook github http://$(oc get route/hook --no-headers=true -o=custom-columns=HOST:spec.host)/hook&quot;
+alias gdoc=&quot;./.asciidoctor/generate.sh &amp;&amp; xdg-open gh-pages/index.html &amp;&gt;/dev/null&quot;</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_sentry_logging"><a class="anchor" href="#_sentry_logging"></a>2.5. Sentry Logging</h3>
+<div class="paragraph">
+<p>Plugins in this repository can be integrated with <a href="https://sentry.io/welcome/">Sentry</a> error tracking tool. Use following flags when starting a plugin service to enable it:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><code>sentry-dsn-file</code> - path to the file containing complete <a href="https://docs.sentry.io/quickstart/#configure-the-dsn">Sentry DSN</a>. Defaults to <code>/etc/sentry-dsn/sentry</code>.</p>
+</li>
+<li>
+<p><code>sentry-timeout</code> - Sentry server timeout in ms. Defaults to 1 second.</p>
+</li>
+<li>
+<p><code>env</code>  - environment name plugin is running in. Used e.g. by Sentry for tagging.</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>You will have to add <code>config/sentry.dsn</code> file in this repository so built-in <code>Makefile</code> targets will be able to populate DSN correctly to plugin pods.</p>
+</div>
+</div>
 </div>
 </div>
 <div class="sect1">
-<h2 id="_test_keeper_plugin"><a class="anchor" href="#_test_keeper_plugin"></a>3. Test Keeper plugin</h2>
+<h2 id="_plugins"><a class="anchor" href="#_plugins"></a>3. Plugins</h2>
 <div class="sectionbody">
+<div class="sect2">
+<h3 id="_configuration"><a class="anchor" href="#_configuration"></a>3.1. Configuration</h3>
+<div class="paragraph">
+<p>In order to enable certain plugins for your repository or organization, you should edit <code>plugins.yaml</code> file adding:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="yml"><span class="key">external_plugins</span>:
+  <span class="key">bartoszmajsak/wfswarm-booster-pipeline-test</span>:
+  - <span class="string"><span class="content">name: test-keeper </span></span><i class="conum" data-value="1"></i><b>(1)</b>
+    <span class="key">events</span>: <i class="conum" data-value="2"></i><b>(2)</b>
+      - <span class="string"><span class="content">pull_request</span></span>
+      - <span class="string"><span class="content">issue_comment</span></span></code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>The <code>test-keeper</code> plugin will be applied to specified repository. You can also specify plugins only for the whole
+organization. Be aware however, that adding an external plugin both to the repository and its organization <a href="https://github.com/kubernetes/test-infra/blob/7de525b1f6943e5d08d9a127b0b668cec404c665/prow/plugins/plugins_test.go#L143">will result in an error</a>.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>You can limit events dispatched by hook to your plugin.</td>
+</tr>
+</table>
+</div>
+<div class="sect3">
+<h4 id="gh-settings"><a class="anchor" href="#gh-settings"></a>3.1.1. GitHub settings</h4>
+<div class="paragraph">
+<p>You will need two secrets to be able to integrate with GitHub. The <code>config/hmac.token</code> file should contain the token that
+you give to GitHub for validating webhooks. You can generate it using any reasonable randomness-generator, for example
+<a href="http://random.org">random.org</a>.</p>
+</div>
+<div class="paragraph">
+<p>The <code>config/oauth.token</code> is an OAuth2 token that has read and write access to the GitHub account. Generate it from
+<a href="https://github.com/settings/tokens/new">here</a>. Depending on your plugin needs the scopes might vary,
+but it is important to have following scopes enabled: <code>admin:org_hook</code> and <code>admin:repo_hook</code>.</p>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+Both of these files are ignored by git (see <code>.gitignore</code>) so you can keep them in your repository, as some <code>make</code>
+targets rely on them.
+</td>
+</tr>
+</table>
+</div>
+</div>
+<div class="sect3">
+<h4 id="webhook"><a class="anchor" href="#webhook"></a>3.1.2. Setting up the web hook</h4>
+<div class="paragraph">
+<p>In order to setup webhook for your repository go to <code><a href="https://github.com/{org}/{repo}/settings/hooks/new" class="bare">https://github.com/{org}/{repo}/settings/hooks/new</a></code> and provide:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>payload URL</p>
+</li>
+<li>
+<p>content type needs to be <code>application-json</code></p>
+</li>
+<li>
+<p>secret the same as defined in <code>config/hmac.token</code> file</p>
+</li>
+<li>
+<p>customize types of hooks you would like to receive (or use all to start)</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>For hints how to test web hook against your local setup head over to <a href="#testing-hooks">Testing hooks</a> section.</p>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+More details about GitHub hooks can be found in the <a href="https://developer.github.com/webhooks/">official developer documentation</a>.
+</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_test_keeper_plugin"><a class="anchor" href="#_test_keeper_plugin"></a>3.2. Test Keeper plugin</h3>
 <div class="paragraph">
 <p>This plugin can help you stick to the rule that every feature you ship comes with automated way of assuring it works - by using automated tests.
 If it won&#8217;t find any tests in the Pull Request, it adds a comment with a description and marks its check as <strong>Failure</strong>, or as <strong>Success</strong> otherwise (see the screenshots below):</p>
@@ -933,7 +1007,7 @@ If it won&#8217;t find any tests in the Pull Request, it adds a comment with a d
 <div class="title">Figure 2. Failure status</div>
 </div>
 <div class="paragraph">
-<p>This check is done based on the file name patterns - for more information head over to <a href="#testkeeper-config">Configuration</a> part.</p>
+<p>This check is done based on the file name patterns - for more information head over to <a href="#testkeeper-config">Plugin Configuration</a> part.</p>
 </div>
 <div class="paragraph">
 <p>The plugin is triggered when the Pull Request is opened/reopened or updated by new or removed commit.</p>
@@ -942,16 +1016,16 @@ If it won&#8217;t find any tests in the Pull Request, it adds a comment with a d
 <p>If, for whatever reason, you want to bypass this check - simply comment using <code>/ok-without-tests</code> command. If you are an admin user you will see the <strong>Success</strong> status.
 If the comment will be later removed the check is triggered again.</p>
 </div>
-<div class="sect2">
-<h3 id="testkeeper-config"><a class="anchor" href="#testkeeper-config"></a>3.1. Configuration</h3>
+<div class="sect3">
+<h4 id="testkeeper-config"><a class="anchor" href="#testkeeper-config"></a>3.2.1. Plugin Configuration</h4>
 <div class="paragraph">
 <p>To configure Test Keeper plugin place <code>test-keeper.yml</code> file in the root of your project and use properties described below.</p>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="yml"><span class="key">test_pattern</span>: <span class="string"><span class="content">'(__test\.go)$'             </span></span><i class="conum" data-value="1"></i><b>(1)</b>
-<span class="key">skip_validation_for</span>:  <span class="string"><span class="content">'README.adoc'       </span></span><i class="conum" data-value="2"></i><b>(2)</b>
-<span class="key">combine_defaults</span>: <span class="string"><span class="content">false                   </span></span><i class="conum" data-value="3"></i><b>(3)</b>
+<pre class="CodeRay highlight"><code data-lang="yml"><span class="key">test_pattern</span>: <span class="string"><span class="content">'(__test\.go)$'              </span></span><i class="conum" data-value="1"></i><b>(1)</b>
+<span class="key">skip_validation_for</span>:  <span class="string"><span class="content">'README.adoc'        </span></span><i class="conum" data-value="2"></i><b>(2)</b>
+<span class="key">combine_defaults</span>: <span class="string"><span class="content">false                    </span></span><i class="conum" data-value="3"></i><b>(3)</b>
 <span class="key">plugin_hint</span>: <span class="string"><span class="content">plugins/keeper-file-hint.md  </span></span> <i class="conum" data-value="4"></i><b>(4)</b></code></pre>
 </div>
 </div>
@@ -987,8 +1061,8 @@ Both the configuration file and the file with plugin hint are always loaded from
 </tr>
 </table>
 </div>
-<div class="sect3">
-<h4 id="_default_exclusions"><a class="anchor" href="#_default_exclusions"></a>3.1.1. Default exclusions</h4>
+<div class="sect4">
+<h5 id="_default_exclusions"><a class="anchor" href="#_default_exclusions"></a>Default exclusions</h5>
 <div class="paragraph">
 <p>We have included few reasonable defaults for verifying if the PR comes with the tests. You can see them <a href="https://github.com/arquillian/ike-prow-plugins/blob/9ebe5bc5d3daf3bf50d1538fe86c9099624149b0/pkg/plugin/test-keeper/plugin/matchers.go#L53-L95">here</a>.</p>
 </div>
@@ -1008,31 +1082,11 @@ If we missed some important patterns feel free to open an <a href="https://githu
 </div>
 </div>
 </div>
-<div class="sect1">
-<h2 id="_sentry_logging"><a class="anchor" href="#_sentry_logging"></a>4. Sentry Logging</h2>
-<div class="sectionbody">
-<div class="paragraph">
-<p>Plugins in this repository can be integrated with <a href="https://sentry.io/welcome/">Sentry</a> error tracking tool. Use following flags when starting a plugin service to enable it:</p>
-</div>
-<div class="ulist">
-<ul>
-<li>
-<p><code>sentry-dsn-file</code> - path to the file containing complete <a href="https://docs.sentry.io/quickstart/#configure-the-dsn">Sentry DSN</a>. Defaults to <code>/etc/sentry-dsn/sentry</code>.</p>
-</li>
-<li>
-<p><code>sentry-timeout</code> - Sentry server timeout in ms. Defaults to 1 second.</p>
-</li>
-<li>
-<p><code>env</code>  - environment name plugin is running in. Used e.g. by Sentry for tagging.</p>
-</li>
-</ul>
-</div>
-</div>
 </div>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2018-03-21 12:56:53 UTC
+Last updated 2018-03-21 14:23:28 UTC
 </div>
 </div>
 <script>
