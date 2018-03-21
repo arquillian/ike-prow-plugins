@@ -9,7 +9,7 @@ CLUSTER_DIR?=${PWD}/cluster
 PLUGIN_DEPLOYMENTS_DIR?=$(CLUSTER_DIR)/generated
 
 REGISTRY?=docker.io
-DOCKER_REPO?=bartoszmajsak
+DOCKER_REPO?=arquillian
 BUILD_IMAGES:=$(patsubst %,build-%, $(PLUGINS))
 PUSH_IMAGES:=$(patsubst %,push-%, $(PLUGINS))
 CLEAN_IMAGES:=$(patsubst %,clean-%, $(PLUGINS))
