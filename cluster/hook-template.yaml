@@ -20,7 +20,7 @@ objects:
     labels:
       app: hook
     spec:
-      replicas: 2
+      replicas: 1
       strategy:
         type: RollingUpdate
         rollingUpdate:
@@ -36,6 +36,9 @@ objects:
           - name: hook
             image: ${REGISTRY}/${DOCKER_REPO}/hook:${VERSION}
             imagePullPolicy: Always
+            resources:
+                limits:
+                  memory: "256Mi"
             args:
             - --dry-run=false
             ports:
