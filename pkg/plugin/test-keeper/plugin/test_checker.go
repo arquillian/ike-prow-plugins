@@ -12,16 +12,16 @@ type TestChecker struct {
 	TestKeeperMatcher TestMatcher
 }
 
-// FileCategories holds information about the total files coming in the changeset, legit files (those which are excluded from test verification)
-// and Tests
+// FileCategories holds information about the total files coming in the changeset, skipped files (those which are excluded from test verification)
+// and tests
 type FileCategories struct {
-	Total, Legit, Tests int
-	Files               *[]scm.ChangedFile
+	Total, Skipped, Tests int
+	Files                 *[]scm.ChangedFile
 }
 
-// OnlyLegitFiles indicates if changeset contains only files which are excluded from test verification
-func (f *FileCategories) OnlyLegitFiles() bool {
-	return f.Total > 0 && f.Legit == f.Total
+// OnlySkippedFiles indicates if changeset contains only files which are excluded from test verification
+func (f *FileCategories) OnlySkippedFiles() bool {
+	return f.Total > 0 && f.Skipped == f.Total
 }
 
 // TestsExist answers if any test files are found
@@ -50,7 +50,7 @@ func (checker *TestChecker) CategorizeFiles(files []scm.ChangedFile) (FileCatego
 			}
 
 		} else {
-			categories.Legit++
+			categories.Skipped++
 		}
 	}
 	return categories, nil

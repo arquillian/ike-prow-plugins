@@ -26,22 +26,22 @@ func (gh *GitHubTestEventsHandler) newTestStatusService(log log.Logger, change s
 	return testStatusService{statusService: statusService}
 }
 
-func (ts *testStatusService) testsExist() error {
+func (ts *testStatusService) okTestsExist() error {
 	return ts.statusService.Success(TestsExistMessage)
 }
 
-func (ts *testStatusService) onlyLegitFiles() error {
+func (ts *testStatusService) okOnlySkippedFiles() error {
 	return ts.statusService.Success(OkOnlySkippedFilesMessage) // TODO create link to detailed log about the problem
+}
+
+func (ts *testStatusService) okWithoutTests(approvedBy string) error {
+	return ts.statusService.Success(fmt.Sprintf(ApproveByMessage, approvedBy))
 }
 
 func (ts *testStatusService) reportError() error {
 	return ts.statusService.Error(FailureMessage) // TODO create link to detailed log about the problem
 }
 
-func (ts *testStatusService) noTests() error {
+func (ts *testStatusService) failNoTests() error {
 	return ts.statusService.Failure(NoTestsMessage)
-}
-
-func (ts *testStatusService) okWithoutTests(approvedBy string) error {
-	return ts.statusService.Success(fmt.Sprintf(ApproveByMessage, approvedBy))
 }

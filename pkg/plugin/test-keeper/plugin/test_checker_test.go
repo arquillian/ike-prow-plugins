@@ -147,7 +147,7 @@ var _ = Describe("Test Checker features", func() {
 
 			// then
 			Ω(err).ShouldNot(HaveOccurred())
-			Expect(fileCategories.OnlyLegitFiles()).To(BeTrue())
+			Expect(fileCategories.OnlySkippedFiles()).To(BeTrue())
 		})
 
 		It("should accept changeset containing configured exclusion and one test matched by default inclusion", func() {
@@ -190,7 +190,7 @@ var _ = Describe("Test Checker features", func() {
 
 			// then
 			Ω(err).ShouldNot(HaveOccurred())
-			Expect(fileCategories.OnlyLegitFiles()).To(BeTrue())
+			Expect(fileCategories.OnlySkippedFiles()).To(BeTrue())
 		})
 
 		It("should accept changeset containing configured overlapping exclusion and inclusion", func() {
@@ -213,7 +213,7 @@ var _ = Describe("Test Checker features", func() {
 
 			// then
 			Ω(err).ShouldNot(HaveOccurred())
-			Expect(fileCategories.OnlyLegitFiles()).To(BeTrue())
+			Expect(fileCategories.OnlySkippedFiles()).To(BeTrue())
 		})
 
 		It("should accept changeset containing exclusion combined with default excluded files", func() {
@@ -236,7 +236,7 @@ var _ = Describe("Test Checker features", func() {
 
 			// then
 			Ω(err).ShouldNot(HaveOccurred())
-			Expect(fileCategories.OnlyLegitFiles()).To(BeTrue())
+			Expect(fileCategories.OnlySkippedFiles()).To(BeTrue())
 		})
 
 		It("should accept changeset containing inclusion combined with default included files", func() {

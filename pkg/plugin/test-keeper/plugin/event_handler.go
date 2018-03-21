@@ -135,15 +135,15 @@ func (gh *GitHubTestEventsHandler) checkTestsAndSetStatus(log log.Logger, change
 		return err
 	}
 
-	if fileCategories.OnlyLegitFiles() {
-		return statusService.onlyLegitFiles()
+	if fileCategories.OnlySkippedFiles() {
+		return statusService.okOnlySkippedFiles()
 	}
 
 	if fileCategories.TestsExist() {
-		return statusService.testsExist()
+		return statusService.okTestsExist()
 	}
 
-	err = statusService.noTests()
+	err = statusService.failNoTests()
 	if err != nil {
 		log.Errorf("failed to report status on PR [%q]. cause: %s", *pr, err)
 	}
