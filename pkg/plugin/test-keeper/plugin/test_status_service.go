@@ -13,10 +13,15 @@ type testStatusService struct {
 }
 
 const (
+	// TestsExistMessage is a message used in GH Status as description when tests are found
 	TestsExistMessage         = "There are some tests :)"
-	OkOnlySkippedFilesMessage = "Seems that this PR doesn't need to have tests"
-	FailureMessage            = "Failed while check for tests"
+	// NoTestsMessage is a message used in GH Status as description when no tests shipped with the PR
 	NoTestsMessage            = "No tests in this PR :("
+	// OkOnlySkippedFilesMessage is a message used in GH Status as description when PR comes with a changeset which shouldn't be subject of test verification
+	OkOnlySkippedFilesMessage = "Seems that this PR doesn't need to have tests"
+	// FailureMessage is a message used in GH Status as description when failure occured
+	FailureMessage            = "Failed while check for tests"
+	// ApproveByMessage is a message used in GH Status as description when it's commented to skip the check
 	ApproveByMessage 		  = "PR is fine without tests says @%s"
 )
 
