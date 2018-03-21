@@ -163,7 +163,7 @@ func (gh *GitHubTestEventsHandler) checkTestsAndSetStatus(log log.Logger, change
 func (gh *GitHubTestEventsHandler) checkTests(log log.Logger, change scm.RepositoryChange, config TestKeeperConfiguration, prNumber int) (FileCategories, error) {
 	matcher := LoadMatcher(config)
 
-	checker := TestChecker{TestKeeperMatcher: matcher}
+	fileCategoryCounter := FileCategoryCounter{Matcher: matcher}
 
 	files, _, err := gh.Client.PullRequests.ListFiles(context.Background(), change.Owner, change.RepoName, prNumber, nil)
 	if err != nil {
@@ -171,7 +171,7 @@ func (gh *GitHubTestEventsHandler) checkTests(log log.Logger, change scm.Reposit
 		return FileCategories{}, err
 	}
 
-	fileCategories, err := checker.CategorizeFiles(asChangedFiles(files))
+	fileCategories, err := fileCategoryCounter.Count(asChangedFiles(files))
 	if err != nil {
 		log.Error(err)
 	}

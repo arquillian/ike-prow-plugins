@@ -7,7 +7,7 @@ import (
 	. "github.com/onsi/gomega"
 )
 
-var _ = Describe("Test Checker features", func() {
+var _ = Describe("Test fileCategoryCounter features", func() {
 
 	Context("Detecting tests within file changeset", func() {
 
@@ -18,10 +18,10 @@ var _ = Describe("Test Checker features", func() {
 				"path/to/page.html",
 				"path/to/test/AnythingTestCase.java")
 
-			checker := TestChecker{TestKeeperMatcher: DefaultMatchers}
+			fileCategoryCounter := FileCategoryCounter{Matcher: DefaultMatchers}
 
 			// when
-			fileCategories, err := checker.CategorizeFiles(changedFiles)
+			fileCategories, err := fileCategoryCounter.Count(changedFiles)
 
 			// then
 			Ω(err).ShouldNot(HaveOccurred())
@@ -34,10 +34,10 @@ var _ = Describe("Test Checker features", func() {
 				"pkg/plugin/test-keeper/plugin/test_checker.go",
 				"path/to/golang/main_test.go")
 
-			checker := TestChecker{TestKeeperMatcher: DefaultMatchers}
+			fileCategoryCounter := FileCategoryCounter{Matcher: DefaultMatchers}
 
 			// when
-			fileCategories, err := checker.CategorizeFiles(changedFiles)
+			fileCategories, err := fileCategoryCounter.Count(changedFiles)
 
 			// then
 			Ω(err).ShouldNot(HaveOccurred())
@@ -50,10 +50,10 @@ var _ = Describe("Test Checker features", func() {
 				"path/to/JavaTest.java",
 				"path/to/golang/main_test.go")
 
-			checker := TestChecker{TestKeeperMatcher: DefaultMatchers}
+			fileCategoryCounter := FileCategoryCounter{Matcher: DefaultMatchers}
 
 			// when
-			fileCategories, err := checker.CategorizeFiles(changedFiles)
+			fileCategories, err := fileCategoryCounter.Count(changedFiles)
 
 			// then
 			Ω(err).ShouldNot(HaveOccurred())
@@ -68,10 +68,10 @@ var _ = Describe("Test Checker features", func() {
 				"path/Test.java/js/something.in.js",
 				"path/to/go/another_in.go")
 
-			checker := TestChecker{TestKeeperMatcher: DefaultMatchers}
+			fileCategoryCounter := FileCategoryCounter{Matcher: DefaultMatchers}
 
 			// when
-			fileCategories, err := checker.CategorizeFiles(changedFiles)
+			fileCategories, err := fileCategoryCounter.Count(changedFiles)
 
 			// then
 			Ω(err).ShouldNot(HaveOccurred())
@@ -82,10 +82,10 @@ var _ = Describe("Test Checker features", func() {
 			// given
 			changedFiles := changedFilesSet()
 
-			checker := TestChecker{TestKeeperMatcher: DefaultMatchers}
+			fileCategoryCounter := FileCategoryCounter{Matcher: DefaultMatchers}
 
 			// when
-			fileCategories, err := checker.CategorizeFiles(changedFiles)
+			fileCategories, err := fileCategoryCounter.Count(changedFiles)
 
 			// then
 			Ω(err).ShouldNot(HaveOccurred())
@@ -101,10 +101,10 @@ var _ = Describe("Test Checker features", func() {
 				"path/to/github_service.rb",
 				"path/to/github_service_test.rb")
 
-			checker := TestChecker{TestKeeperMatcher: matcher}
+			fileCategoryCounter := FileCategoryCounter{Matcher: matcher}
 
 			// when
-			fileCategories, err := checker.CategorizeFiles(changedFiles)
+			fileCategories, err := fileCategoryCounter.Count(changedFiles)
 
 			// then
 			Ω(err).ShouldNot(HaveOccurred())
@@ -123,10 +123,10 @@ var _ = Describe("Test Checker features", func() {
 				"path/to/JavaTestCase.java",
 				"path/to/golang/main_test.go")
 
-			checker := TestChecker{TestKeeperMatcher: matcher}
+			fileCategoryCounter := FileCategoryCounter{Matcher: matcher}
 
 			// when
-			fileCategories, err := checker.CategorizeFiles(changedFiles)
+			fileCategories, err := fileCategoryCounter.Count(changedFiles)
 
 			// then
 			Ω(err).ShouldNot(HaveOccurred())
@@ -140,10 +140,10 @@ var _ = Describe("Test Checker features", func() {
 				"pom.xml",
 				".travis.yml")
 
-			checker := TestChecker{TestKeeperMatcher: DefaultMatchers}
+			fileCategoryCounter := FileCategoryCounter{Matcher: DefaultMatchers}
 
 			// when
-			fileCategories, err := checker.CategorizeFiles(changedFiles)
+			fileCategories, err := fileCategoryCounter.Count(changedFiles)
 
 			// then
 			Ω(err).ShouldNot(HaveOccurred())
@@ -162,10 +162,10 @@ var _ = Describe("Test Checker features", func() {
 				"meme.svg",
 				"test.png")
 
-			checker := TestChecker{TestKeeperMatcher: matcher}
+			fileCategoryCounter := FileCategoryCounter{Matcher: matcher}
 
 			// when
-			fileCategories, err := checker.CategorizeFiles(changedFiles)
+			fileCategories, err := fileCategoryCounter.Count(changedFiles)
 
 			// then
 			Ω(err).ShouldNot(HaveOccurred())
@@ -183,10 +183,10 @@ var _ = Describe("Test Checker features", func() {
 				"meme.svg",
 				"test.png")
 
-			checker := TestChecker{TestKeeperMatcher: matcher}
+			fileCategoryCounter := FileCategoryCounter{Matcher: matcher}
 
 			// when
-			fileCategories, err := checker.CategorizeFiles(changedFiles)
+			fileCategories, err := fileCategoryCounter.Count(changedFiles)
 
 			// then
 			Ω(err).ShouldNot(HaveOccurred())
@@ -206,10 +206,10 @@ var _ = Describe("Test Checker features", func() {
 				"meme.svg",
 				"test.png")
 
-			checker := TestChecker{TestKeeperMatcher: matcher}
+			fileCategoryCounter := FileCategoryCounter{Matcher: matcher}
 
 			// when
-			fileCategories, err := checker.CategorizeFiles(changedFiles)
+			fileCategories, err := fileCategoryCounter.Count(changedFiles)
 
 			// then
 			Ω(err).ShouldNot(HaveOccurred())
@@ -229,10 +229,10 @@ var _ = Describe("Test Checker features", func() {
 				"pom.xml",
 				".travis.yml")
 
-			checker := TestChecker{TestKeeperMatcher: matcher}
+			fileCategoryCounter := FileCategoryCounter{Matcher: matcher}
 
 			// when
-			fileCategories, err := checker.CategorizeFiles(changedFiles)
+			fileCategories, err := fileCategoryCounter.Count(changedFiles)
 
 			// then
 			Ω(err).ShouldNot(HaveOccurred())
@@ -252,10 +252,10 @@ var _ = Describe("Test Checker features", func() {
 				"src/test/com/acme/FancyTestCase.java",
 				"src/test/com/acme/AwesomeFunctionalTest.java")
 
-			checker := TestChecker{TestKeeperMatcher: matcher}
+			fileCategoryCounter := FileCategoryCounter{Matcher: matcher}
 
 			// when
-			fileCategories, err := checker.CategorizeFiles(changedFiles)
+			fileCategories, err := fileCategoryCounter.Count(changedFiles)
 
 			// then
 			Ω(err).ShouldNot(HaveOccurred())
