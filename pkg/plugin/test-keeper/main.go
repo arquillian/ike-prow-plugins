@@ -3,7 +3,7 @@ package main
 import (
 	"github.com/arquillian/ike-prow-plugins/pkg/plugin/server"
 	"github.com/arquillian/ike-prow-plugins/pkg/plugin/test-keeper/plugin"
-	gogh"github.com/google/go-github/github"
+	gogh "github.com/google/go-github/github"
 	"k8s.io/test-infra/prow/pluginhelp"
 
 	pluginBootstrap "github.com/arquillian/ike-prow-plugins/pkg/plugin"

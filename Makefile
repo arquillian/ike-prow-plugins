@@ -113,7 +113,15 @@ oc-deploy-starter: ## Deploys basic prow infrastructure
 	@echo "Deploying prow infrastructure"
 	@oc apply -f cluster/starter.yaml
 
-.PHONY: oc-apply
+HOOK_VERSION?=v20180316-93ade3390
+.PHONY: oc-deploy-hook
+oc-deploy-hook: ## Deploys hook service only
+	@echo "Deploys hook service ${HOOK_VERSION}"
+	@oc process -f $(CLUSTER_DIR)/hook-template.yaml \
+    		-p VERSION=$(HOOK_VERSION) \
+    		-o yaml | oc apply -f -
+
+.PHONY: oc-apply ## Builds plugin images, updates configuration and deploys new version of ike-plugins
 oc-apply: oc-init-project build-images push-images oc-generate-deployments
 	@echo "Updating cluster configuration..."
 

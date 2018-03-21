@@ -100,7 +100,7 @@ func configureLogger(pluginName string) *logrus.Entry {
 
 	sentryDsn, err := utils.LoadSecret(*sentryDsnSecretFile)
 	if err != nil {
-		logger.WithError(err).Errorf("unable to load sentry dsn from %q. No sentry integration enabled", sentryDsnSecretFile)
+		logger.WithError(err).Errorf("unable to load sentry dsn from %q. No sentry integration enabled", *sentryDsnSecretFile)
 	} else {
 		log.AddSentryHook(logger, log.NewSentryConfiguration(string(sentryDsn), map[string]string{
 			"plugin":      pluginName,

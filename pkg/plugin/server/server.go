@@ -3,12 +3,13 @@ package server
 import (
 	"net/http"
 
+	"encoding/json"
+
 	"github.com/arquillian/ike-prow-plugins/pkg/github"
 	"github.com/arquillian/ike-prow-plugins/pkg/log"
+	gogh "github.com/google/go-github/github"
 	"github.com/sirupsen/logrus"
 	"k8s.io/test-infra/prow/hook"
-	gogh "github.com/google/go-github/github"
-	"encoding/json"
 )
 
 // GitHubEventHandler is a type which keeps the logic of handling GitHub events for the given plugin implementation.
@@ -28,8 +29,8 @@ type Server struct {
 // repoEvent is a minimal common subset of most of the events sent by GitHub (such as IssueComment or PullRequest)
 // This information is used for contextual logging
 type repoEvent struct {
-	Repo         *gogh.Repository   `json:"repository,omitempty"`
-	Sender       *gogh.User         `json:"sender,omitempty"`
+	Repo   *gogh.Repository `json:"repository,omitempty"`
+	Sender *gogh.User       `json:"sender,omitempty"`
 }
 
 // ServeHTTP validates an incoming webhook and puts it into the event channel.
@@ -42,9 +43,9 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 	l := logrus.StandardLogger().WithFields(
 		logrus.Fields{
-			"ike-plugins": s.PluginName,
-			github.EventGUID:  eventGUID,
-			github.Event:  eventType,
+			"ike-plugins":    s.PluginName,
+			github.EventGUID: eventGUID,
+			github.Event:     eventType,
 		},
 	)
 
@@ -53,7 +54,7 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		l.WithError(err).Warnf("Failed while parsing event with payload: %q.", string(payload))
 	} else {
 		l = l.WithFields(logrus.Fields{
-			github.RepoLogField: event.Repo.URL,
+			github.RepoLogField:   event.Repo.URL,
 			github.SenderLogField: event.Sender.URL,
 		})
 	}

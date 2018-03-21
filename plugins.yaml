@@ -2,12 +2,14 @@ plugins:
   bartoszmajsak/wfswarm-booster-pipeline-test:
   - size
 
+# tag::external_plugins[]
 external_plugins:
   bartoszmajsak/wfswarm-booster-pipeline-test:
-  - name: test-keeper
-    events:
+  - name: test-keeper # <!--1-->
+    events: # <!--2-->
       - pull_request
       - issue_comment
+# end::external_plugins[]
   - name: pr-sanitizer
     events:
       - pull_request
