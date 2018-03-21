@@ -99,7 +99,7 @@ endef
 OC_PROJECT_NAME?=ike-prow-plugins
 .PHONY: oc-init-project
 oc-init-project: ## Initializes new project with config maps and secrets
-	@echo "Setting cluster project (ignoring potential errors if entries already exist)"
+	@echo "Setting up project '$(OC_PROJECT_NAME)' in the cluster (ignoring potential errors if entries already exist)"
 	@oc new-project $(OC_PROJECT_NAME) || true
 
 	$(call populate_configmap,plugins,plugins.yaml)
@@ -123,7 +123,7 @@ oc-deploy-hook: ## Deploys hook service only
 
 .PHONY: oc-apply ## Builds plugin images, updates configuration and deploys new version of ike-plugins
 oc-apply: oc-init-project build-images push-images oc-generate-deployments
-	@echo "Updating cluster configuration..."
+	@echo "Updating cluster configuration for '$(OC_PROJECT_NAME)'..."
 
 $(OC_DEPLOYMENTS): oc-%: %
 	@mkdir -p $(PLUGIN_DEPLOYMENTS_DIR)
