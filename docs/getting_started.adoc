@@ -1,66 +1,5 @@
 == Development
 
-=== Local Setup using Minishift
-
-You can use Minishift for developing plugins locally.
-Follow link:https://docs.openshift.org/latest/minishift/getting-started/installing.html#installing-instructions[official installation guide] to set it up.
-
-This setup is based on following versions:
-
-[source,bash]
-----
-minishift v1.13.1
-openshift v3.7.1
-kubernetes v1.7.6
-----
-
-To start your Minishift cluster you can use following command (you might want to customize CPU and memory limits):
-
-[source,bash]
-----
-minishift start --profile prow --memory 8GB --cpus 4
-----
-
-==== Initial setup
-
-Before you start developing new plugins or evolving existing ones you need to deploy set of basic Prow services and configuration.
-
-For this purpose use login to your OpenShift cluster using `oc login` and execute `make oc-init-project` target which will:
-
-* Create new project named `ike-prow-plugins`
-* Add config maps for Prow configuration (`config.yaml`) and its plugins (`plugins.yaml`)
-* Add required secrets (see <<gh-settings>> for details)
-
-At this point you have new Openshift project created and before you will be able to deploy plugins you can select one of following targets:
-
-. `oc-deploy-hook` will only deploy `hook` service responsible for dispatching incoming GitHub events.
-. `oc-deploy-starter` will deploy key Prow services next to `hook`. For the explanation head over to the link:https://github.com/kubernetes/test-infra/blob/8a2cb8faf150750fd308f6d92a32773c386a3da9/prow/README.md[official documentation].
-
-The key piece of both deployments is the `hook` service which listens to GitHub events and dispatches them to relevant plugins.
-
-==== Pushing to local Minishift repository
-
-To speed up development cycle (and avoid pushing work-in-progress) images to Docker Hub you can use built-in docker repository available in Minishift.
-`Makefile` and templates are adjusted to use it, so the only thing you have to do is to set up few environment variables.
-
-IMPORTANT: Before executing `docker login` make sure you are logged in using token instead of regular password. That's returned
-by `oc whoami -t` and is used as password by Docker daemon. To do that open OpenShift Console (e.g. `xdg-open https://$(minishift ip):8443/console &>/dev/null`),
-click on your username in the upper-right corner and then `Copy Login Command`. Use it to login from the terminal and
-you are ready to go.
-
-NOTE: If you are using `zsh` you can take a look at link:https://github.com/kennethreitz/autoenv[autoenv] or
-link:https://direnv.net/[direnv] to automate this setup every time you access project's directory. Just make sure to add it to your global `.gitignore` to avoid sharing it through PRs (e.g. `git config --global core.excludesfile ~/.gitignore`).
-
-[#sample-autoenv]
-[source,bash]
-.Sample shell script with local dev setup
-----
-include::../local.sh[]
-----
-<1> Your GitHub Webhook secret. See for more details <<gh-settings>>.
-<2> Your user (or bot account) GitHub OAuth Token. See for more details <<gh-settings>>.
-<3> link:https://docs.sentry.io/quickstart/#about-the-dsn[Sentry DSN] in `+https://<key>:<secret>@<sentry_host>/<project>+` format.
-
 === Building
 
 In order to compile the project simply execute `make build` target. This will compile, run tests and put binaries of each
@@ -120,41 +59,82 @@ NOTE: If not done before add ultrahook URL as payload URL for webhook configurat
 Having this set up you will start seeing events triggered by your actions in the repository and
 corresponding plugins reacting on them. Have a look at pods logs to verify if everything is working expected.
 
-== Using plugins
 
-In order to enable certain plugins for your repository or organization, you should edit `plugins.yaml` file adding:
+=== Local Setup using Minishift
 
-[source,yml]
+You can use Minishift for developing plugins locally.
+Follow link:https://docs.openshift.org/latest/minishift/getting-started/installing.html#installing-instructions[official installation guide] to set it up.
+
+This setup is based on following versions:
+
+[source,bash]
 ----
-include::../plugins.yaml[tag="externalPlugins"]
+minishift v1.13.1
+openshift v3.7.1
+kubernetes v1.7.6
 ----
-<1> The `test-keeper` plugin will be applied to specified repository. You can also specify plugins only for the whole
-organization. Be aware however, that adding an external plugin both to the repository and its organization link:https://github.com/kubernetes/test-infra/blob/7de525b1f6943e5d08d9a127b0b668cec404c665/prow/plugins/plugins_test.go#L143[will result in an error].
-<2> You can limit events dispatched by hook to your plugin.
 
+To start your Minishift cluster you can use following command (you might want to customize CPU and memory limits):
 
-=== GitHub settings [[gh-settings]]
+[source,bash]
+----
+minishift start --profile prow --memory 8GB --cpus 4
+----
 
-You will need two secrets to be able to integrate with GitHub. The `config/hmac.token` file should contain the token that
-you give to GitHub for validating webhooks. You can generate it using any reasonable randomness-generator, for example
-link:http://random.org[random.org].
+==== Initial setup
 
-The `config/oauth.token` is an OAuth2 token that has read and write access to the GitHub account. Generate it from
-link:https://github.com/settings/tokens/new[here]. Depending on your plugin needs the scopes might vary,
-but it is important to have following scopes enabled: `admin:org_hook` and `admin:repo_hook`.
+Before you start developing new plugins or evolving existing ones you need to deploy set of basic Prow services and configuration.
 
-NOTE: Both of these files are ignored by git (see `.gitignore`) so you can keep them in your repository, as some `make`
-targets rely on them.
+For this purpose use login to your OpenShift cluster using `oc login` and execute `make oc-init-project` target which will:
 
-=== Setting up the web hook [[webhook]]
+* Create new project named `ike-prow-plugins`
+* Add config maps for Prow configuration (`config.yaml`) and its plugins (`plugins.yaml`)
+* Add required secrets (see <<gh-settings>> for details)
 
-In order to setup webhook for your repository go to `https://github.com/{org}/{repo}/settings/hooks/new` and provide:
+At this point you have new Openshift project created and before you will be able to deploy plugins you can select one of following targets:
 
-* payload URL
-* content type needs to be `application-json`
-* secret the same as defined in `config/hmac.token` file
-* customize types of hooks you would like to receive (or use all to start)
+. `oc-deploy-hook` will only deploy `hook` service responsible for dispatching incoming GitHub events.
+. `oc-deploy-starter` will deploy key Prow services next to `hook`. For the explanation head over to the link:https://github.com/kubernetes/test-infra/blob/8a2cb8faf150750fd308f6d92a32773c386a3da9/prow/README.md[official documentation].
 
-For hints how to test web hook against your local setup head over to <<testing-hooks>> section.
+The key piece of both deployments is the `hook` service which listens to GitHub events and dispatches them to relevant plugins.
 
-NOTE: More details about GitHub hooks can be found in the link:https://developer.github.com/webhooks/[official developer documentation].
+==== Pushing to local Minishift repository
+
+To speed up development cycle (and avoid pushing work-in-progress) images to Docker Hub you can use built-in docker repository available in Minishift.
+`Makefile` and templates are adjusted to use it, so the only thing you have to do is to set up few environment variables.
+
+IMPORTANT: Before executing `docker login` make sure you are logged in using token instead of regular password. That's returned
+by `oc whoami -t` and is used as password by Docker daemon. To do that open OpenShift Console (e.g. `xdg-open https://$(minishift ip):8443/console &>/dev/null`),
+click on your username in the upper-right corner and then `Copy Login Command`. Use it to login from the terminal and
+you are ready to go.
+
+[source,bash]
+.Setting up Docker to use local Minishift registry
+----
+include::../local.sh[tag=local_docker_registry]
+----
+
+==== Hints
+
+You can simplify your setup by seeding configuration files
+
+[source,bash]
+.Seeding tokens
+----
+include::../local.sh[tag=seeding_secrets]
+----
+
+<1> Your GitHub Webhook secret. See for more details <<gh-settings>>.
+<2> Your user (or bot account) GitHub OAuth Token. See for more details <<gh-settings>>.
+<3> link:https://docs.sentry.io/quickstart/#about-the-dsn[Sentry DSN] in `+https://<key>:<secret>@<sentry_host>/<project>+` format.
+
+NOTE: If you are using `zsh` you can take a look at link:https://github.com/kennethreitz/autoenv[autoenv] or
+link:https://direnv.net/[direnv] to automate this setup every time you access project's directory. Just make sure to add it to your global `.gitignore` to avoid sharing it through PRs (e.g. `git config --global core.excludesfile ~/.gitignore`).
+
+[source,bash]
+.Some handy aliases
+----
+include::../local.sh[tag=handy_aliases]
+----
+
+include::{asciidoctor-source}/fragments/sentry.adoc[leveloffset=1]

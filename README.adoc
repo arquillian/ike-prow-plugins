@@ -24,13 +24,11 @@ ifndef::generated-doc[]
 Welcome in PR automation plugins Arquillian project. These plugins are based on link:https://github.com/kubernetes/test-infra/tree/master/prow[Prow] sub project of
 Kubernetes Test Infrastructure.
 
-toc::[]
 
+[discrete]
 endif::generated-doc[]
 
 == Prerequisites
-
-=== Tooling
 
 You need to have following packages in place:
 
@@ -82,7 +80,6 @@ endif::generated-doc[]
 ifdef::generated-doc[]
 
 include::{asciidoctor-source}/getting_started.adoc[]
-include::{asciidoctor-source}/test-keeper.adoc[]
-include::{asciidoctor-source}/sentry.adoc[]
+include::{asciidoctor-source}/plugins.adoc[]
 
 endif::generated-doc[]
