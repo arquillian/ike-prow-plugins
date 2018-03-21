@@ -24,8 +24,6 @@ ifndef::generated-doc[]
 Welcome in PR automation plugins Arquillian project. These plugins are based on link:https://github.com/kubernetes/test-infra/tree/master/prow[Prow] sub project of
 Kubernetes Test Infrastructure.
 
-
-[discrete]
 endif::generated-doc[]
 
 == Prerequisites
@@ -52,10 +50,8 @@ NOTE: You can also use link:https://raw.githubusercontent.com/arquillian/ike-pro
 `$ curl -sSL https://git.io/vxnSk | bash` +
 and you are all set.
 
-
 ifndef::generated-doc[]
 
-[discrete]
 == Documentation
 
 The complete documentation can be found at http://arquillian.org/ike-prow-plugins.
