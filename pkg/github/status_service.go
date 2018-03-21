@@ -49,12 +49,13 @@ func (s *StatusService) Error(reason string) error {
 
 // setStatus sets the given status with the given reason to the related commit
 func (s *StatusService) setStatus(status, reason string) error {
-	c := fmt.Sprintf("%q/%q", s.statusContext.BotName, s.statusContext.PluginName)
+	c := fmt.Sprintf("%s/%s", s.statusContext.BotName, s.statusContext.PluginName)
 	repoStatus := github.RepoStatus{
 		State:       &status,
 		Context:     &c,
 		Description: &reason,
 	}
+
 	_, _, err := s.client.Repositories.CreateStatus(context.Background(), s.change.Owner, s.change.RepoName, s.change.Hash, &repoStatus)
 
 	if err != nil {

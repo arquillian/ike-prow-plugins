@@ -9,5 +9,5 @@ import (
 
 func TestGithub(t *testing.T) {
 	RegisterFailHandler(Fail)
-	RunSpecs(t, "Github Services Suite")
+	RunSpecs(t, "GitHub Services Suite")
 }
