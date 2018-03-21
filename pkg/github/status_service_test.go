@@ -1,13 +1,13 @@
 package github_test
 
 import (
+	"github.com/arquillian/ike-prow-plugins/pkg/github"
+	. "github.com/arquillian/ike-prow-plugins/pkg/internal/test"
+	"github.com/arquillian/ike-prow-plugins/pkg/scm"
+	gogh "github.com/google/go-github/github"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
-	. "github.com/arquillian/ike-prow-plugins/pkg/internal/test"
-	gogh "github.com/google/go-github/github"
 	"gopkg.in/h2non/gock.v1"
-	"github.com/arquillian/ike-prow-plugins/pkg/github"
-	"github.com/arquillian/ike-prow-plugins/pkg/scm"
 )
 
 var _ = Describe("GitHub Status Service", func() {
@@ -61,7 +61,6 @@ var _ = Describe("GitHub Status Service", func() {
 			// then - implicit verification of /statuses call occurrence with proper payload
 			Ω(err).ShouldNot(HaveOccurred())
 		})
-
 
 		It("should report pending without description", func() {
 			// given

@@ -16,7 +16,7 @@ type TestChecker struct {
 // and Tests
 type FileCategories struct {
 	Total, Legit, Tests int
-	Files *[]scm.ChangedFile
+	Files               *[]scm.ChangedFile
 }
 
 // OnlyLegitFiles indicates if changeset contains only files which are excluded from test verification
@@ -25,13 +25,13 @@ func (f *FileCategories) OnlyLegitFiles() bool {
 }
 
 // TestsExist answers if any test files are found
-func (f* FileCategories) TestsExist() bool {
+func (f *FileCategories) TestsExist() bool {
 	return f.Tests > 0
 }
 
 // NewFileCategories creates new instance of FileCategories struct with files populated
 func NewFileCategories(files []scm.ChangedFile) FileCategories {
-	return FileCategories{Files:&files, Total: len(files)}
+	return FileCategories{Files: &files, Total: len(files)}
 }
 
 // CategorizeFiles counts files in the changeset which are tests (included files) and should not be considered for

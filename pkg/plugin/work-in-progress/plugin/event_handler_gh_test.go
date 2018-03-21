@@ -1,9 +1,9 @@
 package plugin_test
 
 import (
-	wip "github.com/arquillian/ike-prow-plugins/pkg/plugin/work-in-progress/plugin"
 	"github.com/arquillian/ike-prow-plugins/pkg/github"
 	. "github.com/arquillian/ike-prow-plugins/pkg/internal/test"
+	wip "github.com/arquillian/ike-prow-plugins/pkg/plugin/work-in-progress/plugin"
 	gogh "github.com/google/go-github/github"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"

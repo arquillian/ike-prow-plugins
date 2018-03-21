@@ -30,7 +30,6 @@ func (ts *testStatusService) reportError() error {
 	return ts.statusService.Error("Failed while check for tests") // TODO create link to detailed log about the problem
 }
 
-
 func (ts *testStatusService) noTests() error {
 	return ts.statusService.Failure("No tests in this PR :(")
 }
