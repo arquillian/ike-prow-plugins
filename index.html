@@ -813,7 +813,7 @@ you are ready to go.
 <pre class="CodeRay highlight"><code data-lang="bash">eval $(minishift docker-env)
 docker login -u $(oc whoami) -p $(oc whoami -t) $(minishift openshift registry)
 export REGISTRY=$(minishift openshift registry)
-export DOCKER_REPO=$(oc get project --show-all=false -o=custom-columns=HOST:metadata.name --no-headers=true)</code></pre>
+export DOCKER_REPO=$(oc project -q)</code></pre>
 </div>
 </div>
 </div>
@@ -1086,7 +1086,7 @@ If we missed some important patterns feel free to open an <a href="https://githu
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2018-03-21 19:52:51 UTC
+Last updated 2018-03-22 08:42:44 UTC
 </div>
 </div>
 <script>
