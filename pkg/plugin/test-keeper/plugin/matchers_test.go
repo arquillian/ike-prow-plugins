@@ -2,11 +2,10 @@ package plugin_test
 
 import (
 	"fmt"
-
 	. "github.com/arquillian/ike-prow-plugins/pkg/plugin/test-keeper/plugin"
 	. "github.com/onsi/ginkgo"
-	"github.com/onsi/ginkgo/extensions/table"
 	. "github.com/onsi/gomega"
+	"github.com/onsi/ginkgo/extensions/table"
 )
 
 var (
@@ -67,7 +66,7 @@ var (
 	}()
 )
 
-var assertFileMatchers = func(matchers []FileNamePattern, file string, shouldMatch bool) {
+var expectThatFile = func(matchers []FileNamePattern, file string, shouldMatch bool) {
 	Expect(Matches(matchers, file)).To(Equal(shouldMatch))
 }
 
@@ -105,53 +104,64 @@ var _ = Describe("Test Matcher features", func() {
 	Context("Predefined exclusion regex check (DefaultMatchers)", func() {
 
 		table.DescribeTable("should exclude common build tools",
-			assertFileMatchers,
-			matchingEntries(DefaultMatchers.Exclusion, buildAssets)...
+			expectThatFile,
+			matches(DefaultMatchers.Exclusion).using(buildAssets)...
 		)
 
 
 		table.DescribeTable("should exclude common config files",
-			assertFileMatchers,
-			matchingEntries(DefaultMatchers.Exclusion, configFiles)...
+			expectThatFile,
+			matches(DefaultMatchers.Exclusion).using(configFiles)...
 
 		)
 
 		table.DescribeTable("should exclude common .ignore files",
-			assertFileMatchers,
-			matchingEntries(DefaultMatchers.Exclusion, ignoreFiles)...
+			expectThatFile,
+			matches(DefaultMatchers.Exclusion).using(ignoreFiles)...
 		)
 
 		table.DescribeTable("should exclude common documentation files",
-			assertFileMatchers,
-			matchingEntries(DefaultMatchers.Exclusion, textFiles)...
+			expectThatFile,
+			matches(DefaultMatchers.Exclusion).using(textFiles)...
 		)
 
 		table.DescribeTable("should exclude ui assets",
-			assertFileMatchers,
-			matchingEntries(DefaultMatchers.Exclusion, visualAssets)...
+			expectThatFile,
+			matches(DefaultMatchers.Exclusion).using(visualAssets)...
 		)
 	})
 
 	Context("Predefined inclusion regex check (DefaultMatchers)", func() {
 
 		table.DescribeTable("should include common test naming conventions",
-			assertFileMatchers,
-			matchingEntries(DefaultMatchers.Inclusion, testSourceCode)...
+			expectThatFile,
+			matches(DefaultMatchers.Inclusion).using(testSourceCode)...
 		)
 
 		table.DescribeTable("should not include other source files",
-			assertFileMatchers,
-			notMatchingEntries(DefaultMatchers.Inclusion, allNoTestFiles)...
+			expectThatFile,
+			doesNotMatch(DefaultMatchers.Inclusion).using(allNoTestFiles)...
 		)
 	})
 })
 
-func matchingEntries(patterns []FileNamePattern, files []string) []table.TableEntry {
-	return entries(patterns, files, true)
+
+type tableEntryProvider func(files []string) []table.TableEntry
+
+func (t tableEntryProvider) using(files []string) []table.TableEntry {
+	return t(files)
 }
 
-func notMatchingEntries(patterns []FileNamePattern, files []string) []table.TableEntry {
-	return entries(patterns, files, false)
+func matches(patterns []FileNamePattern) tableEntryProvider {
+	return tableEntryProvider(func(files []string) []table.TableEntry {
+		return entries(patterns, files, true)
+	})
+}
+
+func doesNotMatch(patterns []FileNamePattern) tableEntryProvider {
+	return tableEntryProvider(func(files []string) []table.TableEntry {
+		return entries(patterns, files, false)
+	})
 }
 
 func entries(patterns []FileNamePattern, files []string, shouldMatch bool) []table.TableEntry {
@@ -170,6 +180,6 @@ func createEntry(matchers []FileNamePattern, file string, shouldMatch bool) tabl
 	if shouldMatch {
 		return table.Entry(fmt.Sprintf(msg, "", file, " NOT"), matchers, file, shouldMatch)
 	}
-	
+
 	return table.Entry(fmt.Sprintf(msg, " NOT", file, ""), matchers, file, shouldMatch)
 }
