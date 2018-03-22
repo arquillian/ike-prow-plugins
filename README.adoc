@@ -17,7 +17,7 @@ ifdef::generated-doc[]
 :toclevels: 2
 endif::generated-doc[]
 :data-uri:
-:imagesdir: docs
+:imagesdir: docs/images
 
 ifndef::generated-doc[]
 
