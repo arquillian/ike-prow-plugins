@@ -1,6 +1,8 @@
 package plugin
 
 import (
+	"fmt"
+
 	"github.com/arquillian/ike-prow-plugins/pkg/log"
 	"github.com/arquillian/ike-prow-plugins/pkg/plugin/config"
 	"github.com/arquillian/ike-prow-plugins/pkg/scm"
@@ -9,22 +11,25 @@ import (
 // TestKeeperConfiguration defines inclusion and exclusion patterns set of files will be matched against
 // It's unmarshaled from test-keeper.yml configuration file
 type TestKeeperConfiguration struct {
-	config.PluginConfiguration
-	Inclusion   string `yaml:"test_pattern,omitempty"`
-	Exclusion   string `yaml:"skip_validation_for,omitempty"`
-	Combine     bool   `yaml:"combine_defaults,omitempty"`
-	PluginHint  string `yaml:"plugin_hint,omitempty"`
+	BaseConfig config.PluginConfiguration `yaml:",omitempty,inline"`
+	Inclusion  string                     `yaml:"test_pattern,omitempty"`
+	Exclusion  string                     `yaml:"skip_validation_for,omitempty"`
+	Combine    bool                       `yaml:"combine_defaults,omitempty"`
 }
 
 // LoadTestKeeperConfig loads a TestKeeperConfiguration for the given change
 func LoadTestKeeperConfig(log log.Logger, change scm.RepositoryChange) TestKeeperConfiguration {
-	configLoader := config.NewPluginConfigLoader(ProwPluginName, change)
 
-	configuration := TestKeeperConfiguration{Combine: true}
-	err := configLoader.Load(&configuration)
+	configuration := TestKeeperConfiguration{Combine: true, BaseConfig: config.PluginConfiguration{}}
+
+	err := config.Load(&configuration,
+		config.GitHubConfigLoader(&configuration.BaseConfig, fmt.Sprintf("%s.yml", "test-keeper"), change),
+		config.GitHubConfigLoader(&configuration.BaseConfig, fmt.Sprintf("%s.yaml", "test-keeper"), change))
+
 	if err != nil {
 		log.Warnf("Config file was not loaded. Cause: %s", err)
 		return configuration
 	}
+
 	return configuration
 }

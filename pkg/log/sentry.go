@@ -1,9 +1,10 @@
 package log
 
 import (
-	"github.com/sirupsen/logrus"
-	"github.com/evalphobia/logrus_sentry"
 	"time"
+
+	"github.com/evalphobia/logrus_sentry"
+	"github.com/sirupsen/logrus"
 )
 
 // SentryTags encapsulate map of tags where both key and values are strings. Those tags are used by Sentry
