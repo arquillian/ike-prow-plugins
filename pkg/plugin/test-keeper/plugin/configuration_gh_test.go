@@ -23,8 +23,8 @@ var _ = Describe("Test keeper config loader features", func() {
 				Get("owner/repo/46cb8fac44709e4ccaae97448c65e8f7320cfea7/" + plugin.ProwPluginName + ".yml").
 				Reply(200).
 				BodyString("test_pattern: (.*my|test\\.go|pattern\\.js)$\n" +
-				"skip_validation_for: pom\\.xml|*\\.adoc\n" +
-				"plugin_hint: 'http://my.server.com/message.md'")
+					"skip_validation_for: pom\\.xml|*\\.adoc\n" +
+					"plugin_hint: 'http://my.server.com/message.md'")
 
 			change := scm.RepositoryChange{
 				Owner:    "owner",

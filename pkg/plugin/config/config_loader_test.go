@@ -1,15 +1,15 @@
 package config_test
 
 import (
+	"github.com/arquillian/ike-prow-plugins/pkg/plugin/config"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
-	"github.com/arquillian/ike-prow-plugins/pkg/plugin/config"
 	"github.com/pkg/errors"
 )
 
 type sampleConfiguration struct {
 	config.PluginConfiguration `yaml:",inline,omitempty"`
-	Name string `yaml:"name,omitempty"`
+	Name                       string `yaml:"name,omitempty"`
 }
 
 type testConfigProvider func() []config.Source
@@ -35,7 +35,7 @@ var _ = Describe("Config loader features", func() {
 
 	Context("Loading configuration using different strategies", func() {
 
-		It( "should load configuration when a successful lookup provided", func() {
+		It("should load configuration when a successful lookup provided", func() {
 			// given
 			testConfigProviders := testConfigProvider(func() []config.Source {
 				return []config.Source{onlyName}
@@ -51,7 +51,7 @@ var _ = Describe("Config loader features", func() {
 			Expect(sampleConfig.Name).To(Equal("awesome-o"))
 		})
 
-		It( "should load configuration when failing and successful lookup provided, skipping first failing", func() {
+		It("should load configuration when failing and successful lookup provided, skipping first failing", func() {
 			// given
 			testConfigProviders := testConfigProvider(func() []config.Source {
 				return []config.Source{faulty, onlyName}
@@ -67,7 +67,7 @@ var _ = Describe("Config loader features", func() {
 			Expect(sampleConfig.Name).To(Equal("awesome-o"))
 		})
 
-		It( "should load config from first working source (precedence)", func() {
+		It("should load config from first working source (precedence)", func() {
 			// given
 			testConfigProviders := testConfigProvider(func() []config.Source {
 				return []config.Source{nameAndHint, onlyName}
@@ -84,7 +84,7 @@ var _ = Describe("Config loader features", func() {
 			Expect(sampleConfig.PluginHint).To(Equal("I am just a hint"))
 		})
 
-		It( "should preserve prototype config name when no sources provided", func() {
+		It("should preserve prototype config name when no sources provided", func() {
 			// given
 			testConfigProviders := testConfigProvider(func() []config.Source {
 				return []config.Source{}
@@ -100,7 +100,7 @@ var _ = Describe("Config loader features", func() {
 			Expect(sampleConfig.Name).To(Equal("prototype"))
 		})
 
-		It( "should not propagate error when faulty source provided", func() {
+		It("should not propagate error when faulty source provided", func() {
 			// given
 			testConfigProviders := testConfigProvider(func() []config.Source {
 				return []config.Source{faulty}

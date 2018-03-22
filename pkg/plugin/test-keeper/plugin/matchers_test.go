@@ -2,10 +2,11 @@ package plugin_test
 
 import (
 	"fmt"
+
 	. "github.com/arquillian/ike-prow-plugins/pkg/plugin/test-keeper/plugin"
 	. "github.com/onsi/ginkgo"
-	. "github.com/onsi/gomega"
 	"github.com/onsi/ginkgo/extensions/table"
+	. "github.com/onsi/gomega"
 )
 
 var (
@@ -52,7 +53,6 @@ var (
 		"/path/to/test.go/my.assertion.ts", "/path/test/my.assertion.tsx", "/path/test/test.anything.ts",
 		"/path/test/my_assertion.py",
 	}
-
 
 	allNoTestFiles = func() []string {
 		var all []string
@@ -105,29 +105,27 @@ var _ = Describe("Test Matcher features", func() {
 
 		table.DescribeTable("should exclude common build tools",
 			expectThatFile,
-			matches(DefaultMatchers.Exclusion).using(buildAssets)...
+			matches(DefaultMatchers.Exclusion).using(buildAssets)...,
 		)
-
 
 		table.DescribeTable("should exclude common config files",
 			expectThatFile,
-			matches(DefaultMatchers.Exclusion).using(configFiles)...
-
+			matches(DefaultMatchers.Exclusion).using(configFiles)...,
 		)
 
 		table.DescribeTable("should exclude common .ignore files",
 			expectThatFile,
-			matches(DefaultMatchers.Exclusion).using(ignoreFiles)...
+			matches(DefaultMatchers.Exclusion).using(ignoreFiles)...,
 		)
 
 		table.DescribeTable("should exclude common documentation files",
 			expectThatFile,
-			matches(DefaultMatchers.Exclusion).using(textFiles)...
+			matches(DefaultMatchers.Exclusion).using(textFiles)...,
 		)
 
 		table.DescribeTable("should exclude ui assets",
 			expectThatFile,
-			matches(DefaultMatchers.Exclusion).using(visualAssets)...
+			matches(DefaultMatchers.Exclusion).using(visualAssets)...,
 		)
 	})
 
@@ -135,16 +133,15 @@ var _ = Describe("Test Matcher features", func() {
 
 		table.DescribeTable("should include common test naming conventions",
 			expectThatFile,
-			matches(DefaultMatchers.Inclusion).using(testSourceCode)...
+			matches(DefaultMatchers.Inclusion).using(testSourceCode)...,
 		)
 
 		table.DescribeTable("should not include other source files",
 			expectThatFile,
-			doesNotMatch(DefaultMatchers.Inclusion).using(allNoTestFiles)...
+			doesNotMatch(DefaultMatchers.Inclusion).using(allNoTestFiles)...,
 		)
 	})
 })
-
 
 type tableEntryProvider func(files []string) []table.TableEntry
 
