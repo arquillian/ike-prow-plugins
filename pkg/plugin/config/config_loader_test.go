@@ -1,77 +1,120 @@
 package config_test
 
 import (
-	"github.com/arquillian/ike-prow-plugins/pkg/plugin/config"
-	"github.com/arquillian/ike-prow-plugins/pkg/scm"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
-	gock "gopkg.in/h2non/gock.v1"
+	"github.com/arquillian/ike-prow-plugins/pkg/plugin/config"
+	"github.com/pkg/errors"
 )
 
 type sampleConfiguration struct {
-	Inclusion string `yaml:"test_pattern,omitempty"`
-	Exclusion string `yaml:"exclusion,omitempty"`
-	Combine   bool   `yaml:"combine_defaults,omitempty"`
-	AnyNumber int    `yaml:"number,omitempty"`
+	config.PluginConfiguration `yaml:",inline,omitempty"`
+	Name string `yaml:"name,omitempty"`
 }
+
+type testConfigProvider func() []config.Source
+
+func (s testConfigProvider) Sources() []config.Source {
+	return s()
+}
+
+var onlyName = config.Source(func() ([]byte, error) {
+	return []byte("name: 'awesome-o'"), nil
+})
+
+var nameAndHint = config.Source(func() ([]byte, error) {
+	return []byte("name: 'name-and-hint'\n" +
+		"plugin_hint: 'I am just a hint'"), nil
+})
+
+var faulty = config.Source(func() ([]byte, error) {
+	return nil, errors.New("no config found here")
+})
 
 var _ = Describe("Config loader features", func() {
 
-	BeforeEach(func() {
-		gock.Off()
-	})
+	Context("Loading configuration using different strategies", func() {
 
-	Context("Loading configuration file from the repository", func() {
-
-		It("should load configuration yaml file", func() {
+		It( "should load configuration when a successful lookup provided", func() {
 			// given
-			gock.New("https://raw.githubusercontent.com").
-				Get("owner/repo/46cb8fac44709e4ccaae97448c65e8f7320cfea7/sample-plugin.yml").
-				Reply(200).
-				BodyString("test_pattern: (.*my|test\\.go|pattern\\.js)$\n" +
-					"exclusion: pom\\.xml|*\\.adoc\n" +
-					"number: 12345")
+			testConfigProviders := testConfigProvider(func() []config.Source {
+				return []config.Source{onlyName}
+			})
 
-			loader := config.NewPluginConfigLoader("sample-plugin",
-				scm.RepositoryChange{
-					Owner:    "owner",
-					RepoName: "repo",
-					Hash:     "46cb8fac44709e4ccaae97448c65e8f7320cfea7",
-				})
-
-			configuration := sampleConfiguration{
-				Combine: true,
-			}
+			sampleConfig := sampleConfiguration{}
 
 			// when
-			err := loader.Load(&configuration)
+			err := config.Load(&sampleConfig, testConfigProviders)
 
 			// then
 			Ω(err).ShouldNot(HaveOccurred())
-			Expect(configuration.Inclusion).To(Equal(`(.*my|test\.go|pattern\.js)$`))
-			Expect(configuration.Exclusion).To(Equal(`pom\.xml|*\.adoc`))
-			Expect(configuration.Combine).To(BeTrue())
-			Expect(configuration.AnyNumber).To(Equal(12345))
+			Expect(sampleConfig.Name).To(Equal("awesome-o"))
 		})
-	})
 
-	Context("URL construction", func() {
-
-		It("should create a URL to a configuration file for the given change", func() {
+		It( "should load configuration when failing and successful lookup provided, skipping first failing", func() {
 			// given
-			loader := config.NewPluginConfigLoader("sample-plugin",
-				scm.RepositoryChange{
-					Owner:    "owner",
-					RepoName: "repo",
-					Hash:     "46cb8fac44709e4ccaae97448c65e8f7320cfea7",
-				})
+			testConfigProviders := testConfigProvider(func() []config.Source {
+				return []config.Source{faulty, onlyName}
+			})
+
+			sampleConfig := sampleConfiguration{}
 
 			// when
-			url := loader.CreateConfigFileURL()
+			err := config.Load(&sampleConfig, testConfigProviders)
 
 			// then
-			Expect(url).To(Equal("https://raw.githubusercontent.com/" +
-				"owner/repo/46cb8fac44709e4ccaae97448c65e8f7320cfea7/sample-plugin.yml"))
+			Ω(err).ShouldNot(HaveOccurred())
+			Expect(sampleConfig.Name).To(Equal("awesome-o"))
 		})
+
+		It( "should load config from first working source (precedence)", func() {
+			// given
+			testConfigProviders := testConfigProvider(func() []config.Source {
+				return []config.Source{nameAndHint, onlyName}
+			})
+
+			sampleConfig := sampleConfiguration{Name: "prototype"}
+
+			// when
+			err := config.Load(&sampleConfig, testConfigProviders)
+
+			// then
+			Ω(err).ShouldNot(HaveOccurred())
+			Expect(sampleConfig.Name).To(Equal("name-and-hint"))
+			Expect(sampleConfig.PluginHint).To(Equal("I am just a hint"))
+		})
+
+		It( "should preserve prototype config name when no sources provided", func() {
+			// given
+			testConfigProviders := testConfigProvider(func() []config.Source {
+				return []config.Source{}
+			})
+
+			sampleConfig := sampleConfiguration{Name: "prototype"}
+
+			// when
+			err := config.Load(&sampleConfig, testConfigProviders)
+
+			// then
+			Ω(err).ShouldNot(HaveOccurred())
+			Expect(sampleConfig.Name).To(Equal("prototype"))
+		})
+
+		It( "should not propagate error when faulty source provided", func() {
+			// given
+			testConfigProviders := testConfigProvider(func() []config.Source {
+				return []config.Source{faulty}
+			})
+
+			sampleConfig := sampleConfiguration{Name: "prototype"}
+
+			// when
+			err := config.Load(&sampleConfig, testConfigProviders)
+
+			// then
+			Ω(err).ShouldNot(HaveOccurred())
+			Expect(sampleConfig.Name).To(Equal("prototype"))
+		})
+
 	})
 })

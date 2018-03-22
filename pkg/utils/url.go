@@ -21,6 +21,7 @@ func GetFileFromURL(url string) ([]byte, error) {
 			err = cerr
 		}
 	}()
+
 	body, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
 		return nil, err
