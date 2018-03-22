@@ -3,9 +3,9 @@
 This plugin can help you stick to the rule that every feature you ship comes with automated way of assuring it works - by using automated tests. 
 If it won't find any tests in the Pull Request, it adds a comment with a description and marks its check as **Failure**, or as **Success** otherwise (see the screenshots below):
 
-image::images/testkeeper-success.png[Success, title="Success status"]
+image::../images/testkeeper-success.png[Success, title="Success status"]
 
-image::images/testkeeper-failure.png[Failure, title="Failure status"]
+image::../images/testkeeper-failure.png[Failure, title="Failure status"]
 
 This check is done based on the file name patterns - for more information head over to <<testkeeper-config>> part.
   
