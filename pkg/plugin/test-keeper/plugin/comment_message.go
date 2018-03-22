@@ -27,32 +27,32 @@ const (
 
 // CreateCommentMessage creates a comment message for the test-keeper plugin. If the comment message is set in config then it takes that one, the default otherwise.
 func CreateCommentMessage(configuration TestKeeperConfiguration, change scm.RepositoryChange) string {
-	if configuration.BaseConfig.LocationURL == "" {
+	if configuration.LocationURL == "" {
 		return beginning + noConfig
 	}
-	if configuration.BaseConfig.PluginHint != "" {
+	if configuration.PluginHint != "" {
 		return getMsgFromFile(configuration, change)
 	}
-	return getMsgWithConfigRef(configuration.BaseConfig.LocationURL)
+	return getMsgWithConfigRef(configuration.LocationURL)
 
 }
 
 func getMsgFromFile(configuration TestKeeperConfiguration, change scm.RepositoryChange) string {
-	_, err := url.ParseRequestURI(configuration.BaseConfig.PluginHint)
+	_, err := url.ParseRequestURI(configuration.PluginHint)
 
 	var content []byte
 	var msgFileURL string
 
 	if err == nil {
-		msgFileURL = configuration.BaseConfig.PluginHint
+		msgFileURL = configuration.PluginHint
 	} else {
 		ghFileService := github.RawFileService{Change: change}
-		msgFileURL = ghFileService.GetRawFileURL(configuration.BaseConfig.PluginHint)
+		msgFileURL = ghFileService.GetRawFileURL(configuration.PluginHint)
 	}
 	content, err = utils.GetFileFromURL(msgFileURL)
 
 	if err != nil {
-		return getMsgWithConfigRef(configuration.BaseConfig.LocationURL) + fmt.Sprintf(notFoundFileSuffix, msgFileURL)
+		return getMsgWithConfigRef(configuration.LocationURL) + fmt.Sprintf(notFoundFileSuffix, msgFileURL)
 	}
 
 	return string(content)

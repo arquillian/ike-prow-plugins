@@ -15,7 +15,7 @@ var _ = Describe("Test keeper comment message creation", func() {
 
 		It("should create default message referencing to documentation when url to config is empty", func() {
 			// given
-			config := plugin.TestKeeperConfiguration{BaseConfig: config.PluginConfiguration{PluginHint: "any-file"}}
+			config := plugin.TestKeeperConfiguration{PluginConfiguration: config.PluginConfiguration{PluginHint: "any-file"}}
 
 			// when
 			msg := plugin.CreateCommentMessage(config, scm.RepositoryChange{})
@@ -28,7 +28,7 @@ var _ = Describe("Test keeper comment message creation", func() {
 		It("should create default message referencing to config file when url to config is not empty", func() {
 			// given
 			url := "http://github.com/my/repo/test-keeper.yaml"
-			config := plugin.TestKeeperConfiguration{BaseConfig: config.PluginConfiguration{LocationURL: url}}
+			config := plugin.TestKeeperConfiguration{PluginConfiguration: config.PluginConfiguration{LocationURL: url}}
 
 			// when
 			msg := plugin.CreateCommentMessage(config, scm.RepositoryChange{})
@@ -55,7 +55,7 @@ var _ = Describe("Test keeper comment message creation", func() {
 
 			url := "http://github.com/my/repo/test-keeper.yaml"
 			config := plugin.TestKeeperConfiguration{
-				BaseConfig: config.PluginConfiguration{
+				PluginConfiguration: config.PluginConfiguration{
 					LocationURL: url,
 					PluginHint:  "path/to/custom_message_file.md",
 				},
@@ -82,7 +82,7 @@ var _ = Describe("Test keeper comment message creation", func() {
 
 			url := "http://github.com/my/repo/test-keeper.yaml"
 			config := plugin.TestKeeperConfiguration{
-				BaseConfig: config.PluginConfiguration{
+				PluginConfiguration: config.PluginConfiguration{
 					LocationURL: url,
 					PluginHint:  "path/to/custom_message_file.md",
 				},
@@ -115,7 +115,7 @@ var _ = Describe("Test keeper comment message creation", func() {
 
 			url := "http://github.com/my/repo/test-keeper.yaml"
 			config := plugin.TestKeeperConfiguration{
-				BaseConfig: config.PluginConfiguration{
+				PluginConfiguration: config.PluginConfiguration{
 					LocationURL: url,
 					PluginHint:  "http://my.server.com/path/to/custom_message_file.md",
 				},
@@ -136,7 +136,7 @@ var _ = Describe("Test keeper comment message creation", func() {
 
 			url := "http://github.com/my/repo/test-keeper.yaml"
 			config := plugin.TestKeeperConfiguration{
-				BaseConfig: config.PluginConfiguration{
+				PluginConfiguration: config.PluginConfiguration{
 					LocationURL: url,
 					PluginHint:  "http://my.server.com/path/to/custom_message_file.md",
 				},
@@ -161,7 +161,7 @@ var _ = Describe("Test keeper comment message creation", func() {
 
 			url := "http://github.com/my/repo/test-keeper.yaml"
 			config := plugin.TestKeeperConfiguration{
-				BaseConfig: config.PluginConfiguration{
+				PluginConfiguration: config.PluginConfiguration{
 					LocationURL: url,
 					PluginHint:  "http/server.com/custom_message_file.md",
 				},

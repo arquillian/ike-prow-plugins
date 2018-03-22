@@ -1,0 +1,47 @@
+package github
+
+import (
+	"github.com/arquillian/ike-prow-plugins/pkg/scm"
+	"github.com/arquillian/ike-prow-plugins/pkg/utils"
+	"github.com/arquillian/ike-prow-plugins/pkg/plugin/config"
+	"fmt"
+)
+
+const githubBaseURL = "https://github.com/"
+
+// LoadableConfig holds information about the plugin name, repository change and pointer to base config
+type LoadableConfig struct {
+	PluginName string
+	Change     scm.RepositoryChange
+	BaseConfig *config.PluginConfiguration
+}
+
+// Sources provides default loading strategies for a plugin looking it up in the root of the repository for a given
+// revision. Two files are expected to be found there plugin-name.yml or plugin-name.yaml (in that order)
+func (l *LoadableConfig) Sources() []config.Source {
+	return []config.Source{
+		l.loadFromRawFile("%s.yml"),
+		l.loadFromRawFile("%s.yaml"),
+	}
+}
+
+func (l *LoadableConfig) loadFromRawFile(pathTemplate string) config.Source {
+
+	filePath := fmt.Sprintf(pathTemplate, l.PluginName)
+
+	rawFileService := RawFileService{
+		Change: l.Change,
+	}
+
+	return func() ([]byte, error) {
+		configURL := rawFileService.GetRawFileURL(filePath)
+		downloadedConfig, err := utils.GetFileFromURL(configURL)
+
+		if err != nil {
+			return nil, err
+		}
+
+		l.BaseConfig.LocationURL = githubBaseURL + rawFileService.GetRelativePath(filePath)
+		return downloadedConfig, nil
+	}
+}

@@ -1,11 +1,16 @@
 package config
 
 import (
-	"github.com/arquillian/ike-prow-plugins/pkg/github"
-	"github.com/arquillian/ike-prow-plugins/pkg/scm"
-	"github.com/arquillian/ike-prow-plugins/pkg/utils"
 	"gopkg.in/yaml.v2"
 )
+
+// SourcesProvider is an interface which provides a slice of configuration source loader functions as strategies
+type SourcesProvider interface {
+	Sources() []Source
+}
+
+// Source is a function type representing strategy for loading configuration file into []byte
+type Source func() ([]byte, error)
 
 // PluginConfiguration holds common configuration for all the plugins
 type PluginConfiguration struct {
@@ -13,12 +18,11 @@ type PluginConfiguration struct {
 	PluginHint  string `yaml:"plugin_hint,omitempty"`
 }
 
-// Load loads configuration of the plugin stored in the YAML file named after the plugin name
-// It looks it up based on the scm.RepositoryChange hash information and unmarshals content into
-// passed target interface
-func Load(target interface{}, sources ...func() ([]byte, error)) error {
+// Load loads configuration of the plugin based on strategies defined by SourcesProvider
+// It ignores errors returned by providers and only propagates the one occurred while unmarshalling
+func Load(target interface{}, loader SourcesProvider) error {
 	var source []byte
-	for _, load := range sources {
+	for _, load := range loader.Sources() {
 		loaded, err := load()
 		if err == nil {
 			source = loaded
@@ -26,23 +30,4 @@ func Load(target interface{}, sources ...func() ([]byte, error)) error {
 		}
 	}
 	return yaml.Unmarshal(source, target)
-}
-
-// TODO might need a new home
-// nolint
-func GitHubConfigLoader(baseConfig *PluginConfiguration, filePath string, change scm.RepositoryChange) func() ([]byte, error) {
-	rawFileService := github.RawFileService{
-		Change: change,
-	}
-
-	return func() ([]byte, error) {
-		configURL := rawFileService.GetRawFileURL(filePath)
-		downloadedConfig, err := utils.GetFileFromURL(configURL)
-
-		if err != nil {
-			return nil, err
-		}
-		baseConfig.LocationURL = configURL
-		return downloadedConfig, nil
-	}
 }
