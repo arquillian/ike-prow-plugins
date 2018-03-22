@@ -14,13 +14,13 @@ The plugin is triggered when the Pull Request is opened/reopened or updated by n
 If, for whatever reason, you want to bypass this check - simply comment using `const:pkg/plugin/test-keeper/plugin/event_handler.go[name="SkipComment"]` command. If you are an admin user you will see the **Success** status.
 If the comment will be later removed the check is triggered again.
 
-=== Configuration [[testkeeper-config]]
+=== Plugin Configuration [[testkeeper-config]]
 
 To configure Test Keeper plugin place `test-keeper.yml` (or `test-keeper.yaml`) file in the root of your project and use properties described below.
 
 [source, yml, indent=0]
 ----
-include::../pkg/plugin/test-keeper/plugin/test_fixtures/github_calls/prs/with_tests/test-keeper.yml[]
+include::../../pkg/plugin/test-keeper/plugin/test_fixtures/github_calls/prs/with_tests/test-keeper.yml[]
 ----
 
 <1> Defines set of regular expressions which will be used to match files changeset and determine if Pull Requests comes with any changed test files.

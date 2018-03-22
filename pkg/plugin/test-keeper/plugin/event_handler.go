@@ -125,20 +125,27 @@ func (gh *GitHubTestEventsHandler) handlePrComment(log log.Logger, prComment *go
 }
 
 func (gh *GitHubTestEventsHandler) checkTestsAndSetStatus(log log.Logger, change scm.RepositoryChange, pr *gogh.PullRequest) error {
+	statusService := gh.newTestStatusService(log, change)
 	configuration := LoadTestKeeperConfig(log, change)
-	testsExist, err := gh.checkTests(log, change, configuration, *pr.Number)
+	fileCategories, err := gh.checkTests(log, change, configuration, *pr.Number)
 	if err != nil {
+		if statusErr := statusService.reportError(); statusErr != nil {
+			log.Errorf("failed to report error status on PR [%q]. cause: %s", *pr, statusErr)
+		}
 		return err
 	}
 
-	statusService := gh.newTestStatusService(log, change)
-	if testsExist {
-		return statusService.testsExist()
+	if fileCategories.OnlySkippedFiles() {
+		return statusService.okOnlySkippedFiles()
 	}
 
-	err = statusService.noTests()
+	if fileCategories.TestsExist() {
+		return statusService.okTestsExist()
+	}
+
+	err = statusService.failNoTests()
 	if err != nil {
-		log.Error("There occur an error when the status was being set to PR:", err)
+		log.Errorf("failed to report status on PR [%q]. cause: %s", *pr, err)
 	}
 
 	commentContext := github.CommentContext{PluginName: ProwPluginName, Assignee: *pr.User.Login}
@@ -146,28 +153,30 @@ func (gh *GitHubTestEventsHandler) checkTestsAndSetStatus(log log.Logger, change
 
 	cerr := commentService.PluginComment(CreateCommentMessage(configuration, change))
 	if cerr != nil {
+		log.Errorf("failed to comment on PR [%q]. cause: %s", *pr, cerr)
 		return cerr
 	}
+
 	return err
 }
 
-func (gh *GitHubTestEventsHandler) checkTests(log log.Logger, change scm.RepositoryChange, config TestKeeperConfiguration, prNumber int) (bool, error) {
+func (gh *GitHubTestEventsHandler) checkTests(log log.Logger, change scm.RepositoryChange, config TestKeeperConfiguration, prNumber int) (FileCategories, error) {
 	matcher := LoadMatcher(config)
 
-	checker := TestChecker{TestKeeperMatcher: matcher}
+	fileCategoryCounter := FileCategoryCounter{Matcher: matcher}
 
 	files, _, err := gh.Client.PullRequests.ListFiles(context.Background(), change.Owner, change.RepoName, prNumber, nil)
 	if err != nil {
 		log.Error(err)
-		return false, nil
+		return FileCategories{}, err
 	}
 
-	testsExist, err := checker.IsAnyNotExcludedFileTest(asChangedFiles(files))
+	fileCategories, err := fileCategoryCounter.Count(asChangedFiles(files))
 	if err != nil {
 		log.Error(err)
 	}
 
-	return testsExist, err
+	return fileCategories, err
 }
 
 func asChangedFiles(files []*gogh.CommitFile) []scm.ChangedFile {

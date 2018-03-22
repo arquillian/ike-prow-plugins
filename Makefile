@@ -1,15 +1,15 @@
 PROJECT_NAME:=ike-prow-plugins
 PACKAGE_NAME:=github.com/arquillian/ike-prow-plugins
 
-PLUGINS:=test-keeper pr-sanitizer work-in-progress
+PLUGINS?=test-keeper pr-sanitizer work-in-progress
 BINARIES:=$(patsubst %,binaries-%, $(PLUGINS))
 
-BINARY_DIR=${PWD}/bin
+BINARY_DIR:=${PWD}/bin
 CLUSTER_DIR?=${PWD}/cluster
 PLUGIN_DEPLOYMENTS_DIR?=$(CLUSTER_DIR)/generated
 
 REGISTRY?=docker.io
-DOCKER_REPO?=bartoszmajsak
+DOCKER_REPO?=arquillian
 BUILD_IMAGES:=$(patsubst %,build-%, $(PLUGINS))
 PUSH_IMAGES:=$(patsubst %,push-%, $(PLUGINS))
 CLEAN_IMAGES:=$(patsubst %,clean-%, $(PLUGINS))
@@ -85,25 +85,45 @@ check: ## Concurrently runs a whole bunch of static analysis tools
 .PHONY: oc-generate-deployments
 oc-generate-deployments: $(OC_DEPLOYMENTS) ## Creates openshift deployments for ike-prow plugins
 
-.PHONY: oc-init
-oc-init:
-	@echo "Setting cluster project"
-	@oc new-project ike-prow-plugins
-	@oc create configmap plugins && oc create configmap config
-	@oc create secret generic hmac-token --from-file=hmac=config/hmac.token && oc create secret generic oauth-token --from-file=oauth=config/oauth.token
-	@oc create configmap plugins --from-file=plugins=plugins.yaml --dry-run -o yaml | oc replace configmap plugins -f -
-	@oc create configmap config --from-file=config=config.yaml --dry-run -o yaml | oc replace configmap config -f -
-	@oc create secret generic hmac-token --from-file=hmac=config/hmac.token --dry-run -o yaml | oc replace secret generic hmac-token  -f -
-	@oc create secret generic oauth-token --from-file=oauth=config/oauth.token --dry-run -o yaml | oc replace secret generic oauth-token  -f -
+define populate_secret ## params: secret filename, secret name, secret key
+	@touch config/$(1)
+	@oc create secret generic $(2) --from-file=$(3)=config/$(1) || true
+	@oc create secret generic $(2) --from-file=$(3)=config/$(1) --dry-run -o yaml | oc replace secret generic $(2) -f -
+endef
+
+define populate_configmap ## params: configmap name, configmap file
+	@oc create configmap $(1) || true
+	@oc create configmap $(1) --from-file=$(1)=$(2) --dry-run -o yaml | oc replace configmap $(1) -f -
+endef
+
+OC_PROJECT_NAME?=ike-prow-plugins
+.PHONY: oc-init-project
+oc-init-project: ## Initializes new project with config maps and secrets
+	@echo "Setting up project '$(OC_PROJECT_NAME)' in the cluster (ignoring potential errors if entries already exist)"
+	@oc new-project $(OC_PROJECT_NAME) || true
+
+	$(call populate_configmap,plugins,plugins.yaml)
+	$(call populate_configmap,config,config.yaml)
+	$(call populate_secret,oauth.token,oauth-token,oauth)
+	$(call populate_secret,hmac.token,hmac-token,hmac)
+	$(call populate_secret,sentry.dsn,sentry-dsn,sentry)
+
+.PHONY: oc-deploy-starter
+oc-deploy-starter: ## Deploys basic prow infrastructure
+	@echo "Deploying prow infrastructure"
 	@oc apply -f cluster/starter.yaml
 
-.PHONY: oc-apply
-oc-apply: build-images push-images oc-generate-deployments
-	@echo "Updating cluster configuration..."
-	@oc create configmap plugins --from-file=plugins=plugins.yaml --dry-run -o yaml | oc replace configmap plugins -f -
-	@oc create configmap config --from-file=config=config.yaml --dry-run -o yaml | oc replace configmap config -f -
-	@oc create secret generic hmac-token --from-file=hmac=config/hmac.token --dry-run -o yaml | oc replace secret generic hmac-token  -f -
-	@oc create secret generic oauth-token --from-file=oauth=config/oauth.token --dry-run -o yaml | oc replace secret generic oauth-token  -f -
+HOOK_VERSION?=v20180316-93ade3390
+.PHONY: oc-deploy-hook
+oc-deploy-hook: ## Deploys hook service only
+	@echo "Deploys hook service ${HOOK_VERSION}"
+	@oc process -f $(CLUSTER_DIR)/hook-template.yaml \
+    		-p VERSION=$(HOOK_VERSION) \
+    		-o yaml | oc apply -f -
+
+.PHONY: oc-apply ## Builds plugin images, updates configuration and deploys new version of ike-plugins
+oc-apply: oc-init-project build-images push-images oc-generate-deployments
+	@echo "Updating cluster configuration for '$(OC_PROJECT_NAME)'..."
 
 $(OC_DEPLOYMENTS): oc-%: %
 	@mkdir -p $(PLUGIN_DEPLOYMENTS_DIR)
@@ -127,6 +147,6 @@ $(CLEAN_IMAGES): clean-%: %
 	$(DOCKER) rmi -f $(REGISTRY)/$(DOCKER_REPO)/$<:$(TAG)
 
 .PHONY: push-images
-push-images: $(PUSH_IMAGES)
+push-images: build-images $(PUSH_IMAGES)
 $(PUSH_IMAGES): push-%: %
 	$(DOCKER) push $(REGISTRY)/$(DOCKER_REPO)/$<:$(TAG)

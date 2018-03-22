@@ -1,0 +1,140 @@
+== Development
+
+=== Build
+
+In order to compile the project simply execute `make build` target. This will compile, run tests and put binaries of each
+plugin in `/bin` directory in the root of the project. There is also a quick compile option (`make compile-only`) where
+`go build` is only invoked, skipping other targets like `tests` and `checks`
+
+You can also automatically format and remove unused imports by invoking `goimports` tool (`make imports`).
+
+IMPORTANT: `goimports` does not correctly handle import of packages where package name differs from last part of the URL
+provided. For example `import "gopkg.in/h2non/gock.v1"` will be removed. To overcome this problem name the import `import gock "gopkg.in/h2non/gock.v1"`. One of the related issues link:https://github.com/golang/go/issues/9882[go/issues/9882].
+
+To deploy plugins use `make oc-apply`. This will build images, push them to the repository, generate deployments and apply
+them on the cluster. This target builds all plugins at once.
+
+IMPORTANT: You have to be logged in to the cluster first.
+
+=== Developing new plugin
+
+Besides creating new folders/packages in `plugin` folder you will have to register your plugin in the `Makefile`. Simply
+add its name to link:https://github.com/arquillian/ike-prow-plugins/blob/308909d88c7bee02b96236121fd25d4e9d08d88b/Makefile#L4[this list] and you should be good.
+
+IMPORTANT: By convention internal `PluginName`, the directory where the code is located and name of the service are assumed to
+be the same.
+
+=== Testing
+
+We use link:https://onsi.github.io/ginkgo/[Ginkgo] testing framework and link:https://onsi.github.io/gomega/[Gomega] assertion library for writing tests.
+
+Make sure you have both installed locally in order to execute tests from the CLI:
+
+[source,bash]
+----
+go get -u github.com/onsi/ginkgo/ginkgo
+go get -u github.com/onsi/gomega
+----
+
+==== Testing hints
+
+* To run all tests at once execute `ginkgo -r` on the root of the project.
+* `ginkgo watch -r` will watch on tests changes recursively starting from the directory the command was invoked. It will re-run the tests whenever change in the code occurs
+* In order to execute one test rename `It` function to `FIt`. Ginkgo runner will only execute given test (focused) instead of the whole test suite. This also works with `Context` and `Describe` blocks.
+* To exclude prefix any of the blocks with `X`.
+
+==== Testing hooks [[testing-hooks]]
+
+You can consume GitHub events through webhook pointing to your local cluster. For this purpose use
+link:http://www.ultrahook.com/[`ultrahook`]. After registering your own API key simply run following command and you
+are all set:
+
+[source,bash]
+----
+ultrahook github http://$(oc get route/hook --no-headers=true -o=custom-columns=HOST:spec.host)/hook
+----
+
+NOTE: If not done before add ultrahook URL as payload URL for webhook configuration (see <<webhook>>).
+
+Having this set up you will start seeing events triggered by your actions in the repository and
+corresponding plugins reacting on them. Have a look at pods logs to verify if everything is working expected.
+
+
+=== Local Setup using Minishift
+
+You can use Minishift for developing plugins locally.
+Follow link:https://docs.openshift.org/latest/minishift/getting-started/installing.html#installing-instructions[official installation guide] to set it up.
+
+This setup is based on following versions:
+
+[source,bash]
+----
+minishift v1.13.1
+openshift v3.7.1
+kubernetes v1.7.6
+----
+
+To start your Minishift cluster you can use following command (you might want to customize CPU and memory limits):
+
+[source,bash]
+----
+minishift start --profile prow --memory 8GB --cpus 4
+----
+
+==== Initial setup
+
+Before you start developing new plugins or evolving existing ones you need to deploy set of basic Prow services and configuration.
+
+For this purpose use login to your OpenShift cluster using `oc login` and execute `make oc-init-project` target which will:
+
+* Create new project named `ike-prow-plugins`
+* Add config maps for Prow configuration (`config.yaml`) and its plugins (`plugins.yaml`)
+* Add required secrets (see <<gh-settings>> for details)
+
+At this point you have new Openshift project created and before you will be able to deploy plugins you can select one of following targets:
+
+. `oc-deploy-hook` will only deploy `hook` service responsible for dispatching incoming GitHub events.
+. `oc-deploy-starter` will deploy key Prow services next to `hook`. For the explanation head over to the link:https://github.com/kubernetes/test-infra/blob/8a2cb8faf150750fd308f6d92a32773c386a3da9/prow/README.md[official documentation].
+
+The key piece of both deployments is the `hook` service which listens to GitHub events and dispatches them to relevant plugins.
+
+==== Pushing to local Minishift repository
+
+To speed up development cycle (and avoid pushing work-in-progress) images to Docker Hub you can use built-in docker repository available in Minishift.
+`Makefile` and templates are adjusted to use it, so the only thing you have to do is to set up few environment variables.
+
+IMPORTANT: Before executing `docker login` make sure you are logged in using token instead of regular password. That's returned
+by `oc whoami -t` and is used as password by Docker daemon. To do that open OpenShift Console (e.g. `xdg-open https://$(minishift ip):8443/console &>/dev/null`),
+click on your username in the upper-right corner and then `Copy Login Command`. Use it to login from the terminal and
+you are ready to go.
+
+[source,bash]
+.Setting up Docker to use local Minishift registry
+----
+include::../local.sh[tag=local_docker_registry]
+----
+
+==== Hints
+
+You can simplify your setup by seeding configuration files
+
+[source,bash]
+.Seeding tokens
+----
+include::../local.sh[tag=seeding_secrets]
+----
+
+<1> Your GitHub Webhook secret. See for more details <<gh-settings>>.
+<2> Your user (or bot account) GitHub OAuth Token. See for more details <<gh-settings>>.
+<3> link:https://docs.sentry.io/quickstart/#about-the-dsn[Sentry DSN] in `+https://<key>:<secret>@<sentry_host>/<project>+` format.
+
+NOTE: If you are using `zsh` you can take a look at link:https://github.com/kennethreitz/autoenv[autoenv] or
+link:https://direnv.net/[direnv] to automate this setup every time you access project's directory. Just make sure to add it to your global `.gitignore` to avoid sharing it through PRs (e.g. `git config --global core.excludesfile ~/.gitignore`).
+
+[source,bash]
+.Some handy aliases
+----
+include::../local.sh[tag=handy_aliases]
+----
+
+include::{asciidoctor-source}/fragments/sentry.adoc[leveloffset=1]
