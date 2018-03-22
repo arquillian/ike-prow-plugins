@@ -16,7 +16,7 @@ If the comment will be later removed the check is triggered again.
 
 === Configuration [[testkeeper-config]]
 
-To configure Test Keeper plugin place `test-keeper.yml` file in the root of your project and use properties described below.
+To configure Test Keeper plugin place `test-keeper.yml` (or `test-keeper.yaml`) file in the root of your project and use properties described below.
 
 [source, yml, indent=0]
 ----
