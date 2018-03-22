@@ -102,44 +102,44 @@ var _ = Describe("Test Matcher features", func() {
 		})
 	})
 
-	Context("Predefined exclusion regex check", func() {
+	Context("Predefined exclusion regex check (DefaultMatchers)", func() {
 
-		table.DescribeTable("DefaultMatchers should exclude common build tools",
+		table.DescribeTable("should exclude common build tools",
 			assertFileMatchers,
 			matchingEntries(DefaultMatchers.Exclusion, buildAssets)...
 		)
 
 
-		table.DescribeTable("DefaultMatchers should exclude common config files",
+		table.DescribeTable("should exclude common config files",
 			assertFileMatchers,
 			matchingEntries(DefaultMatchers.Exclusion, configFiles)...
 
 		)
 
-		table.DescribeTable("DefaultMatchers should exclude common .ignore files",
+		table.DescribeTable("should exclude common .ignore files",
 			assertFileMatchers,
 			matchingEntries(DefaultMatchers.Exclusion, ignoreFiles)...
 		)
 
-		table.DescribeTable("DefaultMatchers should exclude common documentation files",
+		table.DescribeTable("should exclude common documentation files",
 			assertFileMatchers,
 			matchingEntries(DefaultMatchers.Exclusion, textFiles)...
 		)
 
-		table.DescribeTable("DefaultMatchers should exclude ui assets",
+		table.DescribeTable("should exclude ui assets",
 			assertFileMatchers,
 			matchingEntries(DefaultMatchers.Exclusion, visualAssets)...
 		)
 	})
 
-	Context("Predefined inclusion regex check", func() {
+	Context("Predefined inclusion regex check (DefaultMatchers)", func() {
 
-		table.DescribeTable("DefaultMatchers should include common test naming conventions",
+		table.DescribeTable("should include common test naming conventions",
 			assertFileMatchers,
 			matchingEntries(DefaultMatchers.Inclusion, testSourceCode)...
 		)
 
-		table.DescribeTable("DefaultMatchers should not include other source files",
+		table.DescribeTable("should not include other source files",
 			assertFileMatchers,
 			notMatchingEntries(DefaultMatchers.Inclusion, allNoTestFiles)...
 		)
@@ -164,13 +164,12 @@ func entries(patterns []FileNamePattern, files []string, shouldMatch bool) []tab
 	return entries
 }
 
-func createEntry(matchers []FileNamePattern, file string, shouldMatch bool) table.TableEntry {
-	msg := "Test matcher should%s match the file %s, but it did%s."
-	if shouldMatch {
-		msg = fmt.Sprintf(msg, "", file, " NOT")
-	} else {
-		msg = fmt.Sprintf(msg, " NOT", file, "")
-	}
+const msg = "Test matcher should%s match the file %s, but it did%s."
 
-	return table.Entry(msg, matchers, file, shouldMatch)
+func createEntry(matchers []FileNamePattern, file string, shouldMatch bool) table.TableEntry {
+	if shouldMatch {
+		return table.Entry(fmt.Sprintf(msg, "", file, " NOT"), matchers, file, shouldMatch)
+	}
+	
+	return table.Entry(fmt.Sprintf(msg, " NOT", file, ""), matchers, file, shouldMatch)
 }
