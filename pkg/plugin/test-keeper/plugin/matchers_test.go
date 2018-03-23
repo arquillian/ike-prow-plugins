@@ -13,6 +13,8 @@ var (
 	buildAssets = []string{
 		"src/github.com/arquillian/ike-prow-plugins/Makefile", "src/main/java/pom.xml",
 		"mvnw", "mvnw.cmd", "mvnw.bat", "build.gradle", "gulpfile.js",
+		"gradlew", "gradlew.bat",
+		"glide.yaml", "glide.lock", "pom.xml", "package.json",
 		"vendor/github.com/arquillian/runner.go",
 		"docker-compose.yml", "Dockerfile", "Dockerfile.builder", "Dockerfile.deploy",
 	}
@@ -29,7 +31,7 @@ var (
 	}
 
 	ignoreFiles = []string{
-		".gitignore", ".dockerignore", ".dockerignore",
+		".gitignore", ".dockerignore", ".stylelintignore",
 	}
 
 	textFiles = []string{
