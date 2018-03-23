@@ -105,27 +105,27 @@ var _ = Describe("Test Matcher features", func() {
 
 		table.DescribeTable("should exclude common build tools",
 			expectThatFile,
-			matches(DefaultMatchers.Exclusion).using(buildAssets)...,
+			from(buildAssets).matches(DefaultMatchers.Exclusion)...,
 		)
 
 		table.DescribeTable("should exclude common config files",
 			expectThatFile,
-			matches(DefaultMatchers.Exclusion).using(configFiles)...,
+			from(configFiles).matches(DefaultMatchers.Exclusion)...,
 		)
 
 		table.DescribeTable("should exclude common .ignore files",
 			expectThatFile,
-			matches(DefaultMatchers.Exclusion).using(ignoreFiles)...,
+			from(ignoreFiles).matches(DefaultMatchers.Exclusion)...,
 		)
 
 		table.DescribeTable("should exclude common documentation files",
 			expectThatFile,
-			matches(DefaultMatchers.Exclusion).using(textFiles)...,
+			from(textFiles).matches(DefaultMatchers.Exclusion)...,
 		)
 
 		table.DescribeTable("should exclude ui assets",
 			expectThatFile,
-			matches(DefaultMatchers.Exclusion).using(visualAssets)...,
+			from(visualAssets).matches(DefaultMatchers.Exclusion)...,
 		)
 	})
 
@@ -133,32 +133,30 @@ var _ = Describe("Test Matcher features", func() {
 
 		table.DescribeTable("should include common test naming conventions",
 			expectThatFile,
-			matches(DefaultMatchers.Inclusion).using(testSourceCode)...,
+			from(testSourceCode).matches(DefaultMatchers.Inclusion)...,
 		)
 
 		table.DescribeTable("should not include other source files",
 			expectThatFile,
-			doesNotMatch(DefaultMatchers.Inclusion).using(allNoTestFiles)...,
+			from(allNoTestFiles).doesNotMatch(DefaultMatchers.Inclusion)...,
 		)
 	})
 })
 
-type tableEntryProvider func(files []string) []table.TableEntry
-
-func (t tableEntryProvider) using(files []string) []table.TableEntry {
-	return t(files)
-}
-
-func matches(patterns []FileNamePattern) tableEntryProvider {
-	return tableEntryProvider(func(files []string) []table.TableEntry {
-		return entries(patterns, files, true)
+func from(files []string) filesProvider {
+	return filesProvider(func() []string {
+		return files
 	})
 }
 
-func doesNotMatch(patterns []FileNamePattern) tableEntryProvider {
-	return tableEntryProvider(func(files []string) []table.TableEntry {
-		return entries(patterns, files, false)
-	})
+type filesProvider func() []string
+
+func (f filesProvider) matches(patterns []FileNamePattern) []table.TableEntry {
+	return entries(patterns, f(), true)
+}
+
+func (f filesProvider) doesNotMatch(patterns []FileNamePattern) []table.TableEntry {
+	return entries(patterns, f(), false)
 }
 
 func entries(patterns []FileNamePattern, files []string, shouldMatch bool) []table.TableEntry {
