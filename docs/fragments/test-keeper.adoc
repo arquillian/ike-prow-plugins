@@ -14,6 +14,24 @@ The plugin is triggered when the Pull Request is opened/reopened or updated by n
 If, for whatever reason, you want to bypass this check - simply comment using `const:pkg/plugin/test-keeper/plugin/event_handler.go[name="SkipComment"]` command. If you are an admin user you will see the **Success** status.
 If the comment will be later removed the check is triggered again.
 
+==== How does it work?
+
+Test Keeper looks into the files in your Pull Request and checks if any tests were added or modified based on common naming patterns (we don't analyze source code yet...).
+
+In addition, if a PR contains only "non-production" changeset, it won't be checked for test presence. By "non-production" changes we mean things like:
+
+ * documentation
+ * build assets (dependency files, build definition)
+ * shell scripts
+ * visual assets (images, styles, HTML templates)
+ * common configuration files
+
+Of course, all of it is configurable.
+
+We have few reasonable defaults, which you can check link:https://github.com/arquillian/ike-prow-plugins/blob/f738188069690ec727ab0a3a4e9997ca386e8c25/pkg/plugin/test-keeper/plugin/matchers.go#L57-L107[here].
+
+NOTE: If we missed some important patterns feel free to open an link:https://github.com/arquillian/ike-prow-plugins/issues/new[issue] or better yet - a link:https://github.com/arquillian/ike-prow-plugins/pulls/new[Pull request]!
+
 === Plugin Configuration [[testkeeper-config]]
 
 To configure Test Keeper plugin place `test-keeper.yml` (or `test-keeper.yaml`) file in the root of your project and use properties described below.
@@ -30,8 +48,4 @@ include::../../pkg/plugin/test-keeper/plugin/test_fixtures/github_calls/prs/with
 
 IMPORTANT: Both the configuration file and the file with plugin hint are always loaded from the `HEAD` of the Pull Request.
 
-==== Default exclusions
 
-We have included few reasonable defaults for verifying if the PR comes with the tests. You can see them link:https://github.com/arquillian/ike-prow-plugins/blob/9ebe5bc5d3daf3bf50d1538fe86c9099624149b0/pkg/plugin/test-keeper/plugin/matchers.go#L53-L95[here].
-
-NOTE: If we missed some important patterns feel free to open an link:https://github.com/arquillian/ike-prow-plugins/issues/new[issue] or better yet - a link:https://github.com/arquillian/ike-prow-plugins/pulls/new[Pull request]!
