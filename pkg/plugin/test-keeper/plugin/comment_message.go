@@ -10,7 +10,7 @@ import (
 )
 
 const (
-	beginning = "Thanks for this contribution! It seems that there are no tests that would be added or changed in this PR. " +
+	beginning = "It seems that there are no tests that would be added or changed in this PR. " +
 		"Automated tests give us confidence in shipping reliable software. Please add some as part of this change.\n" +
 		"If you are an admin and you are sure that no test is needed then you can use command `" + SkipComment + "` " +
 		"as a comment to make the status green.\n"

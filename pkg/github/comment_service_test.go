@@ -103,7 +103,7 @@ var _ = Describe("Config loader features", func() {
 				Assignee:   "toAssign",
 			}
 
-			expContent := "### Ike Plugins (another-plugin)\n\n@toAssign Please, pay attention to the following message:" +
+			expContent := "### Ike Plugins (another-plugin)\n\nThank you @toAssign for this contribution!" +
 				"\n\nNew comment"
 
 			toHaveModifiedBody := func(statusPayload map[string]interface{}) bool {

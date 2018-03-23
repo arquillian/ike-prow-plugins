@@ -14,7 +14,7 @@ import (
 // PluginTitleTemplate is a constant template containing "Ike Plugins (name-of-plugin)" title with markdown formatting
 const (
 	PluginTitleTemplate     = "### Ike Plugins (%s)"
-	assigneeMentionTemplate = "@%s Please, pay attention to the following message:"
+	assigneeMentionTemplate = "Thank you @%s for this contribution!"
 )
 
 // CommentService is a struct managing plugin comments
