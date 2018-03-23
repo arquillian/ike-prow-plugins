@@ -60,8 +60,8 @@ test:
 .PHONY: build
 build: compile test check
 
-.PHONY: imports ## Removes unneeded imports and formats source code
-imports:
+.PHONY: format ## Removes unneeded imports and formats source code
+format:
 	@goimports -l -w pkg
 
 # Build configuration
