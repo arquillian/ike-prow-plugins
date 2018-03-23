@@ -29,18 +29,22 @@ const (
 		"but the plugin wasn't able to retrieve it from the defined location (%s). Make sure it is either a valid URL or a " +
 		"path to an existing file in this repository."
 
+	sadIke = `<p align="center">
+  				<img src="http://design.jboss.org/arquillian/logo/ui/images/failure/arquillian_ui_failure_256px.svg">
+			  </p>`
 )
 
 // CreateCommentMessage creates a comment message for the test-keeper plugin. If the comment message is set in config then it takes that one, the default otherwise.
 func CreateCommentMessage(configuration TestKeeperConfiguration, change scm.RepositoryChange) string {
+	var msg string
 	if configuration.LocationURL == "" {
-		return beginning + paragraph + noConfig
+		msg = beginning + paragraph + noConfig
+	} else if configuration.PluginHint != "" {
+		msg = getMsgFromFile(configuration, change)
+	} else {
+		msg = getMsgWithConfigRef(configuration.LocationURL)
 	}
-	if configuration.PluginHint != "" {
-		return getMsgFromFile(configuration, change)
-	}
-	return getMsgWithConfigRef(configuration.LocationURL)
-
+	return msg + paragraph + sadIke
 }
 
 func getMsgFromFile(configuration TestKeeperConfiguration, change scm.RepositoryChange) string {

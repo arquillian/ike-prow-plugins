@@ -1,6 +1,7 @@
 package plugin_test
 
 import (
+	. "github.com/arquillian/ike-prow-plugins/pkg/internal/test"
 	"github.com/arquillian/ike-prow-plugins/pkg/plugin/config"
 	"github.com/arquillian/ike-prow-plugins/pkg/plugin/test-keeper/plugin"
 	"github.com/arquillian/ike-prow-plugins/pkg/scm"
@@ -71,7 +72,7 @@ var _ = Describe("Test keeper comment message creation", func() {
 			msg := plugin.CreateCommentMessage(config, change)
 
 			// then
-			Expect(msg).To(Equal("Custom message"))
+			Expect(msg).To(StartWith("Custom message"))
 		})
 
 		It("should create default message with no-found-custom-file suffix using wrong relative path", func() {
@@ -125,7 +126,7 @@ var _ = Describe("Test keeper comment message creation", func() {
 			msg := plugin.CreateCommentMessage(config, scm.RepositoryChange{})
 
 			// then
-			Expect(msg).To(Equal("Custom message"))
+			Expect(msg).To(StartWith("Custom message"))
 		})
 
 		It("should create default message with no-found-custom-file suffix using wrong url path", func() {
