@@ -1016,8 +1016,54 @@ If it won&#8217;t find any tests in the Pull Request, it adds a comment with a d
 <p>If, for whatever reason, you want to bypass this check - simply comment using <code>/ok-without-tests</code> command. If you are an admin user you will see the <strong>Success</strong> status.
 If the comment will be later removed the check is triggered again.</p>
 </div>
+<div class="sect4">
+<h5 id="_how_does_it_work"><a class="anchor" href="#_how_does_it_work"></a>How does it work?</h5>
+<div class="paragraph">
+<p>Test Keeper looks into the files in your Pull Request and checks if any tests were added or modified based on common naming patterns (we don&#8217;t analyze source code yet&#8230;&#8203;).</p>
+</div>
+<div class="paragraph">
+<p>In addition, if a PR contains only "non-production" changeset, it won&#8217;t be checked for test presence. By "non-production" changes we mean things like:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>documentation</p>
+</li>
+<li>
+<p>build assets (dependency files, build definition)</p>
+</li>
+<li>
+<p>shell scripts</p>
+</li>
+<li>
+<p>visual assets (images, styles, HTML templates)</p>
+</li>
+<li>
+<p>common configuration files</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>Of course, all of it is configurable.</p>
+</div>
+<div class="paragraph">
+<p>We have few reasonable defaults, which you can check <a href="https://github.com/arquillian/ike-prow-plugins/blob/f738188069690ec727ab0a3a4e9997ca386e8c25/pkg/plugin/test-keeper/plugin/matchers.go#L57-L107">here</a>.</p>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+If we missed some important patterns feel free to open an <a href="https://github.com/arquillian/ike-prow-plugins/issues/new">issue</a> or better yet - a <a href="https://github.com/arquillian/ike-prow-plugins/pulls/new">Pull request</a>!
+</td>
+</tr>
+</table>
+</div>
+</div>
 <div class="sect3">
-<h4 id="testkeeper-config"><a class="anchor" href="#testkeeper-config"></a>3.2.1. Plugin Configuration</h4>
+<h4 id="testkeeper-config"><a class="anchor" href="#testkeeper-config"></a>3.2.2. Plugin Configuration</h4>
 <div class="paragraph">
 <p>To configure Test Keeper plugin place <code>test-keeper.yml</code> (or <code>test-keeper.yaml</code>) file in the root of your project and use properties described below.</p>
 </div>
@@ -1061,24 +1107,6 @@ Both the configuration file and the file with plugin hint are always loaded from
 </tr>
 </table>
 </div>
-<div class="sect4">
-<h5 id="_default_exclusions"><a class="anchor" href="#_default_exclusions"></a>Default exclusions</h5>
-<div class="paragraph">
-<p>We have included few reasonable defaults for verifying if the PR comes with the tests. You can see them <a href="https://github.com/arquillian/ike-prow-plugins/blob/9ebe5bc5d3daf3bf50d1538fe86c9099624149b0/pkg/plugin/test-keeper/plugin/matchers.go#L53-L95">here</a>.</p>
-</div>
-<div class="admonitionblock note">
-<table>
-<tr>
-<td class="icon">
-<i class="fa icon-note" title="Note"></i>
-</td>
-<td class="content">
-If we missed some important patterns feel free to open an <a href="https://github.com/arquillian/ike-prow-plugins/issues/new">issue</a> or better yet - a <a href="https://github.com/arquillian/ike-prow-plugins/pulls/new">Pull request</a>!
-</td>
-</tr>
-</table>
-</div>
-</div>
 </div>
 </div>
 </div>
@@ -1086,7 +1114,7 @@ If we missed some important patterns feel free to open an <a href="https://githu
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2018-03-23 15:13:43 UTC
+Last updated 2018-03-23 18:12:27 UTC
 </div>
 </div>
 <script>
