@@ -19,12 +19,16 @@ objects:
       name: ${PLUGIN_NAME}
       labels:
         app: ${PLUGIN_NAME}
+        type: ike-plugin
+        version: ${VERSION}
     spec:
       replicas: 1
       template:
         metadata:
           labels:
             app: ${PLUGIN_NAME}
+            type: ike-plugin
+            version: ${VERSION}
         spec:
           terminationGracePeriodSeconds: 180
           containers:

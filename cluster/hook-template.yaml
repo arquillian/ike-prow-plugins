@@ -17,8 +17,10 @@ objects:
     apiVersion: extensions/v1beta1
     metadata:
       name: hook
-    labels:
-      app: hook
+      labels:
+        app: hook
+        type: prow-core
+        version: ${VERSION}
     spec:
       replicas: 1
       strategy:
@@ -30,6 +32,8 @@ objects:
         metadata:
           labels:
             app: hook
+            type: prow-core
+            version: ${VERSION}
         spec:
           terminationGracePeriodSeconds: 180
           containers:
