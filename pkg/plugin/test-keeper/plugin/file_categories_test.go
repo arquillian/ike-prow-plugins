@@ -78,6 +78,21 @@ var _ = Describe("Test fileCategoryCounter features", func() {
 			Expect(fileCategories.TestsExist()).To(BeFalse())
 		})
 
+		It("should not accept changeset when test files are in external dependency folders", func() {
+			// given
+			changedFiles := changedFilesSet(
+				"node_modules/leftpad/dont_delete_me.spec.js",
+				"vendor/github.com/test/repo/should_ignore_this_test.go")
+			fileCategoryCounter := FileCategoryCounter{Matcher: DefaultMatchers}
+
+			// when
+			fileCategories, err := fileCategoryCounter.Count(changedFiles)
+
+			// then
+			Ω(err).ShouldNot(HaveOccurred())
+			Expect(fileCategories.TestsExist()).To(BeFalse())
+		})
+
 		It("should not try to detect any tests when change set is empty", func() {
 			// given
 			changedFiles := changedFilesSet()

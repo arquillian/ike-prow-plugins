@@ -9,6 +9,67 @@ import (
 	. "github.com/onsi/gomega"
 )
 
+var (
+	buildAssets = []string{
+		"src/github.com/arquillian/ike-prow-plugins/Makefile", "src/main/java/pom.xml",
+		"mvnw", "mvnw.cmd", "mvnw.bat", "build.gradle", "gulpfile.js",
+		"vendor/github.com/arquillian/runner.go",
+	}
+
+	configFiles = []string{
+		".nvmrc", ".htmlhintrc", ".stylelintrc", ".editorconfig",
+		"protractor.config.js", "protractorEE.config.js", "project/js/config/karma.conf.js",
+		"project/js/config/tsconfig.json", "requirements.txt", "gulpfile.js",
+	}
+
+	ignoreFiles = []string{
+		".gitignore", ".dockerignore", ".dockerignore",
+	}
+
+	textFiles = []string{
+		"README.adoc", "README.asciidoc", "CONTRIBUTIONS.md", "testing.txt",
+		"LICENSE", "CODEOWNERS",
+	}
+
+	visualAssets = []string{
+		"style.sass", "style.css", "style.less", "style.scss",
+		"meme.png", "chart.svg", "photo.jpg", "pic.jpeg", "reaction.gif",
+	}
+
+	testSourceCode = []string{
+		"/path/to/my.test.js", "/path/to/my.spec.js",
+		"/path/test/any.test.tsx", "/path/to/my.test.ts", "/path/to/my.spec.ts",
+		"/path/test/test_anything.py", "/path/to/my_test.py",
+		"/path/test/TestAnything.groovy", "/path/test/MyTest.groovy", "/path/test/MyTests.groovy", "/path/test/MyTestCase.groovy",
+		"/path/test/TestAnything.java", "/path/test/MyTest.java", "/path/test/MyTests.java",
+		"/path/to/my_test.go",
+	}
+
+	regularSourceCode = []string{
+		"/path/to/Test.java/MyAssertion.java", "/path/to/Test.java/MyAssertion.java",
+		"/path/to/test.py/MyAssertion.groovy", "/path/test/MyAssertions.groovy",
+		"/path/test/anytest.go", "/path/test/my_assertion.go", "/path/test/test_anything.go",
+		"/path/to/test.go/my.assertion.js", "/path/test/my.assertion.js", "/path/test/test.anything.js",
+		"/path/to/test.go/my.assertion.ts", "/path/test/my.assertion.tsx", "/path/test/test.anything.ts",
+		"/path/test/my_assertion.py",
+	}
+
+	allNoTestFiles = func() []string {
+		var all []string
+		all = append(all, regularSourceCode...)
+		all = append(all, buildAssets...)
+		all = append(all, configFiles...)
+		all = append(all, ignoreFiles...)
+		all = append(all, textFiles...)
+		all = append(all, visualAssets...)
+		return all
+	}()
+)
+
+var expectThatFile = func(matchers []FileNamePattern, file string, shouldMatch bool) {
+	Expect(Matches(matchers, file)).To(Equal(shouldMatch))
+}
+
 var _ = Describe("Test Matcher features", func() {
 
 	Context("Test matcher loading", func() {
@@ -40,174 +101,80 @@ var _ = Describe("Test Matcher features", func() {
 		})
 	})
 
-	assertFileMatchers := func(matchers []FileNamePattern, file string, shouldMatch bool) {
-		Expect(Matches(matchers, file)).To(Equal(shouldMatch))
-	}
+	Context("Predefined exclusion regex check (DefaultMatchers)", func() {
 
-	Context("Predefined exclusion regex check", func() {
-
-		table.DescribeTable("DefaultMatchers should exclude common build tools",
-			assertFileMatchers,
-
-			createEntry(DefaultMatchers.Exclusion, "src/github.com/arquillian/ike-prow-plugins/Makefile", true),
-			createEntry(DefaultMatchers.Exclusion, "src/main/java/pom.xml", true),
-			createEntry(DefaultMatchers.Exclusion, "mvnw", true),
-			createEntry(DefaultMatchers.Exclusion, "mvnw.cmd", true),
-			createEntry(DefaultMatchers.Exclusion, "mvnw.bat", true),
-			createEntry(DefaultMatchers.Exclusion, "build.gradle", true),
-			createEntry(DefaultMatchers.Exclusion, "gulpfile.js", true),
+		table.DescribeTable("should exclude common build tools",
+			expectThatFile,
+			from(buildAssets).matches(DefaultMatchers.Exclusion)...,
 		)
 
-		table.DescribeTable("DefaultMatchers should exclude common config files",
-			assertFileMatchers,
-
-			createEntry(DefaultMatchers.Exclusion, ".nvmrc", true),
-			createEntry(DefaultMatchers.Exclusion, ".htmlhintrc", true),
-			createEntry(DefaultMatchers.Exclusion, ".stylelintrc", true),
-			createEntry(DefaultMatchers.Exclusion, ".editorconfig", true),
-			createEntry(DefaultMatchers.Exclusion, "protractor.config.js", true),
-			createEntry(DefaultMatchers.Exclusion, "protractorEE.config.js", true),
-			createEntry(DefaultMatchers.Exclusion, "project/js/config/karma.conf.js", true),
-			createEntry(DefaultMatchers.Exclusion, "project/js/config/tsconfig.json", true),
-			createEntry(DefaultMatchers.Exclusion, "requirements.txt", true),
-			createEntry(DefaultMatchers.Exclusion, "gulpfile.js", true),
-			createEntry(DefaultMatchers.Exclusion, "vendor/github.com/arquillian/ike-prow-pugins/plugin_test.go", true),
+		table.DescribeTable("should exclude common config files",
+			expectThatFile,
+			from(configFiles).matches(DefaultMatchers.Exclusion)...,
 		)
 
-		table.DescribeTable("DefaultMatchers should exclude common .ignore files",
-			assertFileMatchers,
-
-			createEntry(DefaultMatchers.Exclusion, ".gitignore", true),
-			createEntry(DefaultMatchers.Exclusion, ".dockerignore", true),
-			createEntry(DefaultMatchers.Exclusion, ".stylelintignore", true),
+		table.DescribeTable("should exclude common .ignore files",
+			expectThatFile,
+			from(ignoreFiles).matches(DefaultMatchers.Exclusion)...,
 		)
 
-		table.DescribeTable("DefaultMatchers should exclude common documentation files",
-			assertFileMatchers,
-
-			createEntry(DefaultMatchers.Exclusion, "README.adoc", true),
-			createEntry(DefaultMatchers.Exclusion, "README.asciidoc", true),
-			createEntry(DefaultMatchers.Exclusion, "testing.md", true),
-			createEntry(DefaultMatchers.Exclusion, "testing.txt", true),
-			createEntry(DefaultMatchers.Exclusion, "LICENSE", true),
-			createEntry(DefaultMatchers.Exclusion, "CODEOWNERS", true),
+		table.DescribeTable("should exclude common documentation files",
+			expectThatFile,
+			from(textFiles).matches(DefaultMatchers.Exclusion)...,
 		)
 
-		table.DescribeTable("DefaultMatchers should exclude ui assets",
-			assertFileMatchers,
-
-			createEntry(DefaultMatchers.Exclusion, "style.sass", true),
-			createEntry(DefaultMatchers.Exclusion, "style.css", true),
-			createEntry(DefaultMatchers.Exclusion, "style.less", true),
-			createEntry(DefaultMatchers.Exclusion, "style.scss", true),
-			createEntry(DefaultMatchers.Exclusion, "meme.png", true),
-			createEntry(DefaultMatchers.Exclusion, "chart.svg", true),
-			createEntry(DefaultMatchers.Exclusion, "photo.jpg", true),
-			createEntry(DefaultMatchers.Exclusion, "pic.jpeg", true),
-			createEntry(DefaultMatchers.Exclusion, "reaction.gif", true),
+		table.DescribeTable("should exclude ui assets",
+			expectThatFile,
+			from(visualAssets).matches(DefaultMatchers.Exclusion)...,
 		)
 	})
 
-	Context("Predefined inclusion regex check", func() {
+	Context("Predefined inclusion regex check (DefaultMatchers)", func() {
 
-		table.DescribeTable("DefaultMatchers should return true for files that contain word 'test'",
-			assertFileMatchers,
-			// when non test file then false
-			createEntry(DefaultMatchers.Inclusion, "/path/to/Test.java/MyAssertion.java", false),
-
-			// when test file then true
-			createEntry(DefaultMatchers.Inclusion, "/path/to/my_test.go", true),
-			createEntry(DefaultMatchers.Inclusion, "/path/to/my.test.js", true),
-			createEntry(DefaultMatchers.Inclusion, "/path/test/any.test.tsx", true),
-			createEntry(DefaultMatchers.Inclusion, "/path/to/my_test.py", true),
-			createEntry(DefaultMatchers.Inclusion, "/path/test/MyTestCase.groovy", true),
-			createEntry(DefaultMatchers.Inclusion, "/path/test/TestAnything.java", true),
+		table.DescribeTable("should include common test naming conventions",
+			expectThatFile,
+			from(testSourceCode).matches(DefaultMatchers.Inclusion)...,
 		)
 
-		table.DescribeTable("javaTests should return true only when matches Java test file", assertFileMatchers,
-			// when non test file then false
-			createEntry(DefaultMatchers.Inclusion, "/path/to/Test.java/MyAssertion.java", false),
-			createEntry(DefaultMatchers.Inclusion, "/path/test/MyAssertions.java", false),
-
-			// when test file then true
-			createEntry(DefaultMatchers.Inclusion, "/path/test/TestAnything.java", true),
-			createEntry(DefaultMatchers.Inclusion, "/path/test/MyTest.java", true),
-			createEntry(DefaultMatchers.Inclusion, "/path/test/MyTests.java", true),
-			createEntry(DefaultMatchers.Inclusion, "/path/test/MyTestCase.java", true),
-		)
-
-		table.DescribeTable("goTests should return true only when matches Go test file",
-			assertFileMatchers,
-			// when non test file then false
-			createEntry(DefaultMatchers.Inclusion, "/path/to/Test.java/my_assertion.go", false),
-			createEntry(DefaultMatchers.Inclusion, "/path/test/my_assertion.go", false),
-			createEntry(DefaultMatchers.Inclusion, "/path/test/test_anything.go", false),
-			createEntry(DefaultMatchers.Inclusion, "/path/test/anytest.go", false),
-
-			// when test file then true
-			createEntry(DefaultMatchers.Inclusion, "/path/to/my_test.go", true),
-		)
-
-		table.DescribeTable("javascriptTests should return true only when matches JavaScript test file",
-			assertFileMatchers,
-			// when non test file then false
-			createEntry(DefaultMatchers.Inclusion, "/path/to/test.go/my.assertion.js", false),
-			createEntry(DefaultMatchers.Inclusion, "/path/test/my.assertion.js", false),
-			createEntry(DefaultMatchers.Inclusion, "/path/test/test.anything.js", false),
-
-			// when test file then true
-			createEntry(DefaultMatchers.Inclusion, "/path/test/any.test.js", true),
-			createEntry(DefaultMatchers.Inclusion, "/path/to/my.test.js", true),
-			createEntry(DefaultMatchers.Inclusion, "/path/to/my.spec.js", true),
-		)
-
-		table.DescribeTable("typeScriptTests should return true only when matches TypeScript test file",
-			assertFileMatchers,
-			// when non test file then false
-			createEntry(DefaultMatchers.Inclusion, "/path/to/test.go/my.assertion.ts", false),
-			createEntry(DefaultMatchers.Inclusion, "/path/test/my.assertion.tsx", false),
-			createEntry(DefaultMatchers.Inclusion, "/path/test/test.anything.ts", false),
-
-			// when test file then true
-			createEntry(DefaultMatchers.Inclusion, "/path/test/any.test.tsx", true),
-			createEntry(DefaultMatchers.Inclusion, "/path/to/my.test.ts", true),
-			createEntry(DefaultMatchers.Inclusion, "/path/to/my.spec.ts", true),
-		)
-
-		table.DescribeTable("pythonTests should return true only when matches Python test file",
-			assertFileMatchers,
-			// when non test file then false
-			createEntry(DefaultMatchers.Inclusion, "/path/to/test.ts/my_assertion.py", false),
-			createEntry(DefaultMatchers.Inclusion, "/path/test/my_assertion.py", false),
-
-			// when test file then true
-			createEntry(DefaultMatchers.Inclusion, "/path/test/test_anything.py", true),
-			createEntry(DefaultMatchers.Inclusion, "/path/to/my_test.py", true),
-		)
-
-		table.DescribeTable("groovyTests should return true only when matches Groovy test file",
-			assertFileMatchers,
-
-			// when non test file then false
-			createEntry(DefaultMatchers.Inclusion, "/path/to/test.py/MyAssertion.groovy", false),
-			createEntry(DefaultMatchers.Inclusion, "/path/test/MyAssertions.groovy", false),
-
-			// when test file then true
-			createEntry(DefaultMatchers.Inclusion, "/path/test/TestAnything.groovy", true),
-			createEntry(DefaultMatchers.Inclusion, "/path/test/MyTest.groovy", true),
-			createEntry(DefaultMatchers.Inclusion, "/path/test/MyTests.groovy", true),
-			createEntry(DefaultMatchers.Inclusion, "/path/test/MyTestCase.groovy", true),
+		table.DescribeTable("should not include other source files",
+			expectThatFile,
+			from(allNoTestFiles).doesNotMatch(DefaultMatchers.Inclusion)...,
 		)
 	})
 })
 
-func createEntry(matchers []FileNamePattern, file string, shouldMatch bool) table.TableEntry {
-	msg := "Test matcher should%s match the file %s, but it did%s."
-	if shouldMatch {
-		msg = fmt.Sprintf(msg, "", file, " NOT")
-	} else {
-		msg = fmt.Sprintf(msg, " NOT", file, "")
+func from(files []string) filesProvider {
+	return filesProvider(func() []string {
+		return files
+	})
+}
+
+type filesProvider func() []string
+
+func (f filesProvider) matches(patterns []FileNamePattern) []table.TableEntry {
+	return entries(patterns, f(), true)
+}
+
+func (f filesProvider) doesNotMatch(patterns []FileNamePattern) []table.TableEntry {
+	return entries(patterns, f(), false)
+}
+
+func entries(patterns []FileNamePattern, files []string, shouldMatch bool) []table.TableEntry {
+	entries := make([]table.TableEntry, len(files))
+
+	for i, file := range files {
+		entries[i] = createEntry(patterns, file, shouldMatch)
 	}
 
-	return table.Entry(msg, matchers, file, shouldMatch)
+	return entries
+}
+
+const msg = "Test matcher should%s match the file %s, but it did%s."
+
+func createEntry(matchers []FileNamePattern, file string, shouldMatch bool) table.TableEntry {
+	if shouldMatch {
+		return table.Entry(fmt.Sprintf(msg, "", file, " NOT"), matchers, file, shouldMatch)
+	}
+
+	return table.Entry(fmt.Sprintf(msg, " NOT", file, ""), matchers, file, shouldMatch)
 }

@@ -83,7 +83,7 @@ var buildToolsFileNameMatcher = FileNamePattern{
 }
 
 var buildToolsDirectoryNameMatcher = FileNamePattern{
-	Regex: `gradle/|vendor/|.mvn/`,
+	Regex: `gradle/|vendor/|.mvn/|node_modules/`,
 }
 
 var ciToolsFileNameMatcher = FileNamePattern{

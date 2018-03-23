@@ -1,10 +1,11 @@
 package github
 
 import (
+	"fmt"
+
+	"github.com/arquillian/ike-prow-plugins/pkg/plugin/config"
 	"github.com/arquillian/ike-prow-plugins/pkg/scm"
 	"github.com/arquillian/ike-prow-plugins/pkg/utils"
-	"github.com/arquillian/ike-prow-plugins/pkg/plugin/config"
-	"fmt"
 )
 
 const githubBaseURL = "https://github.com/"
