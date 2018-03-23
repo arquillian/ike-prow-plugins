@@ -19,6 +19,8 @@ import (
 
 	"net/http"
 
+	"os"
+
 	"github.com/arquillian/ike-prow-plugins/pkg/log"
 	"github.com/sirupsen/logrus"
 )
@@ -102,9 +104,14 @@ func configureLogger(pluginName string) *logrus.Entry {
 	if err != nil {
 		logger.WithError(err).Errorf("unable to load sentry dsn from %q. No sentry integration enabled", *sentryDsnSecretFile)
 	} else {
+		version, found := os.LookupEnv("VERSION")
+		if !found {
+			version = "UNKNOWN"
+		}
 		log.AddSentryHook(logger, log.NewSentryConfiguration(string(sentryDsn), map[string]string{
 			"plugin":      pluginName,
 			"environment": *environment,
+			"version":     version,
 		}, *sentryTimeout))
 	}
 

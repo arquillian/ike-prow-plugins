@@ -31,6 +31,9 @@ objects:
           - name: ${PLUGIN_NAME}
             image: ${REGISTRY}/${DOCKER_REPO}/${PLUGIN_NAME}:${VERSION}
             imagePullPolicy: Always
+            env:
+              - name: VERSION
+                value: ${VERSION}
             resources:
               limits:
                 memory: "256Mi"

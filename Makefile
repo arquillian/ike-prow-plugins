@@ -126,6 +126,7 @@ oc-apply: oc-init-project build-images push-images oc-generate-deployments
 	@echo "Updating cluster configuration for '$(OC_PROJECT_NAME)'..."
 
 $(OC_DEPLOYMENTS): oc-%: %
+	@echo "Creating new deploymet for $<"
 	@mkdir -p $(PLUGIN_DEPLOYMENTS_DIR)
 	@oc process -f $(CLUSTER_DIR)/ike-prow-template.yaml \
 		-p REGISTRY=$(REGISTRY) \
