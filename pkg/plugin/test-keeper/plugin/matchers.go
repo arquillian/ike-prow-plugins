@@ -48,9 +48,9 @@ func Matches(matchers []FileNamePattern, filename string) bool {
 var DefaultMatchers = TestMatcher{
 	Inclusion: []FileNamePattern{javaTests, goTests, javascriptTests, typescriptTests, pythonTests, groovyTests},
 	Exclusion: []FileNamePattern{
-		buildToolsFileNameMatcher, buildToolsDirectoryNameMatcher,
-		ciToolsFileNameMatcher, settingsFileNameMatcher,
-		textAssetsFileNameMatcher, uiAssetsFileNameMatcher,
+		buildTools, buildToolsDirectories,
+		ciTools, configs, shell,
+		textAssets, uiAssets,
 	},
 }
 
@@ -78,26 +78,30 @@ var groovyTests = FileNamePattern{
 	Regex: `(Test[^/]*|IT|TestCase)\.groovy$`,
 }
 
-var buildToolsFileNameMatcher = FileNamePattern{
-	Regex: `(glide\.yaml|glide\.lock|pom\.xml|mvnw(\.cmd|\.bat)?|package\.json|glide\.yaml|build\.gradle|gradlew[\.bat]?|Makefile|gulpfile\.js|(G|g)emfile|requirements\.(in|txt))$`,
+var buildTools = FileNamePattern{
+	Regex: `(glide\.yaml|glide\.lock|pom\.xml|mvnw(\.cmd|\.bat)?|package\.json|build\.gradle|gradlew[\.bat]?|Makefile|gulpfile\.js|(G|g)emfile|requirements\.(in|txt)|docker-compose.yml|Dockerfile.*)$`,
 }
 
-var buildToolsDirectoryNameMatcher = FileNamePattern{
+var buildToolsDirectories = FileNamePattern{
 	Regex: `gradle/|vendor/|.mvn/|node_modules/`,
 }
 
-var ciToolsFileNameMatcher = FileNamePattern{
+var ciTools = FileNamePattern{
 	Regex: `\.travis\.yml|Jenkinsfile|\.gitlab-ci\.yml,|wercker\.yml|circle\.yml$`,
 }
 
-var uiAssetsFileNameMatcher = FileNamePattern{
-	Regex: `(\.jpg|\.jpeg|\.png|\.ico|\.svg|\.gif|\.css|\.scss|\.sass|\.less)$`,
+var uiAssets = FileNamePattern{
+	Regex: `(\.jpg|\.jpeg|\.png|\.ico|\.svg|\.gif|\.css|\.scss|\.sass|\.less|\.[xsd]?html|\.ejs)$`,
 }
 
-var textAssetsFileNameMatcher = FileNamePattern{
+var textAssets = FileNamePattern{
 	Regex: `(\.md|\.txt|\.asciidoc|\.adoc|LICENSE|CODEOWNERS)$`,
 }
 
-var settingsFileNameMatcher = FileNamePattern{
-	Regex: `(karma\.conf\.js|protractor.*\.conf(ig)?\.js|\..+ignore|\.editorconfig|\..+rc|tsconfig.*\.json|karma\.conf\.js|\.codecov\.yml|pylint\.rc)$`,
+var configs = FileNamePattern{
+	Regex: `(karma\.conf\.js|protractor.*\.conf(ig)?\.js|\..+ignore|\.editorconfig|\..+rc|tsconfig.*\.json|karma\.conf\.js|\.codecov\.yml|pylint\.rc|\.gpg)$`,
+}
+
+var shell = FileNamePattern{
+	Regex: `(\.sh|\.bat)$`,
 }

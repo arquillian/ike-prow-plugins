@@ -14,12 +14,18 @@ var (
 		"src/github.com/arquillian/ike-prow-plugins/Makefile", "src/main/java/pom.xml",
 		"mvnw", "mvnw.cmd", "mvnw.bat", "build.gradle", "gulpfile.js",
 		"vendor/github.com/arquillian/runner.go",
+		"docker-compose.yml", "Dockerfile", "Dockerfile.builder", "Dockerfile.deploy",
 	}
 
 	configFiles = []string{
 		".nvmrc", ".htmlhintrc", ".stylelintrc", ".editorconfig",
 		"protractor.config.js", "protractorEE.config.js", "project/js/config/karma.conf.js",
 		"project/js/config/tsconfig.json", "requirements.txt", "gulpfile.js",
+		"0034A06D9D9B0064CE8ADF6BF1747F4AD2306D93.gpg",
+	}
+
+	shellScripts = []string{
+		"openshift-prod-cluster.sh", "test.bat",
 	}
 
 	ignoreFiles = []string{
@@ -34,6 +40,7 @@ var (
 	visualAssets = []string{
 		"style.sass", "style.css", "style.less", "style.scss",
 		"meme.png", "chart.svg", "photo.jpg", "pic.jpeg", "reaction.gif",
+		"index.html", "fav.ico", "index.shtml", "template.ejs",
 	}
 
 	testSourceCode = []string{
@@ -62,6 +69,7 @@ var (
 		all = append(all, ignoreFiles...)
 		all = append(all, textFiles...)
 		all = append(all, visualAssets...)
+		all = append(all, shellScripts...)
 		return all
 	}()
 )
@@ -126,6 +134,11 @@ var _ = Describe("Test Matcher features", func() {
 		table.DescribeTable("should exclude ui assets",
 			expectThatFile,
 			from(visualAssets).matches(DefaultMatchers.Exclusion)...,
+		)
+
+		table.DescribeTable("should exclude shell scripts",
+			expectThatFile,
+			from(shellScripts).matches(DefaultMatchers.Exclusion)...,
 		)
 	})
 
