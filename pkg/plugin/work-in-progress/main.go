@@ -5,7 +5,7 @@ import (
 	"k8s.io/test-infra/prow/pluginhelp"
 
 	pluginBootstrap "github.com/arquillian/ike-prow-plugins/pkg/plugin"
-	"github.com/arquillian/ike-prow-plugins/pkg/plugin/server"
+	"github.com/arquillian/ike-prow-plugins/pkg/server"
 	"github.com/arquillian/ike-prow-plugins/pkg/plugin/work-in-progress/plugin"
 )
 
