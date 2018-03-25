@@ -28,7 +28,6 @@ const (
 	notFoundFileSuffix = "In the configuration file you pointed to the custom comment file, " +
 		"but the plugin wasn't able to retrieve it from the defined location (%s). Make sure it is either a valid URL or a " +
 		"path to an existing file in this repository."
-
 )
 
 // CreateCommentMessage creates a comment message for the test-keeper plugin. If the comment message is set in config then it takes that one, the default otherwise.

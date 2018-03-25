@@ -1,8 +1,8 @@
 package main
 
 import (
-	"github.com/arquillian/ike-prow-plugins/pkg/server"
 	"github.com/arquillian/ike-prow-plugins/pkg/plugin/test-keeper/plugin"
+	"github.com/arquillian/ike-prow-plugins/pkg/server"
 	gogh "github.com/google/go-github/github"
 	"k8s.io/test-infra/prow/pluginhelp"
 

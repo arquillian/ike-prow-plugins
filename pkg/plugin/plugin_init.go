@@ -21,8 +21,8 @@ import (
 	"os"
 
 	"github.com/arquillian/ike-prow-plugins/pkg/log"
-	"github.com/sirupsen/logrus"
 	"github.com/arquillian/ike-prow-plugins/pkg/server"
+	"github.com/sirupsen/logrus"
 )
 
 // nolint

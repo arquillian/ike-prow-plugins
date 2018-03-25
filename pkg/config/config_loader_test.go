@@ -1,7 +1,6 @@
 package config_test
 
 import (
-
 	"github.com/arquillian/ike-prow-plugins/pkg/config"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
