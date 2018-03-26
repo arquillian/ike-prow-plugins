@@ -37,3 +37,6 @@ sentry.dsn
 # Generated files
 cluster/generated/
 gh-pages/
+
+# Ignore Ginkgo junit.xml files
+*junit.xml
