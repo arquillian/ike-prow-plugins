@@ -1,6 +1,6 @@
 test_patterns:
-  - '**/__test.go'                        #<!--1-->
+  - '**/__test.go'                         # <!--1-->
 skip_validation_for:
-  - 'regex{{.*\.[xsd]?html$}}'            #<!--2-->
-combine_defaults: false                   #<!--3-->
-plugin_hint: plugins/keeper-file-hint.md  #<!--4-->
+  - 'regex{{.*\.[xsd]?html$}}'             # <!--2-->
+combine_defaults: false                    # <!--3-->
+plugin_hint: plugins/keeper-file-hint.md  # <!--4-->
