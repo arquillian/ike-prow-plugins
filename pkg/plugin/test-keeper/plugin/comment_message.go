@@ -28,18 +28,21 @@ const (
 	notFoundFileSuffix = "In the configuration file you pointed to the custom comment file, " +
 		"but the plugin wasn't able to retrieve it from the defined location (%s). Make sure it is either a valid URL or a " +
 		"path to an existing file in this repository."
+
+	sadIke = `<img align="left" src="https://cdn.rawgit.com/bartoszmajsak/ike-prow-plugins/2025328b70bd1879520411b3cacadee61a49641a/docs/images/arquillian_ui_failure_128px.png">`
 )
 
 // CreateCommentMessage creates a comment message for the test-keeper plugin. If the comment message is set in config then it takes that one, the default otherwise.
 func CreateCommentMessage(configuration TestKeeperConfiguration, change scm.RepositoryChange) string {
+	var msg string
 	if configuration.LocationURL == "" {
-		return beginning + paragraph + noConfig
+		msg = beginning + paragraph + noConfig
+	} else if configuration.PluginHint != "" {
+		msg = getMsgFromFile(configuration, change)
+	} else {
+		msg = getMsgWithConfigRef(configuration.LocationURL)
 	}
-	if configuration.PluginHint != "" {
-		return getMsgFromFile(configuration, change)
-	}
-	return getMsgWithConfigRef(configuration.LocationURL)
-
+	return sadIke + paragraph + msg
 }
 
 func getMsgFromFile(configuration TestKeeperConfiguration, change scm.RepositoryChange) string {
