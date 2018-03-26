@@ -43,7 +43,7 @@ var _ = Describe("File pattern features", func() {
 				parsePattern("test_*.py").
 				toRegex(`test_[^/]*\.py$`))
 
-		It("it should extract regex", func() {
+		It("should extract regex", func() {
 			// given
 			regexDef := []string{"regex{{my-regex}}"}
 
