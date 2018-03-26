@@ -1,10 +1,13 @@
 package plugin_test
 
 import (
+	"strings"
+
 	. "github.com/arquillian/ike-prow-plugins/pkg/internal/test"
 	"github.com/arquillian/ike-prow-plugins/pkg/plugin/config"
 	"github.com/arquillian/ike-prow-plugins/pkg/plugin/test-keeper/plugin"
 	"github.com/arquillian/ike-prow-plugins/pkg/scm"
+	"github.com/microcosm-cc/bluemonday"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	"gopkg.in/h2non/gock.v1"
@@ -70,9 +73,10 @@ var _ = Describe("Test keeper comment message creation", func() {
 
 			// when
 			msg := plugin.CreateCommentMessage(config, change)
+			sanitizedMsg := removeHtmlElements(msg)
 
 			// then
-			Expect(msg).To(StartWith("Custom message"))
+			Expect(string(sanitizedMsg)).To(StartWith("Custom message"))
 		})
 
 		It("should create default message with no-found-custom-file suffix using wrong relative path", func() {
@@ -124,9 +128,10 @@ var _ = Describe("Test keeper comment message creation", func() {
 
 			// when
 			msg := plugin.CreateCommentMessage(config, scm.RepositoryChange{})
+			sanitizedMsg := removeHtmlElements(msg)
 
 			// then
-			Expect(msg).To(StartWith("Custom message"))
+			Expect(sanitizedMsg).To(StartWith("Custom message"))
 		})
 
 		It("should create default message with no-found-custom-file suffix using wrong url path", func() {
@@ -187,3 +192,7 @@ var _ = Describe("Test keeper comment message creation", func() {
 		})
 	})
 })
+
+func removeHtmlElements(msg string) string {
+	return strings.TrimSpace(string(bluemonday.StrictPolicy().SanitizeBytes([]byte(msg))))
+}

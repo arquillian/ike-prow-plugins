@@ -1,5 +1,5 @@
-hash: a0a3ddfd4887863aec9ce21009a38c76d82d63eceb8937b5c5eafd1c7284e9ba
-updated: 2018-03-19T15:27:10.516770957+01:00
+hash: 772cddbbf46e9e960ea4edc842fd09cd49c1769560907dda9a09bf5372decd69
+updated: 2018-03-26T16:51:12.59527029+02:00
 imports:
 - name: github.com/bazelbuild/buildtools
   version: c98ff0c6395f09b1942e6f7c42bf3ec15e3b9ca7
@@ -286,4 +286,6 @@ imports:
   - prow/plugins/yuks
   - prow/repoowners
   - prow/slack
-testImports: []
+testImports:
+- name: github.com/microcosm-cc/bluemonday
+  version: 542fd4642604d0d0c26112396ce5b1a9d01eee0b

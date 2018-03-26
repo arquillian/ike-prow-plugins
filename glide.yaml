@@ -32,4 +32,8 @@ import:
 - package: gopkg.in/h2non/gock.v1
   version: 1.0.8
 
+testImport:
+- package: github.com/microcosm-cc/bluemonday
+  version: 542fd4642604d0d0c26112396ce5b1a9d01eee0b
+
 
