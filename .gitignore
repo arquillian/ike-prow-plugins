@@ -38,5 +38,5 @@ sentry.dsn
 cluster/generated/
 gh-pages/
 
-# Ignore Ginkgo junit.xml files
-*junit.xml
+# Ignore Ginkgo ginkgo-test-results.xml files
+*ginkgo-test-results.xml
