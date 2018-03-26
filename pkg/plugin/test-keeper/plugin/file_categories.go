@@ -64,18 +64,20 @@ func LoadMatcher(configuration TestKeeperConfiguration) (TestMatcher, error) {
 	}
 
 	if len(configuration.Inclusions) != 0 {
+		exclusions := ParseFilePatterns(configuration.Inclusions)
 		if configuration.Combine {
-			matcher.Inclusion = append(matcher.Inclusion, matcher.Inclusion...)
+			matcher.Inclusion = append(matcher.Inclusion, exclusions...)
 		} else {
-			matcher.Inclusion = ParseFilePatterns(configuration.Inclusions)
+			matcher.Inclusion = exclusions
 		}
 	}
 
 	if len(configuration.Exclusions) != 0 {
+		exclusions := ParseFilePatterns(configuration.Exclusions)
 		if configuration.Combine {
-			matcher.Exclusion = append(matcher.Exclusion, matcher.Exclusion...)
+			matcher.Exclusion = append(matcher.Exclusion, exclusions...)
 		} else {
-			matcher.Exclusion = ParseFilePatterns(configuration.Exclusions)
+			matcher.Exclusion = exclusions
 		}
 	}
 

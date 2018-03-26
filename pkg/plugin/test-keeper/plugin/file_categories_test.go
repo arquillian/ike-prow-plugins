@@ -9,7 +9,13 @@ import (
 
 var _ = Describe("Test fileCategoryCounter features", func() {
 
-	var defaultMatcher, _ = LoadDefaultMatcher()
+	var defaultMatcher TestMatcher
+
+	BeforeEach(func() {
+		var err error
+		defaultMatcher, err = LoadDefaultMatcher()
+		Ω(err).ShouldNot(HaveOccurred())
+	})
 
 	Context("Detecting tests within file changeset", func() {
 
@@ -243,12 +249,13 @@ var _ = Describe("Test fileCategoryCounter features", func() {
 		It("should accept changeset containing exclusion combined with default excluded files", func() {
 			// given
 			matcher, loaderErr := LoadMatcher(TestKeeperConfiguration{
-				Exclusions: []string{"*.svg"},
+				Exclusions: []string{"**/*.heif"},
 				Combine:    true,
 			})
 
 			changedFiles := changedFilesSet(
 				"test.svg",
+				"web/assets/images/high_efficiency_image_file.heif",
 				"path/to/README.adoc",
 				"pom.xml",
 				".travis.yml")
@@ -264,7 +271,7 @@ var _ = Describe("Test fileCategoryCounter features", func() {
 			Expect(fileCategories.OnlySkippedFiles()).To(BeTrue())
 		})
 
-		It("should accept changeset containing inclusion combined with default excluded files", func() {
+		It("should accept changeset containing inclusion not combined with default excluded files", func() {
 			// given
 			matcher, loaderErr := LoadMatcher(TestKeeperConfiguration{
 				Inclusions: []string{`src/**/*FunctionalTest.java$`},
