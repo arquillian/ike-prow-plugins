@@ -28,19 +28,22 @@ objects:
           labels:
             app: ${PLUGIN_NAME}
             type: ike-plugin
-            version: ${VERSION}
         spec:
           terminationGracePeriodSeconds: 180
           containers:
           - name: ${PLUGIN_NAME}
             image: ${REGISTRY}/${DOCKER_REPO}/${PLUGIN_NAME}:${VERSION}
             imagePullPolicy: Always
+            resources:
+              requests:
+                memory: "128Mi"
+                cpu: "100m"
+              limits:
+                memory: "256Mi"
+                cpu: "200m"
             env:
               - name: VERSION
                 value: ${VERSION}
-            resources:
-              limits:
-                memory: "256Mi"
             args:
             - --dry-run=false
             ports:

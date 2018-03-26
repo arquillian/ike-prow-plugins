@@ -39,8 +39,12 @@ objects:
             image: ${REGISTRY}/${DOCKER_REPO}/hook:${VERSION}
             imagePullPolicy: Always
             resources:
-                limits:
-                  memory: "256Mi"
+              requests:
+                memory: "128Mi"
+                cpu: "100m"
+              limits:
+                memory: "256Mi"
+                cpu: "200m"
             args:
             - --dry-run=false
             ports:
