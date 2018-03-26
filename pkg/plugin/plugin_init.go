@@ -11,7 +11,6 @@ import (
 
 	"strconv"
 
-	"github.com/arquillian/ike-prow-plugins/pkg/plugin/server"
 	"github.com/arquillian/ike-prow-plugins/pkg/utils"
 	"github.com/google/go-github/github"
 	"k8s.io/test-infra/prow/pluginhelp/externalplugins"
@@ -22,6 +21,7 @@ import (
 	"os"
 
 	"github.com/arquillian/ike-prow-plugins/pkg/log"
+	"github.com/arquillian/ike-prow-plugins/pkg/server"
 	"github.com/sirupsen/logrus"
 )
 

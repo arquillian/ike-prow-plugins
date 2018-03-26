@@ -7,7 +7,7 @@ import (
 	"github.com/arquillian/ike-prow-plugins/pkg/github"
 	"github.com/arquillian/ike-prow-plugins/pkg/log"
 	pluginBootstrap "github.com/arquillian/ike-prow-plugins/pkg/plugin"
-	"github.com/arquillian/ike-prow-plugins/pkg/plugin/server"
+	"github.com/arquillian/ike-prow-plugins/pkg/server"
 )
 
 // ProwPluginName is an external prow plugin name used to register this service

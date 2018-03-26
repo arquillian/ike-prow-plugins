@@ -1,9 +1,9 @@
 package plugin
 
 import (
+	"github.com/arquillian/ike-prow-plugins/pkg/config"
 	"github.com/arquillian/ike-prow-plugins/pkg/github"
 	"github.com/arquillian/ike-prow-plugins/pkg/log"
-	"github.com/arquillian/ike-prow-plugins/pkg/plugin/config"
 	"github.com/arquillian/ike-prow-plugins/pkg/scm"
 )
 

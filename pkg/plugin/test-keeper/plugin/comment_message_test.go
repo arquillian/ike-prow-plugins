@@ -1,7 +1,7 @@
 package plugin_test
 
 import (
-	"github.com/arquillian/ike-prow-plugins/pkg/plugin/config"
+	"github.com/arquillian/ike-prow-plugins/pkg/config"
 	"github.com/arquillian/ike-prow-plugins/pkg/plugin/test-keeper/plugin"
 	"github.com/arquillian/ike-prow-plugins/pkg/scm"
 	. "github.com/onsi/ginkgo"
