@@ -50,20 +50,20 @@ skip_validation_for:
   - 'docker-compose.yml'
   - 'Dockerfile*'
 
-  #Build tools directories
+  # Build tools directories
   - 'gradle/'
   - 'vendor/'
   - '.mvn/'
   - 'node_modules/'
 
-  #CI tools
+  # CI tools
   - '.travis.yml'
   - 'Jenkinsfile'
   - '.gitlab-ci.yml'
   - 'wercker.yml'
   - 'circle.yml'
 
-  #UI assets
+  # UI assets
   - '*.jpg'
   - '*.jpeg'
   - '*.png'
@@ -77,7 +77,7 @@ skip_validation_for:
   - 'regex{{.*\.[xsd]?html$}}'
   - '*.ejs'
 
-  #Text assets
+  # Text assets
   - '*.md'
   - '*.txt'
   - '*.asciidoc'
@@ -85,7 +85,7 @@ skip_validation_for:
   - 'LICENSE'
   - 'CODEOWNERS'
 
-  #Configs
+  # Configs
   - 'karma.conf.js'
   - 'regex{{protractor.*\.conf(ig)?\.js$}}'
   - 'regex{{\..+ignore}}'
@@ -97,6 +97,6 @@ skip_validation_for:
   - 'pylint.rc'
   - '*.gpg'
 
-  #Shell
+  # Shell
   - '*.sh'
   - '*.bat'
