@@ -23,7 +23,7 @@ func (matcher *startsWith) Match(actual interface{}) (success bool, err error) {
 		return false, fmt.Errorf("StartsWith matcher requires a string or stringer.  Got:\n%s", format.Object(actual, 1))
 	}
 
-	return strings.Contains(actualString, matcher.prefix), nil
+	return strings.HasPrefix(actualString, matcher.prefix), nil
 }
 
 func (matcher *startsWith) FailureMessage(actual interface{}) (message string) {
