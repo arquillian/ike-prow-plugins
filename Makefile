@@ -22,7 +22,7 @@ DOCKER?=$(if $(or $(in_docker_group),$(is_root)),docker,sudo docker)
 .DEFAULT_GOAL := all
 
 .PHONY: all
-all: clean install build build-images push-images oc-apply ## (default) Performs clean build  and container packaging
+all: clean install build build-images push-images oc-deploy-plugins ## (default) Performs clean build  and container packaging
 
 help: ## Hey! That's me!
 	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-10s\033[0m %s\n", $$1, $$2}'
@@ -121,8 +121,8 @@ oc-deploy-hook: ## Deploys hook service only
     		-p VERSION=$(HOOK_VERSION) \
     		-o yaml | oc apply -f -
 
-.PHONY: oc-apply ## Builds plugin images, updates configuration and deploys new version of ike-plugins
-oc-apply: oc-init-project build-images push-images oc-generate-deployments
+.PHONY: oc-deploy-plugins ## Builds plugin images, updates configuration and deploys new version of ike-plugins
+oc-deploy-plugins: oc-init-project build-images push-images oc-generate-deployments
 	@echo "Updating cluster configuration for '$(OC_PROJECT_NAME)'..."
 
 $(OC_DEPLOYMENTS): oc-%: %

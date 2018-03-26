@@ -11,7 +11,7 @@ You can also automatically format and remove unused imports by invoking `goimpor
 IMPORTANT: `goimports` does not correctly handle import of packages where package name differs from last part of the URL
 provided. For example `import "gopkg.in/h2non/gock.v1"` will be removed. To overcome this problem name the import `import gock "gopkg.in/h2non/gock.v1"`. One of the related issues link:https://github.com/golang/go/issues/9882[go/issues/9882].
 
-To deploy plugins use `make oc-apply`. This will build images, push them to the repository, generate deployments and apply
+To deploy plugins use `make oc-deploy-plugins`. This will build images, push them to the repository, generate deployments and apply
 them on the cluster. This target builds all plugins at once.
 
 IMPORTANT: You have to be logged in to the cluster first.
