@@ -14,7 +14,7 @@ The plugin is triggered when the Pull Request is opened/reopened or updated by n
 If, for whatever reason, you want to bypass this check - simply comment using `const:pkg/plugin/test-keeper/plugin/event_handler.go[name="SkipComment"]` command. If you are an admin user you will see the **Success** status.
 If the comment will be later removed the check is triggered again.
 
-==== How does it work?
+=== How does it work?
 
 Test Keeper looks into the files in your Pull Request and checks if any tests were added or modified based on common naming patterns (we don't analyze source code yet...).
 
@@ -55,18 +55,24 @@ Both inclusions and exclusions can be specified in two formats - either in a wil
 ===== Wildcard format
 Wildcard format represents the whole file path using a combination of a star wildcard:
 
-**:: wildcard for expressing "any directory"
-*:: wildcard for expressing "any name"
+`**`:: wildcard for expressing "any directory"
+`*`:: wildcard for expressing "any file name"
 
-examples:
+**Examples**
 
-**/*_test.go:: matches any subdirectory containing a go file whose name ends with `_test`
-*_test.go:: is same as the previous one - just shorter version
-pkg/**/*_test.go:: matches all `pkg` subdirectories containing a go file whose name ends with `_test`
-vendor/:: matches directory `vendor` and all its subdirectories and files located in it
+`**/*_test.go`:: matches any subdirectory containing a go file whose name ends with `_test`
+`*_test.go`:: is same as the previous one - just a shorter version
+`pkg/**/*_test.go`:: matches all `pkg` subdirectories containing a Go file whose name ends with `_test`
+`vendor/`:: matches directory `vendor` and all its subdirectories and files located in it
 
-===== Regex
-Don't use any regex expressions inside of the wildcard format. If the wildcard format is not suitable for you, you can still use the regex expressions, but it has to be surrounded by `regex{{...}}`. Both formats can be combined inside of the configured list of patterns - eg:
+===== Regular expressions
+
+IMPORTANT: Don't use a regular expression inside of the wildcard format. We don't support it.
+
+If the wildcard format is not suitable for you, you can still use regex, but it has to be surrounded by `regex{{...}}`.
+
+Both formats can used together in list of patterns, e.g.:
+
 [source, yml, indent=0]
 ----
 test_patterns:
