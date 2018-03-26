@@ -37,3 +37,6 @@ sentry.dsn
 # Generated files
 cluster/generated/
 gh-pages/
+
+# Ignore Ginkgo ginkgo-test-results.xml files
+*ginkgo-test-results.xml
