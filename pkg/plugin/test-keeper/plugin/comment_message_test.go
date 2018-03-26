@@ -75,7 +75,7 @@ var _ = Describe("Test keeper comment message creation", func() {
 			sanitizedMsg := removeHtmlElements(msg)
 
 			// then
-			Expect(string(sanitizedMsg)).To(Equal("Custom message"))
+			Expect(sanitizedMsg).To(Equal("Custom message"))
 		})
 
 		It("should create default message with no-found-custom-file suffix using wrong relative path", func() {
