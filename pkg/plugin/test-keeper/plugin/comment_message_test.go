@@ -3,7 +3,6 @@ package plugin_test
 import (
 	"strings"
 
-	. "github.com/arquillian/ike-prow-plugins/pkg/internal/test"
 	"github.com/arquillian/ike-prow-plugins/pkg/plugin/config"
 	"github.com/arquillian/ike-prow-plugins/pkg/plugin/test-keeper/plugin"
 	"github.com/arquillian/ike-prow-plugins/pkg/scm"
@@ -76,7 +75,7 @@ var _ = Describe("Test keeper comment message creation", func() {
 			sanitizedMsg := removeHtmlElements(msg)
 
 			// then
-			Expect(string(sanitizedMsg)).To(StartWith("Custom message"))
+			Expect(string(sanitizedMsg)).To(Equal("Custom message"))
 		})
 
 		It("should create default message with no-found-custom-file suffix using wrong relative path", func() {
@@ -131,7 +130,7 @@ var _ = Describe("Test keeper comment message creation", func() {
 			sanitizedMsg := removeHtmlElements(msg)
 
 			// then
-			Expect(sanitizedMsg).To(StartWith("Custom message"))
+			Expect(sanitizedMsg).To(Equal("Custom message"))
 		})
 
 		It("should create default message with no-found-custom-file suffix using wrong url path", func() {
