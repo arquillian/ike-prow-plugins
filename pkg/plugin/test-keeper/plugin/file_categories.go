@@ -6,8 +6,8 @@ import (
 	"github.com/arquillian/ike-prow-plugins/pkg/scm"
 )
 
-// FileCategoryCounter is using plugin.FileNamePattern to figure out if the given commit affects any test file
-// The plugin.FileNamePattern is loaded either from test-keeper.yaml file or from set of default matchers based on the languages using in the related project
+// FileCategoryCounter is using plugin.FilePattern to figure out if the given commit affects any test file
+// The plugin.FilePattern is loaded either from test-keeper.yaml file or from set of default matchers based on the languages using in the related project
 type FileCategoryCounter struct {
 	Matcher TestMatcher
 }
@@ -56,23 +56,28 @@ func (t *FileCategoryCounter) Count(files []scm.ChangedFile) (FileCategories, er
 	return types, nil
 }
 
-// LoadMatcher loads list of FileNamePattern either from the provided configuration or from languages retrieved from the given function
-func LoadMatcher(config TestKeeperConfiguration) TestMatcher {
-	var matcher = DefaultMatchers
+// LoadMatcher loads list of FilePattern either from the provided configuration or from languages retrieved from the given function
+func LoadMatcher(configuration TestKeeperConfiguration) (TestMatcher, error) {
+	matcher, err := LoadDefaultMatcher()
+	if err != nil {
+		return matcher, err
+	}
 
-	if config.Inclusion != "" {
-		matcher.Inclusion = []FileNamePattern{{Regex: config.Inclusion}}
-		if config.Combine {
-			matcher.Inclusion = append(matcher.Inclusion, DefaultMatchers.Inclusion...)
+	if len(configuration.Inclusions) != 0 {
+		if configuration.Combine {
+			matcher.Inclusion = append(matcher.Inclusion, matcher.Inclusion...)
+		} else {
+			matcher.Inclusion = ParseFilePatterns(configuration.Inclusions)
 		}
 	}
 
-	if config.Exclusion != "" {
-		matcher.Exclusion = []FileNamePattern{{Regex: config.Exclusion}}
-		if config.Combine {
-			matcher.Exclusion = append(matcher.Exclusion, DefaultMatchers.Exclusion...)
+	if len(configuration.Exclusions) != 0 {
+		if configuration.Combine {
+			matcher.Exclusion = append(matcher.Exclusion, matcher.Exclusion...)
+		} else {
+			matcher.Exclusion = ParseFilePatterns(configuration.Exclusions)
 		}
 	}
 
-	return matcher
+	return matcher, nil
 }

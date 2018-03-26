@@ -1,24 +1,17 @@
 package plugin
 
 import (
-	"regexp"
+	"path/filepath"
+
+	"github.com/arquillian/ike-prow-plugins/pkg/plugin/config"
+	"github.com/pkg/errors"
 )
-
-// FileNamePattern contains regex that matches a test file
-type FileNamePattern struct {
-	Regex string
-}
-
-// Matches checks if the given string (representing path to a file) contains a substring that matches Regex stored in this matcher
-func (matcher *FileNamePattern) Matches(filename string) bool {
-	return regexp.MustCompile(matcher.Regex).MatchString(filename)
-}
 
 // TestMatcher holds definitions of patterns considered as test filenames (inclusions) and those which shouldn't be
 // verified (exclusions)
 type TestMatcher struct {
-	Inclusion []FileNamePattern
-	Exclusion []FileNamePattern
+	Inclusion []FilePattern
+	Exclusion []FilePattern
 }
 
 // MatchesInclusion checks if file name matches defined inclusion patterns
@@ -31,8 +24,8 @@ func (matcher *TestMatcher) MatchesExclusion(filename string) bool {
 	return Matches(matcher.Exclusion, filename)
 }
 
-// Matches iterates over a slice of FileNamePattern and verifies if passed name matches any of the defined patterns
-func Matches(matchers []FileNamePattern, filename string) bool {
+// Matches iterates over a slice of FilePattern and verifies if passed name matches any of the defined patterns
+func Matches(matchers []FilePattern, filename string) bool {
 
 	for _, matcher := range matchers {
 		if matcher.Matches(filename) {
@@ -43,65 +36,23 @@ func Matches(matchers []FileNamePattern, filename string) bool {
 	return false
 }
 
-// DefaultMatchers is used when no other matcher is loaded
-// It matches any string that contains either "test" or "Test"
-var DefaultMatchers = TestMatcher{
-	Inclusion: []FileNamePattern{javaTests, goTests, javascriptTests, typescriptTests, pythonTests, groovyTests},
-	Exclusion: []FileNamePattern{
-		buildTools, buildToolsDirectories,
-		ciTools, configs, shell,
-		textAssets, uiAssets,
-	},
-}
+// LoadDefaultMatcher loads default matcher containing default include and exclude patterns
+func LoadDefaultMatcher() (TestMatcher, error) {
+	matcher := TestMatcher{}
+	defaultConfig := TestKeeperConfiguration{}
 
-var javaTests = FileNamePattern{
-	Regex: `(Test[^/]*|IT|TestCase)\.java$`,
-}
+	absFilePath, err := filepath.Abs("test-keeper.yaml")
 
-var goTests = FileNamePattern{
-	Regex: `_test\.go$`,
-}
+	if err == nil {
+		err = config.Load(&defaultConfig, &config.IkeProwLocalLoadableConfig{AbsFilePath: absFilePath})
+	}
 
-var javascriptTests = FileNamePattern{
-	Regex: `(test|spec)\.js$`,
-}
+	if err != nil {
+		return matcher, errors.Errorf(
+			"An error occurred when the default test-keeper.yaml config was being loaded: %s", err)
+	}
+	matcher.Inclusion = ParseFilePatterns(defaultConfig.Inclusions)
+	matcher.Exclusion = ParseFilePatterns(defaultConfig.Exclusions)
 
-var typescriptTests = FileNamePattern{
-	Regex: `(test|spec)\.ts(x)?$`,
-}
-
-var pythonTests = FileNamePattern{
-	Regex: `test[^/]*\.py$`,
-}
-
-var groovyTests = FileNamePattern{
-	Regex: `(Test[^/]*|IT|TestCase)\.groovy$`,
-}
-
-var buildTools = FileNamePattern{
-	Regex: `(glide\.yaml|glide\.lock|pom\.xml|mvnw(\.cmd|\.bat)?|package\.json|build\.gradle|gradlew[\.bat]?|Makefile|gulpfile\.js|(G|g)emfile|requirements\.(in|txt)|docker-compose.yml|Dockerfile.*)$`,
-}
-
-var buildToolsDirectories = FileNamePattern{
-	Regex: `gradle/|vendor/|.mvn/|node_modules/`,
-}
-
-var ciTools = FileNamePattern{
-	Regex: `\.travis\.yml|Jenkinsfile|\.gitlab-ci\.yml,|wercker\.yml|circle\.yml$`,
-}
-
-var uiAssets = FileNamePattern{
-	Regex: `(\.jpg|\.jpeg|\.png|\.ico|\.svg|\.gif|\.css|\.scss|\.sass|\.less|\.[xsd]?html|\.ejs)$`,
-}
-
-var textAssets = FileNamePattern{
-	Regex: `(\.md|\.txt|\.asciidoc|\.adoc|LICENSE|CODEOWNERS)$`,
-}
-
-var configs = FileNamePattern{
-	Regex: `(karma\.conf\.js|protractor.*\.conf(ig)?\.js|\..+ignore|\.editorconfig|\..+rc|tsconfig.*\.json|karma\.conf\.js|\.codecov\.yml|pylint\.rc|\.gpg)$`,
-}
-
-var shell = FileNamePattern{
-	Regex: `(\.sh|\.bat)$`,
+	return matcher, nil
 }

@@ -73,8 +73,8 @@ var _ = Describe("Test Keeper Plugin features", func() {
 			gock.New("https://raw.githubusercontent.com").
 				Get(repositoryName + "/5d6e9b25da90edfc19f488e595e0645c081c1575/test-keeper.yml").
 				Reply(200).
-				BodyString("test_pattern: '(__test\\.go)$'\n" +
-					"skip_validation_for: 'README.adoc'")
+				BodyString("test_patterns: ['*__test.go']\n" +
+					"skip_validation_for: ['README.adoc']")
 
 			gock.New("https://api.github.com").
 				Get("/repos/" + repositoryName + "/pulls/2/files").
@@ -110,7 +110,7 @@ var _ = Describe("Test Keeper Plugin features", func() {
 			gock.New("https://api.github.com").
 				Get("/repos/" + repositoryName + "/issues/2/comments").
 				Reply(200).
-				BodyString("{}")
+				BodyString("[]")
 
 			// This way we implicitly verify that call happened after `HandleEvent` call
 			gock.New("https://api.github.com").
@@ -141,7 +141,7 @@ var _ = Describe("Test Keeper Plugin features", func() {
 			gock.New("https://api.github.com").
 				Get("/repos/" + repositoryName + "/issues/1/comments").
 				Reply(200).
-				BodyString("{}")
+				BodyString("[]")
 
 			// This way we implicitly verify that call happened after `HandleEvent` call
 			gock.New("https://api.github.com").

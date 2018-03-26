@@ -9,6 +9,8 @@ import (
 
 var _ = Describe("Test fileCategoryCounter features", func() {
 
+	var defaultMatcher, _ = LoadDefaultMatcher()
+
 	Context("Detecting tests within file changeset", func() {
 
 		It("should accept changeset containing Java file set when based on predefined matchers", func() {
@@ -18,7 +20,7 @@ var _ = Describe("Test fileCategoryCounter features", func() {
 				"path/to/page.html",
 				"path/to/test/AnythingTestCase.java")
 
-			fileCategoryCounter := FileCategoryCounter{Matcher: DefaultMatchers}
+			fileCategoryCounter := FileCategoryCounter{Matcher: defaultMatcher}
 
 			// when
 			fileCategories, err := fileCategoryCounter.Count(changedFiles)
@@ -34,7 +36,7 @@ var _ = Describe("Test fileCategoryCounter features", func() {
 				"pkg/plugin/test-keeper/plugin/test_checker.go",
 				"path/to/golang/main_test.go")
 
-			fileCategoryCounter := FileCategoryCounter{Matcher: DefaultMatchers}
+			fileCategoryCounter := FileCategoryCounter{Matcher: defaultMatcher}
 
 			// when
 			fileCategories, err := fileCategoryCounter.Count(changedFiles)
@@ -50,7 +52,7 @@ var _ = Describe("Test fileCategoryCounter features", func() {
 				"path/to/JavaTest.java",
 				"path/to/golang/main_test.go")
 
-			fileCategoryCounter := FileCategoryCounter{Matcher: DefaultMatchers}
+			fileCategoryCounter := FileCategoryCounter{Matcher: defaultMatcher}
 
 			// when
 			fileCategories, err := fileCategoryCounter.Count(changedFiles)
@@ -68,7 +70,7 @@ var _ = Describe("Test fileCategoryCounter features", func() {
 				"path/Test.java/js/something.in.js",
 				"path/to/go/another_in.go")
 
-			fileCategoryCounter := FileCategoryCounter{Matcher: DefaultMatchers}
+			fileCategoryCounter := FileCategoryCounter{Matcher: defaultMatcher}
 
 			// when
 			fileCategories, err := fileCategoryCounter.Count(changedFiles)
@@ -83,7 +85,7 @@ var _ = Describe("Test fileCategoryCounter features", func() {
 			changedFiles := changedFilesSet(
 				"node_modules/leftpad/dont_delete_me.spec.js",
 				"vendor/github.com/test/repo/should_ignore_this_test.go")
-			fileCategoryCounter := FileCategoryCounter{Matcher: DefaultMatchers}
+			fileCategoryCounter := FileCategoryCounter{Matcher: defaultMatcher}
 
 			// when
 			fileCategories, err := fileCategoryCounter.Count(changedFiles)
@@ -97,7 +99,7 @@ var _ = Describe("Test fileCategoryCounter features", func() {
 			// given
 			changedFiles := changedFilesSet()
 
-			fileCategoryCounter := FileCategoryCounter{Matcher: DefaultMatchers}
+			fileCategoryCounter := FileCategoryCounter{Matcher: defaultMatcher}
 
 			// when
 			fileCategories, err := fileCategoryCounter.Count(changedFiles)
@@ -110,7 +112,9 @@ var _ = Describe("Test fileCategoryCounter features", func() {
 
 		It("should accept changeset based on configured inclusion", func() {
 			// given
-			matcher := LoadMatcher(TestKeeperConfiguration{Inclusion: `_test\.rb$`})
+			matcher, loaderErr := LoadMatcher(TestKeeperConfiguration{
+				Inclusions: []string{`regex{{_test\.rb$}}`},
+			})
 
 			changedFiles := changedFilesSet(
 				"path/to/github_service.rb",
@@ -122,14 +126,15 @@ var _ = Describe("Test fileCategoryCounter features", func() {
 			fileCategories, err := fileCategoryCounter.Count(changedFiles)
 
 			// then
+			Ω(loaderErr).ShouldNot(HaveOccurred())
 			Ω(err).ShouldNot(HaveOccurred())
 			Expect(fileCategories.TestsExist()).To(BeTrue())
 		})
 
 		It("should accept changeset using inclusion in the configuration", func() {
 			// given
-			matcher := LoadMatcher(TestKeeperConfiguration{
-				Inclusion: `(Test\.java|TestCase\.java|_test\.go)$`,
+			matcher, loaderErr := LoadMatcher(TestKeeperConfiguration{
+				Inclusions: []string{`regex{{(Test\.java|TestCase\.java|_test\.go)$}}`},
 			})
 
 			changedFiles := changedFilesSet(
@@ -144,6 +149,7 @@ var _ = Describe("Test fileCategoryCounter features", func() {
 			fileCategories, err := fileCategoryCounter.Count(changedFiles)
 
 			// then
+			Ω(loaderErr).ShouldNot(HaveOccurred())
 			Ω(err).ShouldNot(HaveOccurred())
 			Expect(fileCategories.TestsExist()).To(BeTrue())
 		})
@@ -155,7 +161,7 @@ var _ = Describe("Test fileCategoryCounter features", func() {
 				"pom.xml",
 				".travis.yml")
 
-			fileCategoryCounter := FileCategoryCounter{Matcher: DefaultMatchers}
+			fileCategoryCounter := FileCategoryCounter{Matcher: defaultMatcher}
 
 			// when
 			fileCategories, err := fileCategoryCounter.Count(changedFiles)
@@ -167,8 +173,8 @@ var _ = Describe("Test fileCategoryCounter features", func() {
 
 		It("should accept changeset containing configured exclusion and one test matched by default inclusion", func() {
 			// given
-			matcher := LoadMatcher(TestKeeperConfiguration{
-				Exclusion: `(\.txt|\.svg|\.png)$`,
+			matcher, loaderErr := LoadMatcher(TestKeeperConfiguration{
+				Exclusions: []string{"*.txt", "*.svg", "*.png"},
 			})
 
 			changedFiles := changedFilesSet(
@@ -183,14 +189,15 @@ var _ = Describe("Test fileCategoryCounter features", func() {
 			fileCategories, err := fileCategoryCounter.Count(changedFiles)
 
 			// then
+			Ω(loaderErr).ShouldNot(HaveOccurred())
 			Ω(err).ShouldNot(HaveOccurred())
 			Expect(fileCategories.TestsExist()).To(BeTrue())
 		})
 
 		It("should accept changeset containing configured exclusion", func() {
 			// given
-			matcher := LoadMatcher(TestKeeperConfiguration{
-				Exclusion: `(\.txt|\.svg|\.png)$`,
+			matcher, loaderErr := LoadMatcher(TestKeeperConfiguration{
+				Exclusions: []string{"*.txt", "*.svg", "*.png"},
 			})
 
 			changedFiles := changedFilesSet(
@@ -204,15 +211,16 @@ var _ = Describe("Test fileCategoryCounter features", func() {
 			fileCategories, err := fileCategoryCounter.Count(changedFiles)
 
 			// then
+			Ω(loaderErr).ShouldNot(HaveOccurred())
 			Ω(err).ShouldNot(HaveOccurred())
 			Expect(fileCategories.OnlySkippedFiles()).To(BeTrue())
 		})
 
 		It("should accept changeset containing configured overlapping exclusion and inclusion", func() {
 			// given
-			matcher := LoadMatcher(TestKeeperConfiguration{
-				Inclusion: `test\.txt`,
-				Exclusion: `(\.txt|\.svg|\.png)$`,
+			matcher, loaderErr := LoadMatcher(TestKeeperConfiguration{
+				Inclusions: []string{`**/*_test.txt`},
+				Exclusions: []string{`regex{{(\.txt|\.svg|\.png)$}}`},
 			})
 
 			changedFiles := changedFilesSet(
@@ -227,15 +235,16 @@ var _ = Describe("Test fileCategoryCounter features", func() {
 			fileCategories, err := fileCategoryCounter.Count(changedFiles)
 
 			// then
+			Ω(loaderErr).ShouldNot(HaveOccurred())
 			Ω(err).ShouldNot(HaveOccurred())
 			Expect(fileCategories.OnlySkippedFiles()).To(BeTrue())
 		})
 
 		It("should accept changeset containing exclusion combined with default excluded files", func() {
 			// given
-			matcher := LoadMatcher(TestKeeperConfiguration{
-				Exclusion: `.svg$`,
-				Combine:   true,
+			matcher, loaderErr := LoadMatcher(TestKeeperConfiguration{
+				Exclusions: []string{"*.svg"},
+				Combine:    true,
 			})
 
 			changedFiles := changedFilesSet(
@@ -250,15 +259,16 @@ var _ = Describe("Test fileCategoryCounter features", func() {
 			fileCategories, err := fileCategoryCounter.Count(changedFiles)
 
 			// then
+			Ω(loaderErr).ShouldNot(HaveOccurred())
 			Ω(err).ShouldNot(HaveOccurred())
 			Expect(fileCategories.OnlySkippedFiles()).To(BeTrue())
 		})
 
-		It("should accept changeset containing inclusion combined with default included files", func() {
+		It("should accept changeset containing inclusion combined with default excluded files", func() {
 			// given
-			matcher := LoadMatcher(TestKeeperConfiguration{
-				Inclusion: `FunctionalTest.java$`,
-				Combine:   true,
+			matcher, loaderErr := LoadMatcher(TestKeeperConfiguration{
+				Inclusions: []string{`src/**/*FunctionalTest.java$`},
+				Combine:    false,
 			})
 
 			changedFiles := changedFilesSet(
@@ -273,6 +283,7 @@ var _ = Describe("Test fileCategoryCounter features", func() {
 			fileCategories, err := fileCategoryCounter.Count(changedFiles)
 
 			// then
+			Ω(loaderErr).ShouldNot(HaveOccurred())
 			Ω(err).ShouldNot(HaveOccurred())
 			Expect(fileCategories.TestsExist()).To(BeTrue())
 		})

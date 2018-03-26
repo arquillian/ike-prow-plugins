@@ -1,4 +1,6 @@
-test_pattern: '(__test\.go)$'              #<!--1-->
-skip_validation_for:  'README.adoc'        #<!--2-->
-combine_defaults: false                    #<!--3-->
+test_patterns:
+  - '**/__test.go'                        #<!--1-->
+skip_validation_for:
+  - 'regex{{.*\.[xsd]?html$}}'            #<!--2-->
+combine_defaults: false                   #<!--3-->
 plugin_hint: plugins/keeper-file-hint.md  #<!--4-->

@@ -1,0 +1,102 @@
+test_patterns:
+  # Java
+  - 'Test*.java'
+  - '*Test.java'
+  - '*Tests.java'
+  - '*TestCase.java'
+  - '*IT.java'
+
+  # Go
+  - '*_test.go'
+
+  # JavaScript
+  - '*test.js'
+  - '*spec.js'
+
+  # TypeScript
+  - '*test.ts'
+  - '*test.tsx'
+  - '*spec.ts'
+  - '*spec.tsx'
+
+  # Python
+  - 'test*.py'
+
+  # Groovy
+  - 'Test*.groovy'
+  - '*Test.groovy'
+  - '*Tests.groovy'
+  - '*TestCase.groovy'
+  - '*IT.groovy'
+
+skip_validation_for:
+  # Build tools files
+  - 'glide.yaml'
+  - 'glide.lock'
+  - 'pom.xml'
+  - 'mvnw'
+  - 'mvnw.cmd'
+  - 'mvnw.bat'
+  - 'package.json'
+  - 'build.gradle'
+  - 'gradlew'
+  - 'gradlew.bat'
+  - 'Makefile'
+  - 'gulpfile.js'
+  - 'Gemfile'
+  - 'gemfile'
+  - 'requirements.in'
+  - 'requirements.txt'
+  - 'docker-compose.yml'
+  - 'Dockerfile*'
+
+  #Build tools directories
+  - 'gradle/'
+  - 'vendor/'
+  - '.mvn/'
+  - 'node_modules/'
+
+  #CI tools
+  - '.travis.yml'
+  - 'Jenkinsfile'
+  - '.gitlab-ci.yml'
+  - 'wercker.yml'
+  - 'circle.yml'
+
+  #UI assets
+  - '*.jpg'
+  - '*.jpeg'
+  - '*.png'
+  - '*.ico'
+  - '*.svg'
+  - '*.gif'
+  - '*.css'
+  - '*.scss'
+  - '*.sass'
+  - '*.less'
+  - 'regex{{.*\.[xsd]?html$}}'
+  - '*.ejs'
+
+  #Text assets
+  - '*.md'
+  - '*.txt'
+  - '*.asciidoc'
+  - '*.adoc'
+  - 'LICENSE'
+  - 'CODEOWNERS'
+
+  #Configs
+  - 'karma.conf.js'
+  - 'regex{{protractor.*\.conf(ig)?\.js$}}'
+  - 'regex{{\..+ignore}}'
+  - '.editorconfig'
+  - 'regex{{\..+rc}}'
+  - 'regex{{tsconfig.*\.json$}}'
+  - 'karma.conf.js'
+  - '.codecov.yml'
+  - 'pylint.rc'
+  - '*.gpg'
+
+  #Shell
+  - '*.sh'
+  - '*.bat'
