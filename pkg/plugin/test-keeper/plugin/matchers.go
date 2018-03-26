@@ -48,8 +48,7 @@ func LoadDefaultMatcher() (TestMatcher, error) {
 	}
 
 	if err != nil {
-		return matcher, errors.Errorf(
-			"An error occurred when the default test-keeper.yaml config was being loaded: %s", err)
+		return matcher, errors.Errorf("an error occurred while loading the default test-keeper.yaml: %s", err)
 	}
 	matcher.Inclusion = ParseFilePatterns(defaultConfig.Inclusions)
 	matcher.Exclusion = ParseFilePatterns(defaultConfig.Exclusions)
