@@ -3,7 +3,7 @@ package github
 import (
 	"fmt"
 
-	"github.com/arquillian/ike-prow-plugins/pkg/plugin/config"
+	"github.com/arquillian/ike-prow-plugins/pkg/config"
 	"github.com/arquillian/ike-prow-plugins/pkg/scm"
 	"github.com/arquillian/ike-prow-plugins/pkg/utils"
 )
