@@ -30,6 +30,7 @@ const (
 		"path to an existing file in this repository."
 
 	sadIke = `<img align="left" src="https://cdn.rawgit.com/bartoszmajsak/ike-prow-plugins/2025328b70bd1879520411b3cacadee61a49641a/docs/images/arquillian_ui_failure_128px.png">`
+	
 )
 
 // CreateCommentMessage creates a comment message for the test-keeper plugin. If the comment message is set in config then it takes that one, the default otherwise.
