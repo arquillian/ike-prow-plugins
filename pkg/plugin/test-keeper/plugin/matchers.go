@@ -3,7 +3,7 @@ package plugin
 import (
 	"path/filepath"
 
-	"github.com/arquillian/ike-prow-plugins/pkg/plugin/config"
+	"github.com/arquillian/ike-prow-plugins/pkg/config"
 	"github.com/pkg/errors"
 )
 
