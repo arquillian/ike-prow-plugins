@@ -7,7 +7,7 @@ import:
 - package: github.com/sirupsen/logrus
   version: 0.10.0
 - package: github.com/google/go-github/github
-  version: v15.0.0
+  version: 15.0.0
 - package: k8s.io/test-infra/prow/hook
   version: 93ade3390d83b5e4d9cd75d5a769b6391137cd1e
 - package: k8s.io/test-infra/prow/pluginhelp
@@ -21,7 +21,7 @@ import:
 - package: github.com/certifi/gocertifi
   version: 2018.01.18
 - package: github.com/evalphobia/logrus_sentry
-  version: v0.4.5
+  version: 0.4.5
 
 # Normally these dependencies should belong to testImport,
 # but as they are used in shared internal packages they have to go as regular ones
