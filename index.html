@@ -1016,8 +1016,8 @@ If it won&#8217;t find any tests in the Pull Request, it adds a comment with a d
 <p>If, for whatever reason, you want to bypass this check - simply comment using <code>/ok-without-tests</code> command. If you are an admin user you will see the <strong>Success</strong> status.
 If the comment will be later removed the check is triggered again.</p>
 </div>
-<div class="sect4">
-<h5 id="_how_does_it_work"><a class="anchor" href="#_how_does_it_work"></a>How does it work?</h5>
+<div class="sect3">
+<h4 id="_how_does_it_work"><a class="anchor" href="#_how_does_it_work"></a>3.2.1. How does it work?</h4>
 <div class="paragraph">
 <p>Test Keeper looks into the files in your Pull Request and checks if any tests were added or modified based on common naming patterns (we don&#8217;t analyze source code yet&#8230;&#8203;).</p>
 </div>
@@ -1047,7 +1047,7 @@ If the comment will be later removed the check is triggered again.</p>
 <p>Of course, all of it is configurable.</p>
 </div>
 <div class="paragraph">
-<p>We have few reasonable defaults, which you can check <a href="https://github.com/arquillian/ike-prow-plugins/blob/f738188069690ec727ab0a3a4e9997ca386e8c25/pkg/plugin/test-keeper/plugin/matchers.go#L57-L107">here</a>.</p>
+<p>We have few reasonable defaults, which you can check <a href="https://github.com/arquillian/ike-prow-plugins/blob/master/pkg/plugin/test-keeper/plugin/test-keeper.yaml">here</a>.</p>
 </div>
 <div class="admonitionblock note">
 <table>
@@ -1069,8 +1069,10 @@ If we missed some important patterns feel free to open an <a href="https://githu
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="yml"><span class="key">test_pattern</span>: <span class="string"><span class="content">'(__test\.go)$'              </span></span><i class="conum" data-value="1"></i><b>(1)</b>
-<span class="key">skip_validation_for</span>:  <span class="string"><span class="content">'README.adoc'        </span></span><i class="conum" data-value="2"></i><b>(2)</b>
+<pre class="CodeRay highlight"><code data-lang="yml"><span class="key">test_patterns</span>:
+  - <span class="string"><span class="content">'**/__test.go'                         </span></span><i class="conum" data-value="1"></i><b>(1)</b>
+<span class="key">skip_validation_for</span>:
+  - <span class="string"><span class="content">'regex{{.*\.[xsd]?html$}}'             </span></span><i class="conum" data-value="2"></i><b>(2)</b>
 <span class="key">combine_defaults</span>: <span class="string"><span class="content">false                    </span></span><i class="conum" data-value="3"></i><b>(3)</b>
 <span class="key">plugin_hint</span>: <span class="string"><span class="content">plugins/keeper-file-hint.md  </span></span> <i class="conum" data-value="4"></i><b>(4)</b></code></pre>
 </div>
@@ -1079,11 +1081,11 @@ If we missed some important patterns feel free to open an <a href="https://githu
 <table>
 <tr>
 <td><i class="conum" data-value="1"></i><b>1</b></td>
-<td>Defines set of regular expressions which will be used to match files changeset and determine if Pull Requests comes with any changed test files.</td>
+<td>Defines set of <a href="#file-patterns">file patterns</a> which will be used to match files changeset and determine if Pull Requests comes with any changed test files.</td>
 </tr>
 <tr>
 <td><i class="conum" data-value="2"></i><b>2</b></td>
-<td>These regular expressions will be used against changeset in the Pull Requests to exclude files that don&#8217;t have to be verified by any test. If only such files exists the check will be marked as "Success" as no tests are expected for such a PR.</td>
+<td>These <a href="#file-patterns">file patterns</a> will be used against changeset in the Pull Requests to exclude files that don&#8217;t have to be verified by any test. If only such files exists the check will be marked as "Success" as no tests are expected for such a PR.</td>
 </tr>
 <tr>
 <td><i class="conum" data-value="3"></i><b>3</b></td>
@@ -1107,6 +1109,81 @@ Both the configuration file and the file with plugin hint are always loaded from
 </tr>
 </table>
 </div>
+<div class="sect4">
+<h5 id="file-patterns"><a class="anchor" href="#file-patterns"></a>File patterns</h5>
+<div class="paragraph">
+<p>Both inclusions and exclusions can be specified in two formats - either in a wildcard format or in a regex.</p>
+</div>
+<div class="sect5">
+<h6 id="_wildcard_format"><a class="anchor" href="#_wildcard_format"></a>Wildcard format</h6>
+<div class="paragraph">
+<p>Wildcard format represents the whole file path using a combination of a star wildcard:</p>
+</div>
+<div class="dlist">
+<dl>
+<dt class="hdlist1"><code>**</code></dt>
+<dd>
+<p>wildcard for expressing "any directory"</p>
+</dd>
+<dt class="hdlist1"><code>*</code></dt>
+<dd>
+<p>wildcard for expressing "any file name"</p>
+</dd>
+</dl>
+</div>
+<div class="paragraph">
+<p><strong>Examples</strong></p>
+</div>
+<div class="dlist">
+<dl>
+<dt class="hdlist1"><code>**/*_test.go</code></dt>
+<dd>
+<p>matches any subdirectory containing a go file whose name ends with <code>_test</code></p>
+</dd>
+<dt class="hdlist1"><code>*_test.go</code></dt>
+<dd>
+<p>is same as the previous one - just a shorter version</p>
+</dd>
+<dt class="hdlist1"><code>pkg/**/*_test.go</code></dt>
+<dd>
+<p>matches all <code>pkg</code> subdirectories containing a Go file whose name ends with <code>_test</code></p>
+</dd>
+<dt class="hdlist1"><code>vendor/</code></dt>
+<dd>
+<p>matches directory <code>vendor</code> and all its subdirectories and files located in it</p>
+</dd>
+</dl>
+</div>
+</div>
+<div class="sect5">
+<h6 id="_regular_expressions"><a class="anchor" href="#_regular_expressions"></a>Regular expressions</h6>
+<div class="admonitionblock important">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-important" title="Important"></i>
+</td>
+<td class="content">
+Don&#8217;t use a regular expression inside of the wildcard format. We don&#8217;t support it.
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>If the wildcard format is not suitable for you, you can still use regex, but it has to be surrounded by <code>regex{{&#8230;&#8203;}}</code>.</p>
+</div>
+<div class="paragraph">
+<p>Both formats can used together in list of patterns, e.g.:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="yml"><span class="key">test_patterns</span>:
+  - <span class="string"><span class="content">'**/__test.go'</span></span>
+  - <span class="string"><span class="content">'regex{{.*test\.ts[x]?}}'</span></span></code></pre>
+</div>
+</div>
+</div>
+</div>
 </div>
 </div>
 </div>
@@ -1114,7 +1191,7 @@ Both the configuration file and the file with plugin hint are always loaded from
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2018-03-27 13:19:10 UTC
+Last updated 2018-03-27 16:23:52 UTC
 </div>
 </div>
 <script>
