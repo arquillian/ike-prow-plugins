@@ -23,6 +23,11 @@ external_plugins:
       events:
         - pull_request
         - issue_comment
+  fabric8-services/fabric8-wit:
+    - name: test-keeper
+      events:
+        - pull_request
+        - issue_comment
   fabric8-services/fabric8-notification:
     - name: test-keeper
       events:
