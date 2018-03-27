@@ -6,3 +6,9 @@ type RepositoryIssue struct {
 	RepoName string
 	Number   int
 }
+
+// ChangedFile is a type that contains information about created/modified/removed file within an scm repository
+type ChangedFile struct {
+	Name   string
+	Status string
+}
