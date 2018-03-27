@@ -95,6 +95,33 @@ var _ = Describe("Test Keeper Plugin features", func() {
 			Ω(err).ShouldNot(HaveOccurred())
 		})
 
+		It("should approve edited pull request when tests included based on configured pattern and defaults (implicitly combined)", func() {
+			// given
+			gock.New("https://raw.githubusercontent.com").
+				Get(repositoryName + "/5d6e9b25da90edfc19f488e595e0645c081c1575/test-keeper.yml").
+				Reply(200).
+				BodyString("test_pattern: '(__test\\.go)$'\n" +
+					"skip_validation_for: 'README.adoc'")
+
+			gock.New("https://api.github.com").
+				Get("/repos/" + repositoryName + "/pulls/2/files").
+				Reply(200).
+				Body(FromFile("test_fixtures/github_calls/prs/with_tests/changes_go_files.json"))
+
+			gock.New("https://api.github.com").
+				Post("/repos/" + repositoryName + "/statuses").
+				SetMatcher(ExpectPayload(toBe(github.StatusSuccess, keeper.TestsExistMessage))).
+				Reply(201) // This way we implicitly verify that call happened after `HandleEvent` call
+
+			statusPayload := LoadFromFile("test_fixtures/github_calls/prs/with_tests/status_edited.json")
+
+			// when
+			err := handler.HandleEvent(log, github.PullRequest, statusPayload)
+
+			// then - implicit verification of /statuses call occurrence with proper payload
+			Ω(err).ShouldNot(HaveOccurred())
+		})
+
 		It("should reject opened pull request when no tests are matching defined pattern with no defaults implicitly combined", func() {
 			// given
 			gock.New("https://raw.githubusercontent.com").
