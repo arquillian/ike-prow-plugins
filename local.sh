@@ -1,3 +1,4 @@
+#!/usr/bin/env bash
 # tag::local_docker_registry[]
 eval $(minishift docker-env)
 docker login -u $(oc whoami) -p $(oc whoami -t) $(minishift openshift registry)
