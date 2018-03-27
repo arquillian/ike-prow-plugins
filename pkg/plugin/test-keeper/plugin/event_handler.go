@@ -161,7 +161,11 @@ func (gh *GitHubTestEventsHandler) checkTestsAndSetStatus(log log.Logger, change
 }
 
 func (gh *GitHubTestEventsHandler) checkTests(log log.Logger, change scm.RepositoryChange, config TestKeeperConfiguration, prNumber int) (FileCategories, error) {
-	matcher := LoadMatcher(config)
+	matcher, err := LoadMatcher(config)
+	if err != nil {
+		log.Error(err)
+		return FileCategories{}, err
+	}
 
 	fileCategoryCounter := FileCategoryCounter{Matcher: matcher}
 

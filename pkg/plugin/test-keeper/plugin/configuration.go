@@ -11,9 +11,9 @@ import (
 // It's unmarshaled from test-keeper.yml configuration file
 type TestKeeperConfiguration struct {
 	config.PluginConfiguration `yaml:",inline"`
-	Inclusion                  string `yaml:"test_pattern,omitempty"`
-	Exclusion                  string `yaml:"skip_validation_for,omitempty"`
-	Combine                    bool   `yaml:"combine_defaults,omitempty"`
+	Inclusions                 []string `yaml:"test_patterns,omitempty"`
+	Exclusions                 []string `yaml:"skip_validation_for,omitempty"`
+	Combine                    bool     `yaml:"combine_defaults,omitempty"`
 }
 
 // LoadTestKeeperConfig loads a TestKeeperConfiguration for the given change

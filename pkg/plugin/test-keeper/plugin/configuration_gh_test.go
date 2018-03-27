@@ -22,8 +22,8 @@ var _ = Describe("Test keeper config loader features", func() {
 			gock.New("https://raw.githubusercontent.com").
 				Get("owner/repo/46cb8fac44709e4ccaae97448c65e8f7320cfea7/" + plugin.ProwPluginName + ".yml").
 				Reply(200).
-				BodyString("test_pattern: (.*my|test\\.go|pattern\\.js)$\n" +
-					"skip_validation_for: pom\\.xml|*\\.adoc\n" +
+				BodyString("test_patterns: ['*my', 'test.go', 'pattern.js']\n" +
+					"skip_validation_for: ['pom.xml', 'regex{{*\\.adoc}}']\n" +
 					"plugin_hint: 'http://my.server.com/message.md'")
 
 			change := scm.RepositoryChange{
@@ -44,8 +44,8 @@ var _ = Describe("Test keeper config loader features", func() {
 			gock.New("https://raw.githubusercontent.com").
 				Get("owner/repo/46cb8fac44709e4ccaae97448c65e8f7320cfea7/" + plugin.ProwPluginName + ".yml").
 				Reply(200).
-				BodyString("test_pattern: (.*my|test\\.go|pattern\\.js)$\n" +
-					"skip_validation_for: pom\\.xml|*\\.adoc\n" +
+				BodyString("test_patterns: ['*my', 'test.go', 'pattern.js']\n" +
+					"skip_validation_for: ['pom.xml', 'regex{{*\\.adoc}}']\n" +
 					"plugin_hint: 'http://my.server.com/message.md'")
 
 			change := scm.RepositoryChange{
@@ -59,8 +59,8 @@ var _ = Describe("Test keeper config loader features", func() {
 
 			// then
 			Expect(configuration.PluginHint).To(Equal("http://my.server.com/message.md"))
-			Expect(configuration.Inclusion).To(Equal(`(.*my|test\.go|pattern\.js)$`))
-			Expect(configuration.Exclusion).To(Equal(`pom\.xml|*\.adoc`))
+			Expect(configuration.Inclusions).To(ConsistOf("*my", "test.go", "pattern.js"))
+			Expect(configuration.Exclusions).To(ConsistOf("pom.xml", "regex{{*\\.adoc}}"))
 			Expect(configuration.Combine).To(BeTrue())
 		})
 
@@ -69,8 +69,8 @@ var _ = Describe("Test keeper config loader features", func() {
 			gock.New("https://raw.githubusercontent.com").
 				Get("owner/repo/46cb8fac44709e4ccaae97448c65e8f7320cfea7/" + plugin.ProwPluginName + ".yaml").
 				Reply(200).
-				BodyString("test_pattern: (.*my|test\\.go|pattern\\.js)$\n" +
-					"skip_validation_for: pom\\.xml|*\\.adoc\n" +
+				BodyString("test_patterns: ['*my', 'test.go', 'pattern.js']\n" +
+					"skip_validation_for: ['pom.xml', 'regex{{*\\.adoc}}']\n" +
 					"plugin_hint: 'http://my.server.com/message.md'")
 
 			change := scm.RepositoryChange{
@@ -84,8 +84,8 @@ var _ = Describe("Test keeper config loader features", func() {
 
 			// then
 			Expect(configuration.PluginHint).To(Equal("http://my.server.com/message.md"))
-			Expect(configuration.Inclusion).To(Equal(`(.*my|test\.go|pattern\.js)$`))
-			Expect(configuration.Exclusion).To(Equal(`pom\.xml|*\.adoc`))
+			Expect(configuration.Inclusions).To(ConsistOf("*my", "test.go", "pattern.js"))
+			Expect(configuration.Exclusions).To(ConsistOf("pom.xml", "regex{{*\\.adoc}}"))
 			Expect(configuration.Combine).To(BeTrue())
 		})
 
@@ -107,8 +107,8 @@ var _ = Describe("Test keeper config loader features", func() {
 			// then
 			Expect(configuration.LocationURL).To(BeEmpty())
 			Expect(configuration.PluginHint).To(BeEmpty())
-			Expect(configuration.Inclusion).To(BeEmpty())
-			Expect(configuration.Exclusion).To(BeEmpty())
+			Expect(configuration.Inclusions).To(BeEmpty())
+			Expect(configuration.Exclusions).To(BeEmpty())
 			Expect(configuration.Combine).To(BeTrue())
 		})
 	})

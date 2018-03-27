@@ -76,11 +76,13 @@ var (
 	}()
 )
 
-var expectThatFile = func(matchers []FileNamePattern, file string, shouldMatch bool) {
+var expectThatFile = func(matchers []FilePattern, file string, shouldMatch bool) {
 	Expect(Matches(matchers, file)).To(Equal(shouldMatch))
 }
 
 var _ = Describe("Test Matcher features", func() {
+
+	var DefaultMatchers, _ = LoadDefaultMatcher()
 
 	Context("Test matcher loading", func() {
 
@@ -89,29 +91,33 @@ var _ = Describe("Test Matcher features", func() {
 			emptyConfiguration := TestKeeperConfiguration{}
 
 			// when
-			matchers := LoadMatcher(emptyConfiguration)
+			matchers, err := LoadMatcher(emptyConfiguration)
 
 			// then
+			Ω(err).ShouldNot(HaveOccurred())
 			Expect(matchers).To(Equal(DefaultMatchers))
 		})
 
 		It("should load defined inclusion pattern without default language specific matchers", func() {
 			// given
-			configurationWithInclusionPattern := TestKeeperConfiguration{Inclusion: `*IT.java|*TestCase.java`}
-			firstRegex := func(matcher TestMatcher) string {
-				return matcher.Inclusion[0].Regex
+			configurationWithInclusionPattern := TestKeeperConfiguration{
+				Inclusions: []string{`regex{{*IT.java|*TestCase.java}}`},
+			}
+			firstRegexp := func(matcher TestMatcher) string {
+				return matcher.Inclusion[0].Regexp
 			}
 
 			// when
-			matchers := LoadMatcher(configurationWithInclusionPattern)
+			matchers, err := LoadMatcher(configurationWithInclusionPattern)
 
 			// then
+			Ω(err).ShouldNot(HaveOccurred())
 			Expect(matchers.Inclusion).To(HaveLen(1))
-			Expect(matchers).To(WithTransform(firstRegex, Equal("*IT.java|*TestCase.java")))
+			Expect(matchers).To(WithTransform(firstRegexp, Equal("*IT.java|*TestCase.java")))
 		})
 	})
 
-	Context("Predefined exclusion regex check (DefaultMatchers)", func() {
+	Context("Predefined exclusion regexp check (DefaultMatchers)", func() {
 
 		table.DescribeTable("should exclude common build tools",
 			expectThatFile,
@@ -144,7 +150,7 @@ var _ = Describe("Test Matcher features", func() {
 		)
 	})
 
-	Context("Predefined inclusion regex check (DefaultMatchers)", func() {
+	Context("Predefined inclusion regexp check (DefaultMatchers)", func() {
 
 		table.DescribeTable("should include common test naming conventions",
 			expectThatFile,
@@ -166,15 +172,15 @@ func from(files []string) filesProvider {
 
 type filesProvider func() []string
 
-func (f filesProvider) matches(patterns []FileNamePattern) []table.TableEntry {
+func (f filesProvider) matches(patterns []FilePattern) []table.TableEntry {
 	return entries(patterns, f(), true)
 }
 
-func (f filesProvider) doesNotMatch(patterns []FileNamePattern) []table.TableEntry {
+func (f filesProvider) doesNotMatch(patterns []FilePattern) []table.TableEntry {
 	return entries(patterns, f(), false)
 }
 
-func entries(patterns []FileNamePattern, files []string, shouldMatch bool) []table.TableEntry {
+func entries(patterns []FilePattern, files []string, shouldMatch bool) []table.TableEntry {
 	entries := make([]table.TableEntry, len(files))
 
 	for i, file := range files {
@@ -186,7 +192,7 @@ func entries(patterns []FileNamePattern, files []string, shouldMatch bool) []tab
 
 const msg = "Test matcher should%s match the file %s, but it did%s."
 
-func createEntry(matchers []FileNamePattern, file string, shouldMatch bool) table.TableEntry {
+func createEntry(matchers []FilePattern, file string, shouldMatch bool) table.TableEntry {
 	if shouldMatch {
 		return table.Entry(fmt.Sprintf(msg, "", file, " NOT"), matchers, file, shouldMatch)
 	}
