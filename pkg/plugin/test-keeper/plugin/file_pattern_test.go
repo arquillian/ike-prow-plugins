@@ -11,47 +11,47 @@ import (
 
 var _ = Describe("File pattern features", func() {
 
-	var it = func(filePattern, expectedRegex string) {
+	var it = func(filePattern, expectedRegexp string) {
 		parsed := plugin.ParseFilePatterns([]string{filePattern})
-		Expect(parsed).To(ConsistOf(plugin.FilePattern{Regex: expectedRegex}))
+		Expect(parsed).To(ConsistOf(plugin.FilePattern{Regexp: expectedRegexp}))
 	}
 
 	Context("File pattern parsing", func() {
 
 		table.DescribeTable(
-			"should parse file patterns to regex",
+			"should parse file patterns to regexp",
 			it,
 			should().
 				parsePattern("**/*Test.java").
-				toRegex(`.*/[^/]*Test\.java$`),
+				toRegexp(`.*/[^/]*Test\.java$`),
 			should().
 				parsePattern("*/*Test.java").
-				toRegex(`[^/]*/[^/]*Test\.java$`),
+				toRegexp(`[^/]*/[^/]*Test\.java$`),
 			should().
 				parsePattern("*Test.java").
-				toRegex(`.*Test\.java$`),
+				toRegexp(`.*Test\.java$`),
 			should().
 				parsePattern("pkg/**/*_test.go").
-				toRegex(`pkg/.*/[^/]*_test\.go$`),
+				toRegexp(`pkg/.*/[^/]*_test\.go$`),
 			should().
 				parsePattern("vendor/").
-				toRegex(`vendor/.*`),
+				toRegexp(`vendor/.*`),
 			should().
 				parsePattern("pkg/*/**/*_test.go").
-				toRegex(`pkg/[^/]*/.*/[^/]*_test\.go$`),
+				toRegexp(`pkg/[^/]*/.*/[^/]*_test\.go$`),
 			should().
 				parsePattern("test_*.py").
-				toRegex(`test_[^/]*\.py$`))
+				toRegexp(`test_[^/]*\.py$`))
 
-		It("should extract regex", func() {
+		It("should extract regexp", func() {
 			// given
-			regexDef := []string{"regex{{my-regex}}"}
+			regexpDef := []string{"regex{{my-regexp}}"}
 
 			// when
-			parsed := plugin.ParseFilePatterns(regexDef)
+			parsed := plugin.ParseFilePatterns(regexpDef)
 
 			// then
-			Expect(parsed).To(ConsistOf(plugin.FilePattern{Regex: "my-regex"}))
+			Expect(parsed).To(ConsistOf(plugin.FilePattern{Regexp: "my-regexp"}))
 		})
 	})
 })
@@ -59,7 +59,7 @@ var _ = Describe("File pattern features", func() {
 type assertion func()
 type filePatternProvider func() string
 
-var patternAssertionMsg = "Should parse file pattern %s to regex %s"
+var patternAssertionMsg = "Should parse file pattern %s to regexp %s"
 
 func should() assertion {
 	return assertion(func() {})
@@ -71,6 +71,6 @@ func (p assertion) parsePattern(filePattern string) filePatternProvider {
 	})
 }
 
-func (f filePatternProvider) toRegex(expRegex string) table.TableEntry {
-	return table.Entry(fmt.Sprintf(patternAssertionMsg, f(), expRegex), f(), expRegex)
+func (f filePatternProvider) toRegexp(expRegexp string) table.TableEntry {
+	return table.Entry(fmt.Sprintf(patternAssertionMsg, f(), expRegexp), f(), expRegexp)
 }

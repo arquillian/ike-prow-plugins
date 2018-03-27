@@ -103,8 +103,8 @@ var _ = Describe("Test Matcher features", func() {
 			configurationWithInclusionPattern := TestKeeperConfiguration{
 				Inclusions: []string{`regex{{*IT.java|*TestCase.java}}`},
 			}
-			firstRegex := func(matcher TestMatcher) string {
-				return matcher.Inclusion[0].Regex
+			firstRegexp := func(matcher TestMatcher) string {
+				return matcher.Inclusion[0].Regexp
 			}
 
 			// when
@@ -113,11 +113,11 @@ var _ = Describe("Test Matcher features", func() {
 			// then
 			Ω(err).ShouldNot(HaveOccurred())
 			Expect(matchers.Inclusion).To(HaveLen(1))
-			Expect(matchers).To(WithTransform(firstRegex, Equal("*IT.java|*TestCase.java")))
+			Expect(matchers).To(WithTransform(firstRegexp, Equal("*IT.java|*TestCase.java")))
 		})
 	})
 
-	Context("Predefined exclusion regex check (DefaultMatchers)", func() {
+	Context("Predefined exclusion regexp check (DefaultMatchers)", func() {
 
 		table.DescribeTable("should exclude common build tools",
 			expectThatFile,
@@ -150,7 +150,7 @@ var _ = Describe("Test Matcher features", func() {
 		)
 	})
 
-	Context("Predefined inclusion regex check (DefaultMatchers)", func() {
+	Context("Predefined inclusion regexp check (DefaultMatchers)", func() {
 
 		table.DescribeTable("should include common test naming conventions",
 			expectThatFile,
