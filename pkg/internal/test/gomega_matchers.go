@@ -11,14 +11,14 @@ func HaveState(expectedState string) types.GomegaMatcher {
 	return gomega.WithTransform(func(s map[string]interface{}) interface{} { return s["state"] }, gomega.Equal(expectedState))
 }
 
-// HaveDescription gets "description" key from map[string]interface{} and compares its value with expectedState
-// This matcher is used to verify status update sent to GitHub API
+// HaveDescription gets "description" key from map[string]interface{} and compares its value with expectedReason
+// This matcher is used to verify status description sent to GitHub API
 func HaveDescription(expectedReason string) types.GomegaMatcher {
 	return gomega.WithTransform(func(s map[string]interface{}) interface{} { return s["description"] }, gomega.Equal(expectedReason))
 }
 
 // HaveContext gets "context" key from map[string]interface{} and compares its value with expectedContext
-// This matcher is used to verify status update sent to GitHub API
+// This matcher is used to verify status context sent to GitHub API
 func HaveContext(expectedContext string) types.GomegaMatcher {
 	return gomega.WithTransform(func(s map[string]interface{}) interface{} { return s["context"] }, gomega.Equal(expectedContext))
 }
