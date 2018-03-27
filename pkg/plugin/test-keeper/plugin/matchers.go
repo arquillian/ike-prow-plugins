@@ -1,10 +1,9 @@
 package plugin
 
 import (
-	"path/filepath"
-
 	"github.com/arquillian/ike-prow-plugins/pkg/config"
 	"github.com/pkg/errors"
+	"github.com/arquillian/ike-prow-plugins/pkg/assets"
 )
 
 // TestMatcher holds definitions of patterns considered as test filenames (inclusions) and those which shouldn't be
@@ -41,11 +40,7 @@ func LoadDefaultMatcher() (TestMatcher, error) {
 	matcher := TestMatcher{}
 	defaultConfig := TestKeeperConfiguration{}
 
-	absFilePath, err := filepath.Abs("test-keeper.yaml")
-
-	if err == nil {
-		err = config.Load(&defaultConfig, &config.LocalLoadableConfig{AbsFilePath: absFilePath})
-	}
+	err := config.Load(&defaultConfig, &assets.LocalLoadableConfig{ConfigFileName: "test-keeper.yaml"})
 
 	if err != nil {
 		return matcher, errors.Errorf("an error occurred while loading the default test-keeper.yaml: %s", err)

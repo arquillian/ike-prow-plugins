@@ -1,8 +1,6 @@
 package config
 
 import (
-	"io/ioutil"
-
 	"gopkg.in/yaml.v2"
 )
 
@@ -32,20 +30,4 @@ func Load(target interface{}, loader SourcesProvider) error {
 		}
 	}
 	return yaml.Unmarshal(source, target)
-}
-
-// LocalLoadableConfig holds absolute path to a local config file (located in ike-prow-plugins project) to be loaded
-type LocalLoadableConfig struct {
-	AbsFilePath string
-}
-
-// Sources loads local config file that is located in ike-prow-plugins project structure
-func (i *LocalLoadableConfig) Sources() []Source {
-	return []Source{func() ([]byte, error) {
-		file, err := ioutil.ReadFile(i.AbsFilePath)
-		if err != nil {
-			return nil, err
-		}
-		return file, nil
-	}}
 }

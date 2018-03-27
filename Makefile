@@ -38,6 +38,7 @@ tools: ## Installs required go tools
 	@go get -u github.com/onsi/ginkgo/ginkgo
 	@go get -u github.com/onsi/gomega
 	@go get -u golang.org/x/tools/cmd/goimports
+	@go get -u github.com/jteeuwen/go-bindata/...
 
 .PHONY: install
 install: ## Fetches all dependencies using Glide
@@ -51,7 +52,11 @@ up: ## Updates all dependencies defined for glide
 compile: up compile-only ## Compiles all plugins and puts them in the bin/ folder (calls up target)
 
 .PHONY: compile-only
-compile-only: $(BINARIES)
+compile-only: generate $(BINARIES)
+
+.PHONY: generate ## Generates any necessary assets using go-bindata library
+generate:
+	go generate ./pkg/assets/...
 
 .PHONY: test
 test:
