@@ -1,0 +1,30 @@
+plugins:
+  arquillian/ike-prow-plugins:
+  - size
+
+external_plugins:
+  arquillian/ike-prow-plugins:
+    - name: test-keeper
+      events:
+        - pull_request
+        - issue_comment
+  fabric8-ui/fabric8-ui:
+    - name: test-keeper
+      events:
+        - pull_request
+        - issue_comment
+  fabric8-services/fabric8-auth:
+    - name: test-keeper
+      events:
+        - pull_request
+        - issue_comment
+  fabric8-services/fabric8-tenant:
+    - name: test-keeper
+      events:
+        - pull_request
+        - issue_comment
+  fabric8-services/fabric8-notification:
+    - name: test-keeper
+      events:
+        - pull_request
+        - issue_comment
