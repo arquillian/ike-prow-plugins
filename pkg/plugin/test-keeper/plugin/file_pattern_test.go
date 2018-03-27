@@ -11,7 +11,7 @@ import (
 
 var _ = Describe("File pattern features", func() {
 
-	var it = func(filePattern, expectedRegexp string) {
+	var assertThat = func(filePattern, expectedRegexp string) {
 		parsed := plugin.ParseFilePatterns([]string{filePattern})
 		Expect(parsed).To(ConsistOf(plugin.FilePattern{Regexp: expectedRegexp}))
 	}
@@ -20,28 +20,14 @@ var _ = Describe("File pattern features", func() {
 
 		table.DescribeTable(
 			"should parse file patterns to regexp",
-			it,
-			should().
-				parsePattern("**/*Test.java").
-				toRegexp(`.*/[^/]*Test\.java$`),
-			should().
-				parsePattern("*/*Test.java").
-				toRegexp(`[^/]*/[^/]*Test\.java$`),
-			should().
-				parsePattern("*Test.java").
-				toRegexp(`.*Test\.java$`),
-			should().
-				parsePattern("pkg/**/*_test.go").
-				toRegexp(`pkg/.*/[^/]*_test\.go$`),
-			should().
-				parsePattern("vendor/").
-				toRegexp(`vendor/.*`),
-			should().
-				parsePattern("pkg/*/**/*_test.go").
-				toRegexp(`pkg/[^/]*/.*/[^/]*_test\.go$`),
-			should().
-				parsePattern("test_*.py").
-				toRegexp(`test_[^/]*\.py$`))
+			assertThat,
+			pattern("**/*Test.java").isParsedToRegexp(`.*/[^/]*Test\.java$`),
+			pattern("*/*Test.java").isParsedToRegexp(`[^/]*/[^/]*Test\.java$`),
+			pattern("*Test.java").isParsedToRegexp(`.*Test\.java$`),
+			pattern("pkg/**/*_test.go").isParsedToRegexp(`pkg/.*/[^/]*_test\.go$`),
+			pattern("vendor/").isParsedToRegexp(`vendor/.*`),
+			pattern("pkg/*/**/*_test.go").isParsedToRegexp(`pkg/[^/]*/.*/[^/]*_test\.go$`),
+			pattern("test_*.py").isParsedToRegexp(`test_[^/]*\.py$`))
 
 		It("should extract regexp", func() {
 			// given
@@ -56,21 +42,16 @@ var _ = Describe("File pattern features", func() {
 	})
 })
 
-type assertion func()
 type filePatternProvider func() string
 
 var patternAssertionMsg = "Should parse file pattern %s to regexp %s"
 
-func should() assertion {
-	return assertion(func() {})
-}
-
-func (p assertion) parsePattern(filePattern string) filePatternProvider {
+func pattern(filePattern string) filePatternProvider {
 	return filePatternProvider(func() string {
 		return filePattern
 	})
 }
 
-func (f filePatternProvider) toRegexp(expRegexp string) table.TableEntry {
+func (f filePatternProvider) isParsedToRegexp(expRegexp string) table.TableEntry {
 	return table.Entry(fmt.Sprintf(patternAssertionMsg, f(), expRegexp), f(), expRegexp)
 }
