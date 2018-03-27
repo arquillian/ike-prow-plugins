@@ -44,7 +44,7 @@ func LoadDefaultMatcher() (TestMatcher, error) {
 	absFilePath, err := filepath.Abs("test-keeper.yaml")
 
 	if err == nil {
-		err = config.Load(&defaultConfig, &config.IkeProwLocalLoadableConfig{AbsFilePath: absFilePath})
+		err = config.Load(&defaultConfig, &config.LocalLoadableConfig{AbsFilePath: absFilePath})
 	}
 
 	if err != nil {

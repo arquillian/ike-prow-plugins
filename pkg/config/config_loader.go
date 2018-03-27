@@ -34,13 +34,13 @@ func Load(target interface{}, loader SourcesProvider) error {
 	return yaml.Unmarshal(source, target)
 }
 
-// IkeProwLocalLoadableConfig holds absolute path to a local config file (located in ike-prow-plugins project) to be loaded
-type IkeProwLocalLoadableConfig struct {
+// LocalLoadableConfig holds absolute path to a local config file (located in ike-prow-plugins project) to be loaded
+type LocalLoadableConfig struct {
 	AbsFilePath string
 }
 
 // Sources loads local config file that is located in ike-prow-plugins project structure
-func (i *IkeProwLocalLoadableConfig) Sources() []Source {
+func (i *LocalLoadableConfig) Sources() []Source {
 	return []Source{func() ([]byte, error) {
 		file, err := ioutil.ReadFile(i.AbsFilePath)
 		if err != nil {
