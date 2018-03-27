@@ -8,13 +8,13 @@ import (
 const (
 	regexpDefinitionPrefix = "regex{{"
 	regexpDefinitionSuffix = "}}"
-	anyPathWildcard       = "**"
-	anyNameWildcard       = "*"
+	anyPathWildcard        = "**"
+	anyNameWildcard        = "*"
 	anyNameRegexp          = "[^/]*"
 	anythingRegexp         = ".*"
-	twoStarsReplacement   = "<two-stars-replacement>"
+	twoStarsReplacement    = "<two-stars-replacement>"
 	endOfLineRegexp        = "$"
-	directorySeparator    = "/"
+	directorySeparator     = "/"
 )
 
 // FilePattern contains regexp that matches a file

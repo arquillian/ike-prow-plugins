@@ -1,9 +1,9 @@
 package plugin
 
 import (
+	"github.com/arquillian/ike-prow-plugins/pkg/assets"
 	"github.com/arquillian/ike-prow-plugins/pkg/config"
 	"github.com/pkg/errors"
-	"github.com/arquillian/ike-prow-plugins/pkg/assets"
 )
 
 // TestMatcher holds definitions of patterns considered as test filenames (inclusions) and those which shouldn't be

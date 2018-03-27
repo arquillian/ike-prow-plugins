@@ -1,8 +1,8 @@
 package assets
 
 import (
-	"github.com/arquillian/ike-prow-plugins/pkg/config"
 	"github.com/arquillian/ike-prow-plugins/pkg/assets/generated"
+	"github.com/arquillian/ike-prow-plugins/pkg/config"
 )
 
 //go:generate go-bindata -prefix "./config/" -pkg assets -o ./generated/assets_config.go ./config/...
