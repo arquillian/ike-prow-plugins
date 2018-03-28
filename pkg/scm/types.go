@@ -12,3 +12,10 @@ type ChangedFile struct {
 	Name   string
 	Status string
 }
+
+// RepositoryChange holds information about owner and repository to which the change indicated by Hash belongs
+type RepositoryChange struct {
+	Owner,
+	RepoName,
+	Hash string
+}
