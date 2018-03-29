@@ -1,18 +1,14 @@
 package plugin
 
 import (
-	"context"
 	"flag"
 	"net/url"
 	"os/signal"
 	"syscall"
 
-	"golang.org/x/oauth2"
-
 	"strconv"
 
 	"github.com/arquillian/ike-prow-plugins/pkg/utils"
-	"github.com/google/go-github/github"
 	"k8s.io/test-infra/prow/pluginhelp/externalplugins"
 	"k8s.io/test-infra/prow/plugins"
 
@@ -20,6 +16,7 @@ import (
 
 	"os"
 
+	"github.com/arquillian/ike-prow-plugins/pkg/github"
 	"github.com/arquillian/ike-prow-plugins/pkg/log"
 	"github.com/arquillian/ike-prow-plugins/pkg/server"
 	"github.com/sirupsen/logrus"
@@ -78,11 +75,7 @@ func InitPlugin(pluginName string, newEventHandler EventHandlerCreator, newServe
 		logger.WithError(err).Fatalf("Error loading ike-plugins config from %q.", *pluginConfig)
 	}
 
-	ctx := context.Background()
-	token := oauth2.StaticTokenSource(
-		&oauth2.Token{AccessToken: string(oauthSecret)},
-	)
-	githubClient := github.NewClient(oauth2.NewClient(ctx, token))
+	githubClient := github.NewClient(oauthSecret)
 
 	handler := newEventHandler(githubClient)
 	pluginServer := newServer(webhookSecret, handler)

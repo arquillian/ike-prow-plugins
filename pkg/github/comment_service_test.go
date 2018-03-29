@@ -4,7 +4,6 @@ import (
 	"github.com/arquillian/ike-prow-plugins/pkg/github"
 	. "github.com/arquillian/ike-prow-plugins/pkg/internal/test"
 	"github.com/arquillian/ike-prow-plugins/pkg/scm"
-	gogh "github.com/google/go-github/github"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	"gopkg.in/h2non/gock.v1"
@@ -14,12 +13,12 @@ var _ = Describe("Config loader features", func() {
 
 	Context("Loading configuration file from the repository", func() {
 
-		var client *gogh.Client
+		var client *github.Client
 
 		BeforeEach(func() {
 			gock.Off()
 
-			client = gogh.NewClient(nil)
+			client = CreateEmptyGitHubClient()
 		})
 
 		It("should add new comment with main title, dev mention and plugin message when no such a comment exists", func() {

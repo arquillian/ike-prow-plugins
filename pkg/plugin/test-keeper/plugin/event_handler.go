@@ -1,7 +1,6 @@
 package plugin
 
 import (
-	"context"
 	"encoding/json"
 	"strings"
 
@@ -15,7 +14,7 @@ import (
 // GitHubTestEventsHandler is the event handler for the plugin.
 // Implements server.GitHubEventHandler interface which contains the logic for incoming GitHub events
 type GitHubTestEventsHandler struct {
-	Client *gogh.Client
+	Client *github.Client
 }
 
 // ProwPluginName is an external prow plugin name used to register this service
@@ -88,7 +87,7 @@ func (gh *GitHubTestEventsHandler) handlePrComment(log log.Logger, prComment *go
 	prNumber := prComment.Issue.Number
 
 	sender := prComment.Sender.Login
-	permissionLevel, _, e := gh.Client.Repositories.GetPermissionLevel(context.Background(), *org, *name, *sender)
+	permissionLevel, e := gh.Client.GetPermissionLevel(*org, *name, *sender)
 	if e != nil {
 		log.Fatal(e)
 		return e
@@ -104,7 +103,7 @@ func (gh *GitHubTestEventsHandler) handlePrComment(log log.Logger, prComment *go
 		return nil
 	}
 
-	pullRequest, _, err := gh.Client.PullRequests.Get(context.Background(), *org, *name, *prNumber)
+	pullRequest, err := gh.Client.GetPullRequest(*org, *name, *prNumber)
 	if err != nil {
 		log.Fatal(err)
 		return err
@@ -169,25 +168,16 @@ func (gh *GitHubTestEventsHandler) checkTests(log log.Logger, change scm.Reposit
 
 	fileCategoryCounter := FileCategoryCounter{Matcher: matcher}
 
-	files, _, err := gh.Client.PullRequests.ListFiles(context.Background(), change.Owner, change.RepoName, prNumber, nil)
+	changedFiles, err := gh.Client.ListPullRequestFiles(change.Owner, change.RepoName, prNumber)
 	if err != nil {
 		log.Error(err)
 		return FileCategories{}, err
 	}
 
-	fileCategories, err := fileCategoryCounter.Count(asChangedFiles(files))
+	fileCategories, err := fileCategoryCounter.Count(changedFiles)
 	if err != nil {
 		log.Error(err)
 	}
 
 	return fileCategories, err
-}
-
-func asChangedFiles(files []*gogh.CommitFile) []scm.ChangedFile {
-	changedFiles := make([]scm.ChangedFile, 0, len(files))
-	for _, file := range files {
-		changedFiles = append(changedFiles, scm.ChangedFile{Name: *file.Filename, Status: *file.Status})
-	}
-
-	return changedFiles
 }

@@ -4,7 +4,6 @@ import (
 	"github.com/arquillian/ike-prow-plugins/pkg/github"
 	. "github.com/arquillian/ike-prow-plugins/pkg/internal/test"
 	"github.com/arquillian/ike-prow-plugins/pkg/scm"
-	gogh "github.com/google/go-github/github"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	"gopkg.in/h2non/gock.v1"
@@ -28,10 +27,9 @@ var _ = Describe("GitHub Status Service", func() {
 
 		BeforeEach(func() {
 			defer gock.Off()
-			client := gogh.NewClient(nil)
 			change := scm.RepositoryChange{RepoName: "test-repo", Owner: "alien-ike", Hash: "1232asdasd"}
 			context := github.StatusContext{BotName: "alien-ike", PluginName: "test-keeper"}
-			statusService = github.NewStatusService(client, NewDiscardOutLogger(), change, context)
+			statusService = github.NewStatusService(CreateEmptyGitHubClient(), NewDiscardOutLogger(), change, context)
 		})
 
 		It("should report success with context having bot name and plugin name", func() {

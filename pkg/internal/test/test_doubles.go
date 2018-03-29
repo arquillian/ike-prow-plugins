@@ -8,10 +8,12 @@ import (
 	"net/http"
 	"os"
 
+	"github.com/arquillian/ike-prow-plugins/pkg/github"
 	"github.com/arquillian/ike-prow-plugins/pkg/log"
+	gogh "github.com/google/go-github/github"
 	"github.com/onsi/ginkgo"
 	"github.com/sirupsen/logrus"
-	gock "gopkg.in/h2non/gock.v1"
+	"gopkg.in/h2non/gock.v1"
 )
 
 // This package is intended to keep helper functions used across the tests. Shouldn't be used for production code
@@ -55,4 +57,10 @@ func NewDiscardOutLogger() log.Logger {
 	nullLogger := logrus.New()
 	nullLogger.Out = ioutil.Discard // TODO rethink if we want to discard logging entirely
 	return logrus.NewEntry(nullLogger)
+}
+
+func CreateEmptyGitHubClient() *github.Client {
+	return &github.Client{
+		Client: gogh.NewClient(nil), // TODO with hoverfly/go-vcr we might want to use tokens instead to capture real traffic
+	}
 }
