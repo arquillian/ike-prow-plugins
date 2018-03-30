@@ -102,7 +102,7 @@ define populate_configmap ## params: configmap name, configmap file
 endef
 
 OC_PROJECT_NAME?=ike-prow-plugins
-PLUGINS_CONFIG?=config.yaml
+PLUGINS_CONFIG?=plugins.yaml
 .PHONY: oc-init-project
 oc-init-project: ## Initializes new project with config maps and secrets
 	@echo "Setting up project '$(OC_PROJECT_NAME)' in the cluster (ignoring potential errors if entries already exist)"
