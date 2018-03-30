@@ -6,13 +6,27 @@ import (
 
 	"github.com/arquillian/ike-prow-plugins/pkg/github"
 	"github.com/arquillian/ike-prow-plugins/pkg/log"
+	"github.com/arquillian/ike-prow-plugins/pkg/plugin"
 	"github.com/arquillian/ike-prow-plugins/pkg/scm"
 	"github.com/arquillian/ike-prow-plugins/pkg/utils"
 	gogh "github.com/google/go-github/github"
 )
 
-// ProwPluginName is an external prow plugin name used to register this service
-const ProwPluginName = "work-in-progress"
+const (
+	// ProwPluginName is an external prow plugin name used to register this service
+	ProwPluginName = "work-in-progress"
+	wipPrefix      = "wip "
+
+	// InProgressMessage is a message used in GH Status as description when the PR is in progress
+	InProgressMessage = "PR is in progress and can't be merged yet. You might want to wait with review as well"
+	// InProgressTargetURL is a link to an anchor in arq documentation that contains additional status details for InProgressMessage
+	InProgressTargetURL = plugin.DocumentationURL + "#wip-failed"
+
+	// ReadyForReviewMessage is a message used in GH Status as description when the PR is ready for review and merge
+	ReadyForReviewMessage = "PR is ready for review and merge"
+	// ReadyForReviewTargetURL is a link to an anchor in arq documentation that contains additional status details for ReadyForReviewMessage
+	ReadyForReviewTargetURL = plugin.DocumentationURL + "#wip-success"
+)
 
 // GitHubWIPPRHandler handles PR events and updates status of the PR based on work-in-progress indicator
 type GitHubWIPPRHandler struct {
@@ -46,9 +60,9 @@ func (gh *GitHubWIPPRHandler) HandleEvent(log log.Logger, eventType github.Event
 		statusContext := github.StatusContext{BotName: "ike-plugins", PluginName: ProwPluginName}
 		statusService := github.NewStatusService(gh.Client, log, change, statusContext)
 		if gh.IsWorkInProgress(event.PullRequest.Title) {
-			return statusService.Failure("PR is in progress and can't be merged yet. You might want to wait with review as well")
+			return statusService.Failure(InProgressMessage, InProgressTargetURL)
 		}
-		return statusService.Success("PR is ready for review and merge")
+		return statusService.Success(ReadyForReviewMessage, ReadyForReviewTargetURL)
 
 	default:
 		log.Warnf("received an event of type %q but didn't ask for it", eventType)
@@ -59,5 +73,5 @@ func (gh *GitHubWIPPRHandler) HandleEvent(log log.Logger, eventType github.Event
 
 // IsWorkInProgress checks if title is marked as Work In Progress
 func (gh *GitHubWIPPRHandler) IsWorkInProgress(title *string) bool {
-	return strings.HasPrefix(strings.ToLower(*title), "wip ")
+	return strings.HasPrefix(strings.ToLower(*title), wipPrefix)
 }

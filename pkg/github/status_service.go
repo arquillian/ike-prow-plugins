@@ -6,6 +6,7 @@ import (
 
 	"github.com/arquillian/ike-prow-plugins/pkg/log"
 	"github.com/arquillian/ike-prow-plugins/pkg/scm"
+	"github.com/arquillian/ike-prow-plugins/pkg/utils"
 	"github.com/google/go-github/github"
 )
 
@@ -28,32 +29,33 @@ func NewStatusService(client *github.Client, log log.Logger, change scm.Reposito
 }
 
 // Success marks given change as a success.
-func (s *StatusService) Success(reason string) error {
-	return s.setStatus(StatusSuccess, reason)
+func (s *StatusService) Success(reason, targetURL string) error {
+	return s.setStatus(StatusSuccess, reason, targetURL)
 }
 
 // Failure marks given change as a failure.
-func (s *StatusService) Failure(reason string) error {
-	return s.setStatus(StatusFailure, reason)
+func (s *StatusService) Failure(reason, targetURL string) error {
+	return s.setStatus(StatusFailure, reason, targetURL)
 }
 
 // Pending marks given change as a pending.
 func (s *StatusService) Pending(reason string) error {
-	return s.setStatus(StatusPending, reason)
+	return s.setStatus(StatusPending, reason, "")
 }
 
 // Error marks given change as a error.
-func (s *StatusService) Error(reason string) error {
-	return s.setStatus(StatusError, reason)
+func (s *StatusService) Error(reason, targetURL string) error {
+	return s.setStatus(StatusError, reason, targetURL)
 }
 
 // setStatus sets the given status with the given reason to the related commit
-func (s *StatusService) setStatus(status, reason string) error {
+func (s *StatusService) setStatus(status, reason, targetURL string) error {
 	c := fmt.Sprintf("%s/%s", s.statusContext.BotName, s.statusContext.PluginName)
 	repoStatus := github.RepoStatus{
 		State:       &status,
 		Context:     &c,
 		Description: &reason,
+		TargetURL:   utils.String(targetURL),
 	}
 
 	_, _, err := s.client.Repositories.CreateStatus(context.Background(), s.change.Owner, s.change.RepoName, s.change.Hash, &repoStatus)

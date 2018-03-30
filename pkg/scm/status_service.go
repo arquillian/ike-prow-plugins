@@ -2,8 +2,8 @@ package scm
 
 // StatusService encapsulates operation for updating status of the RepositoryChange
 type StatusService interface {
-	Failure(reason string) error
-	Success(reason string) error
+	Failure(reason, targetURL string) error
+	Success(reason, targetURL string) error
 	Pending(reason string) error
-	Error(reason string) error
+	Error(reason, targetURL string) error
 }

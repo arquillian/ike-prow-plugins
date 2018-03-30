@@ -23,6 +23,12 @@ func HaveContext(expectedContext string) types.GomegaMatcher {
 	return gomega.WithTransform(func(s map[string]interface{}) interface{} { return s["context"] }, gomega.Equal(expectedContext))
 }
 
+// HaveTargetURL gets "target_url" key from map[string]interface{} and compares its value with expectedTargetURL
+// This matcher is used to verify status target URL sent to GitHub API
+func HaveTargetURL(expectedTargetURL string) types.GomegaMatcher {
+	return gomega.WithTransform(func(s map[string]interface{}) interface{} { return s["target_url"] }, gomega.Equal(expectedTargetURL))
+}
+
 // HaveBody gets "body" key from map[string]interface{} and compares its value with expectedBody
 // This matcher is used to verify body content sent in request to GitHub API
 func HaveBody(expectedBody string) types.GomegaMatcher {

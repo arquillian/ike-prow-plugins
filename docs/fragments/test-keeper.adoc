@@ -1,6 +1,6 @@
 == Test Keeper plugin
 
-This plugin can help you stick to the rule that every feature you ship comes with automated way of assuring it works - by using automated tests. 
+This plugin can help you stick to the rule that every feature you ship comes with automated way of assuring it works - by using automated tests.
 If it won't find any tests in the Pull Request, it adds a comment with a description and marks its check as **Failure**, or as **Success** otherwise (see the screenshots below):
 
 image::testkeeper-success.png[Success, title="Success status"]
@@ -8,13 +8,13 @@ image::testkeeper-success.png[Success, title="Success status"]
 image::testkeeper-failure.png[Failure, title="Failure status"]
 
 This check is done based on the file name patterns - for more information head over to <<testkeeper-config>> part.
-  
+
 The plugin is triggered when the Pull Request is opened/reopened or updated by new or removed commit.
 
 If, for whatever reason, you want to bypass this check - simply comment using `const:pkg/plugin/test-keeper/plugin/event_handler.go[name="SkipComment"]` command. If you are an admin user you will see the **Success** status.
 If the comment will be later removed the check is triggered again.
 
-=== How does it work?
+=== How does it work? [[test-keeper-how]]
 
 Test Keeper looks into the files in your Pull Request and checks if any tests were added or modified based on common naming patterns (we don't analyze source code yet...).
 
@@ -79,3 +79,36 @@ test_patterns:
   - '**/__test.go'
   - 'regex{{.*test\.ts[x]?}}'
 ----
+
+=== Status details
+
+==== Success - test is present [[tests-exist]]
+
+Your Pull Request has been approved because the plugin detected a test file that has been added or changed in the PR.
+
+The test file has been detected by any of the default test patterns, by your configured test patterns or by a combination of both of them. For more information about the behavior and what the default file patterns are, see <<test-keeper-how>> section. If you need to reconfigure the plugin then read the section <<testkeeper-config>>.
+
+==== Success - no test needed [[only-skipped]]
+
+Your Pull Request has been approved because it seems that it doesn't need to have tests. All changed files in the change-set have been matched by the file patterns the validation should be skipped for.
+
+For more information about the behavior and what the default file patterns are, see <<test-keeper-how>> section. If you need to reconfigure the plugin then read the section <<testkeeper-config>>.
+
+==== Success - approved by [[keeper-approved-by]]
+
+Your Pull Request has been approved by any of the administrators or reviewers despite the fact that no test has been detected in the PR.
+
+If the PR contains only "non-production" change-set and some of them haven't been detected by any file patterns the validation should be skipped for, then you can add it into your configuration file.
+
+For more information see <<test-keeper-how>> and <<testkeeper-config>> sections.
+
+==== Failed [[no-tests]]
+
+Your Pull Request has been rejected because the plugin wasn't able to find any added or changed test file in the change-set.
+
+Automated tests give us confidence in shipping reliable software. Please add some as part of this change.
+
+If you are an admin and you are sure that no test is needed then you can use a command `const:pkg/plugin/test-keeper/plugin/event_handler.go[name="SkipComment"]` as a comment to make the status green.
+
+For more information about the behavior, how the test files are detected and what the default file patterns are, see <<test-keeper-how>> section.
+If you need to reconfigure the plugin then read the section <<testkeeper-config>>.
