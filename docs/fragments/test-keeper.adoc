@@ -3,11 +3,11 @@
 This plugin can help you stick to the rule that every feature you ship comes with automated way of assuring it works - by using automated tests.
 If it won't find any tests in the Pull Request, it adds a comment with a description and marks its check as **Failure**, or as **Success** otherwise (see the screenshots below):
 
-image::testkeeper-success.png[Success, title="Success status"]
+image::test-keeper-success.png[Success, title="Success status"]
 
-image::testkeeper-failure.png[Failure, title="Failure status"]
+image::test-keeper-failure.png[Failure, title="Failure status"]
 
-This check is done based on the file name patterns - for more information head over to <<testkeeper-config>> part.
+This check is done based on the file name patterns - for more information head over to <<test-keeper-config>> part.
 
 The plugin is triggered when the Pull Request is opened/reopened or updated by new or removed commit.
 
@@ -32,7 +32,7 @@ We have few reasonable defaults, which you can check link:https://github.com/arq
 
 NOTE: If we missed some important patterns feel free to open an link:https://github.com/arquillian/ike-prow-plugins/issues/new[issue] or better yet - a link:https://github.com/arquillian/ike-prow-plugins/pulls/new[Pull request]!
 
-=== Plugin Configuration [[testkeeper-config]]
+=== Plugin Configuration [[test-keeper-config]]
 
 To configure Test Keeper plugin place `test-keeper.yml` (or `test-keeper.yaml`) file in the root of your project and use properties described below.
 
@@ -86,21 +86,23 @@ test_patterns:
 
 Your Pull Request has been approved because the plugin detected a test file that has been added or changed in the PR.
 
-The test file has been detected by any of the default test patterns, by your configured test patterns or by a combination of both of them. For more information about the behavior and what the default file patterns are, see <<test-keeper-how>> section. If you need to reconfigure the plugin then read the section <<testkeeper-config>>.
+It means that changeset in this PR has files matching any of the default test patterns, those you configured  or by a combination of both.
+
+For more information about the behavior and what the default file patterns are, see <<test-keeper-how>> section. If you need to reconfigure the plugin then read the section <<test-keeper-config>>.
 
 ==== Success - no test needed [[only-skipped]]
 
-Your Pull Request has been approved because it seems that it doesn't need to have tests. All changed files in the change-set have been matched by the file patterns the validation should be skipped for.
+Your Pull Request has been approved because it seems that it doesn't need to have additional tests. All changed files in the changeset match patterns for which the validation should be skipped.
 
-For more information about the behavior and what the default file patterns are, see <<test-keeper-how>> section. If you need to reconfigure the plugin then read the section <<testkeeper-config>>.
+For more information about the behavior and what the default file patterns are, see <<test-keeper-how>> section. If you need to reconfigure the plugin then read the section <<test-keeper-config>>.
 
 ==== Success - approved by [[keeper-approved-by]]
 
-Your Pull Request has been approved by any of the administrators or reviewers despite the fact that no test has been detected in the PR.
+Your Pull Request has been approved by any of the administrators or reviewers despite the fact that it has no test.
 
-If the PR contains only "non-production" change-set and some of them haven't been detected by any file patterns the validation should be skipped for, then you can add it into your configuration file.
+If the PR contains only "non-production" changeset and some of them haven't been detected by any file patterns the validation should be skipped for, you can add them in your configuration file.
 
-For more information see <<test-keeper-how>> and <<testkeeper-config>> sections.
+For more information see <<test-keeper-how>> and <<test-keeper-config>> sections.
 
 ==== Failed [[no-tests]]
 
@@ -111,4 +113,4 @@ Automated tests give us confidence in shipping reliable software. Please add som
 If you are an admin and you are sure that no test is needed then you can use a command `const:pkg/plugin/test-keeper/plugin/event_handler.go[name="SkipComment"]` as a comment to make the status green.
 
 For more information about the behavior, how the test files are detected and what the default file patterns are, see <<test-keeper-how>> section.
-If you need to reconfigure the plugin then read the section <<testkeeper-config>>.
+If you need to reconfigure the plugin then read the section <<test-keeper-config>>.
