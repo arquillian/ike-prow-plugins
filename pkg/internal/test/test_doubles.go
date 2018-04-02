@@ -50,8 +50,8 @@ func ExpectPayload(payloadAssert func(payload map[string]interface{}) bool) gock
 	return matcher
 }
 
-// nolint
-func CreateNullLogger() log.Logger {
+// NewDiscardOutLogger creates a logger instance not logging any output to Out Writer
+func NewDiscardOutLogger() log.Logger {
 	nullLogger := logrus.New()
 	nullLogger.Out = ioutil.Discard // TODO rethink if we want to discard logging entirely
 	return logrus.NewEntry(nullLogger)

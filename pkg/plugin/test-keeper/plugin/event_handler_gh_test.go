@@ -22,7 +22,7 @@ var _ = Describe("Test Keeper Plugin features", func() {
 
 		var handler *keeper.GitHubTestEventsHandler
 
-		log := CreateNullLogger()
+		log := NewDiscardOutLogger()
 
 		toBe := func(status, description string) func(statusPayload map[string]interface{}) bool {
 			return func(statusPayload map[string]interface{}) bool {

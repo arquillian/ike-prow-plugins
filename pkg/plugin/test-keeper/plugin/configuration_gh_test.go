@@ -33,7 +33,7 @@ var _ = Describe("Test keeper config loader features", func() {
 			}
 
 			// when
-			configuration := plugin.LoadTestKeeperConfig(test.CreateNullLogger(), change)
+			configuration := plugin.LoadTestKeeperConfig(test.NewDiscardOutLogger(), change)
 
 			// then
 			Expect(configuration.LocationURL).To(Equal("https://github.com/owner/repo/46cb8fac44709e4ccaae97448c65e8f7320cfea7/test-keeper.yml"))
@@ -55,7 +55,7 @@ var _ = Describe("Test keeper config loader features", func() {
 			}
 
 			// when
-			configuration := plugin.LoadTestKeeperConfig(test.CreateNullLogger(), change)
+			configuration := plugin.LoadTestKeeperConfig(test.NewDiscardOutLogger(), change)
 
 			// then
 			Expect(configuration.PluginHint).To(Equal("http://my.server.com/message.md"))
@@ -80,7 +80,7 @@ var _ = Describe("Test keeper config loader features", func() {
 			}
 
 			// when
-			configuration := plugin.LoadTestKeeperConfig(test.CreateNullLogger(), change)
+			configuration := plugin.LoadTestKeeperConfig(test.NewDiscardOutLogger(), change)
 
 			// then
 			Expect(configuration.PluginHint).To(Equal("http://my.server.com/message.md"))
@@ -102,7 +102,7 @@ var _ = Describe("Test keeper config loader features", func() {
 			}
 
 			// when
-			configuration := plugin.LoadTestKeeperConfig(test.CreateNullLogger(), change)
+			configuration := plugin.LoadTestKeeperConfig(test.NewDiscardOutLogger(), change)
 
 			// then
 			Expect(configuration.LocationURL).To(BeEmpty())
