@@ -36,6 +36,8 @@ install:
   - export PATH="$HOME/bin:$PATH"
   - make tools
 
+go_import_path: github.com/arquillian/ike-prow-plugins
+
 script:
   - make build
   - 'if [ $GENERATE_DOC -eq 0 ]; then
