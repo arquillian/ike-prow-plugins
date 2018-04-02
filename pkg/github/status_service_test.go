@@ -17,13 +17,13 @@ var _ = Describe("GitHub Status Service", func() {
 
 		var statusService scm.StatusService
 
-		toBe := func(status, description, context, targetURL string) func(statusPayload map[string]interface{}) bool {
+		toBe := func(status, description, context, detailsLink string) func(statusPayload map[string]interface{}) bool {
 			return func(statusPayload map[string]interface{}) bool {
 				return Expect(statusPayload).To(SatisfyAll(
 					HaveState(status),
 					HaveDescription(description),
 					HaveContext(context),
-					HaveTargetURL(targetURL),
+					HaveTargetURL(detailsLink),
 				))
 			}
 		}

@@ -29,13 +29,13 @@ func NewStatusService(client *github.Client, log log.Logger, change scm.Reposito
 }
 
 // Success marks given change as a success.
-func (s *StatusService) Success(reason, targetURL string) error {
-	return s.setStatus(StatusSuccess, reason, targetURL)
+func (s *StatusService) Success(reason, detailsLink string) error {
+	return s.setStatus(StatusSuccess, reason, detailsLink)
 }
 
 // Failure marks given change as a failure.
-func (s *StatusService) Failure(reason, targetURL string) error {
-	return s.setStatus(StatusFailure, reason, targetURL)
+func (s *StatusService) Failure(reason, detailsLink string) error {
+	return s.setStatus(StatusFailure, reason, detailsLink)
 }
 
 // Pending marks given change as a pending.
@@ -49,13 +49,13 @@ func (s *StatusService) Error(reason string) error {
 }
 
 // setStatus sets the given status with the given reason to the related commit
-func (s *StatusService) setStatus(status, reason, targetURL string) error {
+func (s *StatusService) setStatus(status, reason, detailsLink string) error {
 	c := fmt.Sprintf("%s/%s", s.statusContext.BotName, s.statusContext.PluginName)
 	repoStatus := github.RepoStatus{
 		State:       &status,
 		Context:     &c,
 		Description: &reason,
-		TargetURL:   utils.String(targetURL),
+		TargetURL:   utils.String(detailsLink),
 	}
 
 	_, _, err := s.client.Repositories.CreateStatus(context.Background(), s.change.Owner, s.change.RepoName, s.change.Hash, &repoStatus)

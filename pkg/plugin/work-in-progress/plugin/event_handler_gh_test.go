@@ -22,7 +22,7 @@ var _ = Describe("Test Keeper Plugin features", func() {
 			return Expect(statusPayload).To(SatisfyAll(
 				HaveState(github.StatusSuccess),
 				HaveDescription(wip.ReadyForReviewMessage),
-				HaveTargetURL(wip.ReadyForReviewTargetURL),
+				HaveTargetURL(wip.ReadyForReviewDetailsLink),
 			))
 		}
 
@@ -30,7 +30,7 @@ var _ = Describe("Test Keeper Plugin features", func() {
 			return Expect(statusPayload).To(SatisfyAll(
 				HaveState(github.StatusFailure),
 				HaveDescription(wip.InProgressMessage),
-				HaveTargetURL(wip.InProgressTargetURL),
+				HaveTargetURL(wip.InProgressDetailsLink),
 			))
 		}
 

@@ -21,13 +21,13 @@ const (
 
 	// InProgressMessage is a message used in GH Status as description when the PR is in progress
 	InProgressMessage = "PR is in progress and can't be merged yet. You might want to wait with review as well"
-	// InProgressTargetURL is a link to an anchor in arq documentation that contains additional status details for InProgressMessage
-	InProgressTargetURL = plugin.DocumentationURL + "#wip-failed"
+	// InProgressDetailsLink is a link to an anchor in arq documentation that contains additional status details for InProgressMessage
+	InProgressDetailsLink = plugin.DocumentationURL + "#wip-failed"
 
 	// ReadyForReviewMessage is a message used in GH Status as description when the PR is ready for review and merge
 	ReadyForReviewMessage = "PR is ready for review and merge"
-	// ReadyForReviewTargetURL is a link to an anchor in arq documentation that contains additional status details for ReadyForReviewMessage
-	ReadyForReviewTargetURL = plugin.DocumentationURL + "#wip-success"
+	// ReadyForReviewDetailsLink is a link to an anchor in arq documentation that contains additional status details for ReadyForReviewMessage
+	ReadyForReviewDetailsLink = plugin.DocumentationURL + "#wip-success"
 )
 
 // GitHubWIPPRHandler handles PR events and updates status of the PR based on work-in-progress indicator
@@ -62,9 +62,9 @@ func (gh *GitHubWIPPRHandler) HandleEvent(log log.Logger, eventType github.Event
 		statusContext := github.StatusContext{BotName: "ike-plugins", PluginName: ProwPluginName}
 		statusService := github.NewStatusService(gh.Client, log, change, statusContext)
 		if gh.IsWorkInProgress(event.PullRequest.Title) {
-			return statusService.Failure(InProgressMessage, InProgressTargetURL)
+			return statusService.Failure(InProgressMessage, InProgressDetailsLink)
 		}
-		return statusService.Success(ReadyForReviewMessage, ReadyForReviewTargetURL)
+		return statusService.Success(ReadyForReviewMessage, ReadyForReviewDetailsLink)
 
 	default:
 		log.Warnf("received an event of type %q but didn't ask for it", eventType)

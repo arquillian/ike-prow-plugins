@@ -16,26 +16,26 @@ type testStatusService struct {
 const (
 	// TestsExistMessage is a message used in GH Status as description when tests are found
 	TestsExistMessage = "There are some tests :)"
-	// TestsExistTargetURL is a link to an anchor in arq documentation that contains additional status details for TestsExistMessage
-	TestsExistTargetURL = plugin.DocumentationURL + "#tests-exist"
+	// TestsExistDetailsLink is a link to an anchor in arq documentation that contains additional status details for TestsExistMessage
+	TestsExistDetailsLink = plugin.DocumentationURL + "#tests-exist"
 
 	// NoTestsMessage is a message used in GH Status as description when no tests shipped with the PR
 	NoTestsMessage = "No tests in this PR :("
-	// NoTestsTargetURL is a link to an anchor in arq documentation that contains additional status details for NoTestsMessage
-	NoTestsTargetURL = plugin.DocumentationURL + "#no-tests"
+	// NoTestsDetailsLink is a link to an anchor in arq documentation that contains additional status details for NoTestsMessage
+	NoTestsDetailsLink = plugin.DocumentationURL + "#no-tests"
 
 	// OkOnlySkippedFilesMessage is a message used in GH Status as description when PR comes with a changeset which shouldn't be subject of test verification
 	OkOnlySkippedFilesMessage = "Seems that this PR doesn't need to have tests"
-	// OkOnlySkippedFilesTargetURL is a link to an anchor in arq documentation that contains additional status details for OkOnlySkippedFilesMessage
-	OkOnlySkippedFilesTargetURL = plugin.DocumentationURL + "#only-skipped"
+	// OkOnlySkippedFilesDetailsLink is a link to an anchor in arq documentation that contains additional status details for OkOnlySkippedFilesMessage
+	OkOnlySkippedFilesDetailsLink = plugin.DocumentationURL + "#only-skipped"
 
 	// FailureMessage is a message used in GH Status as description when failure occured
 	FailureMessage = "Failed while check for tests"
 
 	// ApprovedByMessage is a message used in GH Status as description when it's commented to skip the check
 	ApprovedByMessage = "PR is fine without tests says @%s"
-	// ApprovedByTargetURL is a link to an anchor in arq documentation that contains additional status details for ApprovedByMessage
-	ApprovedByTargetURL = plugin.DocumentationURL + "#keeper-approved-by"
+	// ApprovedByDetailsLink is a link to an anchor in arq documentation that contains additional status details for ApprovedByMessage
+	ApprovedByDetailsLink = plugin.DocumentationURL + "#keeper-approved-by"
 )
 
 func (gh *GitHubTestEventsHandler) newTestStatusService(log log.Logger, change scm.RepositoryChange) testStatusService {
@@ -45,15 +45,15 @@ func (gh *GitHubTestEventsHandler) newTestStatusService(log log.Logger, change s
 }
 
 func (ts *testStatusService) okTestsExist() error {
-	return ts.statusService.Success(TestsExistMessage, TestsExistTargetURL)
+	return ts.statusService.Success(TestsExistMessage, TestsExistDetailsLink)
 }
 
 func (ts *testStatusService) okOnlySkippedFiles() error {
-	return ts.statusService.Success(OkOnlySkippedFilesMessage, OkOnlySkippedFilesTargetURL)
+	return ts.statusService.Success(OkOnlySkippedFilesMessage, OkOnlySkippedFilesDetailsLink)
 }
 
 func (ts *testStatusService) okWithoutTests(approvedBy string) error {
-	return ts.statusService.Success(fmt.Sprintf(ApprovedByMessage, approvedBy), ApprovedByTargetURL)
+	return ts.statusService.Success(fmt.Sprintf(ApprovedByMessage, approvedBy), ApprovedByDetailsLink)
 }
 
 func (ts *testStatusService) reportError() error {
@@ -61,5 +61,5 @@ func (ts *testStatusService) reportError() error {
 }
 
 func (ts *testStatusService) failNoTests() error {
-	return ts.statusService.Failure(NoTestsMessage, NoTestsTargetURL)
+	return ts.statusService.Failure(NoTestsMessage, NoTestsDetailsLink)
 }
