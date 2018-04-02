@@ -18,7 +18,7 @@ var _ = Describe("Config loader features", func() {
 		BeforeEach(func() {
 			gock.Off()
 
-			client = CreateEmptyGitHubClient()
+			client = NewDefaultGitHubClient()
 		})
 
 		It("should add new comment with main title, dev mention and plugin message when no such a comment exists", func() {

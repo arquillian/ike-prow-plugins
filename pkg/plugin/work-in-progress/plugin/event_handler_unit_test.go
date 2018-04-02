@@ -18,7 +18,7 @@ var _ = Describe("Work-in-progress Plugin features", func() {
 		BeforeEach(func() {
 			defer gock.Off()
 
-			handler = &wip.GitHubWIPPRHandler{Client: test.CreateEmptyGitHubClient()}
+			handler = &wip.GitHubWIPPRHandler{Client: test.NewDefaultGitHubClient()}
 		})
 
 		DescribeTable("should recognize PR as work-in-progress if title starts with WIP",

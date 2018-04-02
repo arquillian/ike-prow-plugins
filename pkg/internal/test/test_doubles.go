@@ -59,7 +59,7 @@ func NewDiscardOutLogger() log.Logger {
 	return logrus.NewEntry(nullLogger)
 }
 
-func CreateEmptyGitHubClient() *github.Client {
+func NewDefaultGitHubClient() *github.Client {
 	return &github.Client{
 		Client: gogh.NewClient(nil), // TODO with hoverfly/go-vcr we might want to use tokens instead to capture real traffic
 	}

@@ -42,7 +42,7 @@ var _ = Describe("Test Keeper Plugin features", func() {
 		BeforeEach(func() {
 			gock.Off()
 
-			handler = &keeper.GitHubTestEventsHandler{Client: CreateEmptyGitHubClient()}
+			handler = &keeper.GitHubTestEventsHandler{Client: NewDefaultGitHubClient()}
 		})
 
 		It("should approve opened pull request when tests included", func() {

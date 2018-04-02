@@ -29,7 +29,7 @@ var _ = Describe("Client features", func() {
 				BodyString("Not Found")
 
 			// when
-			_, err := CreateEmptyGitHubClient().ListPullRequestFiles("owner", "repo", 123)
+			_, err := NewDefaultGitHubClient().ListPullRequestFiles("owner", "repo", 123)
 
 			// then
 			Ω(err).Should(HaveOccurred())
@@ -53,7 +53,7 @@ var _ = Describe("Client features", func() {
 				BodyString("[]")
 
 			// when
-			_, err := CreateEmptyGitHubClient().ListPullRequestFiles("owner", "repo", 123)
+			_, err := NewDefaultGitHubClient().ListPullRequestFiles("owner", "repo", 123)
 
 			// then
 			Ω(err).ShouldNot(HaveOccurred())

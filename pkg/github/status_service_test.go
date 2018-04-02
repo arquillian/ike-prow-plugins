@@ -29,7 +29,7 @@ var _ = Describe("GitHub Status Service", func() {
 			defer gock.Off()
 			change := scm.RepositoryChange{RepoName: "test-repo", Owner: "alien-ike", Hash: "1232asdasd"}
 			context := github.StatusContext{BotName: "alien-ike", PluginName: "test-keeper"}
-			statusService = github.NewStatusService(CreateEmptyGitHubClient(), NewDiscardOutLogger(), change, context)
+			statusService = github.NewStatusService(NewDefaultGitHubClient(), NewDiscardOutLogger(), change, context)
 		})
 
 		It("should report success with context having bot name and plugin name", func() {
