@@ -36,7 +36,6 @@ var (
 	sentryDsnSecretFile = flag.String("sentry-dsn-file", "/etc/sentry-dsn/sentry", "Path to the file containing the Sentry DSN url.")
 	sentryTimeout       = flag.Int("sentry-timeout", 1000, "Sentry server timeout in ms. Defaults to 1 second ")
 	environment         = flag.String("env", "tenant", "Environment plugin is running in. Used e.g. by Sentry for tagging.")
-	SentryHost          string
 )
 
 // DocumentationURL is a link to arquillian ike-prow-plugins documentation
@@ -117,11 +116,6 @@ func configureLogger(pluginName string) *logrus.Entry {
 			"environment": *environment,
 			"version":     version,
 		}, *sentryTimeout))
-
-		u, err := url.Parse(string(sentryDsn))
-		if err == nil {
-			SentryHost = u.Scheme + "://" + u.Host
-		}
 	}
 
 	return logger
