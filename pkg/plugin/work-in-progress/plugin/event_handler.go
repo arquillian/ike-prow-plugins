@@ -15,7 +15,9 @@ import (
 const (
 	// ProwPluginName is an external prow plugin name used to register this service
 	ProwPluginName = "work-in-progress"
-	wipPrefix      = "wip "
+
+	// WipPrefix is a prefix which, when applied on the PR title, marks its state as "work-in-progress"
+	WipPrefix      = "wip "
 
 	// InProgressMessage is a message used in GH Status as description when the PR is in progress
 	InProgressMessage = "PR is in progress and can't be merged yet. You might want to wait with review as well"
@@ -73,5 +75,5 @@ func (gh *GitHubWIPPRHandler) HandleEvent(log log.Logger, eventType github.Event
 
 // IsWorkInProgress checks if title is marked as Work In Progress
 func (gh *GitHubWIPPRHandler) IsWorkInProgress(title *string) bool {
-	return strings.HasPrefix(strings.ToLower(*title), wipPrefix)
+	return strings.HasPrefix(strings.ToLower(*title), WipPrefix)
 }
