@@ -4,10 +4,9 @@ import (
 	"github.com/arquillian/ike-prow-plugins/pkg/github"
 	. "github.com/arquillian/ike-prow-plugins/pkg/internal/test"
 	wip "github.com/arquillian/ike-prow-plugins/pkg/plugin/work-in-progress/plugin"
-	gogh "github.com/google/go-github/github"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
-	gock "gopkg.in/h2non/gock.v1"
+	"gopkg.in/h2non/gock.v1"
 )
 
 var _ = Describe("Test Keeper Plugin features", func() {
@@ -34,8 +33,7 @@ var _ = Describe("Test Keeper Plugin features", func() {
 
 		BeforeEach(func() {
 			defer gock.Off()
-			client := gogh.NewClient(nil) // TODO with hoverfly/go-vcr we might want to use tokens instead to capture real traffic
-			handler = &wip.GitHubWIPPRHandler{Client: client}
+			handler = &wip.GitHubWIPPRHandler{Client: NewDefaultGitHubClient()}
 		})
 
 		It("should mark opened PR as ready for review if not prefixed with WIP", func() {
