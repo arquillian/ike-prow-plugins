@@ -6,7 +6,6 @@ import (
 	"github.com/arquillian/ike-prow-plugins/pkg/github"
 	. "github.com/arquillian/ike-prow-plugins/pkg/internal/test"
 	keeper "github.com/arquillian/ike-prow-plugins/pkg/plugin/test-keeper/plugin"
-	gogh "github.com/google/go-github/github"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	"gopkg.in/h2non/gock.v1"
@@ -44,8 +43,7 @@ var _ = Describe("Test Keeper Plugin features", func() {
 		BeforeEach(func() {
 			gock.Off()
 
-			client := gogh.NewClient(nil) // TODO with hoverfly/go-vcr we might want to use tokens instead to capture real traffic
-			handler = &keeper.GitHubTestEventsHandler{Client: client}
+			handler = &keeper.GitHubTestEventsHandler{Client: NewDefaultGitHubClient()}
 		})
 
 		It("should approve opened pull request when tests included", func() {

@@ -5,7 +5,7 @@ import (
 
 	"github.com/arquillian/ike-prow-plugins/pkg/config"
 	"github.com/arquillian/ike-prow-plugins/pkg/scm"
-	"github.com/arquillian/ike-prow-plugins/pkg/utils"
+	"github.com/arquillian/ike-prow-plugins/pkg/http"
 )
 
 const githubBaseURL = "https://github.com/"
@@ -36,7 +36,7 @@ func (l *LoadableConfig) loadFromRawFile(pathTemplate string) config.Source {
 
 	return func() ([]byte, error) {
 		configURL := rawFileService.GetRawFileURL(filePath)
-		downloadedConfig, err := utils.GetFileFromURL(configURL)
+		downloadedConfig, err := http.GetFileFromURL(configURL)
 
 		if err != nil {
 			return nil, err

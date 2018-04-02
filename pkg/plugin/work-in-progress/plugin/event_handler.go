@@ -32,7 +32,7 @@ const (
 
 // GitHubWIPPRHandler handles PR events and updates status of the PR based on work-in-progress indicator
 type GitHubWIPPRHandler struct {
-	Client *gogh.Client
+	Client *github.Client
 }
 
 var (

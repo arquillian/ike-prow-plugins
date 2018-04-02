@@ -1,7 +1,6 @@
 package github
 
 import (
-	"context"
 	"fmt"
 
 	"github.com/arquillian/ike-prow-plugins/pkg/log"
@@ -12,14 +11,14 @@ import (
 
 // StatusService is a struct
 type StatusService struct {
-	client        *github.Client
+	client        *Client
 	log           log.Logger
 	statusContext StatusContext
 	change        scm.RepositoryChange
 }
 
 // NewStatusService creates an instance of GitHub StatusService
-func NewStatusService(client *github.Client, log log.Logger, change scm.RepositoryChange, context StatusContext) scm.StatusService {
+func NewStatusService(client *Client, log log.Logger, change scm.RepositoryChange, context StatusContext) scm.StatusService {
 	return &StatusService{
 		client:        client,
 		log:           log,
@@ -58,7 +57,7 @@ func (s *StatusService) setStatus(status, reason, detailsLink string) error {
 		TargetURL:   utils.String(detailsLink),
 	}
 
-	_, _, err := s.client.Repositories.CreateStatus(context.Background(), s.change.Owner, s.change.RepoName, s.change.Hash, &repoStatus)
+	err := s.client.CreateStatus(s.change, &repoStatus)
 
 	if err != nil {
 		s.log.Errorf("error trying to send status. %q. cause: %q", repoStatus, err)

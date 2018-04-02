@@ -1,9 +1,9 @@
 package main
 
 import (
-	"github.com/google/go-github/github"
 	"k8s.io/test-infra/prow/pluginhelp"
 
+	"github.com/arquillian/ike-prow-plugins/pkg/github"
 	pluginBootstrap "github.com/arquillian/ike-prow-plugins/pkg/plugin"
 	"github.com/arquillian/ike-prow-plugins/pkg/plugin/work-in-progress/plugin"
 	"github.com/arquillian/ike-prow-plugins/pkg/server"
