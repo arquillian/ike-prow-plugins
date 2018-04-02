@@ -1,14 +1,12 @@
 package github
 
 import (
-	"context"
 	"fmt"
 	"strings"
 
 	"github.com/arquillian/ike-prow-plugins/pkg/log"
 	"github.com/arquillian/ike-prow-plugins/pkg/scm"
 	"github.com/arquillian/ike-prow-plugins/pkg/utils"
-	"github.com/google/go-github/github"
 )
 
 // PluginTitleTemplate is a constant template containing "Ike Plugins (name-of-plugin)" title with markdown formatting
@@ -19,7 +17,7 @@ const (
 
 // CommentService is a struct managing plugin comments
 type CommentService struct {
-	client         *github.Client
+	client         *Client
 	log            log.Logger
 	issue          scm.RepositoryIssue
 	commentContext CommentContext
@@ -32,7 +30,7 @@ type CommentContext struct {
 }
 
 // NewCommentService creates an instance of GitHub CommentService for the given CommentContext
-func NewCommentService(client *github.Client, log log.Logger, change scm.RepositoryChange, issueOrPrNumber int, commentContext CommentContext) *CommentService {
+func NewCommentService(client *Client, log log.Logger, change scm.RepositoryChange, issueOrPrNumber int, commentContext CommentContext) *CommentService {
 	return &CommentService{
 		client: client,
 		log:    log,
@@ -50,8 +48,7 @@ func NewCommentService(client *github.Client, log log.Logger, change scm.Reposit
 // and the given commentMsg. If such a comment is present already, then it does nothing.
 func (s *CommentService) PluginComment(commentMsg string) error {
 
-	comments, _, err := s.client.Issues.
-		ListComments(context.Background(), s.issue.Owner, s.issue.RepoName, s.issue.Number, &github.IssueListCommentsOptions{})
+	comments, err := s.client.ListIssueComments(s.issue)
 	if err != nil {
 		s.log.Errorf("Getting all comments failed with an error: %s", err)
 	}
@@ -63,11 +60,7 @@ func (s *CommentService) PluginComment(commentMsg string) error {
 		}
 	}
 
-	comment := &github.IssueComment{
-		Body: s.createPluginHint(commentMsg),
-	}
-
-	_, _, err = s.client.Issues.CreateComment(context.Background(), s.issue.Owner, s.issue.RepoName, s.issue.Number, comment)
+	err = s.client.CreateIssueComment(s.issue, s.createPluginHint(commentMsg))
 
 	return err
 }

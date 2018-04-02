@@ -1,7 +1,6 @@
 package main
 
 import (
-	gogh "github.com/google/go-github/github"
 	"k8s.io/test-infra/prow/pluginhelp"
 
 	"github.com/arquillian/ike-prow-plugins/pkg/github"
@@ -16,14 +15,14 @@ const ProwPluginName = "pr-sanitizer"
 // GitHubLabelsEventsHandler is the event handler for the plugin.
 // Implements server.GitHubEventHandler interface which contains the logic for incoming GitHub events
 type GitHubLabelsEventsHandler struct {
-	Client *gogh.Client
+	Client *github.Client
 }
 
 func main() {
 	pluginBootstrap.InitPlugin(ProwPluginName, handlerCreator, serverCreator, helpProvider)
 }
 
-func handlerCreator(githubClient *gogh.Client) server.GitHubEventHandler {
+func handlerCreator(githubClient *github.Client) server.GitHubEventHandler {
 	return &GitHubLabelsEventsHandler{Client: githubClient}
 }
 
