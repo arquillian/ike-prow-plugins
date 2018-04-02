@@ -530,6 +530,7 @@ table.CodeRay td.code>pre{padding:0}
 <ul class="sectlevel2">
 <li><a href="#_configuration">3.1. Configuration</a></li>
 <li><a href="#_test_keeper_plugin">3.2. Test Keeper plugin</a></li>
+<li><a href="#_work_in_progress_plugin">3.3. Work In Progress plugin</a></li>
 </ul>
 </li>
 </ul>
@@ -1007,7 +1008,7 @@ If it won&#8217;t find any tests in the Pull Request, it adds a comment with a d
 <div class="title">Figure 2. Failure status</div>
 </div>
 <div class="paragraph">
-<p>This check is done based on the file name patterns - for more information head over to <a href="#testkeeper-config">Plugin Configuration</a> part.</p>
+<p>This check is done based on the file name patterns - for more information head over to <a href="#test-keeper-config">Plugin Configuration</a> part.</p>
 </div>
 <div class="paragraph">
 <p>The plugin is triggered when the Pull Request is opened/reopened or updated by new or removed commit.</p>
@@ -1017,7 +1018,7 @@ If it won&#8217;t find any tests in the Pull Request, it adds a comment with a d
 If the comment will be later removed the check is triggered again.</p>
 </div>
 <div class="sect3">
-<h4 id="_how_does_it_work"><a class="anchor" href="#_how_does_it_work"></a>3.2.1. How does it work?</h4>
+<h4 id="test-keeper-how"><a class="anchor" href="#test-keeper-how"></a>3.2.1. How does it work?</h4>
 <div class="paragraph">
 <p>Test Keeper looks into the files in your Pull Request and checks if any tests were added or modified based on common naming patterns (we don&#8217;t analyze source code yet&#8230;&#8203;).</p>
 </div>
@@ -1063,7 +1064,7 @@ If we missed some important patterns feel free to open an <a href="https://githu
 </div>
 </div>
 <div class="sect3">
-<h4 id="testkeeper-config"><a class="anchor" href="#testkeeper-config"></a>3.2.2. Plugin Configuration</h4>
+<h4 id="test-keeper-config"><a class="anchor" href="#test-keeper-config"></a>3.2.2. Plugin Configuration</h4>
 <div class="paragraph">
 <p>To configure Test Keeper plugin place <code>test-keeper.yml</code> (or <code>test-keeper.yaml</code>) file in the root of your project and use properties described below.</p>
 </div>
@@ -1185,13 +1186,92 @@ Don&#8217;t use a regular expression inside of the wildcard format. We don&#8217
 </div>
 </div>
 </div>
+<div class="sect3">
+<h4 id="_status_details"><a class="anchor" href="#_status_details"></a>3.2.3. Status details</h4>
+<div class="sect4">
+<h5 id="tests-exist"><a class="anchor" href="#tests-exist"></a>Success - test is present</h5>
+<div class="paragraph">
+<p>Your Pull Request has been approved because the plugin detected a test file that has been added or changed in the PR.</p>
+</div>
+<div class="paragraph">
+<p>It means that changeset in this PR has files matching any of the default test patterns, those you configured  or by a combination of both.</p>
+</div>
+<div class="paragraph">
+<p>For more information about the behavior and what the default file patterns are, see <a href="#test-keeper-how">How does it work?</a> section. If you need to reconfigure the plugin then read the section <a href="#test-keeper-config">Plugin Configuration</a>.</p>
+</div>
+</div>
+<div class="sect4">
+<h5 id="only-skipped"><a class="anchor" href="#only-skipped"></a>Success - no test needed</h5>
+<div class="paragraph">
+<p>Your Pull Request has been approved because it seems that it doesn&#8217;t need to have additional tests. All changed files in the changeset match patterns for which the validation should be skipped.</p>
+</div>
+<div class="paragraph">
+<p>For more information about the behavior and what the default file patterns are, see <a href="#test-keeper-how">How does it work?</a> section. If you need to reconfigure the plugin then read the section <a href="#test-keeper-config">Plugin Configuration</a>.</p>
+</div>
+</div>
+<div class="sect4">
+<h5 id="keeper-approved-by"><a class="anchor" href="#keeper-approved-by"></a>Success - approved by</h5>
+<div class="paragraph">
+<p>Your Pull Request has been approved by any of the administrators or reviewers despite the fact that it has no test.</p>
+</div>
+<div class="paragraph">
+<p>If the PR contains only "non-production" changeset and some of them haven&#8217;t been detected by any file patterns the validation should be skipped for, you can add them in your configuration file.</p>
+</div>
+<div class="paragraph">
+<p>For more information see <a href="#test-keeper-how">How does it work?</a> and <a href="#test-keeper-config">Plugin Configuration</a> sections.</p>
+</div>
+</div>
+<div class="sect4">
+<h5 id="no-tests"><a class="anchor" href="#no-tests"></a>Failed</h5>
+<div class="paragraph">
+<p>Your Pull Request has been rejected because the plugin wasn&#8217;t able to find any added or changed test file in the change-set.</p>
+</div>
+<div class="paragraph">
+<p>Automated tests give us confidence in shipping reliable software. Please add some as part of this change.</p>
+</div>
+<div class="paragraph">
+<p>If you are an admin and you are sure that no test is needed then you can use a command <code>/ok-without-tests</code> as a comment to make the status green.</p>
+</div>
+<div class="paragraph">
+<p>For more information about the behavior, how the test files are detected and what the default file patterns are, see <a href="#test-keeper-how">How does it work?</a> section.
+If you need to reconfigure the plugin then read the section <a href="#test-keeper-config">Plugin Configuration</a>.</p>
+</div>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_work_in_progress_plugin"><a class="anchor" href="#_work_in_progress_plugin"></a>3.3. Work In Progress plugin</h3>
+<div class="paragraph">
+<p>This plugin can help reviewers with focusing on work that really matters so they don&#8217;t need to spend time with Pull Requests that are still in progress unless they were requested to do partial reviews.</p>
+</div>
+<div class="paragraph">
+<p>If the PR title starts with "work-in-progress" prefix (non-case sensitive) then the plugin marks its check as <strong>Failure</strong>, or as <strong>Success</strong> otherwise.</p>
+</div>
+<div class="sect3">
+<h4 id="_status_details_2"><a class="anchor" href="#_status_details_2"></a>3.3.1. Status details</h4>
+<div class="sect4">
+<h5 id="wip-success"><a class="anchor" href="#wip-success"></a>Success</h5>
+<div class="paragraph">
+<p>Your Pull Request has been approved as the plugin didn&#8217;t detect any sign of work in progress (the PR title doesn&#8217;t start with "work-in-progress" prefix).</p>
+</div>
+</div>
+<div class="sect4">
+<h5 id="wip-failed"><a class="anchor" href="#wip-failed"></a>Failed</h5>
+<div class="paragraph">
+<p>Your Pull Request has been rejected because the plugin detected that the PR title starts with "work-in-progress" prefix, so it seems that there is still an ongoing work.</p>
+</div>
+<div class="paragraph">
+<p>When the PR is done and ready for review and merge, then remove the prefix from the title to make the status green.</p>
+</div>
+</div>
+</div>
 </div>
 </div>
 </div>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2018-04-02 15:01:53 UTC
+Last updated 2018-04-02 16:49:17 UTC
 </div>
 </div>
 <script>
