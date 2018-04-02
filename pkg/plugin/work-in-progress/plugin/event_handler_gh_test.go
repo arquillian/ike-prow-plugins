@@ -16,7 +16,7 @@ var _ = Describe("Test Keeper Plugin features", func() {
 
 		var handler *wip.GitHubWIPPRHandler
 
-		log := CreateNullLogger()
+		log := NewDiscardOutLogger()
 
 		toHaveSuccessState := func(statusPayload map[string]interface{}) bool {
 			return Expect(statusPayload).To(SatisfyAll(
