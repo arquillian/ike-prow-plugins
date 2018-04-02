@@ -6,21 +6,29 @@ import (
 	"github.com/arquillian/ike-prow-plugins/pkg/scm"
 	gogh "github.com/google/go-github/github"
 	"golang.org/x/oauth2"
+	"time"
+	"github.com/arquillian/ike-prow-plugins/pkg/http"
 )
 
 // Client manages communication with the GitHub API.
 type Client struct {
-	Client *gogh.Client
+	Client  *gogh.Client
+	Retries int
+	Sleep   time.Duration
 }
 
-// NewClient creates a Client instance with the given oauth secret used as a access token
-func NewClient(oauthSecret []byte) *Client {
+// NewClient creates a Client instance with the given oauth secret used as a access token.
+// The given number of retries and a duration of sleep sets how many times the client should invoke the request until
+// it gets response with a code < 404 and how long it should sleep between every request attempt
+func NewClient(oauthSecret []byte, retries int, sleep time.Duration) *Client {
 	token := oauth2.StaticTokenSource(
 		&oauth2.Token{AccessToken: string(oauthSecret)},
 	)
 
 	return &Client{
-		Client: gogh.NewClient(oauth2.NewClient(context.Background(), token)),
+		Client:  gogh.NewClient(oauth2.NewClient(context.Background(), token)),
+		Retries: retries,
+		Sleep:   sleep,
 	}
 }
 
@@ -29,7 +37,7 @@ func (c *Client) GetPermissionLevel(owner, repo, user string) (*gogh.RepositoryP
 	var permissionLevel *gogh.RepositoryPermissionLevel
 	var err error
 
-	invokeThreeTimesIfNotSuccess(func() *gogh.Response {
+	c.do(func() *gogh.Response {
 		var response *gogh.Response
 		permissionLevel, response, err = c.Client.Repositories.GetPermissionLevel(context.Background(), owner, repo, user)
 		return response
@@ -43,7 +51,7 @@ func (c *Client) GetPullRequest(owner, repo string, prNumber int) (*gogh.PullReq
 	var pr *gogh.PullRequest
 	var err error
 
-	invokeThreeTimesIfNotSuccess(func() *gogh.Response {
+	c.do(func() *gogh.Response {
 		var response *gogh.Response
 		pr, response, err = c.Client.PullRequests.Get(context.Background(), owner, repo, prNumber)
 		return response
@@ -57,7 +65,7 @@ func (c *Client) ListPullRequestFiles(owner, repo string, prNumber int) ([]scm.C
 	var files []*gogh.CommitFile
 	var err error
 
-	invokeThreeTimesIfNotSuccess(func() *gogh.Response {
+	c.do(func() *gogh.Response {
 		var response *gogh.Response
 		files, response, err = c.Client.PullRequests.ListFiles(context.Background(), owner, repo, prNumber, nil)
 		return response
@@ -76,7 +84,7 @@ func (c *Client) ListIssueComments(issue scm.RepositoryIssue) ([]*gogh.IssueComm
 	var comments []*gogh.IssueComment
 	var err error
 
-	invokeThreeTimesIfNotSuccess(func() *gogh.Response {
+	c.do(func() *gogh.Response {
 		var response *gogh.Response
 		comments, response, err =
 			c.Client.Issues.ListComments(context.Background(), issue.Owner, issue.RepoName, issue.Number, &gogh.IssueListCommentsOptions{})
@@ -93,7 +101,7 @@ func (c *Client) CreateIssueComment(issue scm.RepositoryIssue, commentMsg *strin
 		Body: commentMsg,
 	}
 
-	invokeThreeTimesIfNotSuccess(func() *gogh.Response {
+	c.do(func() *gogh.Response {
 		var response *gogh.Response
 		_, response, err = c.Client.Issues.CreateComment(context.Background(), issue.Owner, issue.RepoName, issue.Number, comment)
 		return response
@@ -106,7 +114,7 @@ func (c *Client) CreateIssueComment(issue scm.RepositoryIssue, commentMsg *strin
 func (c *Client) CreateStatus(change scm.RepositoryChange, repoStatus *gogh.RepoStatus) error {
 	var err error
 
-	invokeThreeTimesIfNotSuccess(func() *gogh.Response {
+	c.do(func() *gogh.Response {
 		var response *gogh.Response
 		_, response, err =
 			c.Client.Repositories.CreateStatus(context.Background(), change.Owner, change.RepoName, change.Hash, repoStatus)
@@ -116,11 +124,6 @@ func (c *Client) CreateStatus(change scm.RepositoryChange, repoStatus *gogh.Repo
 	return err
 }
 
-type requestInvoker func() *gogh.Response
-
-func invokeThreeTimesIfNotSuccess(invokeRequest requestInvoker) {
-	response := invokeRequest()
-	for i := 0; i < 2 && response != nil && response.StatusCode >= 404; i++ {
-		response = invokeRequest()
-	}
+func (c *Client) do(invoker http.RequestInvoker) {
+	http.Do(c.Retries, c.Sleep, invoker)
 }

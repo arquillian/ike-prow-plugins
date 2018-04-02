@@ -14,6 +14,7 @@ import (
 	"github.com/onsi/ginkgo"
 	"github.com/sirupsen/logrus"
 	"gopkg.in/h2non/gock.v1"
+	"time"
 )
 
 // This package is intended to keep helper functions used across the tests. Shouldn't be used for production code
@@ -59,8 +60,12 @@ func NewDiscardOutLogger() log.Logger {
 	return logrus.NewEntry(nullLogger)
 }
 
+// NewDefaultGitHubClient creates a GH client with default go-github client (without any authentication token),
+// with number of retries set to 3 and sleep duration set to 1 second
 func NewDefaultGitHubClient() *github.Client {
 	return &github.Client{
-		Client: gogh.NewClient(nil), // TODO with hoverfly/go-vcr we might want to use tokens instead to capture real traffic
+		Client:  gogh.NewClient(nil), // TODO with hoverfly/go-vcr we might want to use tokens instead to capture real traffic
+		Retries: 3,
+		Sleep:   time.Second,
 	}
 }

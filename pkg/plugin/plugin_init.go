@@ -20,6 +20,7 @@ import (
 	"github.com/arquillian/ike-prow-plugins/pkg/log"
 	"github.com/arquillian/ike-prow-plugins/pkg/server"
 	"github.com/sirupsen/logrus"
+	"time"
 )
 
 // nolint
@@ -75,7 +76,7 @@ func InitPlugin(pluginName string, newEventHandler EventHandlerCreator, newServe
 		logger.WithError(err).Fatalf("Error loading ike-plugins config from %q.", *pluginConfig)
 	}
 
-	githubClient := github.NewClient(oauthSecret)
+	githubClient := github.NewClient(oauthSecret, 3, time.Second)
 
 	handler := newEventHandler(githubClient)
 	pluginServer := newServer(webhookSecret, handler)
