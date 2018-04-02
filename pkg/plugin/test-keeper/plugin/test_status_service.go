@@ -57,7 +57,7 @@ func (ts *testStatusService) okWithoutTests(approvedBy string) error {
 }
 
 func (ts *testStatusService) reportError() error {
-	return ts.statusService.Error(FailureMessage, "") // TODO create link to detailed log about the problem
+	return ts.statusService.Error(FailureMessage)
 }
 
 func (ts *testStatusService) failNoTests() error {

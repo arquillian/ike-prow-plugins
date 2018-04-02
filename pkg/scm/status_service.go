@@ -5,5 +5,5 @@ type StatusService interface {
 	Failure(reason, targetURL string) error
 	Success(reason, targetURL string) error
 	Pending(reason string) error
-	Error(reason, targetURL string) error
+	Error(reason string) error
 }

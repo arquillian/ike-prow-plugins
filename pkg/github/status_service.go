@@ -44,8 +44,8 @@ func (s *StatusService) Pending(reason string) error {
 }
 
 // Error marks given change as a error.
-func (s *StatusService) Error(reason, targetURL string) error {
-	return s.setStatus(StatusError, reason, targetURL)
+func (s *StatusService) Error(reason string) error {
+	return s.setStatus(StatusError, reason, "")
 }
 
 // setStatus sets the given status with the given reason to the related commit
