@@ -29,7 +29,9 @@ class ConstBlockMacro < Extensions::InlineMacroProcessor
         if (line =~ /\s#{const_name}(\s|=)/)
           # Gets content between double quotes
           const_value = line.scan(/"([^"]*)"/)
-          break;
+          unless const_value.nil? or const_value[0].nil? or const_value[0][0].nil?
+            break;
+          end
         end
       end
     else
