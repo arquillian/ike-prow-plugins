@@ -38,7 +38,7 @@ var _ = Describe("Config loader features", func() {
 				PluginName: "my-plugin-name",
 				Assignee:   "toAssign",
 			}
-			service := github.NewCommentService(client, CreateNullLogger(), change, 2, commentContext)
+			service := github.NewCommentService(client, NewDiscardOutLogger(), change, 2, commentContext)
 
 			toHaveBodyWithWholePluginsComment := func(statusPayload map[string]interface{}) bool {
 				return Expect(statusPayload).To(SatisfyAll(
@@ -77,7 +77,7 @@ var _ = Describe("Config loader features", func() {
 				Assignee:   "toAssign",
 			}
 
-			service := github.NewCommentService(client, CreateNullLogger(), change, 2, commentContext)
+			service := github.NewCommentService(client, NewDiscardOutLogger(), change, 2, commentContext)
 
 			// when
 			err := service.PluginComment("New comment")
@@ -117,7 +117,7 @@ var _ = Describe("Config loader features", func() {
 				SetMatcher(ExpectPayload(toHaveModifiedBody)).
 				Reply(200)
 
-			service := github.NewCommentService(client, CreateNullLogger(), change, 2, commentContext)
+			service := github.NewCommentService(client, NewDiscardOutLogger(), change, 2, commentContext)
 
 			// when
 			err := service.PluginComment("New comment")
