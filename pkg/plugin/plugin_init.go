@@ -36,6 +36,9 @@ var (
 	environment         = flag.String("env", "tenant", "Environment plugin is running in. Used e.g. by Sentry for tagging.")
 )
 
+// DocumentationURL is a link to arquillian ike-prow-plugins documentation
+const DocumentationURL = "http://arquillian.org/ike-prow-plugins/"
+
 // EventHandlerCreator is a func type that creates server.GitHubEventHandler instance which is the central point for
 // the plugin logic
 type EventHandlerCreator func(client *github.Client) server.GitHubEventHandler

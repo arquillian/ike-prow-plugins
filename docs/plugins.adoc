@@ -41,3 +41,4 @@ For hints how to test web hook against your local setup head over to <<testing-h
 NOTE: More details about GitHub hooks can be found in the link:https://developer.github.com/webhooks/[official developer documentation].
 
 include::{asciidoctor-source}/fragments/test-keeper.adoc[leveloffset=1]
+include::{asciidoctor-source}/fragments/work-in-progress.adoc[leveloffset=1]

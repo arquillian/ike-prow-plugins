@@ -1,0 +1,17 @@
+== Work In Progress plugin
+
+This plugin can help reviewers with focusing on work that really matters so they don't need to spend time with Pull Requests that are still in progress unless they were requested to do partial reviews.
+
+If the PR title starts with "const:pkg/plugin/work-in-progress/plugin/event_handler.go[name="WipPrefix"]" prefix (non-case sensitive) then the plugin marks its check as **Failure**, or as **Success** otherwise.
+
+=== Status details
+
+==== Success [[wip-success]]
+
+Your Pull Request has been approved as the plugin didn't detect any sign of work in progress (the PR title doesn't start with "const:pkg/plugin/work-in-progress/plugin/event_handler.go[name="WipPrefix"]" prefix).
+
+==== Failed [[wip-failed]]
+
+Your Pull Request has been rejected because the plugin detected that the PR title starts with "const:pkg/plugin/work-in-progress/plugin/event_handler.go[name="WipPrefix"]" prefix, so it seems that there is still an ongoing work.
+
+When the PR is done and ready for review and merge, then remove the prefix from the title to make the status green.
