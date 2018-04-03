@@ -18,12 +18,13 @@ var _ = Describe("Work-in-progress Plugin features", func() {
 		BeforeEach(func() {
 			defer gock.Off()
 
-			handler = &wip.GitHubWIPPRHandler{Client: NewDefaultGitHubClient()}
+			handler = &wip.GitHubWIPPRHandler{Client: NewDefaultGitHubClient(), BotName: "alien-ike"}
 		})
 
 		DescribeTable("should recognize PR as work-in-progress if title starts with WIP",
 			func(title string) {
 				Expect(handler.IsWorkInProgress(&title)).To(BeTrue())
+				Expect(handler.BotName).To(Equal("alien-ike"))
 			},
 			Entry("Uppercase WIP prefix", "WIP fix(#1): off-by one bug"),
 			Entry("Lowercase WIP prefix", "wip fix(#1): off-by one bug"),
@@ -33,6 +34,7 @@ var _ = Describe("Work-in-progress Plugin features", func() {
 		DescribeTable("should not recognize PR as work-in-progress if title doesn't start with WIP",
 			func(title string) {
 				Expect(handler.IsWorkInProgress(&title)).To(BeFalse())
+				Expect(handler.BotName).To(Equal("alien-ike"))
 			},
 			Entry("regular PR title", "fix(#1): off-by one bug"),
 			Entry("not a supported wip prefix", "wip-fix off-by one bug"),
