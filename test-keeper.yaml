@@ -1,2 +1,2 @@
 skip_validation_for:
-  - 'osio-plugins.yaml'
+  - '**/osio-plugins.yaml'
