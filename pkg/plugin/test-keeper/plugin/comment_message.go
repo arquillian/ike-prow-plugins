@@ -3,6 +3,7 @@ package plugin
 import (
 	"fmt"
 	"net/url"
+	"regexp"
 
 	"github.com/arquillian/ike-prow-plugins/pkg/github"
 	"github.com/arquillian/ike-prow-plugins/pkg/http"
@@ -30,6 +31,8 @@ const (
 		"path to an existing file in this repository."
 
 	sadIke = `<img align="left" src="https://cdn.rawgit.com/bartoszmajsak/ike-prow-plugins/2025328b70bd1879520411b3cacadee61a49641a/docs/images/arquillian_ui_failure_128px.png">`
+
+	fileRegex = `(?m)^(?:https?\:)?([a-z_\-\s0-9\.\/]+)+\.(txt|md|doc|docx|adoc)$`
 )
 
 // CreateCommentMessage creates a comment message for the test-keeper plugin. If the comment message is set in config then it takes that one, the default otherwise.
@@ -38,11 +41,19 @@ func CreateCommentMessage(configuration TestKeeperConfiguration, change scm.Repo
 	if configuration.LocationURL == "" {
 		msg = beginning + paragraph + noConfig
 	} else if configuration.PluginHint != "" {
-		msg = getMsgFromFile(configuration, change)
+		msg = getMsgFromConfigHint(configuration, change)
 	} else {
 		msg = getMsgWithConfigRef(configuration.LocationURL)
 	}
 	return sadIke + paragraph + msg
+}
+
+func getMsgFromConfigHint(configuration TestKeeperConfiguration, change scm.RepositoryChange) string {
+	isFilePath, _ := regexp.MatchString(fileRegex, configuration.PluginHint)
+	if isFilePath {
+		return getMsgFromFile(configuration, change)
+	}
+	return configuration.PluginHint
 }
 
 func getMsgFromFile(configuration TestKeeperConfiguration, change scm.RepositoryChange) string {
