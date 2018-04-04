@@ -33,11 +33,11 @@ var _ = Describe("Config loader features", func() {
 				RepoName: "repo",
 				Hash:     "46cb8fac44709e4ccaae97448c65e8f7320cfea7",
 			}
-			commentContext := github.CommentContext{
+			commentContext := github.HintCommentContext{
 				PluginName: "my-plugin-name",
 				Assignee:   "toAssign",
 			}
-			service := github.NewCommentService(client, NewDiscardOutLogger(), change, 2, commentContext)
+			service := github.NewHintCommentService(client, NewDiscardOutLogger(), change, 2, commentContext)
 
 			toHaveBodyWithWholePluginsComment := func(statusPayload map[string]interface{}) bool {
 				return Expect(statusPayload).To(SatisfyAll(
@@ -71,12 +71,12 @@ var _ = Describe("Config loader features", func() {
 				RepoName: "repo",
 				Hash:     "46cb8fac44709e4ccaae97448c65e8f7320cfea7",
 			}
-			commentContext := github.CommentContext{
+			commentContext := github.HintCommentContext{
 				PluginName: "test-keeper",
 				Assignee:   "toAssign",
 			}
 
-			service := github.NewCommentService(client, NewDiscardOutLogger(), change, 2, commentContext)
+			service := github.NewHintCommentService(client, NewDiscardOutLogger(), change, 2, commentContext)
 
 			// when
 			err := service.PluginComment("New comment")
@@ -97,7 +97,7 @@ var _ = Describe("Config loader features", func() {
 				RepoName: "repo",
 				Hash:     "46cb8fac44709e4ccaae97448c65e8f7320cfea7",
 			}
-			commentContext := github.CommentContext{
+			commentContext := github.HintCommentContext{
 				PluginName: "another-plugin",
 				Assignee:   "toAssign",
 			}
@@ -116,7 +116,7 @@ var _ = Describe("Config loader features", func() {
 				SetMatcher(ExpectPayload(toHaveModifiedBody)).
 				Reply(200)
 
-			service := github.NewCommentService(client, NewDiscardOutLogger(), change, 2, commentContext)
+			service := github.NewHintCommentService(client, NewDiscardOutLogger(), change, 2, commentContext)
 
 			// when
 			err := service.PluginComment("New comment")
