@@ -245,7 +245,7 @@ var _ = Describe("Test Keeper Plugin features", func() {
 		It("should ignore "+keeper.SkipComment+" when used by non-admin user", func() {
 			// given
 			gock.New("https://api.github.com").
-				Get("/repos/" + repositoryName + "/commits/5d6e9b25da90edfc19f488e595e0645c081c1575").
+				Get("/repos/" + repositoryName + "/pulls/1").
 				Reply(200).
 				Body(FromFile("test_fixtures/github_calls/prs/without_tests/pr_details.json"))
 
