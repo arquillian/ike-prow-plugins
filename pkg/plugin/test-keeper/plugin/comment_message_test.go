@@ -189,6 +189,24 @@ var _ = Describe("Test keeper comment message creation", func() {
 				"https://raw.githubusercontent.com/owner/repo/46cb8fac44709e4ccaae97448c65e8f7320cfea7/" +
 					"http/server.com/custom_message_file.md"))
 		})
+
+		It("should create message taken from a string set in config", func() {
+			// given
+			url := "http://github.com/my/repo/test-keeper.yaml"
+			config := plugin.TestKeeperConfiguration{
+				PluginConfiguration: config.PluginConfiguration{
+					LocationURL: url,
+					PluginHint:  "Custom message",
+				},
+			}
+
+			// when
+			msg := plugin.CreateCommentMessage(config, scm.RepositoryChange{})
+			sanitizedMsg := removeHtmlElements(msg)
+
+			// then
+			Expect(sanitizedMsg).To(Equal("Custom message"))
+		})
 	})
 })
 
