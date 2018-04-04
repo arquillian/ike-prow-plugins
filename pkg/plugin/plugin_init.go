@@ -1,4 +1,3 @@
-
 package plugin
 
 import (
@@ -36,7 +35,7 @@ var (
 	sentryDsnSecretFile = flag.String("sentry-dsn-file", "/etc/sentry-dsn/sentry", "Path to the file containing the Sentry DSN url.")
 	sentryTimeout       = flag.Int("sentry-timeout", 1000, "Sentry server timeout in ms. Defaults to 1 second ")
 	environment         = flag.String("env", "tenant", "Environment plugin is running in. Used e.g. by Sentry for tagging.")
-	pluginBotName       = flag.String("bot-name", "ike-plugins", "Bot Name used for the plugin.")
+	pluginBotName       = flag.String("bot-name", "alien-ike", "Bot Name used for the plugins.")
 )
 
 // DocumentationURL is a link to arquillian ike-prow-plugins documentation
