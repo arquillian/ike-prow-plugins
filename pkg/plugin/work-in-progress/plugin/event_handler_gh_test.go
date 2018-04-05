@@ -4,9 +4,14 @@ import (
 	"github.com/arquillian/ike-prow-plugins/pkg/github"
 	. "github.com/arquillian/ike-prow-plugins/pkg/internal/test"
 	wip "github.com/arquillian/ike-prow-plugins/pkg/plugin/work-in-progress/plugin"
+	"github.com/arquillian/ike-prow-plugins/pkg/utils"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	"gopkg.in/h2non/gock.v1"
+)
+
+const (
+	botName = "alien-ike"
 )
 
 var _ = Describe("Test Keeper Plugin features", func() {
@@ -21,6 +26,7 @@ var _ = Describe("Test Keeper Plugin features", func() {
 			return Expect(statusPayload).To(SatisfyAll(
 				HaveState(github.StatusSuccess),
 				HaveDescription(wip.ReadyForReviewMessage),
+				HaveContext(utils.StringJoin(botName, wip.ProwPluginName)),
 				HaveTargetURL(wip.ReadyForReviewDetailsLink),
 			))
 		}
@@ -29,13 +35,14 @@ var _ = Describe("Test Keeper Plugin features", func() {
 			return Expect(statusPayload).To(SatisfyAll(
 				HaveState(github.StatusFailure),
 				HaveDescription(wip.InProgressMessage),
+				HaveContext(utils.StringJoin(botName, wip.ProwPluginName)),
 				HaveTargetURL(wip.InProgressDetailsLink),
 			))
 		}
 
 		BeforeEach(func() {
 			defer gock.Off()
-			handler = &wip.GitHubWIPPRHandler{Client: NewDefaultGitHubClient()}
+			handler = &wip.GitHubWIPPRHandler{Client: NewDefaultGitHubClient(), BotName: botName}
 		})
 
 		It("should mark opened PR as ready for review if not prefixed with WIP", func() {
