@@ -33,11 +33,11 @@ var _ = Describe("Config loader features", func() {
 				RepoName: "repo",
 				Hash:     "46cb8fac44709e4ccaae97448c65e8f7320cfea7",
 			}
-			commentContext := github.CommentContext{
+			hintContext := github.HintContext{
 				PluginName: "my-plugin-name",
 				Assignee:   "toAssign",
 			}
-			service := github.NewCommentService(client, NewDiscardOutLogger(), change, 2, commentContext)
+			hinter := github.NewHinter(client, NewDiscardOutLogger(), change, 2, hintContext)
 
 			toHaveBodyWithWholePluginsComment := func(statusPayload map[string]interface{}) bool {
 				return Expect(statusPayload).To(SatisfyAll(
@@ -53,7 +53,7 @@ var _ = Describe("Config loader features", func() {
 				Reply(201)
 
 			// when
-			err := service.PluginComment("New comment")
+			err := hinter.PluginComment("New comment")
 
 			// then
 			Ω(err).ShouldNot(HaveOccurred())
@@ -71,15 +71,15 @@ var _ = Describe("Config loader features", func() {
 				RepoName: "repo",
 				Hash:     "46cb8fac44709e4ccaae97448c65e8f7320cfea7",
 			}
-			commentContext := github.CommentContext{
+			hintContext := github.HintContext{
 				PluginName: "test-keeper",
 				Assignee:   "toAssign",
 			}
 
-			service := github.NewCommentService(client, NewDiscardOutLogger(), change, 2, commentContext)
+			hinter := github.NewHinter(client, NewDiscardOutLogger(), change, 2, hintContext)
 
 			// when
-			err := service.PluginComment("New comment")
+			err := hinter.PluginComment("New comment")
 
 			// then
 			Ω(err).ShouldNot(HaveOccurred())
@@ -97,7 +97,7 @@ var _ = Describe("Config loader features", func() {
 				RepoName: "repo",
 				Hash:     "46cb8fac44709e4ccaae97448c65e8f7320cfea7",
 			}
-			commentContext := github.CommentContext{
+			hintContext := github.HintContext{
 				PluginName: "another-plugin",
 				Assignee:   "toAssign",
 			}
@@ -116,10 +116,10 @@ var _ = Describe("Config loader features", func() {
 				SetMatcher(ExpectPayload(toHaveModifiedBody)).
 				Reply(200)
 
-			service := github.NewCommentService(client, NewDiscardOutLogger(), change, 2, commentContext)
+			hinter := github.NewHinter(client, NewDiscardOutLogger(), change, 2, hintContext)
 
 			// when
-			err := service.PluginComment("New comment")
+			err := hinter.PluginComment("New comment")
 
 			// then
 			Ω(err).ShouldNot(HaveOccurred())

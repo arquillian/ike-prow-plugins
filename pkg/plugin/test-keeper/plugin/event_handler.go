@@ -148,10 +148,10 @@ func (gh *GitHubTestEventsHandler) checkTestsAndSetStatus(log log.Logger, change
 		log.Errorf("failed to report status on PR [%q]. cause: %s", *pr, err)
 	}
 
-	commentContext := github.CommentContext{PluginName: ProwPluginName, Assignee: *pr.User.Login}
-	commentService := github.NewCommentService(gh.Client, log, change, *pr.Number, commentContext)
+	hintContext := github.HintContext{PluginName: ProwPluginName, Assignee: *pr.User.Login}
+	hinter := github.NewHinter(gh.Client, log, change, *pr.Number, hintContext)
 
-	cerr := commentService.PluginComment(CreateCommentMessage(configuration, change))
+	cerr := hinter.PluginComment(CreateCommentMessage(configuration, change))
 	if cerr != nil {
 		log.Errorf("failed to comment on PR [%q]. cause: %s", *pr, cerr)
 		return cerr
