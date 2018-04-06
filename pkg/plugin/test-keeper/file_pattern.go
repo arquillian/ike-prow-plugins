@@ -1,4 +1,4 @@
-package test_keeper
+package testkeeper
 
 import (
 	"regexp"

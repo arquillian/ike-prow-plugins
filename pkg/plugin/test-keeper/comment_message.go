@@ -1,4 +1,4 @@
-package test_keeper
+package testkeeper
 
 import (
 	"fmt"
@@ -33,7 +33,7 @@ const (
 )
 
 // CreateCommentMessage creates a comment message for the test-keeper plugin. If the comment message is set in config then it takes that one, the default otherwise.
-func CreateCommentMessage(configuration TestKeeperConfiguration, change scm.RepositoryChange) string {
+func CreateCommentMessage(configuration PluginConfiguration, change scm.RepositoryChange) string {
 	var msg string
 	if configuration.LocationURL == "" {
 		msg = beginning + paragraph + noConfig
@@ -45,7 +45,7 @@ func CreateCommentMessage(configuration TestKeeperConfiguration, change scm.Repo
 	return sadIke + paragraph + msg
 }
 
-func getMsgFromFile(configuration TestKeeperConfiguration, change scm.RepositoryChange) string {
+func getMsgFromFile(configuration PluginConfiguration, change scm.RepositoryChange) string {
 	_, err := url.ParseRequestURI(configuration.PluginHint)
 
 	var content []byte

@@ -1,19 +1,19 @@
-package test_keeper_test
+package testkeeper_test
 
 import (
 	"fmt"
 
-	"github.com/arquillian/ike-prow-plugins/pkg/plugin/test-keeper"
 	. "github.com/onsi/ginkgo"
-	"github.com/onsi/ginkgo/extensions/table"
 	. "github.com/onsi/gomega"
+	"github.com/onsi/ginkgo/extensions/table"
+	"github.com/arquillian/ike-prow-plugins/pkg/plugin/test-keeper"
 )
 
 var _ = Describe("File pattern features", func() {
 
 	var assertThat = func(filePattern, expectedRegexp string) {
-		parsed := test_keeper.ParseFilePatterns([]string{filePattern})
-		Expect(parsed).To(ConsistOf(test_keeper.FilePattern{Regexp: expectedRegexp}))
+		parsed := testkeeper.ParseFilePatterns([]string{filePattern})
+		Expect(parsed).To(ConsistOf(testkeeper.FilePattern{Regexp: expectedRegexp}))
 	}
 
 	Context("File pattern parsing", func() {
@@ -34,10 +34,10 @@ var _ = Describe("File pattern features", func() {
 			regexpDef := []string{"regex{{my-regexp}}"}
 
 			// when
-			parsed := test_keeper.ParseFilePatterns(regexpDef)
+			parsed := testkeeper.ParseFilePatterns(regexpDef)
 
 			// then
-			Expect(parsed).To(ConsistOf(test_keeper.FilePattern{Regexp: "my-regexp"}))
+			Expect(parsed).To(ConsistOf(testkeeper.FilePattern{Regexp: "my-regexp"}))
 		})
 	})
 })

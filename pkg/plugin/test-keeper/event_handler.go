@@ -1,4 +1,4 @@
-package test_keeper
+package testkeeper
 
 import (
 	"encoding/json"
@@ -126,7 +126,7 @@ func (gh *GitHubTestEventsHandler) handlePrComment(log log.Logger, prComment *go
 
 func (gh *GitHubTestEventsHandler) checkTestsAndSetStatus(log log.Logger, change scm.RepositoryChange, pr *gogh.PullRequest) error {
 	statusService := gh.newTestStatusService(log, change)
-	configuration := LoadTestKeeperConfig(log, change)
+	configuration := LoadConfiguration(log, change)
 	fileCategories, err := gh.checkTests(log, change, configuration, *pr.Number)
 	if err != nil {
 		if statusErr := statusService.reportError(); statusErr != nil {
@@ -160,7 +160,7 @@ func (gh *GitHubTestEventsHandler) checkTestsAndSetStatus(log log.Logger, change
 	return err
 }
 
-func (gh *GitHubTestEventsHandler) checkTests(log log.Logger, change scm.RepositoryChange, config TestKeeperConfiguration, prNumber int) (FileCategories, error) {
+func (gh *GitHubTestEventsHandler) checkTests(log log.Logger, change scm.RepositoryChange, config PluginConfiguration, prNumber int) (FileCategories, error) {
 	matcher, err := LoadMatcher(config)
 	if err != nil {
 		log.Error(err)

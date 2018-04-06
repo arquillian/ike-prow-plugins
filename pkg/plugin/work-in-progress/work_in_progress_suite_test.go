@@ -1,4 +1,4 @@
-package work_in_progress
+package wip
 
 import (
 	"testing"

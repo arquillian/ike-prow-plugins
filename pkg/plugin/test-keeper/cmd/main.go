@@ -10,11 +10,11 @@ import (
 )
 
 func main() {
-	pluginBootstrap.InitPlugin(test_keeper.ProwPluginName, eventHandler, eventServer, helpProvider)
+	pluginBootstrap.InitPlugin(testkeeper.ProwPluginName, eventHandler, eventServer, helpProvider)
 }
 
 func eventHandler(githubClient *github.Client) server.GitHubEventHandler {
-	return &test_keeper.GitHubTestEventsHandler{Client: githubClient}
+	return &testkeeper.GitHubTestEventsHandler{Client: githubClient}
 }
 
 func eventServer(webhookSecret []byte, eventHandler server.GitHubEventHandler) *server.Server {

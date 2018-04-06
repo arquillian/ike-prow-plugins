@@ -1,4 +1,4 @@
-package test_keeper_test
+package testkeeper_test
 
 import (
 	"testing"

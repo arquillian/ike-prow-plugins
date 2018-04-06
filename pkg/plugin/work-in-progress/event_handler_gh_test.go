@@ -1,4 +1,4 @@
-package work_in_progress_test
+package wip_test
 
 import (
 	"github.com/arquillian/ike-prow-plugins/pkg/github"

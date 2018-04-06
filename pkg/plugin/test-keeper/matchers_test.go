@@ -1,4 +1,4 @@
-package test_keeper_test
+package testkeeper_test
 
 import (
 	"fmt"
@@ -88,7 +88,7 @@ var _ = Describe("Test Matcher features", func() {
 
 		It("should load default matchers when no pattern is defined", func() {
 			// given
-			emptyConfiguration := TestKeeperConfiguration{}
+			emptyConfiguration := PluginConfiguration{}
 
 			// when
 			matchers, err := LoadMatcher(emptyConfiguration)
@@ -100,7 +100,7 @@ var _ = Describe("Test Matcher features", func() {
 
 		It("should load defined inclusion pattern without default language specific matchers", func() {
 			// given
-			configurationWithInclusionPattern := TestKeeperConfiguration{
+			configurationWithInclusionPattern := PluginConfiguration{
 				Inclusions: []string{`regex{{*IT.java|*TestCase.java}}`},
 			}
 			firstRegexp := func(matcher TestMatcher) string {
