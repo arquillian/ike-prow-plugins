@@ -27,7 +27,7 @@ var _ = Describe("http retry function", func() {
 
 			// then
 			Ω(err).Should(HaveOccurred())
-			Expect(err.Error()).To(ContainSubstring("All 1 attempts of sending a request failed"))
+			Expect(err.Error()).To(ContainSubstring("all 1 attempts of sending a request failed"))
 			Expect(executionCounter).To(Equal(1))
 		})
 
@@ -47,7 +47,7 @@ var _ = Describe("http retry function", func() {
 
 			// then
 			Ω(err).Should(HaveOccurred())
-			Expect(err.Error()).To(ContainSubstring("All 3 attempts of sending a request failed"))
+			Expect(err.Error()).To(ContainSubstring("all 3 attempts of sending a request failed"))
 			Expect(executionCounter).To(Equal(3))
 		})
 
@@ -64,7 +64,7 @@ var _ = Describe("http retry function", func() {
 
 			// then
 			Ω(err).Should(HaveOccurred())
-			Expect(err.Error()).To(ContainSubstring("All 4 attempts of sending a request failed"))
+			Expect(err.Error()).To(ContainSubstring("all 4 attempts of sending a request failed"))
 			Expect(err.Error()).To(ContainSubstring("server responded with error 404"))
 			Expect(executionCounter).To(Equal(4))
 		})
