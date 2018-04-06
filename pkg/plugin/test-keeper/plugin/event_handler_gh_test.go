@@ -100,7 +100,7 @@ var _ = Describe("Test Keeper Plugin features", func() {
 				Get(repositoryName + "/5d6e9b25da90edfc19f488e595e0645c081c1575/test-keeper.yml").
 				Reply(200).
 				BodyString("test_patterns: ['**/*_test_suite.go']\n" +
-					"skip_validation_for: 'README.adoc'")
+					"skip_validation_for: ['README.adoc']")
 
 			gock.New("https://api.github.com").
 				Get("/repos/" + repositoryName + "/pulls/2/files").
@@ -257,6 +257,14 @@ var _ = Describe("Test Keeper Plugin features", func() {
 			gock.New("https://api.github.com").
 				Post("/repos/" + repositoryName + "/statuses").
 				SetMatcher(ExpectPayload(toBe(github.StatusFailure, keeper.NoTestsMessage, keeper.NoTestsDetailsLink))).
+				Reply(201)
+
+			gock.New("https://api.github.com").
+				Post("/repos/" + repositoryName + "/issues/1/comments").
+				SetMatcher(
+					ExpectPayload(
+							ToHaveBodyContaining("@bartoszmajsak-test has used a command `/ok-without-tests`"),
+							ToHaveBodyContaining("anybody who is admin or requested reviewer, but not pull request creator"))).
 				Reply(201) // This way we implicitly verify that call happened after `HandleEvent` call
 
 			statusPayload := LoadFromFile("test_fixtures/github_calls/prs/without_tests/skip_comment_by_external.json")
@@ -268,5 +276,4 @@ var _ = Describe("Test Keeper Plugin features", func() {
 			Ω(err).ShouldNot(HaveOccurred())
 		})
 	})
-
 })

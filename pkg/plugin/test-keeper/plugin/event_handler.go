@@ -2,8 +2,8 @@ package plugin
 
 import (
 	"encoding/json"
-	"strings"
 
+	"github.com/arquillian/ike-prow-plugins/pkg/command"
 	"github.com/arquillian/ike-prow-plugins/pkg/github"
 	"github.com/arquillian/ike-prow-plugins/pkg/log"
 	"github.com/arquillian/ike-prow-plugins/pkg/scm"
@@ -17,12 +17,8 @@ type GitHubTestEventsHandler struct {
 	Client *github.Client
 }
 
-const (
-	// ProwPluginName is an external prow plugin name used to register this service
-	ProwPluginName = "test-keeper"
-	// SkipComment is used as a command to bypass test presence validation
-	SkipComment    = "/ok-without-tests"
-)
+// ProwPluginName is an external prow plugin name used to register this service
+const ProwPluginName = "test-keeper"
 
 var (
 	handledPrActions      = []string{"opened", "reopened", "edited", "synchronize"}
@@ -69,13 +65,7 @@ func (gh *GitHubTestEventsHandler) handlePrEvent(log log.Logger, event *gogh.Pul
 		return nil
 	}
 
-	change := scm.RepositoryChange{
-		Owner:    *event.Repo.Owner.Login,
-		RepoName: *event.Repo.Name,
-		Hash:     *event.PullRequest.Head.SHA,
-	}
-
-	return gh.checkTestsAndSetStatus(log, change, event.PullRequest)
+	return gh.checkTestsAndSetStatus(log, event.PullRequest)
 }
 
 func (gh *GitHubTestEventsHandler) handlePrComment(log log.Logger, prComment *gogh.IssueCommentEvent) error {
@@ -83,48 +73,40 @@ func (gh *GitHubTestEventsHandler) handlePrComment(log log.Logger, prComment *go
 		return nil
 	}
 
-	org := prComment.Repo.Owner.Login
-	name := prComment.Repo.Name
-	prNumber := prComment.Issue.Number
+	prLoader := github.NewPullRequestLoader(gh.Client, prComment)
+	userPerm := command.NewPermissionService(gh.Client, *prComment.Sender.Login, prLoader)
 
-	sender := prComment.Sender.Login
-	permissionLevel, e := gh.Client.GetPermissionLevel(*org, *name, *sender)
-	if e != nil {
-		log.Fatal(e)
-		return e
-	}
+	cmdHandler := command.CommentCmdHandler{Client: gh.Client}
 
-	if *permissionLevel.Permission != "admin" {
-		return nil
-	}
+	cmdHandler.Register(
+		&SkipCommentCmd{
+			userPermissionService: userPerm,
+			whenDeleted: func() error {
+				pullRequest, err := prLoader.Load()
+				if err != nil {
+					return err
+				}
+				return gh.checkTestsAndSetStatus(log, pullRequest)
+			},
+			whenAddedOrCreated: func() error {
+				pullRequest, err := prLoader.Load()
+				if err != nil {
+					return err
+				}
+				statusService := gh.newTestStatusService(log, github.NewRepositoryChangeForPR(pullRequest))
+				return statusService.okWithoutTests(*prComment.Sender.Login)
+			},
+		})
 
-	comment := strings.TrimSpace(*prComment.Comment.Body)
-
-	if comment != SkipComment {
-		return nil
-	}
-
-	pullRequest, err := gh.Client.GetPullRequest(*org, *name, *prNumber)
+	err := cmdHandler.Handle(log, prComment)
 	if err != nil {
 		log.Fatal(err)
-		return err
 	}
-
-	change := scm.RepositoryChange{
-		Owner:    *prComment.Repo.Owner.Login,
-		RepoName: *prComment.Repo.Name,
-		Hash:     *pullRequest.Head.SHA,
-	}
-
-	if comment == SkipComment && *prComment.Action == "deleted" {
-		return gh.checkTestsAndSetStatus(log, change, pullRequest)
-	}
-
-	statusService := gh.newTestStatusService(log, change)
-	return statusService.okWithoutTests(*sender)
+	return err
 }
 
-func (gh *GitHubTestEventsHandler) checkTestsAndSetStatus(log log.Logger, change scm.RepositoryChange, pr *gogh.PullRequest) error {
+func (gh *GitHubTestEventsHandler) checkTestsAndSetStatus(log log.Logger, pr *gogh.PullRequest) error {
+	change := github.NewRepositoryChangeForPR(pr)
 	statusService := gh.newTestStatusService(log, change)
 	configuration := LoadTestKeeperConfig(log, change)
 	fileCategories, err := gh.checkTests(log, change, configuration, *pr.Number)
