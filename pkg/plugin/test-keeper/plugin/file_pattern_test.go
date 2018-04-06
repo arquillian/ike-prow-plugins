@@ -53,11 +53,7 @@ var _ = Describe("File pattern features", func() {
 
 type filePatternProvider func() string
 
-var patternAssertionMsg = "Should parse file pattern %s to regexp %s"
-
-func (f filePatternProvider) isParsedToRegexp(expRegexp string) table.TableEntry {
-	return table.Entry(fmt.Sprintf(patternAssertionMsg, f(), expRegexp), f(), expRegexp)
-}
+var patternAssertionMsg = "Should match file %s to expression %s"
 
 func file(fileName string) filePatternProvider {
 	return filePatternProvider(func() string {

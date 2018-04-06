@@ -22,18 +22,18 @@ type FilePattern struct {
 	Regexp string
 }
 
-type Matcher func(value, exp string) bool
-
 // Matches checks if the given string (representing path to a file) contains a substring that matches Regexp stored in this matcher
 func (matcher *FilePattern) Matches(filename string) bool {
 	return regexp.MustCompile(matcher.Regexp).MatchString(filename)
 }
 
+// FilePatterns is an alias type representing slice of FilePattern
 type FilePatterns []FilePattern
 
-func (matchers *FilePatterns) Matches(filename string) bool {
+// Matches iterates over all patterns and returns first successful match or false if none patterns matched
+func (f *FilePatterns) Matches(filename string) bool {
 
-	for _, matcher := range *matchers {
+	for _, matcher := range *f {
 		if matcher.Matches(filename) {
 			return true
 		}
@@ -69,7 +69,7 @@ func parseFilePattern(pattern string) string {
 	expr := path + fileName
 
 	if strings.HasSuffix(expr, directorySeparator) {
-		expr = anythingRegexp
+		expr += anythingRegexp
 	} else {
 		expr += endOfLineRegexp
 	}
