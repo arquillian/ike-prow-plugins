@@ -1,7 +1,7 @@
 package main
 
 import (
-	"github.com/arquillian/ike-prow-plugins/pkg/plugin/test-keeper/plugin"
+	"github.com/arquillian/ike-prow-plugins/pkg/plugin/test-keeper"
 	"github.com/arquillian/ike-prow-plugins/pkg/server"
 	"k8s.io/test-infra/prow/pluginhelp"
 
@@ -10,11 +10,11 @@ import (
 )
 
 func main() {
-	pluginBootstrap.InitPlugin(plugin.ProwPluginName, eventHandler, eventServer, helpProvider)
+	pluginBootstrap.InitPlugin(test_keeper.ProwPluginName, eventHandler, eventServer, helpProvider)
 }
 
 func eventHandler(githubClient *github.Client) server.GitHubEventHandler {
-	return &plugin.GitHubTestEventsHandler{Client: githubClient}
+	return &test_keeper.GitHubTestEventsHandler{Client: githubClient}
 }
 
 func eventServer(webhookSecret []byte, eventHandler server.GitHubEventHandler) *server.Server {

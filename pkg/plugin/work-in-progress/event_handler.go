@@ -1,4 +1,4 @@
-package plugin
+package work_in_progress
 
 import (
 	"encoding/json"

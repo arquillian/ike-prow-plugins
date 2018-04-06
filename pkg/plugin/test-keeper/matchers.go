@@ -1,4 +1,4 @@
-package plugin
+package test_keeper
 
 import (
 	"github.com/arquillian/ike-prow-plugins/pkg/assets"

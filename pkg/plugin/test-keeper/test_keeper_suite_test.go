@@ -1,4 +1,4 @@
-package plugin_test
+package test_keeper_test
 
 import (
 	"testing"

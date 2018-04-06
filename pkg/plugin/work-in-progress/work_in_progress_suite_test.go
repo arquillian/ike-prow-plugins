@@ -1,4 +1,4 @@
-package plugin_test
+package work_in_progress
 
 import (
 	"testing"
