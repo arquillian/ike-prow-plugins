@@ -11,21 +11,24 @@ import (
 // RequestInvoker is a function that invokes a request and returns a response
 type RequestInvoker func() (*gogh.Response, error)
 
-// Do invokes a request for the given amount of retries with the given sleep before each one of them until the response status code is lower than 404
+// Do invokes a request for the given amount of retries with the given sleep before each one of them until the response
+// status code is lower than 404 or the returned error is not nil
 func Do(retries int, sleep time.Duration, invokeRequest RequestInvoker) error {
-	errs := utils.Retry(retries, sleep, func() error {
+	performedRetries := 0
+	errs := utils.Retry(retries, sleep, func() (shouldRetry bool, error error) {
 		response, err := invokeRequest()
+		performedRetries++
 
 		if response != nil && response.StatusCode >= 404 {
 			if err != nil {
-				return err
+				return true, err
 			}
-			return errors.New("Server responded with error " + string(response.StatusCode))
+			return true, fmt.Errorf("server responded with error %d", response.StatusCode)
 		}
-		return nil
+		return false, err
 	})
-	if len(errs) > 0 {
-		msg := fmt.Sprintf("During %d retries of sending a request %d errors have occurred:", retries, len(errs))
+	if len(errs) == performedRetries {
+		msg := fmt.Sprintf("all %d attempts of sending a request failed. See the errors:", performedRetries)
 		for index, e := range errs {
 			msg = msg + fmt.Sprintf("\n%d. [%s]", index+1, e.Error())
 		}
