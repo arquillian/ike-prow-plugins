@@ -28,7 +28,7 @@ func Do(retries int, sleep time.Duration, invokeRequest RequestInvoker) error {
 		return false, err
 	})
 	if len(errs) == performedRetries {
-		msg := fmt.Sprintf("All %d attempts of sending a request failed. See the errors:", performedRetries)
+		msg := fmt.Sprintf("all %d attempts of sending a request failed. See the errors:", performedRetries)
 		for index, e := range errs {
 			msg = msg + fmt.Sprintf("\n%d. [%s]", index+1, e.Error())
 		}
