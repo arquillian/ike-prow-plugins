@@ -119,7 +119,7 @@ oc-deploy-starter: ## Deploys basic prow infrastructure
 	@echo "Deploying prow infrastructure"
 	@oc apply -f cluster/starter.yaml
 
-HOOK_VERSION?=v20180316-93ade3390
+HOOK_VERSION?=v20180403-2f3ad698f
 .PHONY: oc-deploy-hook
 oc-deploy-hook: ## Deploys hook service only
 	@echo "Deploys hook service ${HOOK_VERSION}"
