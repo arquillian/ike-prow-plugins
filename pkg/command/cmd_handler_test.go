@@ -19,7 +19,7 @@ type configurableCommentCommand struct {
 	triggered         *bool
 }
 
-func (c *configurableCommentCommand) Perform(client *github.Client, log log.Logger, prComment *gogh.IssueCommentEvent) error {
+func (c *configurableCommentCommand) Perform(client *github.Client, log log.Logger, comment *gogh.IssueCommentEvent) error {
 	*c.triggered = true
 	if c.shouldReturnError {
 		return errors.New("error")
@@ -27,7 +27,7 @@ func (c *configurableCommentCommand) Perform(client *github.Client, log log.Logg
 	return nil
 }
 
-func (c *configurableCommentCommand) Matches(prComment *gogh.IssueCommentEvent) bool {
+func (c *configurableCommentCommand) Matches(comment *gogh.IssueCommentEvent) bool {
 	return c.shouldMatch
 }
 

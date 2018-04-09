@@ -24,7 +24,7 @@ var _ = Describe("Pull Request lazy loading", func() {
 			SetMatcher(createCounterMather(&counter)).
 			Reply(200).
 			BodyString(`{"title":"Loaded PR"}`)
-		loader := &github.PullRequestLoader{Client: client, RepoOwner: "owner", RepoName: "repo", Number: 123}
+		loader := &github.PullRequestLazyLoader{Client: client, RepoOwner: "owner", RepoName: "repo", Number: 123}
 		Expect(counter).To(Equal(0))
 
 		// when
@@ -45,7 +45,7 @@ var _ = Describe("Pull Request lazy loading", func() {
 			Persist().
 			Reply(200).
 			BodyString(`{"title":"Loaded PR"}`)
-		loader := &github.PullRequestLoader{Client: client, RepoOwner: "owner", RepoName: "repo", Number: 123}
+		loader := &github.PullRequestLazyLoader{Client: client, RepoOwner: "owner", RepoName: "repo", Number: 123}
 		loader.Load()
 
 		// when

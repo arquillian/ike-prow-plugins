@@ -16,9 +16,9 @@ type doFunctionExecutor func(client *github.Client, log log.Logger, prComment *g
 // CmdExecutor takes care of executing a command triggered by IssueCommentEvent.
 // The execution is set by specifying actions/events and with given restrictions the command should be triggered for.
 type CmdExecutor struct {
-	Command    string
-	QuiteMode  bool
-	doExecutor []doFunctionExecutor
+	Command   string
+	Quiet     bool
+	executors []doFunctionExecutor
 }
 
 // RestrictionSetter keeps information about set actions the command should be triggered for and opens an API to provide
@@ -36,18 +36,18 @@ type DoFunctionProvider struct {
 }
 
 type commentAction struct {
-	actions          []string
-	operationMsgName string
+	actions     []string
+	description string
 }
 
 // Deleted represents comment deletion
-var Deleted = commentAction{actions: []string{"deleted"}, operationMsgName: "deleted"}
+var Deleted = commentAction{actions: []string{"deleted"}, description: "deleted"}
 
 // Triggered represents comment editions and creation
-var Triggered = commentAction{actions: []string{"edited", "created"}, operationMsgName: "used"}
+var Triggered = commentAction{actions: []string{"edited", "created"}, description: "used"}
 
-func (a *commentAction) isMatching(prComment *gogh.IssueCommentEvent) bool {
-	return utils.Contains(a.actions, *prComment.Action)
+func (a *commentAction) isMatching(comment *gogh.IssueCommentEvent) bool {
+	return utils.Contains(a.actions, *comment.Action)
 }
 
 // When takes list of actions the command should be triggered for
@@ -60,8 +60,8 @@ func (s *RestrictionSetter) By(permissionChecks ...PermissionCheck) *DoFunctionP
 	return &DoFunctionProvider{commandExecutor: s.commandExecutor, actions: s.actions, permissionChecks: permissionChecks}
 }
 
-// ThenDo take a DoFunction that performs the required operations (when all checks are fulfilled)
-func (p *DoFunctionProvider) ThenDo(doFunction DoFunction) {
+// Then take a DoFunction that performs the required operations (when all checks are fulfilled)
+func (p *DoFunctionProvider) Then(doFunction DoFunction) {
 	doExecutor := func(client *github.Client, log log.Logger, prComment *gogh.IssueCommentEvent) error {
 		matchingAction := p.getMatchingAction(prComment)
 		if matchingAction == nil {
@@ -72,16 +72,16 @@ func (p *DoFunctionProvider) ThenDo(doFunction DoFunction) {
 		if status.UserIsApproved && err == nil {
 			return doFunction()
 		}
-		message := status.constructMessage(matchingAction.operationMsgName, p.commandExecutor.Command)
+		message := status.constructMessage(matchingAction.description, p.commandExecutor.Command)
 		log.Warn(message)
-		if err == nil && !p.commandExecutor.QuiteMode {
+		if err == nil && !p.commandExecutor.Quiet {
 			commentService := github.NewCommentService(client, prComment)
 			return commentService.AddComment(&message)
 		}
 		return err
 	}
 
-	p.commandExecutor.doExecutor = append(p.commandExecutor.doExecutor, doExecutor)
+	p.commandExecutor.executors = append(p.commandExecutor.executors, doExecutor)
 }
 
 func (p *DoFunctionProvider) getMatchingAction(prComment *gogh.IssueCommentEvent) *commentAction {
@@ -98,7 +98,7 @@ func (e *CmdExecutor) Execute(client *github.Client, log log.Logger, prComment *
 	if e.Command != strings.TrimSpace(*prComment.Comment.Body) {
 		return nil
 	}
-	for _, doExecutor := range e.doExecutor {
+	for _, doExecutor := range e.executors {
 		err := doExecutor(client, log, prComment)
 		if err != nil {
 			return err

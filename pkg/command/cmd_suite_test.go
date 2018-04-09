@@ -10,5 +10,5 @@ import (
 
 func TestCommand(t *testing.T) {
 	RegisterFailHandler(Fail)
-	RunSpecWithJUnitReporter(t, "Command abstraction suite")
+	RunSpecWithJUnitReporter(t, "Command handling test suite")
 }

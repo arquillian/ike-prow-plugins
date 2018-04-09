@@ -42,13 +42,13 @@ var _ = Describe("Command executor features", func() {
 		}
 	})
 
-	Context("Executing of predefined commands in quite mode", func() {
+	Context("Executing of predefined commands in quiet mode", func() {
 
 		It("should not execute command when command name is not matching", func() {
 			// given
 			executed := false
-			command := is.CmdExecutor{Command: "/something-different", QuiteMode: true}
-			command.When(is.Deleted).By(is.AnyBody).ThenDo(func() error {
+			command := is.CmdExecutor{Command: "/something-different", Quiet: true}
+			command.When(is.Deleted).By(is.Anybody).Then(func() error {
 				executed = true
 				return nil
 			})
@@ -65,8 +65,8 @@ var _ = Describe("Command executor features", func() {
 			// given
 			executed := false
 			counter := 0
-			command := is.CmdExecutor{Command: "/command", QuiteMode: true}
-			command.When(is.Deleted).By(is.AnyBody).ThenDo(func() error {
+			command := is.CmdExecutor{Command: "/command", Quiet: true}
+			command.When(is.Deleted).By(is.Anybody).Then(func() error {
 				counter++
 				executed = true
 				return nil
@@ -85,8 +85,8 @@ var _ = Describe("Command executor features", func() {
 			// given
 			executed := false
 			counter := 0
-			command := is.CmdExecutor{Command: "/command", QuiteMode: true}
-			command.When(is.Deleted, is.Triggered).By(is.AnyBody).ThenDo(func() error {
+			command := is.CmdExecutor{Command: "/command", Quiet: true}
+			command.When(is.Deleted, is.Triggered).By(is.Anybody).Then(func() error {
 				counter++
 				executed = true
 				return nil
@@ -105,8 +105,8 @@ var _ = Describe("Command executor features", func() {
 			// given
 			executed := false
 			counter := 0
-			command := is.CmdExecutor{Command: "/command", QuiteMode: true}
-			command.When(is.Deleted, is.Triggered).By(is.AnyBody).ThenDo(func() error {
+			command := is.CmdExecutor{Command: "/command", Quiet: true}
+			command.When(is.Deleted, is.Triggered).By(is.Anybody).Then(func() error {
 				counter++
 				executed = true
 				return nil
@@ -126,8 +126,8 @@ var _ = Describe("Command executor features", func() {
 		It("should not execute command when action is not matching", func() {
 			// given
 			executed := false
-			command := is.CmdExecutor{Command: "/command", QuiteMode: true}
-			command.When(is.Triggered).By(is.AnyBody).ThenDo(func() error {
+			command := is.CmdExecutor{Command: "/command", Quiet: true}
+			command.When(is.Triggered).By(is.Anybody).Then(func() error {
 				executed = true
 				return nil
 			})
@@ -143,8 +143,8 @@ var _ = Describe("Command executor features", func() {
 		It("should not execute command when restriction is not matching", func() {
 			// given
 			executed := false
-			command := is.CmdExecutor{Command: "/command", QuiteMode: true}
-			command.When(is.Deleted).By(is.Not(is.AnyBody)).ThenDo(func() error {
+			command := is.CmdExecutor{Command: "/command", Quiet: true}
+			command.When(is.Deleted).By(is.Not(is.Anybody)).Then(func() error {
 				executed = true
 				return nil
 			})
@@ -171,12 +171,12 @@ var _ = Describe("Command executor features", func() {
 				user := is.PermissionService{
 					Client:   client,
 					User:     "sender",
-					PRLoader: github.NewPullRequestLoader(client, triggeredCommand),
+					PRLoader: github.NewPullRequestLazyLoader(client, triggeredCommand),
 				}
 
 				executed := false
-				command := is.CmdExecutor{Command: "/command", QuiteMode: true}
-				command.When(is.Triggered).By(user.ThatIsAdmin).ThenDo(func() error {
+				command := is.CmdExecutor{Command: "/command", Quiet: true}
+				command.When(is.Triggered).By(user.Admin).Then(func() error {
 					executed = true
 					return nil
 				})
@@ -206,7 +206,7 @@ var _ = Describe("Command executor features", func() {
 				// given
 				executed := false
 				command := is.CmdExecutor{Command: "/command"}
-				command.When(is.Deleted).By(is.AnyBody).ThenDo(func() error {
+				command.When(is.Deleted).By(is.Anybody).Then(func() error {
 					executed = true
 					return nil
 				})
@@ -223,7 +223,7 @@ var _ = Describe("Command executor features", func() {
 				// given
 				executed := false
 				command := is.CmdExecutor{Command: "/command"}
-				command.When(is.Triggered).By(is.AnyBody).ThenDo(func() error {
+				command.When(is.Triggered).By(is.Anybody).Then(func() error {
 					executed = true
 					return nil
 				})
@@ -241,7 +241,7 @@ var _ = Describe("Command executor features", func() {
 				client.Retries = 1
 				executed := false
 				command := is.CmdExecutor{Command: "/command"}
-				command.When(is.Triggered).By(is.Not(is.AnyBody)).ThenDo(func() error {
+				command.When(is.Triggered).By(is.Not(is.Anybody)).Then(func() error {
 					executed = true
 					return nil
 				})

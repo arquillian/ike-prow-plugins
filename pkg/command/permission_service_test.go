@@ -21,7 +21,7 @@ var _ = Describe("Permission service with permission checks features", func() {
 			user = is.PermissionService{
 				Client: client,
 				User:   "user",
-				PRLoader: &github.PullRequestLoader{
+				PRLoader: &github.PullRequestLazyLoader{
 					Client:    client,
 					RepoOwner: "owner",
 					RepoName:  "repo",
@@ -38,7 +38,7 @@ var _ = Describe("Permission service with permission checks features", func() {
 				BodyString("{\"permission\": \"read\"}")
 
 			// when
-			permissionStatus, err := user.ThatIsAdmin()
+			permissionStatus, err := user.Admin()
 
 			// then
 			Ω(err).ShouldNot(HaveOccurred())
@@ -53,7 +53,7 @@ var _ = Describe("Permission service with permission checks features", func() {
 				BodyString("{\"permission\": \"admin\"}")
 
 			// when
-			permissionStatus, err := user.ThatIsAdmin()
+			permissionStatus, err := user.Admin()
 
 			// then
 			Ω(err).ShouldNot(HaveOccurred())
@@ -68,7 +68,7 @@ var _ = Describe("Permission service with permission checks features", func() {
 				BodyString(`{"user": {"login": "creator"}}`)
 
 			// when
-			permissionStatus, err := user.ThatIsPRCreator()
+			permissionStatus, err := user.PRCreator()
 
 			// then
 			Ω(err).ShouldNot(HaveOccurred())
@@ -83,7 +83,7 @@ var _ = Describe("Permission service with permission checks features", func() {
 				BodyString(`{"user": {"login": "user"}}`)
 
 			// when
-			permissionStatus, err := user.ThatIsPRCreator()
+			permissionStatus, err := user.PRCreator()
 
 			// then
 			Ω(err).ShouldNot(HaveOccurred())
@@ -98,7 +98,7 @@ var _ = Describe("Permission service with permission checks features", func() {
 				BodyString(`{"requested_reviewers": [{"login": "reviewer1"}, {"login": "reviewer2"}]}`)
 
 			// when
-			permissionStatus, err := user.ThatIsPRReviewer()
+			permissionStatus, err := user.PRReviewer()
 
 			// then
 			Ω(err).ShouldNot(HaveOccurred())
@@ -113,7 +113,7 @@ var _ = Describe("Permission service with permission checks features", func() {
 				BodyString(`{"requested_reviewers": [{"login": "reviewer1"}, {"login": "user"}]}`)
 
 			// when
-			permissionStatus, err := user.ThatIsPRReviewer()
+			permissionStatus, err := user.PRReviewer()
 
 			// then
 			Ω(err).ShouldNot(HaveOccurred())
@@ -136,7 +136,7 @@ var _ = Describe("Permission service with permission checks features", func() {
 
 		It("tests 'anybody' function that should approve everyone", func() {
 			// when
-			permissionStatus, err := is.AnyBody()
+			permissionStatus, err := is.Anybody()
 
 			// then
 			Ω(err).ShouldNot(HaveOccurred())

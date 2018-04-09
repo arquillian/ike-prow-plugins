@@ -11,11 +11,11 @@ import (
 type PermissionService struct {
 	Client   *github.Client
 	User     string
-	PRLoader *github.PullRequestLoader
+	PRLoader *github.PullRequestLazyLoader
 }
 
 // NewPermissionService creates a new instance of PermissionService with the given client, user and pr loader
-func NewPermissionService(client *github.Client, user string, prLoader *github.PullRequestLoader) *PermissionService {
+func NewPermissionService(client *github.Client, user string, prLoader *github.PullRequestLazyLoader) *PermissionService {
 	return &PermissionService{
 		Client:   client,
 		User:     user,
@@ -56,13 +56,13 @@ func (s *PermissionStatus) constructMessage(operation, command string) string {
 // PermissionCheck represents any check of the user's permissions and returns PermissionStatus that contains the result
 type PermissionCheck func() (*PermissionStatus, error)
 
-// AnyBody allows to any user
-var AnyBody PermissionCheck = func() (*PermissionStatus, error) {
+// Anybody allows to any user
+var Anybody PermissionCheck = func() (*PermissionStatus, error) {
 	return &PermissionStatus{UserIsApproved: true, ApprovedRoles: []string{"anyone"}}, nil
 }
 
-// ThatIsAdmin checks if the user is admin
-func (s *PermissionService) ThatIsAdmin() (*PermissionStatus, error) {
+// Admin checks if the user is admin
+func (s *PermissionService) Admin() (*PermissionStatus, error) {
 	status := s.newPermissionStatus("admin")
 	permissionLevel, err := s.Client.GetPermissionLevel(s.PRLoader.RepoOwner, s.PRLoader.RepoName, s.User)
 	if err != nil {
@@ -75,8 +75,8 @@ func (s *PermissionService) ThatIsAdmin() (*PermissionStatus, error) {
 	return status.reject(), nil
 }
 
-// ThatIsPRReviewer checks if the user is pull request reviewer
-func (s *PermissionService) ThatIsPRReviewer() (*PermissionStatus, error) {
+// PRReviewer checks if the user is pull request reviewer
+func (s *PermissionService) PRReviewer() (*PermissionStatus, error) {
 	status := s.newPermissionStatus("requested reviewer")
 	pr, err := s.PRLoader.Load()
 	if err != nil {
@@ -90,8 +90,8 @@ func (s *PermissionService) ThatIsPRReviewer() (*PermissionStatus, error) {
 	return status.reject(), nil
 }
 
-// ThatIsPRCreator checks if the user is pull request creator
-func (s *PermissionService) ThatIsPRCreator() (*PermissionStatus, error) {
+// PRCreator checks if the user is pull request creator
+func (s *PermissionService) PRCreator() (*PermissionStatus, error) {
 	status := s.newPermissionStatus("pull request creator")
 	pr, err := s.PRLoader.Load()
 	if err != nil {

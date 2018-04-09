@@ -24,18 +24,18 @@ func (c *SkipCommentCmd) Perform(client *github.Client, log log.Logger, prCommen
 	user := c.userPermissionService
 	var SkipCommentCommand = &is.CmdExecutor{Command: SkipComment}
 
-	SkipCommentCommand.When(is.Deleted).By(is.AnyBody).ThenDo(c.whenDeleted)
+	SkipCommentCommand.When(is.Deleted).By(is.Anybody).Then(c.whenDeleted)
 
 	SkipCommentCommand.
 		When(is.Triggered).
-		By(is.AnyOf(user.ThatIsAdmin, user.ThatIsPRReviewer), is.Not(user.ThatIsPRCreator)).
-		ThenDo(c.whenAddedOrCreated)
+		By(is.AnyOf(user.Admin, user.PRReviewer), is.Not(user.PRCreator)).
+		Then(c.whenAddedOrCreated)
 
 	return SkipCommentCommand.Execute(client, log, prComment)
 }
 
 // Matches returns true when the given IssueCommentEvent content is same as "/ok-without-tests"
-func (c *SkipCommentCmd) Matches(prComment *gogh.IssueCommentEvent) bool {
-	comment := strings.TrimSpace(*prComment.Comment.Body)
-	return comment == SkipComment
+func (c *SkipCommentCmd) Matches(comment *gogh.IssueCommentEvent) bool {
+	body := strings.TrimSpace(*comment.Comment.Body)
+	return body == SkipComment
 }

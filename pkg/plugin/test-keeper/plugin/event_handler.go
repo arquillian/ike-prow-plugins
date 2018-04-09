@@ -73,7 +73,7 @@ func (gh *GitHubTestEventsHandler) handlePrComment(log log.Logger, prComment *go
 		return nil
 	}
 
-	prLoader := github.NewPullRequestLoader(gh.Client, prComment)
+	prLoader := github.NewPullRequestLazyLoader(gh.Client, prComment)
 	userPerm := command.NewPermissionService(gh.Client, *prComment.Sender.Login, prLoader)
 
 	cmdHandler := command.CommentCmdHandler{Client: gh.Client}

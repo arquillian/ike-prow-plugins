@@ -8,18 +8,18 @@ import (
 
 // CommentCmdHandler keeps list of CommentCmd implementations to be handled when an IssueCommentEvent occurs
 type CommentCmdHandler struct {
-	Client          *github.Client
-	commentCommands []CommentCmd
+	Client   *github.Client
+	commands []CommentCmd
 }
 
 // Register adds the given CommentCmd implementation to the list of commands to be handled when an IssueCommentEvent occurs
-func (s *CommentCmdHandler) Register(commentCommand CommentCmd) {
-	s.commentCommands = append(s.commentCommands, commentCommand)
+func (s *CommentCmdHandler) Register(command CommentCmd) {
+	s.commands = append(s.commands, command)
 }
 
 // Handle triggers the process of evaluating and performing of all stored CommentCmd implementations for the given comment
 func (s *CommentCmdHandler) Handle(log log.Logger, comment *gogh.IssueCommentEvent) error {
-	for _, commentCommand := range s.commentCommands {
+	for _, commentCommand := range s.commands {
 		if commentCommand.Matches(comment) {
 			err := commentCommand.Perform(s.Client, log, comment)
 			if err != nil {
