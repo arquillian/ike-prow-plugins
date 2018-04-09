@@ -9,13 +9,13 @@ import:
 - package: github.com/google/go-github/github
   version: 15.0.0
 - package: k8s.io/test-infra/prow/hook
-  version: 93ade3390d83b5e4d9cd75d5a769b6391137cd1e
+  version: 2f3ad698ffcff53f881d3292a1b3da894bf1d5f7
 - package: k8s.io/test-infra/prow/pluginhelp
-  version: 93ade3390d83b5e4d9cd75d5a769b6391137cd1e
+  version: 2f3ad698ffcff53f881d3292a1b3da894bf1d5f7
 - package: k8s.io/test-infra/prow/pluginhelp/externalplugins
-  version: 93ade3390d83b5e4d9cd75d5a769b6391137cd1e
+  version: 2f3ad698ffcff53f881d3292a1b3da894bf1d5f7
 - package: k8s.io/test-infra/prow/plugins
-  version: 93ade3390d83b5e4d9cd75d5a769b6391137cd1e
+  version: 2f3ad698ffcff53f881d3292a1b3da894bf1d5f7
 - package: github.com/getsentry/raven-go
   version: 563b81fc02b75d664e54da31f787c2cc2186780b
 - package: github.com/certifi/gocertifi

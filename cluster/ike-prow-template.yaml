@@ -6,7 +6,7 @@ parameters:
   value: docker.io
 - name: DOCKER_REPO
   required: true
-  value: bartoszmajsak
+  value: arquillian
 - name: PLUGIN_NAME
   required: true
 - name: VERSION

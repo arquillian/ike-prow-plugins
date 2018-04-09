@@ -241,7 +241,7 @@ imports:
   subpackages:
   - pkg/common
 - name: k8s.io/test-infra
-  version: 93ade3390d83b5e4d9cd75d5a769b6391137cd1e
+  version: 2f3ad698ffcff53f881d3292a1b3da894bf1d5f7
   subpackages:
   - prow/commentpruner
   - prow/config
@@ -273,6 +273,7 @@ imports:
   - prow/plugins/lifecycle
   - prow/plugins/milestone
   - prow/plugins/milestonestatus
+  - prow/plugins/owners-label
   - prow/plugins/releasenote
   - prow/plugins/requiresig
   - prow/plugins/shrug
@@ -284,6 +285,7 @@ imports:
   - prow/plugins/updateconfig
   - prow/plugins/wip
   - prow/plugins/yuks
+  - prow/pod-utils/downwardapi
   - prow/repoowners
   - prow/slack
 testImports:
