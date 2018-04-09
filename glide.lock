@@ -1,5 +1,5 @@
-hash: a7a4c857ccd2e919240bb3a7ccf92b97269abe41d4509ad39f532be4eb71ec87
-updated: 2018-04-06T12:45:28.103968555+02:00
+hash: 2dc53922a6948058f6a4520a20e9f4b69c96f61846d2c02f4fd32a29b48e81d8
+updated: 2018-04-08T22:56:19.475386739+02:00
 imports:
 - name: github.com/bazelbuild/buildtools
   version: a8cd34f034f2ae1e206eec896cf12d38a0cb26fb
@@ -219,7 +219,7 @@ imports:
   - pkg/watch
   - third_party/forked/golang/reflect
 - name: k8s.io/test-infra
-  version: 93ade3390d83b5e4d9cd75d5a769b6391137cd1e
+  version: 2f3ad698ffcff53f881d3292a1b3da894bf1d5f7
   subpackages:
   - prow/commentpruner
   - prow/config
@@ -251,6 +251,7 @@ imports:
   - prow/plugins/lifecycle
   - prow/plugins/milestone
   - prow/plugins/milestonestatus
+  - prow/plugins/owners-label
   - prow/plugins/releasenote
   - prow/plugins/requiresig
   - prow/plugins/shrug
@@ -262,6 +263,7 @@ imports:
   - prow/plugins/updateconfig
   - prow/plugins/wip
   - prow/plugins/yuks
+  - prow/pod-utils/downwardapi
   - prow/repoowners
   - prow/slack
 testImports:
