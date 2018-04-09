@@ -94,25 +94,24 @@ var _ = Describe("Test Keeper Plugin features", func() {
 			Ω(err).ShouldNot(HaveOccurred())
 		})
 
-		It("should approve edited pull request when tests included based on configured pattern and defaults (implicitly combined)", func() {
+		It("should approve new pull request without tests when it comes with configuration excluding all files from test presence check (implicitly combined)", func() {
 			// given
 			gock.New("https://raw.githubusercontent.com").
 				Get(repositoryName + "/5d6e9b25da90edfc19f488e595e0645c081c1575/test-keeper.yml").
 				Reply(200).
-				BodyString("test_patterns: ['**/*_test_suite.go']\n" +
-					"skip_validation_for: 'README.adoc'")
+				Body(FromFile("test_fixtures/github_calls/prs/without_tests/test-keeper-ignore-randomfile.yml"))
 
 			gock.New("https://api.github.com").
-				Get("/repos/" + repositoryName + "/pulls/2/files").
+				Get("/repos/" + repositoryName + "/pulls/1/files").
 				Reply(200).
-				Body(FromFile("test_fixtures/github_calls/prs/with_tests/changes_go_files.json"))
+				Body(FromFile("test_fixtures/github_calls/prs/without_tests/changes-with-test-keeper-config-excluding-other-file-from-PR.json"))
 
 			gock.New("https://api.github.com").
 				Post("/repos/" + repositoryName + "/statuses").
-				SetMatcher(ExpectPayload(toBe(github.StatusSuccess, keeper.TestsExistMessage, keeper.TestsExistDetailsLink))).
+				SetMatcher(ExpectPayload(toBe(github.StatusSuccess, keeper.OkOnlySkippedFilesMessage, keeper.OkOnlySkippedFilesDetailsLink))).
 				Reply(201) // This way we implicitly verify that call happened after `HandleEvent` call
 
-			statusPayload := LoadFromFile("test_fixtures/github_calls/prs/with_tests/status_edited.json")
+			statusPayload := LoadFromFile("test_fixtures/github_calls/prs/without_tests/status_opened.json")
 
 			// when
 			err := handler.HandleEvent(log, github.PullRequest, statusPayload)

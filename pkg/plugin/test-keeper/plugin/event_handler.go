@@ -21,7 +21,7 @@ const (
 	// ProwPluginName is an external prow plugin name used to register this service
 	ProwPluginName = "test-keeper"
 	// SkipComment is used as a command to bypass test presence validation
-	SkipComment    = "/ok-without-tests"
+	SkipComment = "/ok-without-tests"
 )
 
 var (

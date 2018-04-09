@@ -1,12 +1,13 @@
 package http_test
 
 import (
-	. "github.com/onsi/ginkgo"
-	. "github.com/arquillian/ike-prow-plugins/pkg/http"
-	"time"
-	gogh "github.com/google/go-github/github"
-	"net/http"
 	"errors"
+	"net/http"
+	"time"
+
+	. "github.com/arquillian/ike-prow-plugins/pkg/http"
+	gogh "github.com/google/go-github/github"
+	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 )
 
