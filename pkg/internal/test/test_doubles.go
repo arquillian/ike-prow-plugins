@@ -8,13 +8,14 @@ import (
 	"net/http"
 	"os"
 
+	"time"
+
 	"github.com/arquillian/ike-prow-plugins/pkg/github"
 	"github.com/arquillian/ike-prow-plugins/pkg/log"
 	gogh "github.com/google/go-github/github"
 	"github.com/onsi/ginkgo"
 	"github.com/sirupsen/logrus"
 	"gopkg.in/h2non/gock.v1"
-	"time"
 )
 
 // This package is intended to keep helper functions used across the tests. Shouldn't be used for production code

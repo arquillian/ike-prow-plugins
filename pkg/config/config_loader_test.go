@@ -2,16 +2,16 @@ package config_test
 
 import (
 	"github.com/arquillian/ike-prow-plugins/pkg/config"
+	"github.com/arquillian/ike-prow-plugins/pkg/internal/test"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	"github.com/pkg/errors"
-	"github.com/arquillian/ike-prow-plugins/pkg/internal/test"
 )
 
 type sampleConfiguration struct {
 	config.PluginConfiguration `yaml:",inline,omitempty"`
-	Name       string          `yaml:"name,omitempty"`
-	Skip []string        `yaml:"skip_validation_for,omitempty"`
+	Name                       string   `yaml:"name,omitempty"`
+	Skip                       []string `yaml:"skip_validation_for,omitempty"`
 }
 
 type testConfigProvider func() []config.Source
