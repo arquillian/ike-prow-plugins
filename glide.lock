@@ -1,5 +1,5 @@
-hash: c5a1e928738cbe4eca254ef0facaa19f4423df2197b50807295cc431e18a1a09
-updated: 2018-04-06T10:13:15.305765447+02:00
+hash: 46fd5e46bfd9132b078a214081db533f2b477c7a4984afaae4cf89fbe9eace71
+updated: 2018-04-09T11:32:14.706171021+02:00
 imports:
 - name: github.com/bazelbuild/buildtools
   version: c98ff0c6395f09b1942e6f7c42bf3ec15e3b9ca7
@@ -30,6 +30,8 @@ imports:
   version: 6aced65f8501fe1217321abf0749d354824ba2ff
 - name: github.com/go-openapi/swag
   version: 1d0bd113de87027671077d3c71eb3ac5d7dbba72
+- name: github.com/gobwas/glob
+  version: 5ccd90ef52e1e632236f7326478d4faa74f99438
 - name: github.com/gogo/protobuf
   version: c0656edd0d9eab7c66d1eb0c568f9039345796f7
   subpackages:
