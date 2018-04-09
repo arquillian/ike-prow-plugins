@@ -78,7 +78,8 @@ func parseFilePattern(pattern string) string {
 }
 
 func transformPathPatternToRegexp(path string) string {
-	for ; strings.HasPrefix(path, anyPathWildcard+"/"); path = path[strings.Index(path, "/")+1:] {
+	for strings.HasPrefix(path, anyPathWildcard+"/") {
+		path = path[strings.Index(path, "/")+1:]
 	}
 	path = escapeDots(path)
 	path = strings.Replace(path, anyPathWildcard, twoStarsReplacement, -1)
