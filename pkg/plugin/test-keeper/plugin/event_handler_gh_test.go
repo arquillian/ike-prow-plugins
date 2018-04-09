@@ -104,7 +104,7 @@ var _ = Describe("Test Keeper Plugin features", func() {
 			gock.New("https://api.github.com").
 				Get("/repos/" + repositoryName + "/pulls/1/files").
 				Reply(200).
-				Body(FromFile("test_fixtures/github_calls/prs/without_tests/changes-with-config.json"))
+				Body(FromFile("test_fixtures/github_calls/prs/without_tests/changes-with-test-keeper-config-excluding-other-file-from-PR.json"))
 
 			gock.New("https://api.github.com").
 				Post("/repos/" + repositoryName + "/statuses").
