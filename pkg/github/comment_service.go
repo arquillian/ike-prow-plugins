@@ -12,13 +12,13 @@ type CommentService struct {
 }
 
 // NewCommentService creates an instance of GitHub CommentService with information retrieved from the given IssueCommentEvents
-func NewCommentService(client *Client, prComment *gogh.IssueCommentEvent) *CommentService {
+func NewCommentService(client *Client, comment *gogh.IssueCommentEvent) *CommentService {
 	return &CommentService{
 		client: client,
 		issue: scm.RepositoryIssue{
-			Owner:    *prComment.Repo.Owner.Login,
-			RepoName: *prComment.Repo.Name,
-			Number:   *prComment.Issue.Number,
+			Owner:    *comment.Repo.Owner.Login,
+			RepoName: *comment.Repo.Name,
+			Number:   *comment.Issue.Number,
 		},
 	}
 }

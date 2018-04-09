@@ -20,7 +20,7 @@ type SkipCommentCmd struct {
 }
 
 // Perform executes the set DoFunctions for the given IssueCommentEvent (when all conditions are fulfilled)
-func (c *SkipCommentCmd) Perform(client *github.Client, log log.Logger, prComment *gogh.IssueCommentEvent) error {
+func (c *SkipCommentCmd) Perform(client *github.Client, log log.Logger, comment *gogh.IssueCommentEvent) error {
 	user := c.userPermissionService
 	var SkipCommentCommand = &is.CmdExecutor{Command: SkipComment}
 
@@ -31,7 +31,7 @@ func (c *SkipCommentCmd) Perform(client *github.Client, log log.Logger, prCommen
 		By(is.AnyOf(user.Admin, user.PRReviewer), is.Not(user.PRCreator)).
 		Then(c.whenAddedOrCreated)
 
-	return SkipCommentCommand.Execute(client, log, prComment)
+	return SkipCommentCommand.Execute(client, log, comment)
 }
 
 // Matches returns true when the given IssueCommentEvent content is same as "/ok-without-tests"

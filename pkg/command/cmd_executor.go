@@ -11,7 +11,7 @@ import (
 
 // DoFunction is used for performing operations related to command actions
 type DoFunction func() error
-type doFunctionExecutor func(client *github.Client, log log.Logger, prComment *gogh.IssueCommentEvent) error
+type doFunctionExecutor func(client *github.Client, log log.Logger, comment *gogh.IssueCommentEvent) error
 
 // CmdExecutor takes care of executing a command triggered by IssueCommentEvent.
 // The execution is set by specifying actions/events and with given restrictions the command should be triggered for.
@@ -62,8 +62,8 @@ func (s *RestrictionSetter) By(permissionChecks ...PermissionCheck) *DoFunctionP
 
 // Then take a DoFunction that performs the required operations (when all checks are fulfilled)
 func (p *DoFunctionProvider) Then(doFunction DoFunction) {
-	doExecutor := func(client *github.Client, log log.Logger, prComment *gogh.IssueCommentEvent) error {
-		matchingAction := p.getMatchingAction(prComment)
+	doExecutor := func(client *github.Client, log log.Logger, comment *gogh.IssueCommentEvent) error {
+		matchingAction := p.getMatchingAction(comment)
 		if matchingAction == nil {
 			return nil
 		}
@@ -75,7 +75,7 @@ func (p *DoFunctionProvider) Then(doFunction DoFunction) {
 		message := status.constructMessage(matchingAction.description, p.commandExecutor.Command)
 		log.Warn(message)
 		if err == nil && !p.commandExecutor.Quiet {
-			commentService := github.NewCommentService(client, prComment)
+			commentService := github.NewCommentService(client, comment)
 			return commentService.AddComment(&message)
 		}
 		return err
@@ -84,9 +84,9 @@ func (p *DoFunctionProvider) Then(doFunction DoFunction) {
 	p.commandExecutor.executors = append(p.commandExecutor.executors, doExecutor)
 }
 
-func (p *DoFunctionProvider) getMatchingAction(prComment *gogh.IssueCommentEvent) *commentAction {
+func (p *DoFunctionProvider) getMatchingAction(comment *gogh.IssueCommentEvent) *commentAction {
 	for _, action := range p.actions {
-		if action.isMatching(prComment) {
+		if action.isMatching(comment) {
 			return &action
 		}
 	}
@@ -94,12 +94,12 @@ func (p *DoFunctionProvider) getMatchingAction(prComment *gogh.IssueCommentEvent
 }
 
 // Execute triggers the given DoFunctions (when all checks are fulfilled) for the given pr comment
-func (e *CmdExecutor) Execute(client *github.Client, log log.Logger, prComment *gogh.IssueCommentEvent) error {
-	if e.Command != strings.TrimSpace(*prComment.Comment.Body) {
+func (e *CmdExecutor) Execute(client *github.Client, log log.Logger, comment *gogh.IssueCommentEvent) error {
+	if e.Command != strings.TrimSpace(*comment.Comment.Body) {
 		return nil
 	}
 	for _, doExecutor := range e.executors {
-		err := doExecutor(client, log, prComment)
+		err := doExecutor(client, log, comment)
 		if err != nil {
 			return err
 		}

@@ -68,13 +68,13 @@ func (gh *GitHubTestEventsHandler) handlePrEvent(log log.Logger, event *gogh.Pul
 	return gh.checkTestsAndSetStatus(log, event.PullRequest)
 }
 
-func (gh *GitHubTestEventsHandler) handlePrComment(log log.Logger, prComment *gogh.IssueCommentEvent) error {
-	if !utils.Contains(handledCommentActions, *prComment.Action) {
+func (gh *GitHubTestEventsHandler) handlePrComment(log log.Logger, comment *gogh.IssueCommentEvent) error {
+	if !utils.Contains(handledCommentActions, *comment.Action) {
 		return nil
 	}
 
-	prLoader := github.NewPullRequestLazyLoader(gh.Client, prComment)
-	userPerm := command.NewPermissionService(gh.Client, *prComment.Sender.Login, prLoader)
+	prLoader := github.NewPullRequestLazyLoader(gh.Client, comment)
+	userPerm := command.NewPermissionService(gh.Client, *comment.Sender.Login, prLoader)
 
 	cmdHandler := command.CommentCmdHandler{Client: gh.Client}
 
@@ -94,11 +94,11 @@ func (gh *GitHubTestEventsHandler) handlePrComment(log log.Logger, prComment *go
 					return err
 				}
 				statusService := gh.newTestStatusService(log, github.NewRepositoryChangeForPR(pullRequest))
-				return statusService.okWithoutTests(*prComment.Sender.Login)
+				return statusService.okWithoutTests(*comment.Sender.Login)
 			},
 		})
 
-	err := cmdHandler.Handle(log, prComment)
+	err := cmdHandler.Handle(log, comment)
 	if err != nil {
 		log.Fatal(err)
 	}
