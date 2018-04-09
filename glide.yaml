@@ -22,8 +22,6 @@ import:
   version: 2018.01.18
 - package: github.com/evalphobia/logrus_sentry
   version: 0.4.5
-- package: github.com/gobwas/glob
-  version: 0.2.3
 
 # Normally these dependencies should belong to testImport,
 # but as they are used in shared internal packages they have to go as regular ones
