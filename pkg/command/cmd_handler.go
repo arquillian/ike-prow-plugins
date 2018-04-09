@@ -2,8 +2,8 @@ package command
 
 import (
 	"github.com/arquillian/ike-prow-plugins/pkg/github"
-	gogh "github.com/google/go-github/github"
 	"github.com/arquillian/ike-prow-plugins/pkg/log"
+	gogh "github.com/google/go-github/github"
 )
 
 // CommentCmdHandler keeps list of CommentCmd implementations to be handled when an IssueCommentEvent occurs
@@ -18,10 +18,10 @@ func (s *CommentCmdHandler) Register(commentCommand CommentCmd) {
 }
 
 // Handle triggers the process of evaluating and performing of all stored CommentCmd implementations for the given comment
-func (s *CommentCmdHandler) Handle(log log.Logger, prComment *gogh.IssueCommentEvent) error {
+func (s *CommentCmdHandler) Handle(log log.Logger, comment *gogh.IssueCommentEvent) error {
 	for _, commentCommand := range s.commentCommands {
-		if commentCommand.Matches(prComment) {
-			err := commentCommand.Perform(s.Client, log, prComment)
+		if commentCommand.Matches(comment) {
+			err := commentCommand.Perform(s.Client, log, comment)
 			if err != nil {
 				return err
 			}
@@ -33,7 +33,7 @@ func (s *CommentCmdHandler) Handle(log log.Logger, prComment *gogh.IssueCommentE
 // CommentCmd is a abstraction of a command that is triggered by a comment
 type CommentCmd interface {
 	// Perform triggers the process of evaluating and performing of the command for the given comment
-	Perform(client *github.Client, log log.Logger, prComment *gogh.IssueCommentEvent) error
+	Perform(client *github.Client, log log.Logger, comment *gogh.IssueCommentEvent) error
 	// Matches says if the content of the given comment matches the command
-	Matches(prComment *gogh.IssueCommentEvent) bool
+	Matches(comment *gogh.IssueCommentEvent) bool
 }

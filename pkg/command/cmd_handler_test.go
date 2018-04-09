@@ -6,11 +6,11 @@ import (
 	is "github.com/arquillian/ike-prow-plugins/pkg/command"
 	"github.com/arquillian/ike-prow-plugins/pkg/github"
 	. "github.com/arquillian/ike-prow-plugins/pkg/internal/test"
+	"github.com/arquillian/ike-prow-plugins/pkg/log"
 	"github.com/arquillian/ike-prow-plugins/pkg/utils"
 	gogh "github.com/google/go-github/github"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
-	"github.com/arquillian/ike-prow-plugins/pkg/log"
 )
 
 type configurableCommentCommand struct {

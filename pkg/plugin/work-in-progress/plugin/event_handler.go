@@ -17,7 +17,7 @@ const (
 	ProwPluginName = "work-in-progress"
 
 	// WipPrefix is a prefix which, when applied on the PR title, marks its state as "work-in-progress"
-	WipPrefix      = "wip "
+	WipPrefix = "wip "
 
 	// InProgressMessage is a message used in GH Status as description when the PR is in progress
 	InProgressMessage = "PR is in progress and can't be merged yet. You might want to wait with review as well"
