@@ -91,7 +91,7 @@ objects:
     metadata:
       name: hook
     spec:
-      host: ""
+      host: ${HOOK_HOSTNAME}
       to:
         kind: Service
         name: hook
