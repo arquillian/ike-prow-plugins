@@ -39,7 +39,7 @@ const (
 )
 
 func (gh *GitHubTestEventsHandler) newTestStatusService(log log.Logger, change scm.RepositoryChange) testStatusService {
-	statusContext := github.StatusContext{BotName: "alien-ike", PluginName: ProwPluginName}
+	statusContext := github.StatusContext{BotName: gh.BotName, PluginName: ProwPluginName}
 	statusService := github.NewStatusService(gh.Client, log, change, statusContext)
 	return testStatusService{statusService: statusService}
 }

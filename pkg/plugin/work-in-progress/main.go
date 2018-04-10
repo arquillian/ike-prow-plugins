@@ -13,8 +13,8 @@ func main() {
 	pluginBootstrap.InitPlugin(plugin.ProwPluginName, handlerCreator, serverCreator, helpProvider)
 }
 
-func handlerCreator(githubClient *github.Client) server.GitHubEventHandler {
-	return &plugin.GitHubWIPPRHandler{Client: githubClient}
+func handlerCreator(githubClient *github.Client, botName string) server.GitHubEventHandler {
+	return &plugin.GitHubWIPPRHandler{Client: githubClient, BotName: botName}
 }
 
 func serverCreator(webhookSecret []byte, eventHandler server.GitHubEventHandler) *server.Server {
