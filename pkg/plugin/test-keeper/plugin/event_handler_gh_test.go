@@ -208,6 +208,27 @@ var _ = Describe("Test Keeper Plugin features", func() {
 			Ω(err).ShouldNot(HaveOccurred())
 		})
 
+		It("should not block newly created pull request when deletions are the only changes", func() {
+			// given
+			gock.New("https://api.github.com").
+				Get("/repos/" + repositoryName + "/pulls/1/files").
+				Reply(200).
+				Body(FromFile("test_fixtures/github_calls/prs/without_tests/deletions_only_changes.json"))
+
+			gock.New("https://api.github.com").
+				Post("/repos/" + repositoryName + "/statuses").
+				SetMatcher(ExpectPayload(toBe(github.StatusSuccess, keeper.OkOnlySkippedFilesMessage, keeper.OkOnlySkippedFilesDetailsLink))).
+				Reply(201) // This way we implicitly verify that call happened after `HandleEvent` call
+
+			statusPayload := LoadFromFile("test_fixtures/github_calls/prs/without_tests/status_opened.json")
+
+			// when
+			err := handler.HandleEvent(log, github.PullRequest, statusPayload)
+
+			// then - implicit verification of /statuses call occurrence with proper payload
+			Ω(err).ShouldNot(HaveOccurred())
+		})
+
 		It("should skip test existence check when "+keeper.SkipComment+" command is used by admin user", func() {
 			// given
 			gock.New("https://api.github.com").

@@ -44,6 +44,9 @@ func (t *FileCategoryCounter) Count(files []scm.ChangedFile) (FileCategories, er
 		}
 		excluded := t.Matcher.MatchesExclusion(file.Name)
 		if !excluded {
+			if file.Additions == 0 && file.Deletions > 0 {
+				types.Skipped++
+			}
 			if t.Matcher.MatchesInclusion(file.Name) {
 				types.Tests++
 				return types, nil // As we found the first test and we don't care about the amount of them, we can return

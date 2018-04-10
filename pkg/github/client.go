@@ -74,7 +74,7 @@ func (c *Client) ListPullRequestFiles(owner, repo string, prNumber int) ([]scm.C
 
 	changedFiles := make([]scm.ChangedFile, 0, len(files))
 	for _, file := range files {
-		changedFiles = append(changedFiles, scm.ChangedFile{Name: *file.Filename, Status: *file.Status})
+		changedFiles = append(changedFiles, scm.ChangedFile{Name: *file.Filename, Status: *file.Status, Additions: *file.Additions, Deletions: *file.Deletions})
 	}
 
 	return changedFiles, err
