@@ -15,15 +15,15 @@ organization. Be aware however, that adding an external plugin both to the repos
 
 ==== Creating custom plugin hint messages
 
-To enable customized plugin hint comment messages edit plugins.yaml file adding the `plugin_hint` property.
+To enable customized plugin hint comment messages edit plugin's configuration file (eg. test-keeper.yaml) adding the `plugin_hint` property.
 
 [source, yml, indent=0]
 ----
-include::../plugins.yaml[tag="plugin_hint"]
+include::../../pkg/plugin/test-keeper/plugin/test_fixtures/github_calls/prs/with_tests/test-keeper.yml[tag="plugin_hint"]
 ----
 
 The `plugin_hint` property can either have an inline string directly written inside of the config file or another file with case insensitive 
-filename having extension such as .md or .txt that contains the hint. The location of the file can be set by either a relative path or an
+filename PLUGIN-NAME-HINT.md that contains the hint. The location of the file can be set by either a relative path or an
 absolute URL. If nothing is set then a default message is used.
 
 ==== GitHub settings [[gh-settings]]

@@ -32,21 +32,21 @@ const (
 
 	sadIke = `<img align="left" src="https://cdn.rawgit.com/bartoszmajsak/ike-prow-plugins/2025328b70bd1879520411b3cacadee61a49641a/docs/images/arquillian_ui_failure_128px.png">`
 
-	// FileRegex is used to detect custom plugin hint file.
-	FileRegex = `(?m)\.(md|MD|txt|TXT)$`
+	// FileRegex used to detect case insensitive custom plugin-name-hint.md file.
+	FileRegex = `(?im)\.md$`
 )
 
 // CreateCommentMessage creates a comment message for the test-keeper plugin. If the comment message is set in config then it takes that one, the default otherwise.
 func CreateCommentMessage(configuration TestKeeperConfiguration, change scm.RepositoryChange) string {
 	var msg string
 	if configuration.LocationURL == "" {
-		msg = beginning + paragraph + noConfig
+		msg = sadIke + paragraph + beginning + paragraph + noConfig
 	} else if configuration.PluginHint != "" {
 		msg = getMsgFromConfigHint(configuration, change)
 	} else {
-		msg = getMsgWithConfigRef(configuration.LocationURL)
+		msg = sadIke + paragraph + getMsgWithConfigRef(configuration.LocationURL)
 	}
-	return sadIke + paragraph + msg
+	return msg
 }
 
 func getMsgFromConfigHint(configuration TestKeeperConfiguration, change scm.RepositoryChange) string {

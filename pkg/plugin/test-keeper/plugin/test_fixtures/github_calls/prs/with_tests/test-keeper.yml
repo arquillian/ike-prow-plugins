@@ -3,4 +3,6 @@ test_patterns:
 skip_validation_for:
   - 'regex{{.*\.[xsd]?html$}}'             # <!--2-->
 combine_defaults: false                    # <!--3-->
+# tag::plugin_hint[]
 plugin_hint: plugins/keeper-file-hint.md  # <!--4-->
+# end::plugin_hint[]

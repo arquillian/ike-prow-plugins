@@ -15,7 +15,7 @@ var _ = Describe("Test keeper comment message parsing", func() {
 
 		It("should match plugin hint file from relative path", func() {
 			// given
-			pluginHint := "path/to/custom_message_file.md"
+			pluginHint := "path/to/test-keeper_hint.md"
 
 			// when
 			isFilePath, _ := regexp.MatchString(plugin.FileRegex, pluginHint)
@@ -26,7 +26,7 @@ var _ = Describe("Test keeper comment message parsing", func() {
 
 		It("should match plugin hint file from url", func() {
 			// given
-			pluginHint := "http://my.server.com/path/to/custom_message_file.md"
+			pluginHint := "http://my.server.com/path/to/test-keeper_hint.md"
 
 			// when
 			isFilePath, _ := regexp.MatchString(plugin.FileRegex, pluginHint)
@@ -37,7 +37,7 @@ var _ = Describe("Test keeper comment message parsing", func() {
 
 		It("should match plugin hint file from secure url", func() {
 			// given
-			pluginHint := "https://my.server.com/path/to/custom_message_file.md"
+			pluginHint := "https://my.server.com/path/to/test-keeper_hint.md"
 
 			// when
 			isFilePath, _ := regexp.MatchString(plugin.FileRegex, pluginHint)
@@ -48,7 +48,7 @@ var _ = Describe("Test keeper comment message parsing", func() {
 
 		It("should match plugin hint file with upper case file extension", func() {
 			// given
-			pluginHint := "http://my.server.com/path/to/custom_message_file.MD"
+			pluginHint := "http://my.server.com/path/to/TEST-KEEPER_HINT.MD"
 
 			// when
 			isFilePath, _ := regexp.MatchString(plugin.FileRegex, pluginHint)
@@ -59,7 +59,7 @@ var _ = Describe("Test keeper comment message parsing", func() {
 
 		It("should not match plugin hint inline comment", func() {
 			// given
-			pluginHint := "Custom message."
+			pluginHint := "Test keeper hint message."
 
 			// when
 			isFilePath, _ := regexp.MatchString(plugin.FileRegex, pluginHint)
