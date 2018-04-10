@@ -30,7 +30,7 @@ var _ = Describe("Permission service with permission checks features", func() {
 			}
 		})
 
-		It("tests 'that is admin' function that should not approve the user when the permission is read", func() {
+		It("should not approve the user when the permission is read", func() {
 			// given
 			gock.New("https://api.github.com").
 				Get("/repos/owner/repo/collaborators/user/permission").
@@ -45,7 +45,7 @@ var _ = Describe("Permission service with permission checks features", func() {
 			verifyStatusWithPredefinedUser(permissionStatus, false, "admin")
 		})
 
-		It("tests 'that is admin' function that should approve the user when the permission is admin", func() {
+		It("should approve the user when the permission is admin", func() {
 			// given
 			gock.New("https://api.github.com").
 				Get("/repos/owner/repo/collaborators/user/permission").
@@ -60,7 +60,7 @@ var _ = Describe("Permission service with permission checks features", func() {
 			verifyStatusWithPredefinedUser(permissionStatus, true, "admin")
 		})
 
-		It("tests 'that is pr creator' function that should not approve the user that is not the PR creator", func() {
+		It("should not approve the user that is not the PR creator", func() {
 			// given
 			gock.New("https://api.github.com").
 				Get("/repos/owner/repo/pulls/1").
@@ -75,7 +75,7 @@ var _ = Describe("Permission service with permission checks features", func() {
 			verifyStatusWithPredefinedUser(permissionStatus, false, "pull request creator")
 		})
 
-		It("tests 'that is pr creator' function that should approve the user that is the PR creator", func() {
+		It("should approve the user that is the PR creator", func() {
 			// given
 			gock.New("https://api.github.com").
 				Get("/repos/owner/repo/pulls/1").
@@ -90,7 +90,7 @@ var _ = Describe("Permission service with permission checks features", func() {
 			verifyStatusWithPredefinedUser(permissionStatus, true, "pull request creator")
 		})
 
-		It("tests 'that is pr reviewer' function that should not approve the user that is not the requested PR reviewer", func() {
+		It("should not approve the user that is not the requested PR reviewer", func() {
 			// given
 			gock.New("https://api.github.com").
 				Get("/repos/owner/repo/pulls/1").
@@ -105,7 +105,7 @@ var _ = Describe("Permission service with permission checks features", func() {
 			verifyStatusWithPredefinedUser(permissionStatus, false, "requested reviewer")
 		})
 
-		It("tests 'that is pr reviewer' function that should approve the user that is one of the requested PR reviewers", func() {
+		It("should approve the user that is one of the requested PR reviewers", func() {
 			// given
 			gock.New("https://api.github.com").
 				Get("/repos/owner/repo/pulls/1").
@@ -134,7 +134,7 @@ var _ = Describe("Permission service with permission checks features", func() {
 			ApprovedRoles:  []string{"role in approved"},
 		}
 
-		It("tests 'anybody' function that should approve everyone", func() {
+		It("should approve everyone", func() {
 			// when
 			permissionStatus, err := is.Anybody()
 
@@ -143,7 +143,7 @@ var _ = Describe("Permission service with permission checks features", func() {
 			verifyStatus(permissionStatus, "", true, "anyone")
 		})
 
-		It("tests 'anyOf' function that should approve everyone when no restrictions are set", func() {
+		It("should approve everyone when no restrictions are set", func() {
 			permissionStatus, err := is.AnyOf()()
 
 			// then
@@ -151,7 +151,7 @@ var _ = Describe("Permission service with permission checks features", func() {
 			verifyStatus(permissionStatus, "unknown", true, "anyone")
 		})
 
-		It("tests 'AnyOf' function that should approve when at least one restriction is fulfilled", func() {
+		It("should approve when at least one restriction is fulfilled", func() {
 			// given
 
 			// when
@@ -162,7 +162,7 @@ var _ = Describe("Permission service with permission checks features", func() {
 			verifyStatus(permissionStatus, "user", true, "role in rejected", "role in approved")
 		})
 
-		It("tests 'AnyOf' function that should not approve when no restriction is fulfilled", func() {
+		It("should not approve when no restriction is fulfilled", func() {
 			// when
 			permissionStatus, err := is.AnyOf(newCheck(rejected), newCheck(rejected))()
 
@@ -171,7 +171,7 @@ var _ = Describe("Permission service with permission checks features", func() {
 			verifyStatus(permissionStatus, "user", false, "role in rejected", "role in rejected")
 		})
 
-		It("tests 'AllOf' function that should not approve when at least one restriction is not fulfilled", func() {
+		It("should not approve when at least one restriction is not fulfilled", func() {
 			// when
 			permissionStatus, err := is.AllOf(newCheck(approved), newCheck(rejected), newCheck(approved))()
 
@@ -180,7 +180,7 @@ var _ = Describe("Permission service with permission checks features", func() {
 			verifyStatus(permissionStatus, "user", false, "role in approved", "role in rejected", "role in approved")
 		})
 
-		It("tests 'AllOf' function that should approve when all restrictions are fulfilled", func() {
+		It("should approve when all restrictions are fulfilled", func() {
 			// given
 
 			// when
@@ -191,7 +191,7 @@ var _ = Describe("Permission service with permission checks features", func() {
 			verifyStatus(permissionStatus, "user", true, "role in approved", "role in approved")
 		})
 
-		It("tests 'Not' function that should reverse the approval to rejection", func() {
+		It("should reverse the approval to rejection", func() {
 			// when
 			status, err := is.Not(newCheck(approved))()
 
