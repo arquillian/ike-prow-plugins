@@ -102,7 +102,8 @@ func (gh *GitHubTestEventsHandler) handlePrComment(log log.Logger, prComment *go
 
 	if comment != SkipComment {
 		return nil
-
+	}
+	
 	pullRequest, err := gh.Client.GetPullRequest(*org, *name, *prNumber)
 	if err != nil {
 		log.Error(err)
