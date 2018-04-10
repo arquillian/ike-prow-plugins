@@ -79,7 +79,7 @@ func (gh *GitHubTestEventsHandler) handlePrComment(log log.Logger, comment *gogh
 	cmdHandler := command.CommentCmdHandler{Client: gh.Client}
 
 	cmdHandler.Register(
-		&SkipCommentCmd{
+		&BypassCmd{
 			userPermissionService: userPerm,
 			whenDeleted: func() error {
 				pullRequest, err := prLoader.Load()
