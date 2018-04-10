@@ -209,7 +209,7 @@ var _ = Describe("Test Keeper Plugin features", func() {
 			Ω(err).ShouldNot(HaveOccurred())
 		})
 
-		It("should skip test existence check when "+keeper.SkipComment+" command is used by admin user", func() {
+		It("should skip test existence check when "+keeper.BypassCheckComment+" command is used by admin user", func() {
 			// given
 			gock.New("https://api.github.com").
 				Get("/repos/" + repositoryName + "/pulls/1").
@@ -242,7 +242,7 @@ var _ = Describe("Test Keeper Plugin features", func() {
 			Ω(err).ShouldNot(HaveOccurred())
 		})
 
-		It("should ignore "+keeper.SkipComment+" when used by non-admin user", func() {
+		It("should ignore "+keeper.BypassCheckComment+" when used by non-admin user", func() {
 			// given
 			gock.New("https://api.github.com").
 				Get("/repos/" + repositoryName + "/pulls/1").

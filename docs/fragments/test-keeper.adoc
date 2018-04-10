@@ -11,7 +11,7 @@ This check is done based on the file name patterns - for more information head o
 
 The plugin is triggered when the Pull Request is opened/reopened or updated by new or removed commit.
 
-If, for whatever reason, you want to bypass this check - simply comment using `const:pkg/plugin/test-keeper/plugin/comment_cmd.go[name="SkipComment"]` command. If you are an admin user or requested PR reviewer but not a creator of the PR you will see the **Success** status.
+If, for whatever reason, you want to bypass this check - simply comment using `const:pkg/plugin/test-keeper/plugin/comment_cmd.go[name="BypassCheckComment"]` command. If you are an admin user or requested PR reviewer but not a creator of the PR you will see the **Success** status.
 If the comment will be later removed the check is triggered again.
 
 === How does it work? [[test-keeper-how]]
@@ -110,7 +110,7 @@ Your Pull Request has been rejected because the plugin wasn't able to find any a
 
 Automated tests give us confidence in shipping reliable software. Please add some as part of this change.
 
-If you are an admin and you are sure that no test is needed then you can use a command `const:pkg/plugin/test-keeper/plugin/comment_cmd.go[name="SkipComment"]` as a comment to make the status green.
+If you are an admin and you are sure that no test is needed then you can use a command `const:pkg/plugin/test-keeper/plugin/comment_cmd.go[name="BypassCheckComment"]` as a comment to make the status green.
 
 For more information about the behavior, how the test files are detected and what the default file patterns are, see <<test-keeper-how>> section.
 If you need to reconfigure the plugin then read the section <<test-keeper-config>>.

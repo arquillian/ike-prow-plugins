@@ -9,8 +9,8 @@ import (
 	gogh "github.com/google/go-github/github"
 )
 
-// SkipComment is used as a command to bypass test presence validation
-const SkipComment = "/ok-without-tests"
+// BypassCheckComment is used as a command to bypass test presence validation
+const BypassCheckComment = "/ok-without-tests"
 
 // BypassCmd represents a command that is triggered by "/ok-without-tests"
 type BypassCmd struct {
@@ -22,7 +22,7 @@ type BypassCmd struct {
 // Perform executes the set DoFunctions for the given IssueCommentEvent (when all conditions are fulfilled)
 func (c *BypassCmd) Perform(client *github.Client, log log.Logger, comment *gogh.IssueCommentEvent) error {
 	user := c.userPermissionService
-	var BypassCommand = &is.CmdExecutor{Command: SkipComment}
+	var BypassCommand = &is.CmdExecutor{Command: BypassCheckComment}
 
 	BypassCommand.When(is.Deleted).By(is.Anybody).Then(c.whenDeleted)
 
@@ -37,5 +37,5 @@ func (c *BypassCmd) Perform(client *github.Client, log log.Logger, comment *gogh
 // Matches returns true when the given IssueCommentEvent content is same as "/ok-without-tests"
 func (c *BypassCmd) Matches(comment *gogh.IssueCommentEvent) bool {
 	body := strings.TrimSpace(*comment.Comment.Body)
-	return body == SkipComment
+	return body == BypassCheckComment
 }
