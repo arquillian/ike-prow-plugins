@@ -16,11 +16,12 @@ import (
 
 	"os"
 
+	"time"
+
 	"github.com/arquillian/ike-prow-plugins/pkg/github"
 	"github.com/arquillian/ike-prow-plugins/pkg/log"
 	"github.com/arquillian/ike-prow-plugins/pkg/server"
 	"github.com/sirupsen/logrus"
-	"time"
 )
 
 // nolint

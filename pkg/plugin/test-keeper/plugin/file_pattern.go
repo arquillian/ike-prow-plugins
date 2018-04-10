@@ -27,8 +27,23 @@ func (matcher *FilePattern) Matches(filename string) bool {
 	return regexp.MustCompile(matcher.Regexp).MatchString(filename)
 }
 
+// FilePatterns is an alias type representing slice of FilePattern
+type FilePatterns []FilePattern
+
+// Matches iterates over all patterns and returns first successful match or false if none patterns matched
+func (f *FilePatterns) Matches(filename string) bool {
+
+	for _, matcher := range *f {
+		if matcher.Matches(filename) {
+			return true
+		}
+	}
+
+	return false
+}
+
 // ParseFilePatterns takes the given patterns and parses to an array of FilePattern instances
-func ParseFilePatterns(filePatterns []string) []FilePattern {
+func ParseFilePatterns(filePatterns []string) FilePatterns {
 	patterns := make([]FilePattern, 0, len(filePatterns))
 	for _, pattern := range filePatterns {
 		patterns = append(patterns, FilePattern{
@@ -51,18 +66,21 @@ func parseFilePattern(pattern string) string {
 	path := transformPathPatternToRegexp(pattern[:slashIndex+1])
 	fileName := transformFilenamePatternToRegexp(pattern[slashIndex+1:], path)
 
-	regexp := path + fileName
+	expr := path + fileName
 
-	if strings.HasSuffix(regexp, directorySeparator) {
-		regexp = regexp + anythingRegexp
+	if strings.HasSuffix(expr, directorySeparator) {
+		expr += anythingRegexp
 	} else {
-		regexp = regexp + endOfLineRegexp
+		expr += endOfLineRegexp
 	}
 
-	return regexp
+	return expr
 }
 
 func transformPathPatternToRegexp(path string) string {
+	for strings.HasPrefix(path, anyPathWildcard+"/") {
+		path = path[strings.Index(path, "/")+1:]
+	}
 	path = escapeDots(path)
 	path = strings.Replace(path, anyPathWildcard, twoStarsReplacement, -1)
 	path = replaceAnyNameWildcards(path)

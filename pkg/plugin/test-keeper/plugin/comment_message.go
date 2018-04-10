@@ -5,8 +5,8 @@ import (
 	"net/url"
 
 	"github.com/arquillian/ike-prow-plugins/pkg/github"
-	"github.com/arquillian/ike-prow-plugins/pkg/scm"
 	"github.com/arquillian/ike-prow-plugins/pkg/http"
+	"github.com/arquillian/ike-prow-plugins/pkg/scm"
 )
 
 const (

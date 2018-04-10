@@ -3,11 +3,12 @@ package github
 import (
 	"context"
 
+	"time"
+
+	"github.com/arquillian/ike-prow-plugins/pkg/http"
 	"github.com/arquillian/ike-prow-plugins/pkg/scm"
 	gogh "github.com/google/go-github/github"
 	"golang.org/x/oauth2"
-	"time"
-	"github.com/arquillian/ike-prow-plugins/pkg/http"
 )
 
 // Client manages communication with the GitHub API.

@@ -8,7 +8,7 @@ parameters:
   required: true
   value: k8s-prow
 - name: VERSION
-  value: v20180316-93ade3390
+  value: v20180403-2f3ad698f
   required: true
 - name: HOOK_HOSTNAME
   value: ""
@@ -91,7 +91,7 @@ objects:
     metadata:
       name: hook
     spec:
-      host: ""
+      host: ${HOOK_HOSTNAME}
       to:
         kind: Service
         name: hook
