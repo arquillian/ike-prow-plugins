@@ -17,6 +17,8 @@ const (
 	botName        = "alien-ike"
 )
 
+var expectedContext = utils.StringJoin(botName, keeper.ProwPluginName)
+
 var _ = Describe("Test Keeper Plugin features", func() {
 
 	Context("Pull Request handling", func() {
@@ -58,7 +60,7 @@ var _ = Describe("Test Keeper Plugin features", func() {
 
 			gock.New("https://api.github.com").
 				Post("/repos/" + repositoryName + "/statuses").
-				SetMatcher(ExpectPayload(toBe(github.StatusSuccess, keeper.TestsExistMessage, utils.StringJoin(botName, keeper.ProwPluginName), keeper.TestsExistDetailsLink))).
+				SetMatcher(ExpectPayload(toBe(github.StatusSuccess, keeper.TestsExistMessage, expectedContext, keeper.TestsExistDetailsLink))).
 				Reply(201) // This way we implicitly verify that call happened after `HandleEvent` call
 
 			statusPayload := LoadFromFile("test_fixtures/github_calls/prs/with_tests/status_opened.json")
@@ -85,7 +87,7 @@ var _ = Describe("Test Keeper Plugin features", func() {
 
 			gock.New("https://api.github.com").
 				Post("/repos/" + repositoryName + "/statuses").
-				SetMatcher(ExpectPayload(toBe(github.StatusSuccess, keeper.TestsExistMessage, utils.StringJoin(botName, keeper.ProwPluginName), keeper.TestsExistDetailsLink))).
+				SetMatcher(ExpectPayload(toBe(github.StatusSuccess, keeper.TestsExistMessage, expectedContext, keeper.TestsExistDetailsLink))).
 				Reply(201) // This way we implicitly verify that call happened after `HandleEvent` call
 
 			statusPayload := LoadFromFile("test_fixtures/github_calls/prs/with_tests/status_opened.json")
@@ -111,7 +113,7 @@ var _ = Describe("Test Keeper Plugin features", func() {
 
 			gock.New("https://api.github.com").
 				Post("/repos/" + repositoryName + "/statuses").
-				SetMatcher(ExpectPayload(toBe(github.StatusSuccess, keeper.OkOnlySkippedFilesMessage, utils.StringJoin(botName, keeper.ProwPluginName), keeper.OkOnlySkippedFilesDetailsLink))).
+				SetMatcher(ExpectPayload(toBe(github.StatusSuccess, keeper.OkOnlySkippedFilesMessage, expectedContext, keeper.OkOnlySkippedFilesDetailsLink))).
 				Reply(201) // This way we implicitly verify that call happened after `HandleEvent` call
 
 			statusPayload := LoadFromFile("test_fixtures/github_calls/prs/without_tests/status_opened.json")
@@ -143,7 +145,7 @@ var _ = Describe("Test Keeper Plugin features", func() {
 			// This way we implicitly verify that call happened after `HandleEvent` call
 			gock.New("https://api.github.com").
 				Post("/repos/" + repositoryName + "/statuses").
-				SetMatcher(ExpectPayload(toBe(github.StatusFailure, keeper.NoTestsMessage, utils.StringJoin(botName, keeper.ProwPluginName), keeper.NoTestsDetailsLink))).
+				SetMatcher(ExpectPayload(toBe(github.StatusFailure, keeper.NoTestsMessage, expectedContext, keeper.NoTestsDetailsLink))).
 				Reply(201)
 			gock.New("https://api.github.com").
 				Post("/repos/" + repositoryName + "/issues/2/comments").
@@ -174,7 +176,7 @@ var _ = Describe("Test Keeper Plugin features", func() {
 			// This way we implicitly verify that call happened after `HandleEvent` call
 			gock.New("https://api.github.com").
 				Post("/repos/" + repositoryName + "/statuses").
-				SetMatcher(ExpectPayload(toBe(github.StatusFailure, keeper.NoTestsMessage, utils.StringJoin(botName, keeper.ProwPluginName), keeper.NoTestsDetailsLink))).
+				SetMatcher(ExpectPayload(toBe(github.StatusFailure, keeper.NoTestsMessage, expectedContext, keeper.NoTestsDetailsLink))).
 				Reply(201)
 			gock.New("https://api.github.com").
 				Post("/repos/" + repositoryName + "/issues/1/comments").
@@ -199,7 +201,7 @@ var _ = Describe("Test Keeper Plugin features", func() {
 
 			gock.New("https://api.github.com").
 				Post("/repos/" + repositoryName + "/statuses").
-				SetMatcher(ExpectPayload(toBe(github.StatusSuccess, keeper.OkOnlySkippedFilesMessage, utils.StringJoin(botName, keeper.ProwPluginName), keeper.OkOnlySkippedFilesDetailsLink))).
+				SetMatcher(ExpectPayload(toBe(github.StatusSuccess, keeper.OkOnlySkippedFilesMessage, expectedContext, keeper.OkOnlySkippedFilesDetailsLink))).
 				Reply(201) // This way we implicitly verify that call happened after `HandleEvent` call
 
 			statusPayload := LoadFromFile("test_fixtures/github_calls/prs/without_tests/status_opened.json")
@@ -258,7 +260,7 @@ var _ = Describe("Test Keeper Plugin features", func() {
 
 			gock.New("https://api.github.com").
 				Post("/repos/" + repositoryName + "/statuses").
-				SetMatcher(ExpectPayload(toBe(github.StatusFailure, keeper.NoTestsMessage, utils.StringJoin(botName, keeper.ProwPluginName), keeper.NoTestsDetailsLink))).
+				SetMatcher(ExpectPayload(toBe(github.StatusFailure, keeper.NoTestsMessage, expectedContext, keeper.NoTestsDetailsLink))).
 				Reply(201) // This way we implicitly verify that call happened after `HandleEvent` call
 
 			statusPayload := LoadFromFile("test_fixtures/github_calls/prs/without_tests/skip_comment_by_external.json")
