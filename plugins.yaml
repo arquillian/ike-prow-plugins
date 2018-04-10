@@ -16,3 +16,7 @@ external_plugins:
   - name: work-in-progress
     events:
       - pull_request
+# tag::plugin_hint[]
+plugin_hint: plugins/keeper-file-hint.md 
+# end::plugin_hint[]
+      

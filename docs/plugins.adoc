@@ -13,6 +13,18 @@ include::../plugins.yaml[tag="external_plugins"]
 organization. Be aware however, that adding an external plugin both to the repository and its organization link:https://github.com/kubernetes/test-infra/blob/7de525b1f6943e5d08d9a127b0b668cec404c665/prow/plugins/plugins_test.go#L143[will result in an error].
 <2> You can limit events dispatched by hook to your plugin.
 
+==== Creating custom plugin hint messages
+
+To enable customized plugin hint comment messages edit plugins.yaml file adding the `plugin_hint` property.
+
+[source, yml, indent=0]
+----
+include::../plugins.yaml[tag="plugin_hint"]
+----
+
+The `plugin_hint` property can either have an inline string directly written inside of the config file or another file with case insensitive 
+filename having extension such as .md or .txt that contains the hint. The location of the file can be set by either a relative path or an
+absolute URL. If nothing is set then a default message is used.
 
 ==== GitHub settings [[gh-settings]]
 
