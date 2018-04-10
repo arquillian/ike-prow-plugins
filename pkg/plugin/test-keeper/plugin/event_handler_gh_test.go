@@ -225,6 +225,8 @@ var _ = Describe("Test Keeper Plugin features", func() {
 
 		It("should block newly created pull request when deletions in the tests are the only changes", func() {
 			// given
+			NonExistingRawGitHubFiles("test-keeper.yml", "test-keeper.yaml")
+
 			gock.New("https://api.github.com").
 				Get("/repos/" + repositoryName + "/pulls/1/files").
 				Reply(200).
@@ -255,6 +257,8 @@ var _ = Describe("Test Keeper Plugin features", func() {
 
 		It("should block newly created pull request when there are changes in the business logic but only deletions in the tests", func() {
 			// given
+			NonExistingRawGitHubFiles("test-keeper.yml", "test-keeper.yaml")
+
 			gock.New("https://api.github.com").
 				Get("/repos/" + repositoryName + "/pulls/1/files").
 				Reply(200).

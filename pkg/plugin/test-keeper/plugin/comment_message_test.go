@@ -4,6 +4,7 @@ import (
 	"strings"
 
 	"github.com/arquillian/ike-prow-plugins/pkg/config"
+	. "github.com/arquillian/ike-prow-plugins/pkg/internal/test"
 	"github.com/arquillian/ike-prow-plugins/pkg/plugin/test-keeper/plugin"
 	"github.com/arquillian/ike-prow-plugins/pkg/scm"
 	"github.com/microcosm-cc/bluemonday"
