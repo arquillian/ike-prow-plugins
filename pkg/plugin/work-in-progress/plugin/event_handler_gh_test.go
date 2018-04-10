@@ -1,10 +1,11 @@
 package plugin_test
 
 import (
+	"strings"
+
 	"github.com/arquillian/ike-prow-plugins/pkg/github"
 	. "github.com/arquillian/ike-prow-plugins/pkg/internal/test"
 	wip "github.com/arquillian/ike-prow-plugins/pkg/plugin/work-in-progress/plugin"
-	"github.com/arquillian/ike-prow-plugins/pkg/utils"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	"gopkg.in/h2non/gock.v1"
@@ -13,6 +14,8 @@ import (
 const (
 	botName = "alien-ike"
 )
+
+var expectedContext = strings.Join([]string{botName, wip.ProwPluginName}, "/")
 
 var _ = Describe("Test Keeper Plugin features", func() {
 
@@ -26,7 +29,7 @@ var _ = Describe("Test Keeper Plugin features", func() {
 			return Expect(statusPayload).To(SatisfyAll(
 				HaveState(github.StatusSuccess),
 				HaveDescription(wip.ReadyForReviewMessage),
-				HaveContext(utils.StringJoin(botName, wip.ProwPluginName)),
+				HaveContext(expectedContext),
 				HaveTargetURL(wip.ReadyForReviewDetailsLink),
 			))
 		}
@@ -35,7 +38,7 @@ var _ = Describe("Test Keeper Plugin features", func() {
 			return Expect(statusPayload).To(SatisfyAll(
 				HaveState(github.StatusFailure),
 				HaveDescription(wip.InProgressMessage),
-				HaveContext(utils.StringJoin(botName, wip.ProwPluginName)),
+				HaveContext(expectedContext),
 				HaveTargetURL(wip.InProgressDetailsLink),
 			))
 		}

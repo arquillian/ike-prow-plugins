@@ -2,11 +2,11 @@ package plugin_test
 
 import (
 	"fmt"
+	"strings"
 
 	"github.com/arquillian/ike-prow-plugins/pkg/github"
 	. "github.com/arquillian/ike-prow-plugins/pkg/internal/test"
 	keeper "github.com/arquillian/ike-prow-plugins/pkg/plugin/test-keeper/plugin"
-	"github.com/arquillian/ike-prow-plugins/pkg/utils"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	"gopkg.in/h2non/gock.v1"
@@ -17,7 +17,7 @@ const (
 	botName        = "alien-ike"
 )
 
-var expectedContext = utils.StringJoin(botName, keeper.ProwPluginName)
+var expectedContext = strings.Join([]string{botName, keeper.ProwPluginName}, "/")
 
 var _ = Describe("Test Keeper Plugin features", func() {
 

@@ -37,8 +37,3 @@ func convertSliceToInterface(s interface{}) (slice []interface{}) {
 
 	return slice
 }
-
-// StringJoin takes two strings and joins them with defaultConnector
-func StringJoin(prefix string, suffix string) string {
-	return prefix + defaultConnector + suffix
-}
