@@ -46,13 +46,16 @@ var _ = Describe("Test Keeper Plugin features", func() {
 		}
 
 		BeforeEach(func() {
-			gock.Off()
-
+			defer gock.OffAll()
 			handler = &keeper.GitHubTestEventsHandler{Client: NewDefaultGitHubClient(), BotName: botName}
 		})
 
+		AfterEach(EnsureGockRequestsHaveBeenMatched)
+
 		It("should approve opened pull request when tests included", func() {
 			// given
+			NonExistingRawGitHubFiles("test-keeper.yml", "test-keeper.yaml")
+
 			gock.New("https://api.github.com").
 				Get("/repos/" + repositoryName + "/pulls/2/files").
 				Reply(200).
@@ -127,6 +130,9 @@ var _ = Describe("Test Keeper Plugin features", func() {
 
 		It("should reject opened pull request when no tests are matching defined pattern with no defaults implicitly combined", func() {
 			// given
+
+			NonExistingRawGitHubFiles("plugins/keeper-file-hint.md")
+
 			gock.New("https://raw.githubusercontent.com").
 				Get(repositoryName + "/5d6e9b25da90edfc19f488e595e0645c081c1575/test-keeper.yml").
 				Reply(200).
@@ -163,6 +169,8 @@ var _ = Describe("Test Keeper Plugin features", func() {
 
 		It("should block newly created pull request when no tests are included", func() {
 			// given
+			NonExistingRawGitHubFiles("test-keeper.yml", "test-keeper.yaml")
+
 			gock.New("https://api.github.com").
 				Get("/repos/" + repositoryName + "/pulls/1/files").
 				Reply(200).
@@ -194,6 +202,8 @@ var _ = Describe("Test Keeper Plugin features", func() {
 
 		It("should not block newly created pull request when documentation and build files are the only changes", func() {
 			// given
+			NonExistingRawGitHubFiles("test-keeper.yml", "test-keeper.yaml")
+
 			gock.New("https://api.github.com").
 				Get("/repos/" + repositoryName + "/pulls/1/files").
 				Reply(200).
@@ -215,6 +225,8 @@ var _ = Describe("Test Keeper Plugin features", func() {
 
 		It("should skip test existence check when "+keeper.SkipComment+" command is used by admin user", func() {
 			// given
+			NonExistingRawGitHubFiles("test-keeper.yml", "test-keeper.yaml")
+
 			gock.New("https://api.github.com").
 				Get("/repos/" + repositoryName + "/pulls/1").
 				Reply(200).
@@ -248,6 +260,8 @@ var _ = Describe("Test Keeper Plugin features", func() {
 
 		It("should ignore "+keeper.SkipComment+" when used by non-admin user", func() {
 			// given
+			NonExistingRawGitHubFiles("test-keeper.yml", "test-keeper.yaml")
+
 			gock.New("https://api.github.com").
 				Get("/repos/" + repositoryName + "/pulls/1").
 				Reply(200).

@@ -6,7 +6,6 @@ import (
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/ginkgo/extensions/table"
 	. "github.com/onsi/gomega"
-	"gopkg.in/h2non/gock.v1"
 )
 
 var _ = Describe("Work-in-progress Plugin features", func() {
@@ -16,8 +15,6 @@ var _ = Describe("Work-in-progress Plugin features", func() {
 		var handler *wip.GitHubWIPPRHandler
 
 		BeforeEach(func() {
-			defer gock.Off()
-
 			handler = &wip.GitHubWIPPRHandler{Client: NewDefaultGitHubClient()}
 		})
 

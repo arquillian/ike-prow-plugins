@@ -3,10 +3,10 @@ package github_test
 import (
 	"net/http"
 
-	. "github.com/arquillian/ike-prow-plugins/pkg/internal/test"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	"gopkg.in/h2non/gock.v1"
+	. "github.com/arquillian/ike-prow-plugins/pkg/internal/test"
 )
 
 var _ = Describe("Client features", func() {
@@ -14,8 +14,10 @@ var _ = Describe("Client features", func() {
 	Context("Client should try 3 times to get the correct response", func() {
 
 		BeforeEach(func() {
-			gock.Off()
+			defer gock.OffAll()
 		})
+
+		AfterEach(EnsureGockRequestsHaveBeenMatched)
 
 		It("should try to get the response 3 times and then fail when client gets only 404", func() {
 			// given

@@ -44,9 +44,11 @@ var _ = Describe("Test Keeper Plugin features", func() {
 		}
 
 		BeforeEach(func() {
-			defer gock.Off()
+			defer gock.OffAll()
 			handler = &wip.GitHubWIPPRHandler{Client: NewDefaultGitHubClient(), BotName: botName}
 		})
+
+		AfterEach(EnsureGockRequestsHaveBeenMatched)
 
 		It("should mark opened PR as ready for review if not prefixed with WIP", func() {
 			// given
