@@ -8,8 +8,6 @@ import (
 	"net/http"
 	"os"
 
-	"time"
-
 	"github.com/arquillian/ike-prow-plugins/pkg/github"
 	"github.com/arquillian/ike-prow-plugins/pkg/log"
 	gogh "github.com/google/go-github/github"
@@ -74,7 +72,7 @@ func NewDefaultGitHubClient() *github.Client {
 	return &github.Client{
 		Client:  gogh.NewClient(nil), // TODO with hoverfly/go-vcr we might want to use tokens instead to capture real traffic
 		Retries: 3,
-		Sleep:   time.Nanosecond,
+		Sleep:   0,
 	}
 }
 
