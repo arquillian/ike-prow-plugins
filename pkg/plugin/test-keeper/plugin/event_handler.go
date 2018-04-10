@@ -91,7 +91,7 @@ func (gh *GitHubTestEventsHandler) handlePrComment(log log.Logger, prComment *go
 	sender := prComment.Sender.Login
 	permissionLevel, e := gh.Client.GetPermissionLevel(*org, *name, *sender)
 	if e != nil {
-		log.Fatal(e)
+		log.Error(e)
 		return e
 	}
 
@@ -104,10 +104,10 @@ func (gh *GitHubTestEventsHandler) handlePrComment(log log.Logger, prComment *go
 	if comment != SkipComment {
 		return nil
 	}
-
+	
 	pullRequest, err := gh.Client.GetPullRequest(*org, *name, *prNumber)
 	if err != nil {
-		log.Fatal(err)
+		log.Error(err)
 		return err
 	}
 
