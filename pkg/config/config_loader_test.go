@@ -2,6 +2,7 @@ package config_test
 
 import (
 	"github.com/arquillian/ike-prow-plugins/pkg/config"
+	"github.com/arquillian/ike-prow-plugins/pkg/internal/test"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	"github.com/pkg/errors"
@@ -9,7 +10,8 @@ import (
 
 type sampleConfiguration struct {
 	config.PluginConfiguration `yaml:",inline,omitempty"`
-	Name                       string `yaml:"name,omitempty"`
+	Name                       string   `yaml:"name,omitempty"`
+	Skip                       []string `yaml:"skip_validation_for,omitempty"`
 }
 
 type testConfigProvider func() []config.Source
@@ -32,6 +34,27 @@ var faulty = config.Source(func() ([]byte, error) {
 })
 
 var _ = Describe("Config loader features", func() {
+
+	Context("Loading configuration from file", func() {
+
+		It("should load sample configuration from yaml file", func() {
+			// given
+			sampleConfig := sampleConfiguration{}
+
+			// when
+			err := config.Load(&sampleConfig, testConfigProvider(func() []config.Source {
+				return []config.Source{func() ([]byte, error) {
+					return test.LoadFromFile("test_fixtures/sample_configuration.yaml"), nil
+				}}
+			}))
+
+			// then
+			Ω(err).ShouldNot(HaveOccurred())
+			Expect(sampleConfig.Skip).To(ContainElement("**/osio-plugins.yaml"))
+
+		})
+
+	})
 
 	Context("Loading configuration using different strategies", func() {
 

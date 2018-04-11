@@ -1,5 +1,5 @@
-hash: c5a1e928738cbe4eca254ef0facaa19f4423df2197b50807295cc431e18a1a09
-updated: 2018-04-06T09:49:35.097993579+02:00
+hash: 84a14ebad800adab02ba6e313744eaecf634b1ad07bad12354d4eecf2abb78fa
+updated: 2018-04-11T14:49:51.000778598+02:00
 imports:
 - name: github.com/bazelbuild/buildtools
   version: c98ff0c6395f09b1942e6f7c42bf3ec15e3b9ca7
@@ -44,7 +44,7 @@ imports:
   subpackages:
   - proto
 - name: github.com/google/go-github
-  version: e48060a28fac52d0f1cb758bc8b87c07bac4a87d
+  version: 437797734d06eec5394734a84cb5b59c82a66ee6
   subpackages:
   - github
 - name: github.com/google/go-querystring

@@ -1,11 +1,12 @@
 package http
 
 import (
-	gogh "github.com/google/go-github/github"
-	"time"
-	"fmt"
 	"errors"
+	"fmt"
+	"time"
+
 	"github.com/arquillian/ike-prow-plugins/pkg/utils"
+	gogh "github.com/google/go-github/github"
 )
 
 // RequestInvoker is a function that invokes a request and returns a response

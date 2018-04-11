@@ -16,11 +16,12 @@ import (
 
 	"os"
 
+	"time"
+
 	"github.com/arquillian/ike-prow-plugins/pkg/github"
 	"github.com/arquillian/ike-prow-plugins/pkg/log"
 	"github.com/arquillian/ike-prow-plugins/pkg/server"
 	"github.com/sirupsen/logrus"
-	"time"
 )
 
 // nolint
@@ -34,6 +35,7 @@ var (
 	sentryDsnSecretFile = flag.String("sentry-dsn-file", "/etc/sentry-dsn/sentry", "Path to the file containing the Sentry DSN url.")
 	sentryTimeout       = flag.Int("sentry-timeout", 1000, "Sentry server timeout in ms. Defaults to 1 second ")
 	environment         = flag.String("env", "tenant", "Environment plugin is running in. Used e.g. by Sentry for tagging.")
+	pluginBotName       = flag.String("bot-name", "alien-ike", "Bot Name used for the plugins.")
 )
 
 // DocumentationURL is a link to arquillian ike-prow-plugins documentation
@@ -41,7 +43,7 @@ const DocumentationURL = "http://arquillian.org/ike-prow-plugins/"
 
 // EventHandlerCreator is a func type that creates server.GitHubEventHandler instance which is the central point for
 // the plugin logic
-type EventHandlerCreator func(client *github.Client) server.GitHubEventHandler
+type EventHandlerCreator func(client *github.Client, botName string) server.GitHubEventHandler
 
 // ServerCreator is a func type that wires Server and server.GitHubEventHandler together
 type ServerCreator func(hmacSecret []byte, evenHandler server.GitHubEventHandler) *server.Server
@@ -81,7 +83,7 @@ func InitPlugin(pluginName string, newEventHandler EventHandlerCreator, newServe
 
 	githubClient := github.NewClient(oauthSecret, 3, time.Second)
 
-	handler := newEventHandler(githubClient)
+	handler := newEventHandler(githubClient, *pluginBotName)
 	pluginServer := newServer(webhookSecret, handler)
 
 	port := strconv.Itoa(*port)

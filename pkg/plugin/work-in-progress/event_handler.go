@@ -17,7 +17,7 @@ const (
 	ProwPluginName = "work-in-progress"
 
 	// WipPrefix is a prefix which, when applied on the PR title, marks its state as "work-in-progress"
-	WipPrefix      = "wip "
+	WipPrefix = "wip "
 
 	// InProgressMessage is a message used in GH Status as description when the PR is in progress
 	InProgressMessage = "PR is in progress and can't be merged yet. You might want to wait with review as well"
@@ -32,7 +32,8 @@ const (
 
 // GitHubWIPPRHandler handles PR events and updates status of the PR based on work-in-progress indicator
 type GitHubWIPPRHandler struct {
-	Client *github.Client
+	Client  *github.Client
+	BotName string
 }
 
 var (
@@ -59,7 +60,7 @@ func (gh *GitHubWIPPRHandler) HandleEvent(log log.Logger, eventType github.Event
 			RepoName: *event.Repo.Name,
 			Hash:     *event.PullRequest.Head.SHA,
 		}
-		statusContext := github.StatusContext{BotName: "ike-plugins", PluginName: ProwPluginName}
+		statusContext := github.StatusContext{BotName: gh.BotName, PluginName: ProwPluginName}
 		statusService := github.NewStatusService(gh.Client, log, change, statusContext)
 		if gh.IsWorkInProgress(event.PullRequest.Title) {
 			return statusService.Failure(InProgressMessage, InProgressDetailsLink)

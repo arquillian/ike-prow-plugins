@@ -4,8 +4,8 @@ import (
 	"fmt"
 
 	"github.com/arquillian/ike-prow-plugins/pkg/config"
-	"github.com/arquillian/ike-prow-plugins/pkg/scm"
 	"github.com/arquillian/ike-prow-plugins/pkg/http"
+	"github.com/arquillian/ike-prow-plugins/pkg/scm"
 )
 
 const githubBaseURL = "https://github.com/"

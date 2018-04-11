@@ -10,7 +10,7 @@ import (
 // PluginConfiguration defines inclusion and exclusion patterns set of files will be matched against
 // It's unmarshaled from test-keeper.yml configuration file
 type PluginConfiguration struct {
-	config.PluginConfiguration `yaml:",inline"`
+	config.PluginConfiguration `yaml:",inline,omitempty"`
 	Inclusions                 []string `yaml:"test_patterns,omitempty"`
 	Exclusions                 []string `yaml:"skip_validation_for,omitempty"`
 	Combine                    bool     `yaml:"combine_defaults,omitempty"`
@@ -25,7 +25,7 @@ func LoadConfiguration(log log.Logger, change scm.RepositoryChange) PluginConfig
 	err := config.Load(&configuration, loadableConfig)
 
 	if err != nil {
-		log.Warnf("Config file was not loaded. Cause: %s", err)
+		log.Errorf("Config file was not loaded. Cause: %s", err)
 		return configuration
 	}
 

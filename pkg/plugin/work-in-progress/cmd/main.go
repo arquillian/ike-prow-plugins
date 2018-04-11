@@ -5,7 +5,7 @@ import (
 
 	"github.com/arquillian/ike-prow-plugins/pkg/github"
 	pluginBootstrap "github.com/arquillian/ike-prow-plugins/pkg/plugin"
-	wip "github.com/arquillian/ike-prow-plugins/pkg/plugin/work-in-progress"
+	"github.com/arquillian/ike-prow-plugins/pkg/plugin/work-in-progress"
 	"github.com/arquillian/ike-prow-plugins/pkg/server"
 )
 
@@ -13,8 +13,8 @@ func main() {
 	pluginBootstrap.InitPlugin(wip.ProwPluginName, handlerCreator, serverCreator, helpProvider)
 }
 
-func handlerCreator(githubClient *github.Client) server.GitHubEventHandler {
-	return &wip.GitHubWIPPRHandler{Client: githubClient}
+func handlerCreator(githubClient *github.Client, botName string) server.GitHubEventHandler {
+	return &wip.GitHubWIPPRHandler{Client: githubClient, BotName: botName}
 }
 
 func serverCreator(webhookSecret []byte, eventHandler server.GitHubEventHandler) *server.Server {

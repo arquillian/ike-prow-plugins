@@ -5,8 +5,8 @@ import (
 	"net/url"
 
 	"github.com/arquillian/ike-prow-plugins/pkg/github"
-	"github.com/arquillian/ike-prow-plugins/pkg/scm"
 	"github.com/arquillian/ike-prow-plugins/pkg/http"
+	"github.com/arquillian/ike-prow-plugins/pkg/scm"
 )
 
 const (
@@ -16,7 +16,7 @@ const (
 		paragraph +
 		"Automated tests give us confidence in shipping reliable software. Please add some as part of this change." +
 		paragraph +
-		"If you are an admin and you are sure that no test is needed then you can use the command `" + SkipComment + "` " +
+		"If you are an admin and you are sure that no test is needed then you can use the command `" + BypassCheckComment + "` " +
 		"as a comment to make the status green.\n"
 
 	noConfig = "For more information please head over to official " +

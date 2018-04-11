@@ -1,6 +1,7 @@
 plugins:
   arquillian/ike-prow-plugins:
   - size
+  - assign
 
 external_plugins:
   arquillian/ike-prow-plugins:
@@ -39,6 +40,11 @@ external_plugins:
         - pull_request
         - issue_comment
   fabric8-services/fabric8-jenkins-idler:
+    - name: test-keeper
+      events:
+        - pull_request
+        - issue_comment
+  fabric8-launcher/launcher-backend:
     - name: test-keeper
       events:
         - pull_request

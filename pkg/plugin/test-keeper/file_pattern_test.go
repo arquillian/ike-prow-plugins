@@ -11,23 +11,7 @@ import (
 
 var _ = Describe("File pattern features", func() {
 
-	var assertThat = func(filePattern, expectedRegexp string) {
-		parsed := testkeeper.ParseFilePatterns([]string{filePattern})
-		Expect(parsed).To(ConsistOf(testkeeper.FilePattern{Regexp: expectedRegexp}))
-	}
-
 	Context("File pattern parsing", func() {
-
-		table.DescribeTable(
-			"should parse file patterns to regexp",
-			assertThat,
-			pattern("**/*Test.java").isParsedToRegexp(`.*/[^/]*Test\.java$`),
-			pattern("*/*Test.java").isParsedToRegexp(`[^/]*/[^/]*Test\.java$`),
-			pattern("*Test.java").isParsedToRegexp(`.*Test\.java$`),
-			pattern("pkg/**/*_test.go").isParsedToRegexp(`pkg/.*/[^/]*_test\.go$`),
-			pattern("vendor/").isParsedToRegexp(`vendor/.*`),
-			pattern("pkg/*/**/*_test.go").isParsedToRegexp(`pkg/[^/]*/.*/[^/]*_test\.go$`),
-			pattern("test_*.py").isParsedToRegexp(`test_[^/]*\.py$`))
 
 		It("should extract regexp", func() {
 			// given
@@ -40,18 +24,43 @@ var _ = Describe("File pattern features", func() {
 			Expect(parsed).To(ConsistOf(testkeeper.FilePattern{Regexp: "my-regexp"}))
 		})
 	})
+
+	Context("File pattern matching", func() {
+
+		var assertThat = func(file, pattern string) {
+			parsed := testkeeper.ParseFilePatterns([]string{pattern})
+			Expect(parsed.Matches(file)).To(BeTrue())
+		}
+
+		table.DescribeTable(
+			"should parse file patterns to regexp",
+			assertThat,
+			file("src/main/resources/Anyfile").matches("**/Anyfile"),
+			file("Anyfile").matches("**/**/Anyfile"),
+			file("src/Anyfile").matches("*/Anyfile"),
+			file("src/test/resources/Anyfile").matches("src/**/Anyfile"),
+			file("src/test/resources/Anyfile").matches("*/Anyfile"), // FIXME this should fail as it's single directory
+			file("Anyfile").matches("**/Anyfile"),
+			file("test/directory/Anyfile").matches("*/Anyfile"),
+			file("test/multiple/directory/Anyfile").matches("test/multiple/*/Anyfile"),
+			file("Anyfile").matches("Anyfile"),
+			file("test_case.py").matches("**/test*.py"),
+			file("pkg/test/test_case.py").matches("**/test*.py"),
+		)
+
+	})
 })
 
 type filePatternProvider func() string
 
-var patternAssertionMsg = "Should parse file pattern %s to regexp %s"
+var patternAssertionMsg = "Should match file %s to expression %s"
 
-func pattern(filePattern string) filePatternProvider {
+func file(fileName string) filePatternProvider {
 	return filePatternProvider(func() string {
-		return filePattern
+		return fileName
 	})
 }
 
-func (f filePatternProvider) isParsedToRegexp(expRegexp string) table.TableEntry {
-	return table.Entry(fmt.Sprintf(patternAssertionMsg, f(), expRegexp), f(), expRegexp)
+func (f filePatternProvider) matches(simplifiedRegExp string) table.TableEntry {
+	return table.Entry(fmt.Sprintf(patternAssertionMsg, f(), simplifiedRegExp), f(), simplifiedRegExp)
 }
