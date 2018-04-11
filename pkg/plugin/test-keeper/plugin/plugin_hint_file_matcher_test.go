@@ -67,5 +67,16 @@ var _ = Describe("Test keeper comment message parsing", func() {
 			// then
 			Expect(isFilePath).To(Equal(false))
 		})
+
+		It("should not match plugin hint file with invalid name", func() {
+			// given
+			pluginHint := "https://my.server.com/path/to/test-keeper-file.md"
+
+			// when
+			isFilePath, _ := regexp.MatchString(plugin.FileRegex, pluginHint)
+
+			// then
+			Expect(isFilePath).To(Equal(false))
+		})
 	})
 })

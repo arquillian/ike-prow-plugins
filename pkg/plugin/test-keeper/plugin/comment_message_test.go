@@ -52,7 +52,7 @@ var _ = Describe("Test keeper comment message creation", func() {
 		It("should create message taken from a file set in config using relative path", func() {
 			// given
 			gock.New("https://raw.githubusercontent.com").
-				Get("owner/repo/46cb8fac44709e4ccaae97448c65e8f7320cfea7/path/to/custom_message_file.md").
+				Get("owner/repo/46cb8fac44709e4ccaae97448c65e8f7320cfea7/path/to/test-keeper_hint.md").
 				Reply(200).
 				BodyString("Custom message")
 
@@ -60,7 +60,7 @@ var _ = Describe("Test keeper comment message creation", func() {
 			config := plugin.TestKeeperConfiguration{
 				PluginConfiguration: config.PluginConfiguration{
 					LocationURL: url,
-					PluginHint:  "path/to/custom_message_file.md",
+					PluginHint:  "path/to/test-keeper_hint.md",
 				},
 			}
 
@@ -81,14 +81,14 @@ var _ = Describe("Test keeper comment message creation", func() {
 		It("should create default message with no-found-custom-file suffix using wrong relative path", func() {
 			// given
 			gock.New("https://raw.githubusercontent.com").
-				Get("owner/repo/46cb8fac44709e4ccaae97448c65e8f7320cfea7/path/to/custom_message_file.md").
+				Get("owner/repo/46cb8fac44709e4ccaae97448c65e8f7320cfea7/path/to/test-keeper_hint.md").
 				Reply(404)
 
 			url := "http://github.com/my/repo/test-keeper.yaml"
 			config := plugin.TestKeeperConfiguration{
 				PluginConfiguration: config.PluginConfiguration{
 					LocationURL: url,
-					PluginHint:  "path/to/custom_message_file.md",
+					PluginHint:  "path/to/test-keeper_hint.md",
 				},
 			}
 
@@ -107,13 +107,13 @@ var _ = Describe("Test keeper comment message creation", func() {
 			Expect(msg).To(ContainSubstring(plugin.SkipComment))
 			Expect(msg).To(ContainSubstring(
 				"https://raw.githubusercontent.com/owner/repo/46cb8fac44709e4ccaae97448c65e8f7320cfea7/" +
-					"path/to/custom_message_file.md"))
+					"path/to/test-keeper_hint.md"))
 		})
 
 		It("should create message taken from a file set in config using url", func() {
 			// given
 			gock.New("http://my.server.com").
-				Get("path/to/custom_message_file.md").
+				Get("path/to/test-keeper_hint.md").
 				Reply(200).
 				BodyString("Custom message")
 
@@ -121,7 +121,7 @@ var _ = Describe("Test keeper comment message creation", func() {
 			config := plugin.TestKeeperConfiguration{
 				PluginConfiguration: config.PluginConfiguration{
 					LocationURL: url,
-					PluginHint:  "http://my.server.com/path/to/custom_message_file.md",
+					PluginHint:  "http://my.server.com/path/to/test-keeper_hint.md",
 				},
 			}
 
@@ -136,14 +136,14 @@ var _ = Describe("Test keeper comment message creation", func() {
 		It("should create default message with no-found-custom-file suffix using wrong url path", func() {
 			// given
 			gock.New("http://my.server.com").
-				Get("path/to/custom_message_file.md").
+				Get("path/to/test-keeper_hint.md").
 				Reply(404)
 
 			url := "http://github.com/my/repo/test-keeper.yaml"
 			config := plugin.TestKeeperConfiguration{
 				PluginConfiguration: config.PluginConfiguration{
 					LocationURL: url,
-					PluginHint:  "http://my.server.com/path/to/custom_message_file.md",
+					PluginHint:  "http://my.server.com/path/to/test-keeper_hint.md",
 				},
 			}
 
@@ -155,20 +155,20 @@ var _ = Describe("Test keeper comment message creation", func() {
 			Expect(msg).To(ContainSubstring(url))
 			Expect(msg).To(ContainSubstring(plugin.SkipComment))
 			Expect(msg).To(ContainSubstring(
-				"http://my.server.com/path/to/custom_message_file.md"))
+				"http://my.server.com/path/to/test-keeper_hint.md"))
 		})
 
 		It("should create default message with no-found-custom-file suffix using not-validate url", func() {
 			// given
 			gock.New("https://raw.githubusercontent.com").
-				Get("owner/repo/46cb8fac44709e4ccaae97448c65e8f7320cfea7/path/to/custom_message_file.md").
+				Get("owner/repo/46cb8fac44709e4ccaae97448c65e8f7320cfea7/path/to/test-keeper_hint.md").
 				Reply(404)
 
 			url := "http://github.com/my/repo/test-keeper.yaml"
 			config := plugin.TestKeeperConfiguration{
 				PluginConfiguration: config.PluginConfiguration{
 					LocationURL: url,
-					PluginHint:  "http/server.com/custom_message_file.md",
+					PluginHint:  "http/server.com/test-keeper_hint.md",
 				},
 			}
 
@@ -187,7 +187,7 @@ var _ = Describe("Test keeper comment message creation", func() {
 			Expect(msg).To(ContainSubstring(plugin.SkipComment))
 			Expect(msg).To(ContainSubstring(
 				"https://raw.githubusercontent.com/owner/repo/46cb8fac44709e4ccaae97448c65e8f7320cfea7/" +
-					"http/server.com/custom_message_file.md"))
+					"http/server.com/test-keeper_hint.md"))
 		})
 
 		It("should create message taken from a string set in config", func() {
