@@ -3,10 +3,10 @@ package testkeeper_test
 import (
 	"fmt"
 
-	. "github.com/onsi/ginkgo"
-	. "github.com/onsi/gomega"
-	"github.com/onsi/ginkgo/extensions/table"
 	"github.com/arquillian/ike-prow-plugins/pkg/plugin/test-keeper"
+	. "github.com/onsi/ginkgo"
+	"github.com/onsi/ginkgo/extensions/table"
+	. "github.com/onsi/gomega"
 )
 
 var _ = Describe("File pattern features", func() {
