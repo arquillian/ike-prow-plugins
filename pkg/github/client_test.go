@@ -3,10 +3,10 @@ package github_test
 import (
 	"net/http"
 
+	. "github.com/arquillian/ike-prow-plugins/pkg/internal/test"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	"gopkg.in/h2non/gock.v1"
-	. "github.com/arquillian/ike-prow-plugins/pkg/internal/test"
 )
 
 var _ = Describe("Client features", func() {
