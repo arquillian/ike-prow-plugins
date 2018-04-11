@@ -25,7 +25,7 @@ var _ = Describe("Test keeper comment message creation", func() {
 
 			// then
 			Expect(msg).To(ContainSubstring("http://arquillian.org/ike-prow-plugins/#_test_keeper_plugin"))
-			Expect(msg).To(ContainSubstring(plugin.SkipComment))
+			Expect(msg).To(ContainSubstring(plugin.BypassCheckComment))
 		})
 
 		It("should create default message referencing to config file when url to config is not empty", func() {
@@ -39,7 +39,7 @@ var _ = Describe("Test keeper comment message creation", func() {
 			// then
 			Expect(msg).NotTo(ContainSubstring("http://arquillian.org/ike-prow-plugins/#_test_keeper_plugin"))
 			Expect(msg).To(ContainSubstring(url))
-			Expect(msg).To(ContainSubstring(plugin.SkipComment))
+			Expect(msg).To(ContainSubstring(plugin.BypassCheckComment))
 		})
 	})
 
@@ -104,7 +104,7 @@ var _ = Describe("Test keeper comment message creation", func() {
 			// then
 			Expect(msg).NotTo(ContainSubstring("http://arquillian.org/ike-prow-plugins/#_test_keeper_plugin"))
 			Expect(msg).To(ContainSubstring(url))
-			Expect(msg).To(ContainSubstring(plugin.SkipComment))
+			Expect(msg).To(ContainSubstring(plugin.BypassCheckComment))
 			Expect(msg).To(ContainSubstring(
 				"https://raw.githubusercontent.com/owner/repo/46cb8fac44709e4ccaae97448c65e8f7320cfea7/" +
 					"path/to/test-keeper_hint.md"))
@@ -153,7 +153,7 @@ var _ = Describe("Test keeper comment message creation", func() {
 			// then
 			Expect(msg).NotTo(ContainSubstring("http://arquillian.org/ike-prow-plugins/#_test_keeper_plugin"))
 			Expect(msg).To(ContainSubstring(url))
-			Expect(msg).To(ContainSubstring(plugin.SkipComment))
+			Expect(msg).To(ContainSubstring(plugin.BypassCheckComment))
 			Expect(msg).To(ContainSubstring(
 				"http://my.server.com/path/to/test-keeper_hint.md"))
 		})
@@ -184,7 +184,7 @@ var _ = Describe("Test keeper comment message creation", func() {
 			// then
 			Expect(msg).NotTo(ContainSubstring("http://arquillian.org/ike-prow-plugins/#_test_keeper_plugin"))
 			Expect(msg).To(ContainSubstring(url))
-			Expect(msg).To(ContainSubstring(plugin.SkipComment))
+			Expect(msg).To(ContainSubstring(plugin.BypassCheckComment))
 			Expect(msg).To(ContainSubstring(
 				"https://raw.githubusercontent.com/owner/repo/46cb8fac44709e4ccaae97448c65e8f7320cfea7/" +
 					"http/server.com/test-keeper_hint.md"))

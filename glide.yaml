@@ -7,7 +7,8 @@ import:
 - package: github.com/sirupsen/logrus
   version: 0.10.0
 - package: github.com/google/go-github/github
-  version: 15.0.0
+# Using this latest tag until a new version containing the commit cc3c003dafcc1261f914368c8bae8c7be1a6e2dc is released
+  version: 437797734d06eec5394734a84cb5b59c82a66ee6
 - package: k8s.io/test-infra/prow/hook
   version: 2f3ad698ffcff53f881d3292a1b3da894bf1d5f7
 - package: k8s.io/test-infra/prow/pluginhelp

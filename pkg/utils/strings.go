@@ -5,6 +5,9 @@ import "reflect"
 // String returns a pointer to the string value passed in.
 func String(v string) *string { return &v }
 
+// Int returns a pointer to the int value passed in.
+func Int(v int) *int { return &v }
+
 // Contains checks if a slice contains an element
 func Contains(s interface{}, e interface{}) bool {
 	slice := convertSliceToInterface(s)
@@ -32,4 +35,9 @@ func convertSliceToInterface(s interface{}) (slice []interface{}) {
 	}
 
 	return slice
+}
+
+// Array returns and array of the given string elements
+func Array(elements ...string) []string {
+	return elements
 }
