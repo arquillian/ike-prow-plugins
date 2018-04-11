@@ -213,6 +213,66 @@ var _ = Describe("Test Keeper Plugin features", func() {
 			Ω(err).ShouldNot(HaveOccurred())
 		})
 
+		It("should block newly created pull request when deletions in the tests are the only changes", func() {
+			// given
+			gock.New("https://api.github.com").
+				Get("/repos/" + repositoryName + "/pulls/1/files").
+				Reply(200).
+				Body(FromFile("test_fixtures/github_calls/prs/without_tests/deletions_only_changes_in_tests.json"))
+			gock.New("https://api.github.com").
+				Get("/repos/" + repositoryName + "/issues/1/comments").
+				Reply(200).
+				BodyString("[]")
+
+			gock.New("https://api.github.com").
+				Post("/repos/" + repositoryName + "/statuses").
+				SetMatcher(ExpectPayload(toBe(github.StatusFailure, testkeeper.NoTestsMessage, expectedContext, testkeeper.NoTestsDetailsLink))).
+				Reply(201) // This way we implicitly verify that call happened after `HandleEvent` call
+
+			gock.New("https://api.github.com").
+				Post("/repos/" + repositoryName + "/issues/1/comments").
+				SetMatcher(ExpectPayload(toHaveBodyWithWholePluginsComment)).
+				Reply(201)
+
+			statusPayload := LoadFromFile("test_fixtures/github_calls/prs/without_tests/status_opened.json")
+
+			// when
+			err := handler.HandleEvent(log, github.PullRequest, statusPayload)
+
+			// then - implicit verification of /statuses call occurrence with proper payload
+			Ω(err).ShouldNot(HaveOccurred())
+		})
+
+		It("should block newly created pull request when there are changes in the business logic but only deletions in the tests", func() {
+			// given
+			gock.New("https://api.github.com").
+				Get("/repos/" + repositoryName + "/pulls/1/files").
+				Reply(200).
+				Body(FromFile("test_fixtures/github_calls/prs/without_tests/prod_code_changes_with_deletion_only_in_tests.json"))
+			gock.New("https://api.github.com").
+				Get("/repos/" + repositoryName + "/issues/1/comments").
+				Reply(200).
+				BodyString("[]")
+
+			gock.New("https://api.github.com").
+				Post("/repos/" + repositoryName + "/statuses").
+				SetMatcher(ExpectPayload(toBe(github.StatusFailure, testkeeper.NoTestsMessage, expectedContext, testkeeper.NoTestsDetailsLink))).
+				Reply(201) // This way we implicitly verify that call happened after `HandleEvent` call
+
+			gock.New("https://api.github.com").
+				Post("/repos/" + repositoryName + "/issues/1/comments").
+				SetMatcher(ExpectPayload(toHaveBodyWithWholePluginsComment)).
+				Reply(201)
+
+			statusPayload := LoadFromFile("test_fixtures/github_calls/prs/without_tests/status_opened.json")
+
+			// when
+			err := handler.HandleEvent(log, github.PullRequest, statusPayload)
+
+			// then - implicit verification of /statuses call occurrence with proper payload
+			Ω(err).ShouldNot(HaveOccurred())
+		})
+
 		It("should skip test existence check when "+testkeeper.BypassCheckComment+" command is used by admin user", func() {
 			// given
 			gock.New("https://api.github.com").
