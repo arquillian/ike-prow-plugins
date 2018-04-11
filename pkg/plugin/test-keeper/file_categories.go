@@ -1,4 +1,4 @@
-package plugin
+package testkeeper
 
 import (
 	"errors"
@@ -59,7 +59,7 @@ func (t *FileCategoryCounter) Count(files []scm.ChangedFile) (FileCategories, er
 }
 
 // LoadMatcher loads list of FilePattern either from the provided configuration or from languages retrieved from the given function
-func LoadMatcher(configuration TestKeeperConfiguration) (TestMatcher, error) {
+func LoadMatcher(configuration PluginConfiguration) (TestMatcher, error) {
 	matcher, err := LoadDefaultMatcher()
 	if err != nil {
 		return matcher, err

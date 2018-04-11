@@ -1,8 +1,8 @@
-package plugin_test
+package wip_test
 
 import (
 	. "github.com/arquillian/ike-prow-plugins/pkg/internal/test"
-	wip "github.com/arquillian/ike-prow-plugins/pkg/plugin/work-in-progress/plugin"
+	wip "github.com/arquillian/ike-prow-plugins/pkg/plugin/work-in-progress"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/ginkgo/extensions/table"
 	. "github.com/onsi/gomega"
