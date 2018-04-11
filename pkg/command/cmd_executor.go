@@ -38,13 +38,14 @@ type DoFunctionProvider struct {
 type commentAction struct {
 	actions     []string
 	description string
+	log         bool
 }
 
 // Deleted represents comment deletion
-var Deleted = commentAction{actions: []string{"deleted"}, description: "deleted"}
+var Deleted = commentAction{actions: []string{"deleted"}, description: "delete", log: false}
 
 // Triggered represents comment editions and creation
-var Triggered = commentAction{actions: []string{"edited", "created"}, description: "used"}
+var Triggered = commentAction{actions: []string{"edited", "created"}, description: "trigger", log: true}
 
 func (a *commentAction) isMatching(comment *gogh.IssueCommentEvent) bool {
 	return utils.Contains(a.actions, *comment.Action)
@@ -74,7 +75,7 @@ func (p *DoFunctionProvider) Then(doFunction DoFunction) {
 		}
 		message := status.constructMessage(matchingAction.description, p.commandExecutor.Command)
 		log.Warn(message)
-		if err == nil && !p.commandExecutor.Quiet {
+		if err == nil && matchingAction.log && !p.commandExecutor.Quiet {
 			commentService := github.NewCommentService(client, comment)
 			return commentService.AddComment(&message)
 		}

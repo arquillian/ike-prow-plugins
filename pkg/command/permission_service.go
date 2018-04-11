@@ -29,7 +29,6 @@ func NewPermissionService(client *github.Client, user string, prLoader *github.P
 type PermissionStatus struct {
 	User           string
 	UserIsApproved bool
-	UsersRoles     []string
 	ApprovedRoles  []string
 	RejectedRoles  []string
 }
@@ -52,8 +51,8 @@ func (s *PermissionStatus) constructMessage(operation, command string) string {
 	var msg bytes.Buffer
 
 	msg.WriteString(fmt.Sprintf(
-		"@%s has %s a command `%s` but this will not have any effect due to insufficient permission. "+
-			"Users with the necessary permissions are anybody who is ",
+		"Hey @%s! It seems you tried to %s `%s` command, but this will not have any effect due to insufficient permission. "+
+			"You have to be ",
 		s.User, operation, command))
 
 	if len(s.ApprovedRoles) > 0 {
@@ -62,15 +61,12 @@ func (s *PermissionStatus) constructMessage(operation, command string) string {
 			msg.WriteString(", but ")
 		}
 	}
+
 	if len(s.RejectedRoles) > 0 {
 		msg.WriteString("not " + strings.Join(s.RejectedRoles, " nor "))
 	}
-	msg.WriteString(". ")
-	if len(s.UsersRoles) == 0 {
-		msg.WriteString("The user, however, doesn't belong to any of the related roles.")
-	} else {
-		msg.WriteString("The user belongs to these roles: " + strings.Join(s.UsersRoles, ", ") + ".")
-	}
+
+	msg.WriteString(" for this command to take an effect. ")
 	return msg.String()
 }
 
@@ -113,7 +109,6 @@ func (s *PermissionService) Admin() (*PermissionStatus, error) {
 		return status.reject(), err
 	}
 
-	status.UsersRoles = append(status.UsersRoles, *permissionLevel.Permission)
 	if *permissionLevel.Permission == Admin {
 		return status.allow(), nil
 	}
@@ -129,7 +124,6 @@ func (s *PermissionService) PRReviewer() (*PermissionStatus, error) {
 	}
 	for _, reviewer := range pr.RequestedReviewers {
 		if s.User == *reviewer.Login {
-			status.UsersRoles = append(status.UsersRoles, RequestReviewer)
 			return status.allow(), nil
 		}
 	}
@@ -144,7 +138,6 @@ func (s *PermissionService) PRCreator() (*PermissionStatus, error) {
 		return status.reject(), err
 	}
 	if s.User == *pr.User.Login {
-		status.UsersRoles = append(status.UsersRoles, PullRequestCreator)
 		return status.allow(), nil
 	}
 	return status.reject(), nil
