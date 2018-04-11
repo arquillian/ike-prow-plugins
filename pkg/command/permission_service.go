@@ -29,7 +29,6 @@ func NewPermissionService(client *github.Client, user string, prLoader *github.P
 type PermissionStatus struct {
 	User           string
 	UserIsApproved bool
-	UsersRoles     []string
 	ApprovedRoles  []string
 	RejectedRoles  []string
 }
@@ -110,7 +109,6 @@ func (s *PermissionService) Admin() (*PermissionStatus, error) {
 		return status.reject(), err
 	}
 
-	status.UsersRoles = append(status.UsersRoles, *permissionLevel.Permission)
 	if *permissionLevel.Permission == Admin {
 		return status.allow(), nil
 	}
@@ -126,7 +124,6 @@ func (s *PermissionService) PRReviewer() (*PermissionStatus, error) {
 	}
 	for _, reviewer := range pr.RequestedReviewers {
 		if s.User == *reviewer.Login {
-			status.UsersRoles = append(status.UsersRoles, RequestReviewer)
 			return status.allow(), nil
 		}
 	}
@@ -141,7 +138,6 @@ func (s *PermissionService) PRCreator() (*PermissionStatus, error) {
 		return status.reject(), err
 	}
 	if s.User == *pr.User.Login {
-		status.UsersRoles = append(status.UsersRoles, PullRequestCreator)
 		return status.allow(), nil
 	}
 	return status.reject(), nil
