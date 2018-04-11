@@ -213,7 +213,7 @@ var _ = Describe("Test Keeper Plugin features", func() {
 			Ω(err).ShouldNot(HaveOccurred())
 		})
 
-		It("should skip test existence check when "+keeper.SkipComment+" command is used by admin user", func() {
+		It("should skip test existence check when "+keeper.BypassCheckComment+" command is used by admin user", func() {
 			// given
 			gock.New("https://api.github.com").
 				Get("/repos/" + repositoryName + "/pulls/1").
@@ -246,7 +246,7 @@ var _ = Describe("Test Keeper Plugin features", func() {
 			Ω(err).ShouldNot(HaveOccurred())
 		})
 
-		It("should ignore "+keeper.SkipComment+" when used by non-admin user", func() {
+		It("should ignore "+keeper.BypassCheckComment+" when used by non-admin user", func() {
 			// given
 			gock.New("https://api.github.com").
 				Get("/repos/" + repositoryName + "/pulls/1").
@@ -261,6 +261,15 @@ var _ = Describe("Test Keeper Plugin features", func() {
 			gock.New("https://api.github.com").
 				Post("/repos/" + repositoryName + "/statuses").
 				SetMatcher(ExpectPayload(toBe(github.StatusFailure, keeper.NoTestsMessage, expectedContext, keeper.NoTestsDetailsLink))).
+				Reply(201)
+
+			gock.New("https://api.github.com").
+				Post("/repos/" + repositoryName + "/issues/1/comments").
+				SetMatcher(
+					ExpectPayload(
+							ToHaveBodyContaining("@bartoszmajsak-test has used a command `/ok-without-tests`"),
+							ToHaveBodyContaining("anybody who is admin or requested reviewer, but not pull request creator"),
+							ToHaveBodyContaining("The user belongs to these roles: read."))).
 				Reply(201) // This way we implicitly verify that call happened after `HandleEvent` call
 
 			statusPayload := LoadFromFile("test_fixtures/github_calls/prs/without_tests/skip_comment_by_external.json")
@@ -272,5 +281,4 @@ var _ = Describe("Test Keeper Plugin features", func() {
 			Ω(err).ShouldNot(HaveOccurred())
 		})
 	})
-
 })

@@ -61,7 +61,7 @@ func (s *Hinter) PluginComment(commentMsg string) error {
 		}
 	}
 
-	return s.Comment(s.createPluginHint(commentMsg))
+	return s.AddComment(s.createPluginHint(commentMsg))
 }
 
 func (s *Hinter) append(first, second string) string {

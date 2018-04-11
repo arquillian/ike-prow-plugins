@@ -1,6 +1,7 @@
 plugins:
   arquillian/ike-prow-plugins:
   - size
+  - assign
 
 external_plugins:
   arquillian/ike-prow-plugins:
