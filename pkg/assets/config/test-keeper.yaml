@@ -100,3 +100,7 @@ skip_validation_for:
   # Shell
   - '*.sh'
   - '*.bat'
+
+  # Our own configurations
+  - 'test-keeper.yaml'
+  - 'test-keeper.yml'

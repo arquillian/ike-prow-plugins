@@ -14,7 +14,8 @@ import (
 // GitHubTestEventsHandler is the event handler for the plugin.
 // Implements server.GitHubEventHandler interface which contains the logic for incoming GitHub events
 type GitHubTestEventsHandler struct {
-	Client *github.Client
+	Client  *github.Client
+	BotName string
 }
 
 // ProwPluginName is an external prow plugin name used to register this service
@@ -100,7 +101,7 @@ func (gh *GitHubTestEventsHandler) handlePrComment(log log.Logger, comment *gogh
 
 	err := cmdHandler.Handle(log, comment)
 	if err != nil {
-		log.Fatal(err)
+		log.Error(err)
 	}
 	return err
 }

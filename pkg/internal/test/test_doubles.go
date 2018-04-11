@@ -8,6 +8,8 @@ import (
 	"net/http"
 	"os"
 
+	"time"
+
 	"github.com/arquillian/ike-prow-plugins/pkg/github"
 	"github.com/arquillian/ike-prow-plugins/pkg/log"
 	gogh "github.com/google/go-github/github"
@@ -67,12 +69,12 @@ func NewDiscardOutLogger() log.Logger {
 }
 
 // NewDefaultGitHubClient creates a GH client with default go-github client (without any authentication token),
-// with number of retries set to 3 and sleep duration set to 1 second
+// with number of retries set to 3 and no sleep duration as we use it for mocked tests
 func NewDefaultGitHubClient() *github.Client {
 	return &github.Client{
 		Client:  gogh.NewClient(nil), // TODO with hoverfly/go-vcr we might want to use tokens instead to capture real traffic
 		Retries: 3,
-		Sleep:   0,
+		Sleep:   0 * time.Second,
 	}
 }
 
