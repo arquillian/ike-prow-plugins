@@ -5,6 +5,7 @@ import (
 	"strings"
 
 	"github.com/arquillian/ike-prow-plugins/pkg/github"
+	"bytes"
 )
 
 // PermissionService keeps user name and PR loader and provides information about the user's permissions
@@ -27,6 +28,7 @@ func NewPermissionService(client *github.Client, user string, prLoader *github.P
 type PermissionStatus struct {
 	User           string
 	UserIsApproved bool
+	UsersRoles     []string
 	ApprovedRoles  []string
 	RejectedRoles  []string
 }
@@ -46,30 +48,72 @@ func (s *PermissionStatus) allow() *PermissionStatus {
 }
 
 func (s *PermissionStatus) constructMessage(operation, command string) string {
-	msg := fmt.Sprintf(
-		"@%s has %s a command `%s` but this user is not allowed to do that. "+
-			"Users with the necessary permissions are anybody who is %s, but not %s",
-		s.User, operation, command, strings.Join(s.ApprovedRoles, " or "), strings.Join(s.RejectedRoles, " nor "))
-	return msg
+	var msg bytes.Buffer
+
+	msg.WriteString(fmt.Sprintf(
+		"@%s has %s a command `%s` but this will not have any effect due to insufficient permission. "+
+			"Users with the necessary permissions are anybody who is ",
+		s.User, operation, command))
+
+	if len(s.ApprovedRoles) > 0 {
+		msg.WriteString(strings.Join(s.ApprovedRoles, " or "))
+		if len(s.RejectedRoles) > 0 {
+			msg.WriteString(", but ")
+		}
+	}
+	if len(s.RejectedRoles) > 0 {
+		msg.WriteString("not " + strings.Join(s.RejectedRoles, " nor "))
+	}
+	msg.WriteString(". ")
+	if len(s.UsersRoles) == 0 {
+		msg.WriteString("The user, however, doesn't belong to any of the related roles.")
+	} else {
+		msg.WriteString("The user belongs to these roles: " + strings.Join(s.UsersRoles, ", ") + ".")
+	}
+	return msg.String()
 }
 
 // PermissionCheck represents any check of the user's permissions and returns PermissionStatus that contains the result
 type PermissionCheck func() (*PermissionStatus, error)
 
-// Anybody allows to any user
-var Anybody PermissionCheck = func() (*PermissionStatus, error) {
-	return &PermissionStatus{UserIsApproved: true, ApprovedRoles: []string{"anyone"}}, nil
-}
+var (
+	// Admin is a name of the admin role
+	Admin = "admin"
+	// RequestReviewer is a name of the requested reviewer role
+	RequestReviewer = "requested reviewer"
+	// PullRequestCreator is a name of the pull request creator role
+	PullRequestCreator = "pull request creator"
+	// Unknown represents an unknown user
+	Unknown = "unknown"
+	// Anyone represents any user/role
+	Anyone = "anyone"
+
+	// Anybody allows to any user
+	Anybody = func() (*PermissionStatus, error) {
+		return &PermissionStatus{UserIsApproved: true, ApprovedRoles: []string{Anyone}}, nil
+	}
+
+	// AnyOf checks if any of the given permission checks is fulfilled
+	AnyOf = func(permissionChecks ...PermissionCheck) PermissionCheck {
+		return of(true, permissionChecks...)
+	}
+
+	// AllOf checks if all of the given permission checks are fulfilled
+	AllOf = func(permissionChecks ...PermissionCheck) PermissionCheck {
+		return of(false, permissionChecks...)
+	}
+)
 
 // Admin checks if the user is admin
 func (s *PermissionService) Admin() (*PermissionStatus, error) {
-	status := s.newPermissionStatus("admin")
+	status := s.newPermissionStatus(Admin)
 	permissionLevel, err := s.Client.GetPermissionLevel(s.PRLoader.RepoOwner, s.PRLoader.RepoName, s.User)
 	if err != nil {
 		return status.reject(), err
 	}
 
-	if *permissionLevel.Permission == "admin" {
+	status.UsersRoles = append(status.UsersRoles, *permissionLevel.Permission)
+	if *permissionLevel.Permission == Admin {
 		return status.allow(), nil
 	}
 	return status.reject(), nil
@@ -77,13 +121,14 @@ func (s *PermissionService) Admin() (*PermissionStatus, error) {
 
 // PRReviewer checks if the user is pull request reviewer
 func (s *PermissionService) PRReviewer() (*PermissionStatus, error) {
-	status := s.newPermissionStatus("requested reviewer")
+	status := s.newPermissionStatus(RequestReviewer)
 	pr, err := s.PRLoader.Load()
 	if err != nil {
 		return status.reject(), err
 	}
 	for _, reviewer := range pr.RequestedReviewers {
 		if s.User == *reviewer.Login {
+			status.UsersRoles = append(status.UsersRoles, RequestReviewer)
 			return status.allow(), nil
 		}
 	}
@@ -92,12 +137,13 @@ func (s *PermissionService) PRReviewer() (*PermissionStatus, error) {
 
 // PRCreator checks if the user is pull request creator
 func (s *PermissionService) PRCreator() (*PermissionStatus, error) {
-	status := s.newPermissionStatus("pull request creator")
+	status := s.newPermissionStatus(PullRequestCreator)
 	pr, err := s.PRLoader.Load()
 	if err != nil {
 		return status.reject(), err
 	}
 	if s.User == *pr.User.Login {
+		status.UsersRoles = append(status.UsersRoles, PullRequestCreator)
 		return status.allow(), nil
 	}
 	return status.reject(), nil
@@ -113,16 +159,6 @@ var Not = func(restriction PermissionCheck) PermissionCheck {
 		reversedStatus.ApprovedRoles = status.RejectedRoles
 		return reversedStatus, err
 	}
-}
-
-// AnyOf checks if any of the given permission checks is fulfilled
-var AnyOf = func(permissionChecks ...PermissionCheck) PermissionCheck {
-	return of(true, permissionChecks...)
-}
-
-// AllOf checks if all of the given permission checks are fulfilled
-var AllOf = func(permissionChecks ...PermissionCheck) PermissionCheck {
-	return of(false, permissionChecks...)
 }
 
 func of(any bool, permissionChecks ...PermissionCheck) PermissionCheck {
@@ -144,7 +180,7 @@ func of(any bool, permissionChecks ...PermissionCheck) PermissionCheck {
 // anyOff parameter sets if the user should be approved in any of the given permission statuses or in all of them
 func Flatten(statuses []*PermissionStatus, anyOff bool) *PermissionStatus {
 	if len(statuses) == 0 {
-		return &PermissionStatus{User: "unknown", UserIsApproved: true, ApprovedRoles: []string{"anyone"}}
+		return &PermissionStatus{User: Unknown, UserIsApproved: true, ApprovedRoles: []string{Anyone}}
 	}
 	flattenedStatus := statuses[0]
 	if len(statuses) == 1 {

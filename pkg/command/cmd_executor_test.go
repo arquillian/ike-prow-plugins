@@ -175,7 +175,7 @@ var _ = Describe("Command executor features", func() {
 				}
 
 				executed := false
-				command := is.CmdExecutor{Command: "/command", Quiet: true}
+				command := is.CmdExecutor{Command: "/command"}
 				command.When(is.Triggered).By(user.Admin).Then(func() error {
 					executed = true
 					return nil
@@ -191,7 +191,8 @@ var _ = Describe("Command executor features", func() {
 					SetMatcher(
 						ExpectPayload(
 								ToHaveBodyContaining("@sender has used a command `/command`"),
-								ToHaveBodyContaining("anybody who is admin or requested reviewer, but not pull request creator"))).
+								ToHaveBodyContaining("anybody who is admin."),
+								ToHaveBodyContaining("The user belongs to these roles: read."))).
 					Reply(201) // This way we implicitly verify that call happened after `HandleEvent` call
 
 				// when
