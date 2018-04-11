@@ -213,17 +213,26 @@ var _ = Describe("Test Keeper Plugin features", func() {
 			Ω(err).ShouldNot(HaveOccurred())
 		})
 
-		It("should not block newly created pull request when deletions are the only changes", func() {
+		It("should block newly created pull request when deletions are the only changes in test file.", func() {
 			// given
 			gock.New("https://api.github.com").
 				Get("/repos/" + repositoryName + "/pulls/1/files").
 				Reply(200).
-				Body(FromFile("test_fixtures/github_calls/prs/without_tests/deletions_only_changes.json"))
+				Body(FromFile("test_fixtures/github_calls/prs/without_tests/deletions_only_changes_in_tests.json"))
+			gock.New("https://api.github.com").
+				Get("/repos/" + repositoryName + "/issues/1/comments").
+				Reply(200).
+				BodyString("[]")
 
 			gock.New("https://api.github.com").
 				Post("/repos/" + repositoryName + "/statuses").
-				SetMatcher(ExpectPayload(toBe(github.StatusSuccess, keeper.OkOnlySkippedFilesMessage, keeper.OkOnlySkippedFilesDetailsLink))).
+				SetMatcher(ExpectPayload(toBe(github.StatusFailure, keeper.NoTestsMessage, expectedContext, keeper.NoTestsDetailsLink))).
 				Reply(201) // This way we implicitly verify that call happened after `HandleEvent` call
+
+			gock.New("https://api.github.com").
+				Post("/repos/" + repositoryName + "/issues/1/comments").
+				SetMatcher(ExpectPayload(toHaveBodyWithWholePluginsComment)).
+				Reply(201)
 
 			statusPayload := LoadFromFile("test_fixtures/github_calls/prs/without_tests/status_opened.json")
 
