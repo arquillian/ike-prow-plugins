@@ -1,7 +1,7 @@
-package plugin_test
+package testkeeper_test
 
 import (
-	. "github.com/arquillian/ike-prow-plugins/pkg/plugin/test-keeper/plugin"
+	"github.com/arquillian/ike-prow-plugins/pkg/plugin/test-keeper"
 	"github.com/arquillian/ike-prow-plugins/pkg/scm"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -9,11 +9,11 @@ import (
 
 var _ = Describe("Test fileCategoryCounter features", func() {
 
-	var defaultMatcher TestMatcher
+	var defaultMatcher testkeeper.TestMatcher
 
 	BeforeEach(func() {
 		var err error
-		defaultMatcher, err = LoadDefaultMatcher()
+		defaultMatcher, err = testkeeper.LoadDefaultMatcher()
 		Ω(err).ShouldNot(HaveOccurred())
 	})
 
@@ -26,7 +26,7 @@ var _ = Describe("Test fileCategoryCounter features", func() {
 				"path/to/page.html",
 				"path/to/test/AnythingTestCase.java")
 
-			fileCategoryCounter := FileCategoryCounter{Matcher: defaultMatcher}
+			fileCategoryCounter := testkeeper.FileCategoryCounter{Matcher: defaultMatcher}
 
 			// when
 			fileCategories, err := fileCategoryCounter.Count(changedFiles)
@@ -42,7 +42,7 @@ var _ = Describe("Test fileCategoryCounter features", func() {
 				"pkg/plugin/test-keeper/plugin/test_checker.go",
 				"path/to/golang/main_test.go")
 
-			fileCategoryCounter := FileCategoryCounter{Matcher: defaultMatcher}
+			fileCategoryCounter := testkeeper.FileCategoryCounter{Matcher: defaultMatcher}
 
 			// when
 			fileCategories, err := fileCategoryCounter.Count(changedFiles)
@@ -58,7 +58,7 @@ var _ = Describe("Test fileCategoryCounter features", func() {
 				"path/to/JavaTest.java",
 				"path/to/golang/main_test.go")
 
-			fileCategoryCounter := FileCategoryCounter{Matcher: defaultMatcher}
+			fileCategoryCounter := testkeeper.FileCategoryCounter{Matcher: defaultMatcher}
 
 			// when
 			fileCategories, err := fileCategoryCounter.Count(changedFiles)
@@ -76,7 +76,7 @@ var _ = Describe("Test fileCategoryCounter features", func() {
 				"path/Test.java/js/something.in.js",
 				"path/to/go/another_in.go")
 
-			fileCategoryCounter := FileCategoryCounter{Matcher: defaultMatcher}
+			fileCategoryCounter := testkeeper.FileCategoryCounter{Matcher: defaultMatcher}
 
 			// when
 			fileCategories, err := fileCategoryCounter.Count(changedFiles)
@@ -91,7 +91,7 @@ var _ = Describe("Test fileCategoryCounter features", func() {
 			changedFiles := changedFilesSet(
 				"node_modules/leftpad/dont_delete_me.spec.js",
 				"vendor/github.com/test/repo/should_ignore_this_test.go")
-			fileCategoryCounter := FileCategoryCounter{Matcher: defaultMatcher}
+			fileCategoryCounter := testkeeper.FileCategoryCounter{Matcher: defaultMatcher}
 
 			// when
 			fileCategories, err := fileCategoryCounter.Count(changedFiles)
@@ -105,7 +105,7 @@ var _ = Describe("Test fileCategoryCounter features", func() {
 			// given
 			changedFiles := changedFilesSet()
 
-			fileCategoryCounter := FileCategoryCounter{Matcher: defaultMatcher}
+			fileCategoryCounter := testkeeper.FileCategoryCounter{Matcher: defaultMatcher}
 
 			// when
 			fileCategories, err := fileCategoryCounter.Count(changedFiles)
@@ -118,7 +118,7 @@ var _ = Describe("Test fileCategoryCounter features", func() {
 
 		It("should accept changeset based on configured inclusion", func() {
 			// given
-			matcher, loaderErr := LoadMatcher(TestKeeperConfiguration{
+			matcher, loaderErr := testkeeper.LoadMatcher(testkeeper.PluginConfiguration{
 				Inclusions: []string{`regex{{_test\.rb$}}`},
 			})
 
@@ -126,7 +126,7 @@ var _ = Describe("Test fileCategoryCounter features", func() {
 				"path/to/github_service.rb",
 				"path/to/github_service_test.rb")
 
-			fileCategoryCounter := FileCategoryCounter{Matcher: matcher}
+			fileCategoryCounter := testkeeper.FileCategoryCounter{Matcher: matcher}
 
 			// when
 			fileCategories, err := fileCategoryCounter.Count(changedFiles)
@@ -139,7 +139,7 @@ var _ = Describe("Test fileCategoryCounter features", func() {
 
 		It("should accept changeset using inclusion in the configuration", func() {
 			// given
-			matcher, loaderErr := LoadMatcher(TestKeeperConfiguration{
+			matcher, loaderErr := testkeeper.LoadMatcher(testkeeper.PluginConfiguration{
 				Inclusions: []string{`regex{{(Test\.java|TestCase\.java|_test\.go)$}}`},
 			})
 
@@ -149,7 +149,7 @@ var _ = Describe("Test fileCategoryCounter features", func() {
 				"path/to/JavaTestCase.java",
 				"path/to/golang/main_test.go")
 
-			fileCategoryCounter := FileCategoryCounter{Matcher: matcher}
+			fileCategoryCounter := testkeeper.FileCategoryCounter{Matcher: matcher}
 
 			// when
 			fileCategories, err := fileCategoryCounter.Count(changedFiles)
@@ -167,7 +167,7 @@ var _ = Describe("Test fileCategoryCounter features", func() {
 				"pom.xml",
 				".travis.yml")
 
-			fileCategoryCounter := FileCategoryCounter{Matcher: defaultMatcher}
+			fileCategoryCounter := testkeeper.FileCategoryCounter{Matcher: defaultMatcher}
 
 			// when
 			fileCategories, err := fileCategoryCounter.Count(changedFiles)
@@ -179,7 +179,7 @@ var _ = Describe("Test fileCategoryCounter features", func() {
 
 		It("should accept changeset containing configured exclusion and one test matched by default inclusion", func() {
 			// given
-			matcher, loaderErr := LoadMatcher(TestKeeperConfiguration{
+			matcher, loaderErr := testkeeper.LoadMatcher(testkeeper.PluginConfiguration{
 				Exclusions: []string{"*.txt", "*.svg", "*.png"},
 			})
 
@@ -189,7 +189,7 @@ var _ = Describe("Test fileCategoryCounter features", func() {
 				"meme.svg",
 				"test.png")
 
-			fileCategoryCounter := FileCategoryCounter{Matcher: matcher}
+			fileCategoryCounter := testkeeper.FileCategoryCounter{Matcher: matcher}
 
 			// when
 			fileCategories, err := fileCategoryCounter.Count(changedFiles)
@@ -202,7 +202,7 @@ var _ = Describe("Test fileCategoryCounter features", func() {
 
 		It("should accept changeset containing configured exclusion", func() {
 			// given
-			matcher, loaderErr := LoadMatcher(TestKeeperConfiguration{
+			matcher, loaderErr := testkeeper.LoadMatcher(testkeeper.PluginConfiguration{
 				Exclusions: []string{"*.txt", "*.svg", "*.png"},
 			})
 
@@ -211,7 +211,7 @@ var _ = Describe("Test fileCategoryCounter features", func() {
 				"meme.svg",
 				"test.png")
 
-			fileCategoryCounter := FileCategoryCounter{Matcher: matcher}
+			fileCategoryCounter := testkeeper.FileCategoryCounter{Matcher: matcher}
 
 			// when
 			fileCategories, err := fileCategoryCounter.Count(changedFiles)
@@ -224,7 +224,7 @@ var _ = Describe("Test fileCategoryCounter features", func() {
 
 		It("should accept changeset containing configured overlapping exclusion and inclusion", func() {
 			// given
-			matcher, loaderErr := LoadMatcher(TestKeeperConfiguration{
+			matcher, loaderErr := testkeeper.LoadMatcher(testkeeper.PluginConfiguration{
 				Inclusions: []string{`**/*_test.txt`},
 				Exclusions: []string{`regex{{(\.txt|\.svg|\.png)$}}`},
 			})
@@ -235,7 +235,7 @@ var _ = Describe("Test fileCategoryCounter features", func() {
 				"meme.svg",
 				"test.png")
 
-			fileCategoryCounter := FileCategoryCounter{Matcher: matcher}
+			fileCategoryCounter := testkeeper.FileCategoryCounter{Matcher: matcher}
 
 			// when
 			fileCategories, err := fileCategoryCounter.Count(changedFiles)
@@ -248,7 +248,7 @@ var _ = Describe("Test fileCategoryCounter features", func() {
 
 		It("should accept changeset containing exclusion combined with default excluded files", func() {
 			// given
-			matcher, loaderErr := LoadMatcher(TestKeeperConfiguration{
+			matcher, loaderErr := testkeeper.LoadMatcher(testkeeper.PluginConfiguration{
 				Exclusions: []string{"**/*.heif"},
 				Combine:    true,
 			})
@@ -260,7 +260,7 @@ var _ = Describe("Test fileCategoryCounter features", func() {
 				"pom.xml",
 				".travis.yml")
 
-			fileCategoryCounter := FileCategoryCounter{Matcher: matcher}
+			fileCategoryCounter := testkeeper.FileCategoryCounter{Matcher: matcher}
 
 			// when
 			fileCategories, err := fileCategoryCounter.Count(changedFiles)
@@ -273,7 +273,7 @@ var _ = Describe("Test fileCategoryCounter features", func() {
 
 		It("should accept changeset containing inclusion not combined with default excluded files", func() {
 			// given
-			matcher, loaderErr := LoadMatcher(TestKeeperConfiguration{
+			matcher, loaderErr := testkeeper.LoadMatcher(testkeeper.PluginConfiguration{
 				Inclusions: []string{`src/**/*FunctionalTest.java$`},
 				Combine:    false,
 			})
@@ -284,7 +284,7 @@ var _ = Describe("Test fileCategoryCounter features", func() {
 				"src/test/com/acme/FancyTestCase.java",
 				"src/test/com/acme/AwesomeFunctionalTest.java")
 
-			fileCategoryCounter := FileCategoryCounter{Matcher: matcher}
+			fileCategoryCounter := testkeeper.FileCategoryCounter{Matcher: matcher}
 
 			// when
 			fileCategories, err := fileCategoryCounter.Count(changedFiles)

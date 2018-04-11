@@ -1,4 +1,4 @@
-package plugin_test
+package testkeeper_test
 
 import (
 	"fmt"
@@ -6,7 +6,7 @@ import (
 
 	"github.com/arquillian/ike-prow-plugins/pkg/github"
 	. "github.com/arquillian/ike-prow-plugins/pkg/internal/test"
-	keeper "github.com/arquillian/ike-prow-plugins/pkg/plugin/test-keeper/plugin"
+	"github.com/arquillian/ike-prow-plugins/pkg/plugin/test-keeper"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	"gopkg.in/h2non/gock.v1"
@@ -17,13 +17,13 @@ const (
 	botName        = "alien-ike"
 )
 
-var expectedContext = strings.Join([]string{botName, keeper.ProwPluginName}, "/")
+var expectedContext = strings.Join([]string{botName, testkeeper.ProwPluginName}, "/")
 
 var _ = Describe("Test Keeper Plugin features", func() {
 
 	Context("Pull Request handling", func() {
 
-		var handler *keeper.GitHubTestEventsHandler
+		var handler *testkeeper.GitHubTestEventsHandler
 
 		log := NewDiscardOutLogger()
 
@@ -40,14 +40,14 @@ var _ = Describe("Test Keeper Plugin features", func() {
 
 		toHaveBodyWithWholePluginsComment := func(statusPayload map[string]interface{}) bool {
 			return Expect(statusPayload).To(SatisfyAll(
-				HaveBodyThatContains(fmt.Sprintf(github.PluginTitleTemplate, keeper.ProwPluginName)),
+				HaveBodyThatContains(fmt.Sprintf(github.PluginTitleTemplate, testkeeper.ProwPluginName)),
 				HaveBodyThatContains("@bartoszmajsak"),
 			))
 		}
 
 		BeforeEach(func() {
 			defer gock.OffAll()
-			handler = &keeper.GitHubTestEventsHandler{Client: NewDefaultGitHubClient(), BotName: botName}
+			handler = &testkeeper.GitHubTestEventsHandler{Client: NewDefaultGitHubClient(), BotName: botName}
 		})
 
 		AfterEach(EnsureGockRequestsHaveBeenMatched)
@@ -63,7 +63,7 @@ var _ = Describe("Test Keeper Plugin features", func() {
 
 			gock.New("https://api.github.com").
 				Post("/repos/" + repositoryName + "/statuses").
-				SetMatcher(ExpectPayload(toBe(github.StatusSuccess, keeper.TestsExistMessage, expectedContext, keeper.TestsExistDetailsLink))).
+				SetMatcher(ExpectPayload(toBe(github.StatusSuccess, testkeeper.TestsExistMessage, expectedContext, testkeeper.TestsExistDetailsLink))).
 				Reply(201) // This way we implicitly verify that call happened after `HandleEvent` call
 
 			statusPayload := LoadFromFile("test_fixtures/github_calls/prs/with_tests/status_opened.json")
@@ -90,7 +90,7 @@ var _ = Describe("Test Keeper Plugin features", func() {
 
 			gock.New("https://api.github.com").
 				Post("/repos/" + repositoryName + "/statuses").
-				SetMatcher(ExpectPayload(toBe(github.StatusSuccess, keeper.TestsExistMessage, expectedContext, keeper.TestsExistDetailsLink))).
+				SetMatcher(ExpectPayload(toBe(github.StatusSuccess, testkeeper.TestsExistMessage, expectedContext, testkeeper.TestsExistDetailsLink))).
 				Reply(201) // This way we implicitly verify that call happened after `HandleEvent` call
 
 			statusPayload := LoadFromFile("test_fixtures/github_calls/prs/with_tests/status_opened.json")
@@ -116,7 +116,7 @@ var _ = Describe("Test Keeper Plugin features", func() {
 
 			gock.New("https://api.github.com").
 				Post("/repos/" + repositoryName + "/statuses").
-				SetMatcher(ExpectPayload(toBe(github.StatusSuccess, keeper.OkOnlySkippedFilesMessage, expectedContext, keeper.OkOnlySkippedFilesDetailsLink))).
+				SetMatcher(ExpectPayload(toBe(github.StatusSuccess, testkeeper.OkOnlySkippedFilesMessage, expectedContext, testkeeper.OkOnlySkippedFilesDetailsLink))).
 				Reply(201) // This way we implicitly verify that call happened after `HandleEvent` call
 
 			statusPayload := LoadFromFile("test_fixtures/github_calls/prs/without_tests/status_opened.json")
@@ -151,7 +151,7 @@ var _ = Describe("Test Keeper Plugin features", func() {
 			// This way we implicitly verify that call happened after `HandleEvent` call
 			gock.New("https://api.github.com").
 				Post("/repos/" + repositoryName + "/statuses").
-				SetMatcher(ExpectPayload(toBe(github.StatusFailure, keeper.NoTestsMessage, expectedContext, keeper.NoTestsDetailsLink))).
+				SetMatcher(ExpectPayload(toBe(github.StatusFailure, testkeeper.NoTestsMessage, expectedContext, testkeeper.NoTestsDetailsLink))).
 				Reply(201)
 			gock.New("https://api.github.com").
 				Post("/repos/" + repositoryName + "/issues/2/comments").
@@ -184,7 +184,7 @@ var _ = Describe("Test Keeper Plugin features", func() {
 			// This way we implicitly verify that call happened after `HandleEvent` call
 			gock.New("https://api.github.com").
 				Post("/repos/" + repositoryName + "/statuses").
-				SetMatcher(ExpectPayload(toBe(github.StatusFailure, keeper.NoTestsMessage, expectedContext, keeper.NoTestsDetailsLink))).
+				SetMatcher(ExpectPayload(toBe(github.StatusFailure, testkeeper.NoTestsMessage, expectedContext, testkeeper.NoTestsDetailsLink))).
 				Reply(201)
 			gock.New("https://api.github.com").
 				Post("/repos/" + repositoryName + "/issues/1/comments").
@@ -211,7 +211,7 @@ var _ = Describe("Test Keeper Plugin features", func() {
 
 			gock.New("https://api.github.com").
 				Post("/repos/" + repositoryName + "/statuses").
-				SetMatcher(ExpectPayload(toBe(github.StatusSuccess, keeper.OkOnlySkippedFilesMessage, expectedContext, keeper.OkOnlySkippedFilesDetailsLink))).
+				SetMatcher(ExpectPayload(toBe(github.StatusSuccess, testkeeper.OkOnlySkippedFilesMessage, expectedContext, testkeeper.OkOnlySkippedFilesDetailsLink))).
 				Reply(201) // This way we implicitly verify that call happened after `HandleEvent` call
 
 			statusPayload := LoadFromFile("test_fixtures/github_calls/prs/without_tests/status_opened.json")
@@ -238,7 +238,7 @@ var _ = Describe("Test Keeper Plugin features", func() {
 
 			gock.New("https://api.github.com").
 				Post("/repos/" + repositoryName + "/statuses").
-				SetMatcher(ExpectPayload(toBe(github.StatusFailure, keeper.NoTestsMessage, expectedContext, keeper.NoTestsDetailsLink))).
+				SetMatcher(ExpectPayload(toBe(github.StatusFailure, testkeeper.NoTestsMessage, expectedContext, testkeeper.NoTestsDetailsLink))).
 				Reply(201) // This way we implicitly verify that call happened after `HandleEvent` call
 
 			gock.New("https://api.github.com").
@@ -270,7 +270,7 @@ var _ = Describe("Test Keeper Plugin features", func() {
 
 			gock.New("https://api.github.com").
 				Post("/repos/" + repositoryName + "/statuses").
-				SetMatcher(ExpectPayload(toBe(github.StatusFailure, keeper.NoTestsMessage, expectedContext, keeper.NoTestsDetailsLink))).
+				SetMatcher(ExpectPayload(toBe(github.StatusFailure, testkeeper.NoTestsMessage, expectedContext, testkeeper.NoTestsDetailsLink))).
 				Reply(201) // This way we implicitly verify that call happened after `HandleEvent` call
 
 			gock.New("https://api.github.com").
@@ -287,7 +287,7 @@ var _ = Describe("Test Keeper Plugin features", func() {
 			Ω(err).ShouldNot(HaveOccurred())
 		})
 
-		It("should skip test existence check when "+keeper.BypassCheckComment+" command is used by admin user", func() {
+		It("should skip test existence check when "+testkeeper.BypassCheckComment+" command is used by admin user", func() {
 			// given
 			NonExistingRawGitHubFiles("test-keeper.yml", "test-keeper.yaml")
 
@@ -304,7 +304,7 @@ var _ = Describe("Test Keeper Plugin features", func() {
 			toHaveEnforcedSuccessState := func(statusPayload map[string]interface{}) bool {
 				return Expect(statusPayload).To(SatisfyAll(
 					HaveState(github.StatusSuccess),
-					HaveDescription(fmt.Sprintf(keeper.ApprovedByMessage, "bartoszmajsak")),
+					HaveDescription(fmt.Sprintf(testkeeper.ApprovedByMessage, "bartoszmajsak")),
 				))
 			}
 
@@ -322,7 +322,7 @@ var _ = Describe("Test Keeper Plugin features", func() {
 			Ω(err).ShouldNot(HaveOccurred())
 		})
 
-		It("should ignore "+keeper.BypassCheckComment+" when used by non-admin user", func() {
+		It("should ignore "+testkeeper.BypassCheckComment+" when used by non-admin user", func() {
 			// given
 			NonExistingRawGitHubFiles("test-keeper.yml", "test-keeper.yaml")
 
@@ -338,7 +338,7 @@ var _ = Describe("Test Keeper Plugin features", func() {
 
 			gock.New("https://api.github.com").
 				Post("/repos/" + repositoryName + "/statuses").
-				SetMatcher(ExpectPayload(toBe(github.StatusFailure, keeper.NoTestsMessage, expectedContext, keeper.NoTestsDetailsLink))).
+				SetMatcher(ExpectPayload(toBe(github.StatusFailure, testkeeper.NoTestsMessage, expectedContext, testkeeper.NoTestsDetailsLink))).
 				Reply(201)
 
 			gock.New("https://api.github.com").

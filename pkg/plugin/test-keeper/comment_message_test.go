@@ -1,11 +1,11 @@
-package plugin_test
+package testkeeper_test
 
 import (
 	"strings"
 
 	"github.com/arquillian/ike-prow-plugins/pkg/config"
 	. "github.com/arquillian/ike-prow-plugins/pkg/internal/test"
-	"github.com/arquillian/ike-prow-plugins/pkg/plugin/test-keeper/plugin"
+	"github.com/arquillian/ike-prow-plugins/pkg/plugin/test-keeper"
 	"github.com/arquillian/ike-prow-plugins/pkg/scm"
 	"github.com/microcosm-cc/bluemonday"
 	. "github.com/onsi/ginkgo"
@@ -19,28 +19,28 @@ var _ = Describe("Test keeper comment message creation", func() {
 
 		It("should create default message referencing to documentation when url to config is empty", func() {
 			// given
-			config := plugin.TestKeeperConfiguration{PluginConfiguration: config.PluginConfiguration{PluginHint: "any-file"}}
+			config := testkeeper.PluginConfiguration{PluginConfiguration: config.PluginConfiguration{PluginHint: "any-file"}}
 
 			// when
-			msg := plugin.CreateCommentMessage(config, scm.RepositoryChange{})
+			msg := testkeeper.CreateCommentMessage(config, scm.RepositoryChange{})
 
 			// then
 			Expect(msg).To(ContainSubstring("http://arquillian.org/ike-prow-plugins/#_test_keeper_plugin"))
-			Expect(msg).To(ContainSubstring(plugin.BypassCheckComment))
+			Expect(msg).To(ContainSubstring(testkeeper.BypassCheckComment))
 		})
 
 		It("should create default message referencing to config file when url to config is not empty", func() {
 			// given
 			url := "http://github.com/my/repo/test-keeper.yaml"
-			config := plugin.TestKeeperConfiguration{PluginConfiguration: config.PluginConfiguration{LocationURL: url}}
+			config := testkeeper.PluginConfiguration{PluginConfiguration: config.PluginConfiguration{LocationURL: url}}
 
 			// when
-			msg := plugin.CreateCommentMessage(config, scm.RepositoryChange{})
+			msg := testkeeper.CreateCommentMessage(config, scm.RepositoryChange{})
 
 			// then
 			Expect(msg).NotTo(ContainSubstring("http://arquillian.org/ike-prow-plugins/#_test_keeper_plugin"))
 			Expect(msg).To(ContainSubstring(url))
-			Expect(msg).To(ContainSubstring(plugin.BypassCheckComment))
+			Expect(msg).To(ContainSubstring(testkeeper.BypassCheckComment))
 		})
 	})
 
@@ -62,7 +62,7 @@ var _ = Describe("Test keeper comment message creation", func() {
 				BodyString("Custom message")
 
 			url := "http://github.com/my/repo/test-keeper.yaml"
-			config := plugin.TestKeeperConfiguration{
+			config := testkeeper.PluginConfiguration{
 				PluginConfiguration: config.PluginConfiguration{
 					LocationURL: url,
 					PluginHint:  "path/to/custom_message_file.md",
@@ -76,7 +76,7 @@ var _ = Describe("Test keeper comment message creation", func() {
 			}
 
 			// when
-			msg := plugin.CreateCommentMessage(config, change)
+			msg := testkeeper.CreateCommentMessage(config, change)
 			sanitizedMsg := removeHtmlElements(msg)
 
 			// then
@@ -88,7 +88,7 @@ var _ = Describe("Test keeper comment message creation", func() {
 			NonExistingRawGitHubFiles("path/to/custom_message_file.md", "test-keeper.yaml", "test-keeper.yml")
 
 			url := "http://github.com/my/repo/test-keeper.yaml"
-			config := plugin.TestKeeperConfiguration{
+			config := testkeeper.PluginConfiguration{
 				PluginConfiguration: config.PluginConfiguration{
 					LocationURL: url,
 					PluginHint:  "path/to/custom_message_file.md",
@@ -102,12 +102,12 @@ var _ = Describe("Test keeper comment message creation", func() {
 			}
 
 			// when
-			msg := plugin.CreateCommentMessage(config, change)
+			msg := testkeeper.CreateCommentMessage(config, change)
 
 			// then
 			Expect(msg).NotTo(ContainSubstring("http://arquillian.org/ike-prow-plugins/#_test_keeper_plugin"))
 			Expect(msg).To(ContainSubstring(url))
-			Expect(msg).To(ContainSubstring(plugin.BypassCheckComment))
+			Expect(msg).To(ContainSubstring(testkeeper.BypassCheckComment))
 			Expect(msg).To(ContainSubstring(
 				"https://raw.githubusercontent.com/owner/repo/46cb8fac44709e4ccaae97448c65e8f7320cfea7/" +
 					"path/to/custom_message_file.md"))
@@ -121,7 +121,7 @@ var _ = Describe("Test keeper comment message creation", func() {
 				BodyString("Custom message")
 
 			url := "http://github.com/my/repo/test-keeper.yaml"
-			config := plugin.TestKeeperConfiguration{
+			config := testkeeper.PluginConfiguration{
 				PluginConfiguration: config.PluginConfiguration{
 					LocationURL: url,
 					PluginHint:  "http://my.server.com/path/to/custom_message_file.md",
@@ -129,7 +129,7 @@ var _ = Describe("Test keeper comment message creation", func() {
 			}
 
 			// when
-			msg := plugin.CreateCommentMessage(config, scm.RepositoryChange{})
+			msg := testkeeper.CreateCommentMessage(config, scm.RepositoryChange{})
 			sanitizedMsg := removeHtmlElements(msg)
 
 			// then
@@ -143,7 +143,7 @@ var _ = Describe("Test keeper comment message creation", func() {
 				Reply(404)
 
 			url := "http://github.com/my/repo/test-keeper.yaml"
-			config := plugin.TestKeeperConfiguration{
+			config := testkeeper.PluginConfiguration{
 				PluginConfiguration: config.PluginConfiguration{
 					LocationURL: url,
 					PluginHint:  "http://my.server.com/path/to/custom_message_file.md",
@@ -151,12 +151,12 @@ var _ = Describe("Test keeper comment message creation", func() {
 			}
 
 			// when
-			msg := plugin.CreateCommentMessage(config, scm.RepositoryChange{})
+			msg := testkeeper.CreateCommentMessage(config, scm.RepositoryChange{})
 
 			// then
 			Expect(msg).NotTo(ContainSubstring("http://arquillian.org/ike-prow-plugins/#_test_keeper_plugin"))
 			Expect(msg).To(ContainSubstring(url))
-			Expect(msg).To(ContainSubstring(plugin.BypassCheckComment))
+			Expect(msg).To(ContainSubstring(testkeeper.BypassCheckComment))
 			Expect(msg).To(ContainSubstring(
 				"http://my.server.com/path/to/custom_message_file.md"))
 		})
@@ -170,7 +170,7 @@ var _ = Describe("Test keeper comment message creation", func() {
 				Reply(404)
 
 			url := "http://github.com/my/repo/test-keeper.yaml"
-			config := plugin.TestKeeperConfiguration{
+			config := testkeeper.PluginConfiguration{
 				PluginConfiguration: config.PluginConfiguration{
 					LocationURL: url,
 					PluginHint:  "http/server.com/custom_message_file.md",
@@ -184,12 +184,12 @@ var _ = Describe("Test keeper comment message creation", func() {
 			}
 
 			// when
-			msg := plugin.CreateCommentMessage(config, change)
+			msg := testkeeper.CreateCommentMessage(config, change)
 
 			// then
 			Expect(msg).NotTo(ContainSubstring("http://arquillian.org/ike-prow-plugins/#_test_keeper_plugin"))
 			Expect(msg).To(ContainSubstring(url))
-			Expect(msg).To(ContainSubstring(plugin.BypassCheckComment))
+			Expect(msg).To(ContainSubstring(testkeeper.BypassCheckComment))
 			Expect(msg).To(ContainSubstring(
 				"https://raw.githubusercontent.com/owner/repo/46cb8fac44709e4ccaae97448c65e8f7320cfea7/" +
 					"http/server.com/custom_message_file.md"))

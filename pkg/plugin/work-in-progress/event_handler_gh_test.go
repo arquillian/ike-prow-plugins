@@ -1,11 +1,11 @@
-package plugin_test
+package wip_test
 
 import (
 	"strings"
 
 	"github.com/arquillian/ike-prow-plugins/pkg/github"
 	. "github.com/arquillian/ike-prow-plugins/pkg/internal/test"
-	wip "github.com/arquillian/ike-prow-plugins/pkg/plugin/work-in-progress/plugin"
+	wip "github.com/arquillian/ike-prow-plugins/pkg/plugin/work-in-progress"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	"gopkg.in/h2non/gock.v1"

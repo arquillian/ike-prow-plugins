@@ -1,4 +1,4 @@
-package plugin_test
+package wip
 
 import (
 	"testing"
@@ -8,7 +8,7 @@ import (
 	. "github.com/onsi/gomega"
 )
 
-func TestSuiteTestKeeperPlugin(t *testing.T) {
+func TestSuiteWorkInProgressPlugin(t *testing.T) {
 	RegisterFailHandler(Fail)
-	RunSpecWithJUnitReporter(t, "Test Keeper Prow Plugin Suite")
+	RunSpecWithJUnitReporter(t, "Prow Event Handler Work-in-progress Plugin Suite")
 }

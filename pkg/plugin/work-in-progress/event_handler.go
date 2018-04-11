@@ -1,4 +1,4 @@
-package plugin
+package wip
 
 import (
 	"encoding/json"
