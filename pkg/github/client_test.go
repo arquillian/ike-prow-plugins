@@ -11,6 +11,8 @@ import (
 
 var _ = Describe("Client features", func() {
 
+	client := NewDefaultGitHubClient()
+
 	Context("Client should try 3 times to get the correct response", func() {
 
 		BeforeEach(func() {
@@ -31,7 +33,7 @@ var _ = Describe("Client features", func() {
 				BodyString("Not Found")
 
 			// when
-			_, err := NewDefaultGitHubClient().ListPullRequestFiles("owner", "repo", 123)
+			_, err := client.ListPullRequestFiles("owner", "repo", 123)
 
 			// then
 			Ω(err).Should(HaveOccurred())
@@ -55,13 +57,14 @@ var _ = Describe("Client features", func() {
 				BodyString("[]")
 
 			// when
-			_, err := NewDefaultGitHubClient().ListPullRequestFiles("owner", "repo", 123)
+			_, err := client.ListPullRequestFiles("owner", "repo", 123)
 
 			// then
 			Ω(err).ShouldNot(HaveOccurred())
 			Expect(counter).To(Equal(2))
 		})
 	})
+
 })
 
 func createCounterMather(counter *int) gock.Matcher {
