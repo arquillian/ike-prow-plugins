@@ -36,8 +36,3 @@ func convertSliceToInterface(s interface{}) (slice []interface{}) {
 
 	return slice
 }
-
-// Array returns and array of the given string elements
-func Array(elements ...string) []string {
-	return elements
-}
