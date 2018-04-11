@@ -4,7 +4,6 @@ import (
 	is "github.com/arquillian/ike-prow-plugins/pkg/command"
 	"github.com/arquillian/ike-prow-plugins/pkg/github"
 	. "github.com/arquillian/ike-prow-plugins/pkg/internal/test"
-	"github.com/arquillian/ike-prow-plugins/pkg/utils"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	"gopkg.in/h2non/gock.v1"
@@ -43,7 +42,7 @@ var _ = Describe("Permission service with permission checks features", func() {
 
 			// then
 			Ω(err).ShouldNot(HaveOccurred())
-			verifyStatusWithPredefinedUser(permissionStatus, utils.Array("read"), false, "admin")
+			verifyStatusWithPredefinedUser(permissionStatus, false, "admin")
 		})
 
 		It("should approve the user when the permission is admin", func() {
@@ -58,7 +57,7 @@ var _ = Describe("Permission service with permission checks features", func() {
 
 			// then
 			Ω(err).ShouldNot(HaveOccurred())
-			verifyStatusWithPredefinedUser(permissionStatus, utils.Array(is.Admin), true, "admin")
+			verifyStatusWithPredefinedUser(permissionStatus, true, "admin")
 		})
 
 		It("should not approve the user that is not the PR creator", func() {
@@ -73,7 +72,7 @@ var _ = Describe("Permission service with permission checks features", func() {
 
 			// then
 			Ω(err).ShouldNot(HaveOccurred())
-			verifyStatusWithPredefinedUser(permissionStatus, utils.Array(), false, "pull request creator")
+			verifyStatusWithPredefinedUser(permissionStatus, false, "pull request creator")
 		})
 
 		It("should approve the user that is the PR creator", func() {
@@ -88,7 +87,7 @@ var _ = Describe("Permission service with permission checks features", func() {
 
 			// then
 			Ω(err).ShouldNot(HaveOccurred())
-			verifyStatusWithPredefinedUser(permissionStatus, utils.Array(is.PullRequestCreator), true, "pull request creator")
+			verifyStatusWithPredefinedUser(permissionStatus, true, "pull request creator")
 		})
 
 		It("should not approve the user that is not the requested PR reviewer", func() {
@@ -103,7 +102,7 @@ var _ = Describe("Permission service with permission checks features", func() {
 
 			// then
 			Ω(err).ShouldNot(HaveOccurred())
-			verifyStatusWithPredefinedUser(permissionStatus, utils.Array(), false, "requested reviewer")
+			verifyStatusWithPredefinedUser(permissionStatus, false, "requested reviewer")
 		})
 
 		It("should approve the user that is one of the requested PR reviewers", func() {
@@ -118,7 +117,7 @@ var _ = Describe("Permission service with permission checks features", func() {
 
 			// then
 			Ω(err).ShouldNot(HaveOccurred())
-			verifyStatusWithPredefinedUser(permissionStatus, utils.Array(is.RequestReviewer), true, "requested reviewer")
+			verifyStatusWithPredefinedUser(permissionStatus, true, "requested reviewer")
 		})
 	})
 
@@ -207,18 +206,17 @@ var _ = Describe("Permission service with permission checks features", func() {
 	})
 })
 
-func verifyStatusWithPredefinedUser(status *is.PermissionStatus, usersRoles []string, userIsApproved bool, approvedRole ...string) {
-	verifyStatus(status, "user", usersRoles, userIsApproved, approvedRole...)
+func verifyStatusWithPredefinedUser(status *is.PermissionStatus, userIsApproved bool, approvedRole ...string) {
+	verifyStatus(status, "user", userIsApproved, approvedRole...)
 }
 
 func verifyStatusWithoutUsersRoles(status *is.PermissionStatus, userName string, userIsApproved bool, approvedRole ...string) {
-	verifyStatus(status, userName, utils.Array(), userIsApproved, approvedRole...)
+	verifyStatus(status, userName, userIsApproved, approvedRole...)
 }
 
-func verifyStatus(status *is.PermissionStatus, userName string, usersRoles []string, userIsApproved bool, approvedRole ...string) {
+func verifyStatus(status *is.PermissionStatus, userName string, userIsApproved bool, approvedRole ...string) {
 	Expect(status.User).To(Equal(userName))
 	Expect(status.UserIsApproved).To(Equal(userIsApproved))
-	Expect(status.UsersRoles).To(ConsistOf(usersRoles))
 	Expect(status.ApprovedRoles).To(ConsistOf(approvedRole))
 	Expect(status.RejectedRoles).To(BeEmpty())
 }
