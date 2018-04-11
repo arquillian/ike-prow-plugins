@@ -268,7 +268,8 @@ var _ = Describe("Test Keeper Plugin features", func() {
 				SetMatcher(
 					ExpectPayload(
 							ToHaveBodyContaining("@bartoszmajsak-test has used a command `/ok-without-tests`"),
-							ToHaveBodyContaining("anybody who is admin or requested reviewer, but not pull request creator"))).
+							ToHaveBodyContaining("anybody who is admin or requested reviewer, but not pull request creator"),
+							ToHaveBodyContaining("The user belongs to these roles: read."))).
 				Reply(201) // This way we implicitly verify that call happened after `HandleEvent` call
 
 			statusPayload := LoadFromFile("test_fixtures/github_calls/prs/without_tests/skip_comment_by_external.json")
