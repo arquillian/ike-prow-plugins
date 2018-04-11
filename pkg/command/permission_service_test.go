@@ -4,10 +4,10 @@ import (
 	is "github.com/arquillian/ike-prow-plugins/pkg/command"
 	"github.com/arquillian/ike-prow-plugins/pkg/github"
 	. "github.com/arquillian/ike-prow-plugins/pkg/internal/test"
+	"github.com/arquillian/ike-prow-plugins/pkg/utils"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	"gopkg.in/h2non/gock.v1"
-	"github.com/arquillian/ike-prow-plugins/pkg/utils"
 )
 
 var _ = Describe("Permission service with permission checks features", func() {

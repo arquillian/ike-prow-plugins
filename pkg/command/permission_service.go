@@ -4,8 +4,9 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/arquillian/ike-prow-plugins/pkg/github"
 	"bytes"
+
+	"github.com/arquillian/ike-prow-plugins/pkg/github"
 )
 
 // PermissionService keeps user name and PR loader and provides information about the user's permissions
