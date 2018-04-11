@@ -36,7 +36,7 @@ var _ = Describe("Permission service with permission checks features", func() {
 			gock.New("https://api.github.com").
 				Get("/repos/owner/repo/collaborators/user/permission").
 				Reply(200).
-				BodyString("{\"permission\": \"read\"}")
+				BodyString(`{"permission": "read"}`)
 
 			// when
 			permissionStatus, err := user.Admin()
@@ -51,7 +51,7 @@ var _ = Describe("Permission service with permission checks features", func() {
 			gock.New("https://api.github.com").
 				Get("/repos/owner/repo/collaborators/user/permission").
 				Reply(200).
-				BodyString("{\"permission\": \"admin\"}")
+				BodyString(`{"permission": "admin"}`)
 
 			// when
 			permissionStatus, err := user.Admin()
