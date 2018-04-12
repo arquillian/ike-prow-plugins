@@ -1,10 +1,9 @@
-package plugin_test
+package testkeeper_test
 
 import (
 	"regexp"
 
-	"github.com/arquillian/ike-prow-plugins/pkg/plugin/test-keeper/plugin"
-
+	"github.com/arquillian/ike-prow-plugins/pkg/plugin/test-keeper"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 )
@@ -18,7 +17,7 @@ var _ = Describe("Test keeper comment message parsing", func() {
 			pluginHint := "path/to/test-keeper_hint.md"
 
 			// when
-			isFilePath, _ := regexp.MatchString(plugin.FileRegex, pluginHint)
+			isFilePath, _ := regexp.MatchString(testkeeper.FileRegex, pluginHint)
 
 			// then
 			Expect(isFilePath).To(Equal(true))
@@ -29,7 +28,7 @@ var _ = Describe("Test keeper comment message parsing", func() {
 			pluginHint := "http://my.server.com/path/to/test-keeper_hint.md"
 
 			// when
-			isFilePath, _ := regexp.MatchString(plugin.FileRegex, pluginHint)
+			isFilePath, _ := regexp.MatchString(testkeeper.FileRegex, pluginHint)
 
 			// then
 			Expect(isFilePath).To(Equal(true))
@@ -40,7 +39,7 @@ var _ = Describe("Test keeper comment message parsing", func() {
 			pluginHint := "https://my.server.com/path/to/test-keeper_hint.md"
 
 			// when
-			isFilePath, _ := regexp.MatchString(plugin.FileRegex, pluginHint)
+			isFilePath, _ := regexp.MatchString(testkeeper.FileRegex, pluginHint)
 
 			// then
 			Expect(isFilePath).To(Equal(true))
@@ -51,7 +50,7 @@ var _ = Describe("Test keeper comment message parsing", func() {
 			pluginHint := "http://my.server.com/path/to/TEST-KEEPER_HINT.MD"
 
 			// when
-			isFilePath, _ := regexp.MatchString(plugin.FileRegex, pluginHint)
+			isFilePath, _ := regexp.MatchString(testkeeper.FileRegex, pluginHint)
 
 			// then
 			Expect(isFilePath).To(Equal(true))
@@ -62,7 +61,7 @@ var _ = Describe("Test keeper comment message parsing", func() {
 			pluginHint := "Test keeper hint message."
 
 			// when
-			isFilePath, _ := regexp.MatchString(plugin.FileRegex, pluginHint)
+			isFilePath, _ := regexp.MatchString(testkeeper.FileRegex, pluginHint)
 
 			// then
 			Expect(isFilePath).To(Equal(false))
@@ -73,7 +72,7 @@ var _ = Describe("Test keeper comment message parsing", func() {
 			pluginHint := "https://my.server.com/path/to/test-keeper-file.md"
 
 			// when
-			isFilePath, _ := regexp.MatchString(plugin.FileRegex, pluginHint)
+			isFilePath, _ := regexp.MatchString(testkeeper.FileRegex, pluginHint)
 
 			// then
 			Expect(isFilePath).To(Equal(false))

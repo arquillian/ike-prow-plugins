@@ -193,7 +193,7 @@ var _ = Describe("Test keeper comment message creation", func() {
 		It("should create message taken from a string set in config", func() {
 			// given
 			url := "http://github.com/my/repo/test-keeper.yaml"
-			config := plugin.TestKeeperConfiguration{
+			config := testkeeper.PluginConfiguration{
 				PluginConfiguration: config.PluginConfiguration{
 					LocationURL: url,
 					PluginHint:  "Custom message",
@@ -201,7 +201,7 @@ var _ = Describe("Test keeper comment message creation", func() {
 			}
 
 			// when
-			msg := plugin.CreateCommentMessage(config, scm.RepositoryChange{})
+			msg := testkeeper.CreateCommentMessage(config, scm.RepositoryChange{})
 			sanitizedMsg := removeHtmlElements(msg)
 
 			// then

@@ -49,7 +49,7 @@ func CreateCommentMessage(configuration PluginConfiguration, change scm.Reposito
 	return msg
 }
 
-func getMsgFromConfigHint(configuration TestKeeperConfiguration, change scm.RepositoryChange) string {
+func getMsgFromConfigHint(configuration PluginConfiguration, change scm.RepositoryChange) string {
 	isFilePath, _ := regexp.MatchString(FileRegex, configuration.PluginHint)
 	if isFilePath {
 		return getMsgFromFile(configuration, change)
