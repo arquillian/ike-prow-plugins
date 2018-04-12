@@ -34,9 +34,14 @@ func FromFile(filePath string) io.Reader {
 }
 
 // NewDiscardOutLogger creates a logger instance not logging any output to Out Writer
+// unless "LOG_TESTS" environment variable is set to "true"
 func NewDiscardOutLogger() log.Logger {
 	nullLogger := logrus.New()
-	nullLogger.Out = ioutil.Discard // TODO rethink if we want to discard logging entirely
+	if os.Getenv("LOG_TESTS") == "true" {
+		nullLogger.Out = os.Stdout
+	} else {
+		nullLogger.Out = ioutil.Discard // TODO rethink if we want to discard logging entirely
+	}
 	return logrus.NewEntry(nullLogger)
 }
 
