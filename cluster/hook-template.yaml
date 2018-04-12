@@ -13,8 +13,8 @@ parameters:
 - name: HOOK_HOSTNAME
   value: ""
 objects:
-  - kind: Deployment
-    apiVersion: extensions/v1beta1
+  - kind: DeploymentConfig
+    apiVersion: v1
     metadata:
       name: hook
       labels:
@@ -22,11 +22,16 @@ objects:
         type: prow-core
     spec:
       replicas: 1
+      triggers:
+        - type: ConfigChange
       strategy:
-        type: RollingUpdate
-        rollingUpdate:
-          maxSurge: 1
-          maxUnavailable: 1
+        type: Rolling
+        rollingParams:
+          intervalSeconds: 1
+          updatePeriodSeconds: 1
+          maxSurge: 25%
+          maxUnavailable: 25%
+          timeoutSeconds: 600
       template:
         metadata:
           labels:
