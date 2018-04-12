@@ -5,7 +5,7 @@ import (
 
 	"github.com/arquillian/ike-prow-plugins/pkg/github"
 	. "github.com/arquillian/ike-prow-plugins/pkg/internal/test"
-	wip "github.com/arquillian/ike-prow-plugins/pkg/plugin/work-in-progress"
+	"github.com/arquillian/ike-prow-plugins/pkg/plugin/work-in-progress"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	"gopkg.in/h2non/gock.v1"
@@ -25,23 +25,19 @@ var _ = Describe("Test Keeper Plugin features", func() {
 
 		log := NewDiscardOutLogger()
 
-		toHaveSuccessState := func(statusPayload map[string]interface{}) bool {
-			return Expect(statusPayload).To(SatisfyAll(
-				HaveState(github.StatusSuccess),
-				HaveDescription(wip.ReadyForReviewMessage),
-				HaveContext(expectedContext),
-				HaveTargetURL(wip.ReadyForReviewDetailsLink),
-			))
-		}
+		toHaveSuccessState := SoftlySatisfyAll(
+			HaveState(github.StatusSuccess),
+			HaveDescription(wip.ReadyForReviewMessage),
+			HaveContext(expectedContext),
+			HaveTargetURL(wip.ReadyForReviewDetailsLink),
+		)
 
-		toHaveFailureState := func(statusPayload map[string]interface{}) bool {
-			return Expect(statusPayload).To(SatisfyAll(
-				HaveState(github.StatusFailure),
-				HaveDescription(wip.InProgressMessage),
-				HaveContext(expectedContext),
-				HaveTargetURL(wip.InProgressDetailsLink),
-			))
-		}
+		toHaveFailureState := SoftlySatisfyAll(
+			HaveState(github.StatusFailure),
+			HaveDescription(wip.InProgressMessage),
+			HaveContext(expectedContext),
+			HaveTargetURL(wip.InProgressDetailsLink),
+		)
 
 		BeforeEach(func() {
 			defer gock.Off()

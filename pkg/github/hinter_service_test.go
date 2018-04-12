@@ -39,13 +39,11 @@ var _ = Describe("Config loader features", func() {
 			}
 			hinter := github.NewHinter(client, NewDiscardOutLogger(), change, 2, hintContext)
 
-			toHaveBodyWithWholePluginsComment := func(statusPayload map[string]interface{}) bool {
-				return Expect(statusPayload).To(SatisfyAll(
-					HaveBodyThatContains("### Ike Plugins (my-plugin-name)"),
-					HaveBodyThatContains("@toAssign"),
-					HaveBodyThatContains("New comment"),
-				))
-			}
+			toHaveBodyWithWholePluginsComment := SoftlySatisfyAll(
+				HaveBodyThatContains("### Ike Plugins (my-plugin-name)"),
+				HaveBodyThatContains("@toAssign"),
+				HaveBodyThatContains("New comment"),
+			)
 
 			gock.New("https://api.github.com").
 				Post("/repos/owner/repo/issues/2/comments").
@@ -105,11 +103,9 @@ var _ = Describe("Config loader features", func() {
 			expContent := "### Ike Plugins (another-plugin)\n\nThank you @toAssign for this contribution!" +
 				"\n\nNew comment"
 
-			toHaveModifiedBody := func(statusPayload map[string]interface{}) bool {
-				return Expect(statusPayload).To(SatisfyAll(
-					HaveBody(expContent),
-				))
-			}
+			toHaveModifiedBody := SoftlySatisfyAll(
+				HaveBody(expContent),
+			)
 
 			gock.New("https://api.github.com").
 				Post("/repos/owner/repo/issues/2/comments").
