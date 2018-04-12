@@ -12,10 +12,10 @@ import (
 var (
 	buildAssets = []string{
 		"src/github.com/arquillian/ike-prow-plugins/Makefile", "src/main/java/pom.xml",
-		"mvnw", "mvnw.cmd", "mvnw.bat", "build.gradle", "gulpfile.js",
-		"gradlew", "gradlew.bat",
+		"mvnw", "mvnw.cmd", "mvnw.bat", "build.gradle", "gulpfile.js", "Gruntfile.js",
+		"gradlew", "gradlew.bat", "Rakefile",
 		"glide.yaml", "glide.lock", "pom.xml", "package.json",
-		"vendor/github.com/arquillian/runner.go",
+		"vendor/github.com/arquillian/runner.go", "Gopkg.toml", "Gopkg.lock",
 		"docker-compose.yml", "Dockerfile", "Dockerfile.builder", "Dockerfile.deploy",
 	}
 
@@ -23,7 +23,8 @@ var (
 		".nvmrc", ".htmlhintrc", ".stylelintrc", ".editorconfig",
 		"protractor.config.js", "protractorEE.config.js", "project/js/config/karma.conf.js",
 		"project/js/config/tsconfig.json", "requirements.txt", "gulpfile.js",
-		"0034A06D9D9B0064CE8ADF6BF1747F4AD2306D93.gpg",
+		"0034A06D9D9B0064CE8ADF6BF1747F4AD2306D93.gpg", "webpack.config.js",
+		"codeship-services.yml",
 	}
 
 	shellScripts = []string{
