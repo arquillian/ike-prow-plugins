@@ -141,16 +141,8 @@ var _ = Describe("Permission service with permission checks features", func() {
 
 	Context("Permission check functions", func() {
 
-		rejected := is.PermissionStatus{
-			User:           "user",
-			UserIsApproved: false,
-			ApprovedRoles:  []string{"role in rejected"},
-		}
-		approved := is.PermissionStatus{
-			User:           "user",
-			UserIsApproved: true,
-			ApprovedRoles:  []string{"role in approved"},
-		}
+		rejected := *is.NewPermissionStatus("user", false, []string{"role in rejected"}, []string{})
+		approved := *is.NewPermissionStatus("user", true, []string{"role in approved"}, []string{})
 
 		It("should approve everyone", func() {
 			// when
@@ -188,40 +180,47 @@ var _ = Describe("Permission service with permission checks features", func() {
 		})
 
 		It("should not approve when no restriction is fulfilled", func() {
+			// given
+			secondRejected := *is.NewPermissionStatus("user", false, []string{is.Admin}, []string{})
+
 			// when
-			status, err := is.AnyOf(newCheck(rejected), newCheck(rejected))()
+			status, err := is.AnyOf(newCheck(rejected), newCheck(secondRejected))()
 
 			// then
 			Ω(err).ShouldNot(HaveOccurred())
 			ExpectPermissionStatus(status).To(
 				HaveRejectedUser("user"),
-				HaveApprovedRoles("role in rejected", "role in rejected"),
+				HaveApprovedRoles("role in rejected", is.Admin),
 				HaveNoRejectedRoles())
 		})
 
 		It("should not approve when at least one restriction is not fulfilled", func() {
+			// given
+			secondApproved := *is.NewPermissionStatus("user", true, []string{is.Admin}, []string{})
+
 			// when
-			status, err := is.AllOf(newCheck(approved), newCheck(rejected), newCheck(approved))()
+			status, err := is.AllOf(newCheck(approved), newCheck(rejected), newCheck(secondApproved))()
 
 			// then
 			Ω(err).ShouldNot(HaveOccurred())
 			ExpectPermissionStatus(status).To(
 				HaveRejectedUser("user"),
-				HaveApprovedRoles("role in approved", "role in rejected", "role in approved"),
+				HaveApprovedRoles("role in approved", "role in rejected", is.Admin),
 				HaveNoRejectedRoles())
 		})
 
 		It("should approve when all restrictions are fulfilled", func() {
 			// given
+			secondApproved := *is.NewPermissionStatus("user", true, []string{is.Admin}, []string{})
 
 			// when
-			status, err := is.AllOf(newCheck(approved), newCheck(approved))()
+			status, err := is.AllOf(newCheck(approved), newCheck(secondApproved))()
 
 			// then
 			Ω(err).ShouldNot(HaveOccurred())
 			ExpectPermissionStatus(status).To(
 				HaveApprovedUser("user"),
-				HaveApprovedRoles("role in approved", "role in approved"),
+				HaveApprovedRoles("role in approved", is.Admin),
 				HaveNoRejectedRoles())
 		})
 
