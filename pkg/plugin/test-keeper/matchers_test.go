@@ -1,9 +1,9 @@
-package plugin_test
+package testkeeper_test
 
 import (
 	"fmt"
 
-	. "github.com/arquillian/ike-prow-plugins/pkg/plugin/test-keeper/plugin"
+	. "github.com/arquillian/ike-prow-plugins/pkg/plugin/test-keeper"
 	. "github.com/onsi/ginkgo"
 	"github.com/onsi/ginkgo/extensions/table"
 	. "github.com/onsi/gomega"
@@ -88,7 +88,7 @@ var _ = Describe("Test Matcher features", func() {
 
 		It("should load default matchers when no pattern is defined", func() {
 			// given
-			emptyConfiguration := TestKeeperConfiguration{}
+			emptyConfiguration := PluginConfiguration{}
 
 			// when
 			matchers, err := LoadMatcher(emptyConfiguration)
@@ -100,7 +100,7 @@ var _ = Describe("Test Matcher features", func() {
 
 		It("should load defined inclusion pattern without default language specific matchers", func() {
 			// given
-			configurationWithInclusionPattern := TestKeeperConfiguration{
+			configurationWithInclusionPattern := PluginConfiguration{
 				Inclusions: []string{`regex{{*IT.java|*TestCase.java}}`},
 			}
 			firstRegexp := func(matcher TestMatcher) string {

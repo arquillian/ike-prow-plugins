@@ -1,4 +1,4 @@
-package plugin
+package testkeeper
 
 import (
 	"fmt"
@@ -17,7 +17,7 @@ const (
 		paragraph +
 		"Automated tests give us confidence in shipping reliable software. Please add some as part of this change." +
 		paragraph +
-		"If you are an admin and you are sure that no test is needed then you can use the command `" + BypassCheckComment + "` " +
+		"If you are an admin or the reviewer of this PR and you are sure that no test is needed then you can use the command `" + BypassCheckComment + "` " +
 		"as a comment to make the status green.\n"
 
 	noConfig = "For more information please head over to official " +
@@ -37,7 +37,7 @@ const (
 )
 
 // CreateCommentMessage creates a comment message for the test-keeper plugin. If the comment message is set in config then it takes that one, the default otherwise.
-func CreateCommentMessage(configuration TestKeeperConfiguration, change scm.RepositoryChange) string {
+func CreateCommentMessage(configuration PluginConfiguration, change scm.RepositoryChange) string {
 	var msg string
 	if configuration.LocationURL == "" {
 		msg = sadIke + paragraph + beginning + paragraph + noConfig
@@ -57,7 +57,7 @@ func getMsgFromConfigHint(configuration TestKeeperConfiguration, change scm.Repo
 	return configuration.PluginHint
 }
 
-func getMsgFromFile(configuration TestKeeperConfiguration, change scm.RepositoryChange) string {
+func getMsgFromFile(configuration PluginConfiguration, change scm.RepositoryChange) string {
 	_, err := url.ParseRequestURI(configuration.PluginHint)
 
 	var content []byte

@@ -1,4 +1,4 @@
-package plugin
+package testkeeper
 
 import (
 	"github.com/arquillian/ike-prow-plugins/pkg/assets"
@@ -38,7 +38,7 @@ func Matches(matchers []FilePattern, filename string) bool {
 // LoadDefaultMatcher loads default matcher containing default include and exclude patterns
 func LoadDefaultMatcher() (TestMatcher, error) {
 	matcher := TestMatcher{}
-	defaultConfig := TestKeeperConfiguration{}
+	defaultConfig := PluginConfiguration{}
 
 	err := config.Load(&defaultConfig, &assets.LocalLoadableConfig{ConfigFileName: "test-keeper.yaml"})
 

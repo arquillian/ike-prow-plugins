@@ -190,9 +190,8 @@ var _ = Describe("Command executor features", func() {
 					Post("/repos/owner/repo/issues/1/comments").
 					SetMatcher(
 						ExpectPayload(
-								ToHaveBodyContaining("@sender has used a command `/command`"),
-								ToHaveBodyContaining("anybody who is admin."),
-								ToHaveBodyContaining("The user belongs to these roles: read."))).
+								ToHaveBodyContaining("Hey @sender! It seems you tried to trigger `/command` command"),
+								ToHaveBodyContaining("You have to be admin"))).
 					Reply(201) // This way we implicitly verify that call happened after `HandleEvent` call
 
 				// when
@@ -203,7 +202,7 @@ var _ = Describe("Command executor features", func() {
 				Expect(executed).To(BeFalse())
 			})
 
-			It("should execute command because all conditions are fulfilled so no gock-not-mathing-error is expected ", func() {
+			It("should execute command because all conditions are fulfilled so no gock-not-matching-error is expected ", func() {
 				// given
 				executed := false
 				command := is.CmdExecutor{Command: "/command"}
@@ -220,7 +219,7 @@ var _ = Describe("Command executor features", func() {
 				Expect(executed).To(BeTrue())
 			})
 
-			It("should not return gock-not-mathing-error because the action is different so no request should be sent ", func() {
+			It("should not return gock-not-matching-error because the action is different so no request should be sent ", func() {
 				// given
 				executed := false
 				command := is.CmdExecutor{Command: "/command"}
@@ -237,7 +236,7 @@ var _ = Describe("Command executor features", func() {
 				Expect(executed).To(BeFalse())
 			})
 
-			It("should return gock-not-mathing-error when not quite mode and user doesn't have permissions", func() {
+			It("should return gock-not-matching-error when not quite mode and user doesn't have permissions", func() {
 				// given
 				client.Retries = 1
 				executed := false
