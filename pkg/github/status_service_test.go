@@ -28,11 +28,13 @@ var _ = Describe("GitHub Status Service", func() {
 		}
 
 		BeforeEach(func() {
-			defer gock.Off()
+			defer gock.OffAll()
 			change := scm.RepositoryChange{RepoName: "test-repo", Owner: "alien-ike", Hash: "1232asdasd"}
 			context := github.StatusContext{BotName: "alien-ike", PluginName: "test-keeper"}
 			statusService = github.NewStatusService(NewDefaultGitHubClient(), NewDiscardOutLogger(), change, context)
 		})
+
+		AfterEach(EnsureGockRequestsHaveBeenMatched)
 
 		It("should report success with context having bot name and plugin name", func() {
 			// given

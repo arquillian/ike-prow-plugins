@@ -16,8 +16,10 @@ var _ = Describe("Client features", func() {
 	Context("Client should try 3 times to get the correct response", func() {
 
 		BeforeEach(func() {
-			gock.Off()
+			defer gock.OffAll()
 		})
+
+		AfterEach(EnsureGockRequestsHaveBeenMatched)
 
 		It("should try to get the response 3 times and then fail when client gets only 404", func() {
 			// given
