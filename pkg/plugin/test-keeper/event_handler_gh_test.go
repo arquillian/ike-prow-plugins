@@ -27,23 +27,20 @@ var _ = Describe("Test Keeper Plugin features", func() {
 
 		log := NewDiscardOutLogger()
 
-		toBe := func(status, description, context, detailsLink string) func(statusPayload map[string]interface{}) bool {
-			return func(statusPayload map[string]interface{}) bool {
-				return Expect(statusPayload).To(SatisfyAll(
-					HaveState(status),
-					HaveDescription(description),
-					HaveContext(context),
-					HaveTargetURL(detailsLink),
-				))
-			}
+		toBe := func(status, description, context, detailsLink string) SoftMatcher {
+			return SoftlySatisfyAll(
+				HaveState(status),
+				HaveDescription(description),
+				HaveContext(context),
+				HaveTargetURL(detailsLink),
+			)
+
 		}
 
-		toHaveBodyWithWholePluginsComment := func(statusPayload map[string]interface{}) bool {
-			return Expect(statusPayload).To(SatisfyAll(
-				HaveBodyThatContains(fmt.Sprintf(github.PluginTitleTemplate, testkeeper.ProwPluginName)),
-				HaveBodyThatContains("@bartoszmajsak"),
-			))
-		}
+		toHaveBodyWithWholePluginsComment := SoftlySatisfyAll(
+			HaveBodyThatContains(fmt.Sprintf(github.PluginTitleTemplate, testkeeper.ProwPluginName)),
+			HaveBodyThatContains("@bartoszmajsak"),
+		)
 
 		BeforeEach(func() {
 			defer gock.OffAll()
@@ -301,12 +298,10 @@ var _ = Describe("Test Keeper Plugin features", func() {
 				Reply(200).
 				Body(FromFile("test_fixtures/github_calls/collaborators_repo-admin_permission.json"))
 
-			toHaveEnforcedSuccessState := func(statusPayload map[string]interface{}) bool {
-				return Expect(statusPayload).To(SatisfyAll(
-					HaveState(github.StatusSuccess),
-					HaveDescription(fmt.Sprintf(testkeeper.ApprovedByMessage, "bartoszmajsak")),
-				))
-			}
+			toHaveEnforcedSuccessState := SoftlySatisfyAll(
+				HaveState(github.StatusSuccess),
+				HaveDescription(fmt.Sprintf(testkeeper.ApprovedByMessage, "bartoszmajsak")),
+			)
 
 			gock.New("https://api.github.com").
 				Post("/repos/" + repositoryName + "/statuses").
@@ -344,9 +339,9 @@ var _ = Describe("Test Keeper Plugin features", func() {
 			gock.New("https://api.github.com").
 				Post("/repos/" + repositoryName + "/issues/1/comments").
 				SetMatcher(
-					ExpectPayload(
-							ToHaveBodyContaining("Hey @bartoszmajsak-test! It seems you tried to trigger `/ok-without-tests` command"),
-							ToHaveBodyContaining("You have to be admin or requested reviewer, but not pull request creator"))).
+					ExpectPayload(To(
+							HaveBodyThatContains("Hey @bartoszmajsak-test! It seems you tried to trigger `/ok-without-tests` command"),
+							HaveBodyThatContains("You have to be admin or requested reviewer, but not pull request creator")))).
 				Reply(201) // This way we implicitly verify that call happened after `HandleEvent` call
 
 			statusPayload := LoadFromFile("test_fixtures/github_calls/prs/without_tests/skip_comment_by_external.json")
