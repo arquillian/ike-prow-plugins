@@ -19,7 +19,7 @@ To enable customized plugin hint comment messages edit plugin's configuration fi
 
 [source, yml, indent=0]
 ----
-include::../../pkg/plugin/test-keeper/plugin/test_fixtures/github_calls/prs/with_tests/test-keeper.yml[tag="plugin_hint"]
+include::../../pkg/plugin/test-keeper/test_fixtures/github_calls/prs/with_tests/test-keeper.yml[tag="plugin_hint"]
 ----
 
 The `plugin_hint` property can either have an inline string directly written inside of the config file or another file with case insensitive 
