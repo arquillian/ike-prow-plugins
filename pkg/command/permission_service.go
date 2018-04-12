@@ -33,6 +33,16 @@ type PermissionStatus struct {
 	RejectedRoles  []string
 }
 
+// NewPermissionStatus creates a new instance of PermissionStatus with the given values
+func NewPermissionStatus(user string, userIsApproved bool, approvedRoles []string, rejectedRoles []string) *PermissionStatus {
+	return &PermissionStatus{
+		User:           user,
+		UserIsApproved: userIsApproved,
+		ApprovedRoles:  approvedRoles,
+		RejectedRoles:  rejectedRoles,
+	}
+}
+
 func (s *PermissionService) newPermissionStatus(allowedRoles ...string) *PermissionStatus {
 	return &PermissionStatus{User: s.User, ApprovedRoles: allowedRoles}
 }
