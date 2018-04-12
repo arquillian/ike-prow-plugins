@@ -8,7 +8,7 @@ import (
 	"gopkg.in/h2non/gock.v1"
 )
 
-// EnsureGockRequestsHaveBeenMatched checks if all requests have been matched and all mocked requests have been used in the test
+// EnsureGockRequestsHaveBeenMatched checks if all requests have been matched in the test
 func EnsureGockRequestsHaveBeenMatched() {
 	gomega.Expect(gock.GetUnmatchedRequests()).To(gomega.BeEmpty(), "Have no unmatched requests")
 }
