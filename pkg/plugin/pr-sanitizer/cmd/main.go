@@ -15,7 +15,7 @@ const ProwPluginName = "pr-sanitizer"
 // GitHubLabelsEventsHandler is the event handler for the plugin.
 // Implements server.GitHubEventHandler interface which contains the logic for incoming GitHub events
 type GitHubLabelsEventsHandler struct {
-	Client  *github.Client
+	Client  github.Client
 	BotName string
 }
 
@@ -23,7 +23,7 @@ func main() {
 	pluginBootstrap.InitPlugin(ProwPluginName, handlerCreator, serverCreator, helpProvider)
 }
 
-func handlerCreator(githubClient *github.Client, botName string) server.GitHubEventHandler {
+func handlerCreator(githubClient github.Client, botName string) server.GitHubEventHandler {
 	return &GitHubLabelsEventsHandler{Client: githubClient, BotName: botName}
 }
 

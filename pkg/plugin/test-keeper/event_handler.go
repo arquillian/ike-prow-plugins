@@ -14,7 +14,7 @@ import (
 // GitHubTestEventsHandler is the event handler for the plugin.
 // Implements server.GitHubEventHandler interface which contains the logic for incoming GitHub events
 type GitHubTestEventsHandler struct {
-	Client  *github.Client
+	Client  github.Client
 	BotName string
 }
 

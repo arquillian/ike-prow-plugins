@@ -3,15 +3,16 @@ package github_test
 import (
 	"net/http"
 
+	"github.com/arquillian/ike-prow-plugins/pkg/github"
 	. "github.com/arquillian/ike-prow-plugins/pkg/internal/test"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	"gopkg.in/h2non/gock.v1"
 )
 
-var _ = Describe("Client features", func() {
+var _ = Describe("Retry client features", func() {
 
-	client := NewDefaultGitHubClient()
+	client := github.NewRetryClient(NewDefaultGitHubClient(), 3, 0)
 
 	Context("Client should try 3 times to get the correct response", func() {
 

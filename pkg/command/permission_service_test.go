@@ -30,6 +30,8 @@ var _ = Describe("Permission service with permission checks features", func() {
 			}
 		})
 
+		AfterEach(EnsureGockRequestsHaveBeenMatched)
+
 		It("should not approve the user when the permission is read", func() {
 			// given
 			gock.New("https://api.github.com").

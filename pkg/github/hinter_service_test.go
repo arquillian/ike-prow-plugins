@@ -13,7 +13,7 @@ var _ = Describe("Config loader features", func() {
 
 	Context("Loading configuration file from the repository", func() {
 
-		var client *github.Client
+		var client github.Client
 
 		BeforeEach(func() {
 			defer gock.OffAll()
@@ -28,7 +28,7 @@ var _ = Describe("Config loader features", func() {
 			gock.New("https://api.github.com").
 				Get("/repos/owner/repo/issues/2/comments").
 				Reply(200).
-				BodyString("{}")
+				BodyString("[]")
 
 			change := scm.RepositoryChange{
 				Owner:    "owner",

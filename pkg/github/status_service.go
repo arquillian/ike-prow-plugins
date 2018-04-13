@@ -11,14 +11,14 @@ import (
 
 // StatusService is a struct
 type StatusService struct {
-	client        *Client
+	client        Client
 	log           log.Logger
 	statusContext StatusContext
 	change        scm.RepositoryChange
 }
 
 // NewStatusService creates an instance of GitHub StatusService
-func NewStatusService(client *Client, log log.Logger, change scm.RepositoryChange, context StatusContext) scm.StatusService {
+func NewStatusService(client Client, log log.Logger, change scm.RepositoryChange, context StatusContext) scm.StatusService {
 	return &StatusService{
 		client:        client,
 		log:           log,

@@ -20,7 +20,7 @@ type BypassCmd struct {
 }
 
 // Perform executes the set DoFunctions for the given IssueCommentEvent (when all conditions are fulfilled)
-func (c *BypassCmd) Perform(client *github.Client, log log.Logger, comment *gogh.IssueCommentEvent) error {
+func (c *BypassCmd) Perform(client github.Client, log log.Logger, comment *gogh.IssueCommentEvent) error {
 	user := c.userPermissionService
 	var BypassCommand = &is.CmdExecutor{Command: BypassCheckComment}
 

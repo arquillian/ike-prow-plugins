@@ -160,7 +160,7 @@ var _ = Describe("Command executor features", func() {
 		Context("Executing of predefined commands when comments are activated", func() {
 
 			BeforeEach(func() {
-				gock.Off()
+				gock.OffAll()
 			})
 
 			It("should not execute command when command name is not matching", func() {
@@ -238,7 +238,6 @@ var _ = Describe("Command executor features", func() {
 
 			It("should return gock-not-matching-error when not quite mode and user doesn't have permissions", func() {
 				// given
-				client.Retries = 1
 				executed := false
 				command := is.CmdExecutor{Command: "/command"}
 				command.When(is.Triggered).By(is.Not(is.Anybody)).Then(func() error {

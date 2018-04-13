@@ -29,7 +29,7 @@ type HintContext struct {
 }
 
 // NewHinter creates an instance of GitHub Hinter for the given HintContext
-func NewHinter(client *Client, log log.Logger, change scm.RepositoryChange, issueOrPrNumber int, commentContext HintContext) *Hinter {
+func NewHinter(client Client, log log.Logger, change scm.RepositoryChange, issueOrPrNumber int, commentContext HintContext) *Hinter {
 	return &Hinter{
 		CommentService: &CommentService{
 			client: client,

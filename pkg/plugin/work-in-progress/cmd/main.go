@@ -13,7 +13,7 @@ func main() {
 	pluginBootstrap.InitPlugin(wip.ProwPluginName, handlerCreator, serverCreator, helpProvider)
 }
 
-func handlerCreator(githubClient *github.Client, botName string) server.GitHubEventHandler {
+func handlerCreator(githubClient github.Client, botName string) server.GitHubEventHandler {
 	return &wip.GitHubWIPPRHandler{Client: githubClient, BotName: botName}
 }
 

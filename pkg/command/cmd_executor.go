@@ -11,7 +11,7 @@ import (
 
 // DoFunction is used for performing operations related to command actions
 type DoFunction func() error
-type doFunctionExecutor func(client *github.Client, log log.Logger, comment *gogh.IssueCommentEvent) error
+type doFunctionExecutor func(client github.Client, log log.Logger, comment *gogh.IssueCommentEvent) error
 
 // CmdExecutor takes care of executing a command triggered by IssueCommentEvent.
 // The execution is set by specifying actions/events and with given restrictions the command should be triggered for.
@@ -63,7 +63,7 @@ func (s *RestrictionSetter) By(permissionChecks ...PermissionCheck) *DoFunctionP
 
 // Then take a DoFunction that performs the required operations (when all checks are fulfilled)
 func (p *DoFunctionProvider) Then(doFunction DoFunction) {
-	doExecutor := func(client *github.Client, log log.Logger, comment *gogh.IssueCommentEvent) error {
+	doExecutor := func(client github.Client, log log.Logger, comment *gogh.IssueCommentEvent) error {
 		matchingAction := p.getMatchingAction(comment)
 		if matchingAction == nil {
 			return nil
@@ -95,7 +95,7 @@ func (p *DoFunctionProvider) getMatchingAction(comment *gogh.IssueCommentEvent) 
 }
 
 // Execute triggers the given DoFunctions (when all checks are fulfilled) for the given pr comment
-func (e *CmdExecutor) Execute(client *github.Client, log log.Logger, comment *gogh.IssueCommentEvent) error {
+func (e *CmdExecutor) Execute(client github.Client, log log.Logger, comment *gogh.IssueCommentEvent) error {
 	if e.Command != strings.TrimSpace(*comment.Comment.Body) {
 		return nil
 	}

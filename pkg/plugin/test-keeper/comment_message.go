@@ -5,8 +5,8 @@ import (
 	"net/url"
 
 	"github.com/arquillian/ike-prow-plugins/pkg/github"
-	"github.com/arquillian/ike-prow-plugins/pkg/http"
 	"github.com/arquillian/ike-prow-plugins/pkg/scm"
+	"github.com/arquillian/ike-prow-plugins/pkg/utils"
 )
 
 const (
@@ -57,7 +57,7 @@ func getMsgFromFile(configuration PluginConfiguration, change scm.RepositoryChan
 		ghFileService := github.RawFileService{Change: change}
 		msgFileURL = ghFileService.GetRawFileURL(configuration.PluginHint)
 	}
-	content, err = http.GetFileFromURL(msgFileURL)
+	content, err = utils.GetFileFromURL(msgFileURL)
 
 	if err != nil {
 		return getMsgWithConfigRef(configuration.LocationURL) + paragraph + fmt.Sprintf(notFoundFileSuffix, msgFileURL)

@@ -8,7 +8,7 @@ import (
 
 // CommentCmdHandler keeps list of CommentCmd implementations to be handled when an IssueCommentEvent occurs
 type CommentCmdHandler struct {
-	Client   *github.Client
+	Client   github.Client
 	commands []CommentCmd
 }
 
@@ -33,7 +33,7 @@ func (s *CommentCmdHandler) Handle(log log.Logger, comment *gogh.IssueCommentEve
 // CommentCmd is a abstraction of a command that is triggered by a comment
 type CommentCmd interface {
 	// Perform triggers the process of evaluating and performing of the command for the given comment
-	Perform(client *github.Client, log log.Logger, comment *gogh.IssueCommentEvent) error
+	Perform(client github.Client, log log.Logger, comment *gogh.IssueCommentEvent) error
 	// Matches says if the content of the given comment matches the command
 	Matches(comment *gogh.IssueCommentEvent) bool
 }

@@ -13,7 +13,7 @@ func main() {
 	pluginBootstrap.InitPlugin(testkeeper.ProwPluginName, eventHandler, eventServer, helpProvider)
 }
 
-func eventHandler(githubClient *github.Client, botName string) server.GitHubEventHandler {
+func eventHandler(githubClient github.Client, botName string) server.GitHubEventHandler {
 	return &testkeeper.GitHubTestEventsHandler{Client: githubClient, BotName: botName}
 }
 

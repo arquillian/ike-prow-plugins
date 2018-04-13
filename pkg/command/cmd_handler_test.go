@@ -19,7 +19,7 @@ type configurableCommentCommand struct {
 	triggered         *bool
 }
 
-func (c *configurableCommentCommand) Perform(client *github.Client, log log.Logger, comment *gogh.IssueCommentEvent) error {
+func (c *configurableCommentCommand) Perform(client github.Client, log log.Logger, comment *gogh.IssueCommentEvent) error {
 	*c.triggered = true
 	if c.shouldReturnError {
 		return errors.New("error")

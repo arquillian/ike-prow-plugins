@@ -13,8 +13,10 @@ var _ = Describe("Pull Request lazy loading", func() {
 	client := NewDefaultGitHubClient()
 
 	BeforeEach(func() {
-		gock.Off()
+		defer gock.OffAll()
 	})
+
+	AfterEach(EnsureGockRequestsHaveBeenMatched)
 
 	It("should load pull request when load() method is called", func() {
 		// given

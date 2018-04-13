@@ -6,7 +6,7 @@ import (
 
 // PullRequestLazyLoader represents a lazy loader of pull request information - is loaded when needed and only once
 type PullRequestLazyLoader struct {
-	Client *Client
+	Client Client
 	RepoOwner,
 	RepoName string
 	Number      int
@@ -15,7 +15,7 @@ type PullRequestLazyLoader struct {
 }
 
 // NewPullRequestLazyLoader creates a new instance of PullRequestLazyLoader with information retrieved from the given IssueCommentEvent
-func NewPullRequestLazyLoader(client *Client, comment *gogh.IssueCommentEvent) *PullRequestLazyLoader {
+func NewPullRequestLazyLoader(client Client, comment *gogh.IssueCommentEvent) *PullRequestLazyLoader {
 	return &PullRequestLazyLoader{
 		Client:    client,
 		RepoOwner: *comment.Repo.Owner.Login,

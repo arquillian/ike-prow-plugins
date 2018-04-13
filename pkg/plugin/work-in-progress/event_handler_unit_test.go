@@ -2,7 +2,8 @@ package wip_test
 
 import (
 	. "github.com/arquillian/ike-prow-plugins/pkg/internal/test"
-	wip "github.com/arquillian/ike-prow-plugins/pkg/plugin/work-in-progress"
+	"github.com/arquillian/ike-prow-plugins/pkg/log"
+	"github.com/arquillian/ike-prow-plugins/pkg/plugin/work-in-progress"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/ginkgo/extensions/table"
 	. "github.com/onsi/gomega"
@@ -16,6 +17,7 @@ var _ = Describe("Work-in-progress Plugin features", func() {
 
 		BeforeEach(func() {
 			handler = &wip.GitHubWIPPRHandler{Client: NewDefaultGitHubClient()}
+			log.NewTestLogger().Warn(">>>>>>>>>>>>")
 		})
 
 		DescribeTable("should recognize PR as work-in-progress if title starts with WIP",

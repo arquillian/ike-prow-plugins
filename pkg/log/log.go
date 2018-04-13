@@ -1,6 +1,9 @@
 package log
 
 import (
+	"io/ioutil"
+	"os"
+
 	"github.com/sirupsen/logrus"
 )
 
@@ -18,8 +21,31 @@ type Logger interface {
 
 // ConfigureLogrus defines global formatting, level and fields used while logging
 func ConfigureLogrus(pluginName string) *logrus.Entry {
-	logrus.SetFormatter(&logrus.JSONFormatter{})
-	logrus.SetLevel(logrus.WarnLevel)
+	logrusSettings()
 	log := logrus.WithField("ike-plugins", pluginName)
 	return log
+}
+
+// NewTestLogger creates a logger instance not logging any output to Out Writer
+// unless "LOG_TESTS" environment variable is set to "true"
+func NewTestLogger() Logger {
+	nullLogger := logrus.StandardLogger()
+	logrusSettings()
+	if os.Getenv("LOG_TESTS") == "true" {
+		nullLogger.Out = os.Stdout
+	} else {
+		nullLogger.Out = ioutil.Discard // TODO rethink if we want to discard logging entirely for testing
+	}
+	return logrus.NewEntry(nullLogger)
+}
+
+// StdLogger returns global logger instance with preconfigured formatting
+func StdLogger() Logger {
+	logrusSettings()
+	return logrus.StandardLogger()
+}
+
+func logrusSettings() {
+	logrus.SetFormatter(&logrus.JSONFormatter{})
+	logrus.SetLevel(logrus.WarnLevel)
 }

@@ -43,7 +43,7 @@ const DocumentationURL = "http://arquillian.org/ike-prow-plugins/"
 
 // EventHandlerCreator is a func type that creates server.GitHubEventHandler instance which is the central point for
 // the plugin logic
-type EventHandlerCreator func(client *github.Client, botName string) server.GitHubEventHandler
+type EventHandlerCreator func(client github.Client, botName string) server.GitHubEventHandler
 
 // ServerCreator is a func type that wires Server and server.GitHubEventHandler together
 type ServerCreator func(hmacSecret []byte, evenHandler server.GitHubEventHandler) *server.Server
@@ -81,7 +81,13 @@ func InitPlugin(pluginName string, newEventHandler EventHandlerCreator, newServe
 		logger.WithError(err).Fatalf("Error loading ike-plugins config from %q.", *pluginConfig)
 	}
 
-	githubClient := github.NewClient(oauthSecret, 3, time.Second)
+	githubClient := github.NewRateLimitWatcherClient(
+		github.NewRetryClient(
+			github.NewOauthClient(oauthSecret),
+			2,
+			time.Second),
+		logger,
+		100)
 
 	handler := newEventHandler(githubClient, *pluginBotName)
 	pluginServer := newServer(webhookSecret, handler)
