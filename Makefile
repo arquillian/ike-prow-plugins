@@ -14,6 +14,7 @@ BUILD_IMAGES:=$(patsubst %,build-%, $(PLUGINS))
 PUSH_IMAGES:=$(patsubst %,push-%, $(PLUGINS))
 CLEAN_IMAGES:=$(patsubst %,clean-%, $(PLUGINS))
 OC_DEPLOYMENTS:=$(patsubst %,oc-%, $(PLUGINS))
+OC_RESTART:=$(patsubst %,dc-%, $(PLUGINS))
 
 in_docker_group:=$(filter docker,$(shell groups))
 is_root:=$(filter 0,$(shell id -u))
@@ -72,7 +73,8 @@ format:
 # Build configuration
 BUILD_TIME=$(shell date -u '+%Y-%m-%dT%H:%M:%SZ')
 COMMIT:=$(shell git rev-parse --short HEAD)
-TAG:=$(COMMIT)-$(shell date +%s)
+TIMESTAMP:=$(shell date +%s)
+TAG:=$(COMMIT)-$(TIMESTAMP)
 GITUNTRACKEDCHANGES:=$(shell git status --porcelain --untracked-files=no)
 ifneq ($(GITUNTRACKEDCHANGES),)
   COMMIT := $(COMMIT)-dirty
@@ -99,6 +101,10 @@ endef
 define populate_configmap ## params: configmap name, configmap file
 	@oc create configmap $(1) || true
 	@oc create configmap $(1) --from-file=$(1)=$(2) --dry-run -o yaml | oc replace configmap $(1) -f -
+endef
+
+define restart_dc ## params: deploymentconfig name
+	@oc patch deploymentconfig $(1) --type json -p='[{"op": "replace", "path": "/spec/template/metadata/labels/timestamp", "value":'"'$(TIMESTAMP)'"'}]' || true
 endef
 
 OC_PROJECT_NAME?=ike-prow-plugins
@@ -142,6 +148,18 @@ $(OC_DEPLOYMENTS): oc-%: %
 		-o yaml > $(PLUGIN_DEPLOYMENTS_DIR)/$<.yaml
 
 	@oc apply -f $(PLUGIN_DEPLOYMENTS_DIR)/$<.yaml
+
+.PHONY: oc-restart-all ## Restarts all deploymentconfigs by patching it
+oc-restart-all: oc-restart-hook oc-restart-plugins
+
+.PHONY: oc-restart-hook ## Restarts hook deploymentconfig by patching it
+oc-restart-hook:
+	$(call restart_dc,hook)
+
+.PHONY: oc-restart-plugins ## Restarts plugin deploymentconfigs by patching it
+oc-restart-plugins: $(OC_RESTART)
+$(OC_RESTART): dc-%: %
+	$(call restart_dc,$<)
 
 .PHONY: build-images $(PLUGINS)
 build-images: compile $(BUILD_IMAGES)
