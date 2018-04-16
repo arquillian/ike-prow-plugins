@@ -5,8 +5,8 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/arquillian/ike-prow-plugins/pkg/retry"
 	"github.com/arquillian/ike-prow-plugins/pkg/scm"
-	"github.com/arquillian/ike-prow-plugins/pkg/utils"
 	gogh "github.com/google/go-github/github"
 )
 
@@ -26,7 +26,7 @@ func NewRetryClient(c Client, retries int, sleep time.Duration) Client {
 }
 
 func (r retryClient) retry(toRetry func() error) error {
-	errs := utils.Retry(r.retries, r.sleep, func() error {
+	errs := retry.Do(r.retries, r.sleep, func() error {
 		return toRetry()
 	})
 
