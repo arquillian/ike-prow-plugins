@@ -84,7 +84,7 @@ func InitPlugin(pluginName string, newEventHandler EventHandlerCreator, newServe
 	githubClient := ghclient.NewRateLimitWatcherClient(
 		ghclient.NewRetryClient(
 			ghclient.NewOauthClient(oauthSecret),
-			2,
+			4,
 			time.Second),
 		logger,
 		100)
