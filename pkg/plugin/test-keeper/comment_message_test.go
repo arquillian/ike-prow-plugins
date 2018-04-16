@@ -202,10 +202,9 @@ var _ = Describe("Test keeper comment message creation", func() {
 
 			// when
 			msg := testkeeper.CreateCommentMessage(config, scm.RepositoryChange{})
-			sanitizedMsg := removeHtmlElements(msg)
 
 			// then
-			Expect(sanitizedMsg).To(Equal("Custom message"))
+			Expect(msg).To(Equal("Custom message"))
 		})
 	})
 })
