@@ -31,8 +31,8 @@ test_patterns:
 
 skip_validation_for:
   # Build tools files
-  - 'glide.yaml'
-  - 'glide.lock'
+  - 'regex{{glide.*}}'
+  - 'regex{{Gopkg.*}}'
   - 'pom.xml'
   - 'mvnw'
   - 'mvnw.cmd'
@@ -47,8 +47,9 @@ skip_validation_for:
   - 'gemfile'
   - 'requirements.in'
   - 'requirements.txt'
-  - 'docker-compose.yml'
+  - 'regex{{docker-compose*.yml}}'
   - 'Dockerfile*'
+  - '.dockerignore'
 
   # Build tools directories
   - 'gradle/'
