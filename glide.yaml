@@ -2,25 +2,21 @@ package: github.com/arquillian/ike-prow-plugins
 homepage: https://github.com/arquillian/ike-prow-plugins
 license: Apache-2.0
 import:
-- package: github.com/satori/go.uuid
-  version: 1.1.0
 - package: github.com/sirupsen/logrus
   version: 0.10.0
-- package: github.com/google/go-github/github
-# Using this latest tag until a new version containing the commit cc3c003dafcc1261f914368c8bae8c7be1a6e2dc is released
+- package: github.com/google/go-github
+  # Using this latest tag until a new version containing the
+  # commit cc3c003dafcc1261f914368c8bae8c7be1a6e2dc is released (so if anything newer than v15.0.0 is out
   version: 437797734d06eec5394734a84cb5b59c82a66ee6
-- package: k8s.io/test-infra/prow/hook
+  subpackages:
+  - github
+- package: k8s.io/test-infra
   version: 2f3ad698ffcff53f881d3292a1b3da894bf1d5f7
-- package: k8s.io/test-infra/prow/pluginhelp
-  version: 2f3ad698ffcff53f881d3292a1b3da894bf1d5f7
-- package: k8s.io/test-infra/prow/pluginhelp/externalplugins
-  version: 2f3ad698ffcff53f881d3292a1b3da894bf1d5f7
-- package: k8s.io/test-infra/prow/plugins
-  version: 2f3ad698ffcff53f881d3292a1b3da894bf1d5f7
-- package: github.com/getsentry/raven-go
-  version: 563b81fc02b75d664e54da31f787c2cc2186780b
-- package: github.com/certifi/gocertifi
-  version: 2018.01.18
+  subpackages:
+  - prow/hook
+  - prow/pluginhelp
+  - prow/pluginhelp/externalplugins
+  - prow/plugins
 - package: github.com/evalphobia/logrus_sentry
   version: 0.4.5
 
@@ -32,9 +28,6 @@ import:
   version: 1.4.0
 - package: gopkg.in/h2non/gock.v1
   version: 1.0.8
-
 testImport:
 - package: github.com/microcosm-cc/bluemonday
   version: 542fd4642604d0d0c26112396ce5b1a9d01eee0b
-
-
