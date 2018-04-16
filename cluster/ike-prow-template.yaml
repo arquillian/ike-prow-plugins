@@ -13,8 +13,8 @@ parameters:
   value: latest
   required: true
 objects:
-  - kind: Deployment
-    apiVersion: extensions/v1beta1
+  - kind: DeploymentConfig
+    apiVersion: v1
     metadata:
       name: ${PLUGIN_NAME}
       labels:
@@ -23,6 +23,16 @@ objects:
         version: ${VERSION}
     spec:
       replicas: 1
+      triggers:
+        - type: ConfigChange
+      strategy:
+        type: Rolling
+        rollingParams:
+          intervalSeconds: 1
+          updatePeriodSeconds: 1
+          maxSurge: 25%
+          maxUnavailable: 25%
+          timeoutSeconds: 600
       template:
         metadata:
           labels:
