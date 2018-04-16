@@ -3,12 +3,12 @@ apiVersion: v1
 parameters:
 - name: REGISTRY
   required: true
-  value: gcr.io
+  value: docker.io
 - name: DOCKER_REPO
   required: true
-  value: k8s-prow
+  value: arquillian
 - name: VERSION
-  value: v20180403-2f3ad698f
+  value: latest
   required: true
 - name: HOOK_HOSTNAME
   value: ""
