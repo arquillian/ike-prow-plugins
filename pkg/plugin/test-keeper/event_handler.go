@@ -5,6 +5,8 @@ import (
 
 	"github.com/arquillian/ike-prow-plugins/pkg/command"
 	"github.com/arquillian/ike-prow-plugins/pkg/github"
+	"github.com/arquillian/ike-prow-plugins/pkg/github/client"
+	"github.com/arquillian/ike-prow-plugins/pkg/github/service"
 	"github.com/arquillian/ike-prow-plugins/pkg/log"
 	"github.com/arquillian/ike-prow-plugins/pkg/scm"
 	"github.com/arquillian/ike-prow-plugins/pkg/utils"
@@ -14,7 +16,7 @@ import (
 // GitHubTestEventsHandler is the event handler for the plugin.
 // Implements server.GitHubEventHandler interface which contains the logic for incoming GitHub events
 type GitHubTestEventsHandler struct {
-	Client  github.Client
+	Client  ghclient.Client
 	BotName string
 }
 
@@ -74,7 +76,7 @@ func (gh *GitHubTestEventsHandler) handlePrComment(log log.Logger, comment *gogh
 		return nil
 	}
 
-	prLoader := github.NewPullRequestLazyLoader(gh.Client, comment)
+	prLoader := ghservice.NewPullRequestLazyLoader(gh.Client, comment)
 	userPerm := command.NewPermissionService(gh.Client, *comment.Sender.Login, prLoader)
 
 	cmdHandler := command.CommentCmdHandler{Client: gh.Client}
@@ -94,7 +96,7 @@ func (gh *GitHubTestEventsHandler) handlePrComment(log log.Logger, comment *gogh
 				if err != nil {
 					return err
 				}
-				statusService := gh.newTestStatusService(log, github.NewRepositoryChangeForPR(pullRequest))
+				statusService := gh.newTestStatusService(log, ghservice.NewRepositoryChangeForPR(pullRequest))
 				return statusService.okWithoutTests(*comment.Sender.Login)
 			},
 		})
@@ -107,7 +109,7 @@ func (gh *GitHubTestEventsHandler) handlePrComment(log log.Logger, comment *gogh
 }
 
 func (gh *GitHubTestEventsHandler) checkTestsAndSetStatus(log log.Logger, pr *gogh.PullRequest) error {
-	change := github.NewRepositoryChangeForPR(pr)
+	change := ghservice.NewRepositoryChangeForPR(pr)
 	statusService := gh.newTestStatusService(log, change)
 	configuration := LoadConfiguration(log, change)
 	fileCategories, err := gh.checkTests(log, change, configuration, *pr.Number)
@@ -131,8 +133,8 @@ func (gh *GitHubTestEventsHandler) checkTestsAndSetStatus(log log.Logger, pr *go
 		log.Errorf("failed to report status on PR [%q]. cause: %s", *pr, err)
 	}
 
-	hintContext := github.HintContext{PluginName: ProwPluginName, Assignee: *pr.User.Login}
-	hinter := github.NewHinter(gh.Client, log, change, *pr.Number, hintContext)
+	hintContext := ghservice.HintContext{PluginName: ProwPluginName, Assignee: *pr.User.Login}
+	hinter := ghservice.NewHinter(gh.Client, log, change, *pr.Number, hintContext)
 
 	cerr := hinter.PluginComment(CreateCommentMessage(configuration, change))
 	if cerr != nil {

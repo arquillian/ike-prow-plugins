@@ -1,4 +1,4 @@
-package github
+package ghclient
 
 import (
 	"errors"

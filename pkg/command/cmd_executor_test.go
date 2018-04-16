@@ -2,7 +2,7 @@ package command_test
 
 import (
 	is "github.com/arquillian/ike-prow-plugins/pkg/command"
-	"github.com/arquillian/ike-prow-plugins/pkg/github"
+	"github.com/arquillian/ike-prow-plugins/pkg/github/service"
 	. "github.com/arquillian/ike-prow-plugins/pkg/internal/test"
 	"github.com/arquillian/ike-prow-plugins/pkg/utils"
 	gogh "github.com/google/go-github/github"
@@ -171,7 +171,7 @@ var _ = Describe("Command executor features", func() {
 				user := is.PermissionService{
 					Client:   client,
 					User:     "sender",
-					PRLoader: github.NewPullRequestLazyLoader(client, triggeredCommand),
+					PRLoader: ghservice.NewPullRequestLazyLoader(client, triggeredCommand),
 				}
 
 				executed := false

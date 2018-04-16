@@ -1,7 +1,8 @@
-package github_test
+package ghservice_test
 
 import (
-	"github.com/arquillian/ike-prow-plugins/pkg/github"
+	"github.com/arquillian/ike-prow-plugins/pkg/github/client"
+	"github.com/arquillian/ike-prow-plugins/pkg/github/service"
 	. "github.com/arquillian/ike-prow-plugins/pkg/internal/test"
 	"github.com/arquillian/ike-prow-plugins/pkg/scm"
 	. "github.com/onsi/ginkgo"
@@ -13,7 +14,7 @@ var _ = Describe("Config loader features", func() {
 
 	Context("Loading configuration file from the repository", func() {
 
-		var client github.Client
+		var client ghclient.Client
 
 		BeforeEach(func() {
 			defer gock.OffAll()
@@ -35,11 +36,11 @@ var _ = Describe("Config loader features", func() {
 				RepoName: "repo",
 				Hash:     "46cb8fac44709e4ccaae97448c65e8f7320cfea7",
 			}
-			hintContext := github.HintContext{
+			hintContext := ghservice.HintContext{
 				PluginName: "my-plugin-name",
 				Assignee:   "toAssign",
 			}
-			hinter := github.NewHinter(client, NewDiscardOutLogger(), change, 2, hintContext)
+			hinter := ghservice.NewHinter(client, NewDiscardOutLogger(), change, 2, hintContext)
 
 			toHaveBodyWithWholePluginsComment := SoftlySatisfyAll(
 				HaveBodyThatContains("### Ike Plugins (my-plugin-name)"),
@@ -71,12 +72,12 @@ var _ = Describe("Config loader features", func() {
 				RepoName: "repo",
 				Hash:     "46cb8fac44709e4ccaae97448c65e8f7320cfea7",
 			}
-			hintContext := github.HintContext{
+			hintContext := ghservice.HintContext{
 				PluginName: "test-keeper",
 				Assignee:   "toAssign",
 			}
 
-			hinter := github.NewHinter(client, NewDiscardOutLogger(), change, 2, hintContext)
+			hinter := ghservice.NewHinter(client, NewDiscardOutLogger(), change, 2, hintContext)
 
 			// when
 			err := hinter.PluginComment("New comment")
@@ -97,7 +98,7 @@ var _ = Describe("Config loader features", func() {
 				RepoName: "repo",
 				Hash:     "46cb8fac44709e4ccaae97448c65e8f7320cfea7",
 			}
-			hintContext := github.HintContext{
+			hintContext := ghservice.HintContext{
 				PluginName: "another-plugin",
 				Assignee:   "toAssign",
 			}
@@ -114,7 +115,7 @@ var _ = Describe("Config loader features", func() {
 				SetMatcher(ExpectPayload(toHaveModifiedBody)).
 				Reply(200)
 
-			hinter := github.NewHinter(client, NewDiscardOutLogger(), change, 2, hintContext)
+			hinter := ghservice.NewHinter(client, NewDiscardOutLogger(), change, 2, hintContext)
 
 			// when
 			err := hinter.PluginComment("New comment")

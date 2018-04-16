@@ -1,18 +1,19 @@
-package github
+package ghservice
 
 import (
+	"github.com/arquillian/ike-prow-plugins/pkg/github/client"
 	"github.com/arquillian/ike-prow-plugins/pkg/scm"
 	gogh "github.com/google/go-github/github"
 )
 
 // CommentService is a struct managing issue or pull request comments
 type CommentService struct {
-	client Client
+	client ghclient.Client
 	issue  scm.RepositoryIssue
 }
 
 // NewCommentService creates an instance of GitHub CommentService with information retrieved from the given IssueCommentEvents
-func NewCommentService(client Client, comment *gogh.IssueCommentEvent) *CommentService {
+func NewCommentService(client ghclient.Client, comment *gogh.IssueCommentEvent) *CommentService {
 	return &CommentService{
 		client: client,
 		issue: scm.RepositoryIssue{

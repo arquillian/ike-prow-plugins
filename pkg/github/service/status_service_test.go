@@ -1,7 +1,8 @@
-package github_test
+package ghservice_test
 
 import (
 	"github.com/arquillian/ike-prow-plugins/pkg/github"
+	"github.com/arquillian/ike-prow-plugins/pkg/github/service"
 	. "github.com/arquillian/ike-prow-plugins/pkg/internal/test"
 	"github.com/arquillian/ike-prow-plugins/pkg/plugin"
 	"github.com/arquillian/ike-prow-plugins/pkg/scm"
@@ -29,7 +30,7 @@ var _ = Describe("GitHub Status Service", func() {
 			defer gock.OffAll()
 			change := scm.RepositoryChange{RepoName: "test-repo", Owner: "alien-ike", Hash: "1232asdasd"}
 			context := github.StatusContext{BotName: "alien-ike", PluginName: "test-keeper"}
-			statusService = github.NewStatusService(NewDefaultGitHubClient(), NewDiscardOutLogger(), change, context)
+			statusService = ghservice.NewStatusService(NewDefaultGitHubClient(), NewDiscardOutLogger(), change, context)
 		})
 
 		AfterEach(EnsureGockRequestsHaveBeenMatched)

@@ -1,23 +1,23 @@
 package command
 
 import (
+	"bytes"
 	"fmt"
 	"strings"
 
-	"bytes"
-
-	"github.com/arquillian/ike-prow-plugins/pkg/github"
+	"github.com/arquillian/ike-prow-plugins/pkg/github/client"
+	"github.com/arquillian/ike-prow-plugins/pkg/github/service"
 )
 
 // PermissionService keeps user name and PR loader and provides information about the user's permissions
 type PermissionService struct {
-	Client   github.Client
+	Client   ghclient.Client
 	User     string
-	PRLoader *github.PullRequestLazyLoader
+	PRLoader *ghservice.PullRequestLazyLoader
 }
 
 // NewPermissionService creates a new instance of PermissionService with the given client, user and pr loader
-func NewPermissionService(client github.Client, user string, prLoader *github.PullRequestLazyLoader) *PermissionService {
+func NewPermissionService(client ghclient.Client, user string, prLoader *ghservice.PullRequestLazyLoader) *PermissionService {
 	return &PermissionService{
 		Client:   client,
 		User:     user,

@@ -1,9 +1,9 @@
-package github_test
+package ghclient_test
 
 import (
 	"net/http"
 
-	"github.com/arquillian/ike-prow-plugins/pkg/github"
+	"github.com/arquillian/ike-prow-plugins/pkg/github/client"
 	. "github.com/arquillian/ike-prow-plugins/pkg/internal/test"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -12,7 +12,7 @@ import (
 
 var _ = Describe("Retry client features", func() {
 
-	client := github.NewRetryClient(NewDefaultGitHubClient(), 3, 0)
+	client := ghclient.NewRetryClient(NewDefaultGitHubClient(), 3, 0)
 
 	Context("Client should try 3 times to get the correct response", func() {
 
@@ -28,7 +28,7 @@ var _ = Describe("Retry client features", func() {
 
 			gock.New("https://api.github.com").
 				Get("/repos/owner/repo/pulls/123/files").
-				SetMatcher(createCounterMather(&counter)).
+				SetMatcher(createCounterMatcher(&counter)).
 				Persist().
 				Reply(404).
 				BodyString("Not Found")
@@ -47,13 +47,13 @@ var _ = Describe("Retry client features", func() {
 
 			gock.New("https://api.github.com").
 				Get("/repos/owner/repo/pulls/123/files").
-				SetMatcher(createCounterMather(&counter)).
+				SetMatcher(createCounterMatcher(&counter)).
 				Reply(408).
 				BodyString("Request Timeout")
 
 			gock.New("https://api.github.com").
 				Get("/repos/owner/repo/pulls/123/files").
-				SetMatcher(createCounterMather(&counter)).
+				SetMatcher(createCounterMatcher(&counter)).
 				Reply(200).
 				BodyString("[]")
 
@@ -68,7 +68,7 @@ var _ = Describe("Retry client features", func() {
 
 })
 
-func createCounterMather(counter *int) gock.Matcher {
+func createCounterMatcher(counter *int) gock.Matcher {
 	matcher := gock.NewBasicMatcher()
 	matcher.Add(func(_ *http.Request, _ *gock.Request) (bool, error) {
 		*counter++

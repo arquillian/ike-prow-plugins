@@ -5,6 +5,7 @@ import (
 	"strings"
 
 	"github.com/arquillian/ike-prow-plugins/pkg/github"
+	"github.com/arquillian/ike-prow-plugins/pkg/github/service"
 	. "github.com/arquillian/ike-prow-plugins/pkg/internal/test"
 	"github.com/arquillian/ike-prow-plugins/pkg/plugin/test-keeper"
 	. "github.com/onsi/ginkgo"
@@ -38,7 +39,7 @@ var _ = Describe("Test Keeper Plugin features", func() {
 		}
 
 		toHaveBodyWithWholePluginsComment := SoftlySatisfyAll(
-			HaveBodyThatContains(fmt.Sprintf(github.PluginTitleTemplate, testkeeper.ProwPluginName)),
+			HaveBodyThatContains(fmt.Sprintf(ghservice.PluginTitleTemplate, testkeeper.ProwPluginName)),
 			HaveBodyThatContains("@bartoszmajsak"),
 		)
 

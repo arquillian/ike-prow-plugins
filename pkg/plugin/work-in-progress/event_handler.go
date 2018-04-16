@@ -5,6 +5,8 @@ import (
 	"strings"
 
 	"github.com/arquillian/ike-prow-plugins/pkg/github"
+	"github.com/arquillian/ike-prow-plugins/pkg/github/client"
+	"github.com/arquillian/ike-prow-plugins/pkg/github/service"
 	"github.com/arquillian/ike-prow-plugins/pkg/log"
 	"github.com/arquillian/ike-prow-plugins/pkg/plugin"
 	"github.com/arquillian/ike-prow-plugins/pkg/scm"
@@ -32,7 +34,7 @@ const (
 
 // GitHubWIPPRHandler handles PR events and updates status of the PR based on work-in-progress indicator
 type GitHubWIPPRHandler struct {
-	Client  github.Client
+	Client  ghclient.Client
 	BotName string
 }
 
@@ -61,7 +63,7 @@ func (gh *GitHubWIPPRHandler) HandleEvent(log log.Logger, eventType github.Event
 			Hash:     *event.PullRequest.Head.SHA,
 		}
 		statusContext := github.StatusContext{BotName: gh.BotName, PluginName: ProwPluginName}
-		statusService := github.NewStatusService(gh.Client, log, change, statusContext)
+		statusService := ghservice.NewStatusService(gh.Client, log, change, statusContext)
 		if gh.IsWorkInProgress(event.PullRequest.Title) {
 			return statusService.Failure(InProgressMessage, InProgressDetailsLink)
 		}

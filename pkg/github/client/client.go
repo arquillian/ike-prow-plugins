@@ -1,4 +1,4 @@
-package github
+package ghclient
 
 import (
 	"context"
@@ -22,7 +22,7 @@ type Client interface {
 	ListIssueComments(issue scm.RepositoryIssue) ([]*gogh.IssueComment, error)
 	CreateIssueComment(issue scm.RepositoryIssue, commentMsg *string) error
 	CreateStatus(change scm.RepositoryChange, repoStatus *gogh.RepoStatus) error
-	// This method is intended to be used by client decrators which need access to GH API methods not (yet)
+	// This method is intended to be used by client decorators which need access to GH API methods not (yet)
 	// exposed by this interface
 	unwrap() *gogh.Client
 }

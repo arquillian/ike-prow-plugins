@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	"github.com/arquillian/ike-prow-plugins/pkg/github"
+	"github.com/arquillian/ike-prow-plugins/pkg/github/service"
 	"github.com/arquillian/ike-prow-plugins/pkg/log"
 	"github.com/arquillian/ike-prow-plugins/pkg/plugin"
 	"github.com/arquillian/ike-prow-plugins/pkg/scm"
@@ -40,7 +41,7 @@ const (
 
 func (gh *GitHubTestEventsHandler) newTestStatusService(log log.Logger, change scm.RepositoryChange) testStatusService {
 	statusContext := github.StatusContext{BotName: gh.BotName, PluginName: ProwPluginName}
-	statusService := github.NewStatusService(gh.Client, log, change, statusContext)
+	statusService := ghservice.NewStatusService(gh.Client, log, change, statusContext)
 	return testStatusService{statusService: statusService}
 }
 

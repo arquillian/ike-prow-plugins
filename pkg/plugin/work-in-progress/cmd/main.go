@@ -1,19 +1,18 @@
 package main
 
 import (
-	"k8s.io/test-infra/prow/pluginhelp"
-
-	"github.com/arquillian/ike-prow-plugins/pkg/github"
+	"github.com/arquillian/ike-prow-plugins/pkg/github/client"
 	pluginBootstrap "github.com/arquillian/ike-prow-plugins/pkg/plugin"
 	"github.com/arquillian/ike-prow-plugins/pkg/plugin/work-in-progress"
 	"github.com/arquillian/ike-prow-plugins/pkg/server"
+	"k8s.io/test-infra/prow/pluginhelp"
 )
 
 func main() {
 	pluginBootstrap.InitPlugin(wip.ProwPluginName, handlerCreator, serverCreator, helpProvider)
 }
 
-func handlerCreator(githubClient github.Client, botName string) server.GitHubEventHandler {
+func handlerCreator(githubClient ghclient.Client, botName string) server.GitHubEventHandler {
 	return &wip.GitHubWIPPRHandler{Client: githubClient, BotName: botName}
 }
 

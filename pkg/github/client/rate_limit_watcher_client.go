@@ -1,4 +1,4 @@
-package github
+package ghclient
 
 import (
 	"context"
@@ -26,8 +26,8 @@ func (r rateLimitWatcher) logRateLimitsAround(f func()) {
 }
 
 func (r rateLimitWatcher) logRateLimits() {
-	ghClient := r.unwrap()
-	limits, _, e := ghClient.RateLimits(context.Background())
+	ghclient := r.unwrap()
+	limits, _, e := ghclient.RateLimits(context.Background())
 	if e != nil {
 		r.Logger.Errorf("failed to load rate limits %s", e)
 		return

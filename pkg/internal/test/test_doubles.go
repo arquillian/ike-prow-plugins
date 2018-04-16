@@ -6,7 +6,7 @@ import (
 	"io/ioutil"
 	"os"
 
-	"github.com/arquillian/ike-prow-plugins/pkg/github"
+	"github.com/arquillian/ike-prow-plugins/pkg/github/client"
 	"github.com/arquillian/ike-prow-plugins/pkg/log"
 	gogh "github.com/google/go-github/github"
 	"github.com/onsi/ginkgo"
@@ -39,6 +39,6 @@ func NewDiscardOutLogger() log.Logger {
 }
 
 // NewDefaultGitHubClient creates a GH client with default go-github client (without any authentication token)
-func NewDefaultGitHubClient() github.Client {
-	return github.NewClient(gogh.NewClient(nil))
+func NewDefaultGitHubClient() ghclient.Client {
+	return ghclient.NewClient(gogh.NewClient(nil))
 }

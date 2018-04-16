@@ -1,4 +1,4 @@
-package github_test
+package ghclient_test
 
 import (
 	"testing"
@@ -10,5 +10,5 @@ import (
 
 func TestGithub(t *testing.T) {
 	RegisterFailHandler(Fail)
-	RunSpecWithJUnitReporter(t, "GitHub Services Suite")
+	RunSpecWithJUnitReporter(t, "GitHub Client Suite")
 }

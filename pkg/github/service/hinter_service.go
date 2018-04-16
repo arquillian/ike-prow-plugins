@@ -1,9 +1,10 @@
-package github
+package ghservice
 
 import (
 	"fmt"
 	"strings"
 
+	"github.com/arquillian/ike-prow-plugins/pkg/github/client"
 	"github.com/arquillian/ike-prow-plugins/pkg/log"
 	"github.com/arquillian/ike-prow-plugins/pkg/scm"
 	"github.com/arquillian/ike-prow-plugins/pkg/utils"
@@ -29,7 +30,7 @@ type HintContext struct {
 }
 
 // NewHinter creates an instance of GitHub Hinter for the given HintContext
-func NewHinter(client Client, log log.Logger, change scm.RepositoryChange, issueOrPrNumber int, commentContext HintContext) *Hinter {
+func NewHinter(client ghclient.Client, log log.Logger, change scm.RepositoryChange, issueOrPrNumber int, commentContext HintContext) *Hinter {
 	return &Hinter{
 		CommentService: &CommentService{
 			client: client,
