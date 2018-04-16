@@ -27,32 +27,32 @@ var _ = Describe("Test Keeper Plugin features", func() {
 
 		log := NewDiscardOutLogger()
 
-		toBe := func(status, description, context, detailsLink string) func(statusPayload map[string]interface{}) bool {
-			return func(statusPayload map[string]interface{}) bool {
-				return Expect(statusPayload).To(SatisfyAll(
-					HaveState(status),
-					HaveDescription(description),
-					HaveContext(context),
-					HaveTargetURL(detailsLink),
-				))
-			}
+		toBe := func(status, description, context, detailsLink string) SoftMatcher {
+			return SoftlySatisfyAll(
+				HaveState(status),
+				HaveDescription(description),
+				HaveContext(context),
+				HaveTargetURL(detailsLink),
+			)
+
 		}
 
-		toHaveBodyWithWholePluginsComment := func(statusPayload map[string]interface{}) bool {
-			return Expect(statusPayload).To(SatisfyAll(
-				HaveBodyThatContains(fmt.Sprintf(github.PluginTitleTemplate, testkeeper.ProwPluginName)),
-				HaveBodyThatContains("@bartoszmajsak"),
-			))
-		}
+		toHaveBodyWithWholePluginsComment := SoftlySatisfyAll(
+			HaveBodyThatContains(fmt.Sprintf(github.PluginTitleTemplate, testkeeper.ProwPluginName)),
+			HaveBodyThatContains("@bartoszmajsak"),
+		)
 
 		BeforeEach(func() {
-			gock.Off()
-
+			defer gock.OffAll()
 			handler = &testkeeper.GitHubTestEventsHandler{Client: NewDefaultGitHubClient(), BotName: botName}
 		})
 
+		AfterEach(EnsureGockRequestsHaveBeenMatched)
+
 		It("should approve opened pull request when tests included", func() {
 			// given
+			NonExistingRawGitHubFiles("test-keeper.yml", "test-keeper.yaml")
+
 			gock.New("https://api.github.com").
 				Get("/repos/" + repositoryName + "/pulls/2/files").
 				Reply(200).
@@ -127,6 +127,9 @@ var _ = Describe("Test Keeper Plugin features", func() {
 
 		It("should reject opened pull request when no tests are matching defined pattern with no defaults implicitly combined", func() {
 			// given
+
+			NonExistingRawGitHubFiles("plugins/keeper-file-hint.md")
+
 			gock.New("https://raw.githubusercontent.com").
 				Get(repositoryName + "/5d6e9b25da90edfc19f488e595e0645c081c1575/test-keeper.yml").
 				Reply(200).
@@ -163,6 +166,8 @@ var _ = Describe("Test Keeper Plugin features", func() {
 
 		It("should block newly created pull request when no tests are included", func() {
 			// given
+			NonExistingRawGitHubFiles("test-keeper.yml", "test-keeper.yaml")
+
 			gock.New("https://api.github.com").
 				Get("/repos/" + repositoryName + "/pulls/1/files").
 				Reply(200).
@@ -194,6 +199,8 @@ var _ = Describe("Test Keeper Plugin features", func() {
 
 		It("should not block newly created pull request when documentation and build files are the only changes", func() {
 			// given
+			NonExistingRawGitHubFiles("test-keeper.yml", "test-keeper.yaml")
+
 			gock.New("https://api.github.com").
 				Get("/repos/" + repositoryName + "/pulls/1/files").
 				Reply(200).
@@ -215,6 +222,8 @@ var _ = Describe("Test Keeper Plugin features", func() {
 
 		It("should block newly created pull request when deletions in the tests are the only changes", func() {
 			// given
+			NonExistingRawGitHubFiles("test-keeper.yml", "test-keeper.yaml")
+
 			gock.New("https://api.github.com").
 				Get("/repos/" + repositoryName + "/pulls/1/files").
 				Reply(200).
@@ -245,6 +254,8 @@ var _ = Describe("Test Keeper Plugin features", func() {
 
 		It("should block newly created pull request when there are changes in the business logic but only deletions in the tests", func() {
 			// given
+			NonExistingRawGitHubFiles("test-keeper.yml", "test-keeper.yaml")
+
 			gock.New("https://api.github.com").
 				Get("/repos/" + repositoryName + "/pulls/1/files").
 				Reply(200).
@@ -275,6 +286,8 @@ var _ = Describe("Test Keeper Plugin features", func() {
 
 		It("should skip test existence check when "+testkeeper.BypassCheckComment+" command is used by admin user", func() {
 			// given
+			NonExistingRawGitHubFiles("test-keeper.yml", "test-keeper.yaml")
+
 			gock.New("https://api.github.com").
 				Get("/repos/" + repositoryName + "/pulls/1").
 				Reply(200).
@@ -285,12 +298,10 @@ var _ = Describe("Test Keeper Plugin features", func() {
 				Reply(200).
 				Body(FromFile("test_fixtures/github_calls/collaborators_repo-admin_permission.json"))
 
-			toHaveEnforcedSuccessState := func(statusPayload map[string]interface{}) bool {
-				return Expect(statusPayload).To(SatisfyAll(
-					HaveState(github.StatusSuccess),
-					HaveDescription(fmt.Sprintf(testkeeper.ApprovedByMessage, "bartoszmajsak")),
-				))
-			}
+			toHaveEnforcedSuccessState := SoftlySatisfyAll(
+				HaveState(github.StatusSuccess),
+				HaveDescription(fmt.Sprintf(testkeeper.ApprovedByMessage, "bartoszmajsak")),
+			)
 
 			gock.New("https://api.github.com").
 				Post("/repos/" + repositoryName + "/statuses").
@@ -308,6 +319,8 @@ var _ = Describe("Test Keeper Plugin features", func() {
 
 		It("should ignore "+testkeeper.BypassCheckComment+" when used by non-admin user", func() {
 			// given
+			NonExistingRawGitHubFiles("test-keeper.yml", "test-keeper.yaml")
+
 			gock.New("https://api.github.com").
 				Get("/repos/" + repositoryName + "/pulls/1").
 				Reply(200).
@@ -326,9 +339,9 @@ var _ = Describe("Test Keeper Plugin features", func() {
 			gock.New("https://api.github.com").
 				Post("/repos/" + repositoryName + "/issues/1/comments").
 				SetMatcher(
-					ExpectPayload(
-							ToHaveBodyContaining("Hey @bartoszmajsak-test! It seems you tried to trigger `/ok-without-tests` command"),
-							ToHaveBodyContaining("You have to be admin or requested reviewer, but not pull request creator"))).
+					ExpectPayload(To(
+							HaveBodyThatContains("Hey @bartoszmajsak-test! It seems you tried to trigger `/ok-without-tests` command"),
+							HaveBodyThatContains("You have to be admin or requested reviewer, but not pull request creator")))).
 				Reply(201) // This way we implicitly verify that call happened after `HandleEvent` call
 
 			statusPayload := LoadFromFile("test_fixtures/github_calls/prs/without_tests/skip_comment_by_external.json")

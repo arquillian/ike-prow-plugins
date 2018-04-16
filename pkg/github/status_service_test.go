@@ -16,23 +16,23 @@ var _ = Describe("GitHub Status Service", func() {
 
 		var statusService scm.StatusService
 
-		toBe := func(status, description, context, detailsLink string) func(statusPayload map[string]interface{}) bool {
-			return func(statusPayload map[string]interface{}) bool {
-				return Expect(statusPayload).To(SatisfyAll(
-					HaveState(status),
-					HaveDescription(description),
-					HaveContext(context),
-					HaveTargetURL(detailsLink),
-				))
-			}
+		toBe := func(status, description, context, detailsLink string) SoftMatcher {
+			return SoftlySatisfyAll(
+				HaveState(status),
+				HaveDescription(description),
+				HaveContext(context),
+				HaveTargetURL(detailsLink),
+			)
 		}
 
 		BeforeEach(func() {
-			defer gock.Off()
+			defer gock.OffAll()
 			change := scm.RepositoryChange{RepoName: "test-repo", Owner: "alien-ike", Hash: "1232asdasd"}
 			context := github.StatusContext{BotName: "alien-ike", PluginName: "test-keeper"}
 			statusService = github.NewStatusService(NewDefaultGitHubClient(), NewDiscardOutLogger(), change, context)
 		})
+
+		AfterEach(EnsureGockRequestsHaveBeenMatched)
 
 		It("should report success with context having bot name and plugin name", func() {
 			// given

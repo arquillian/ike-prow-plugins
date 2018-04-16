@@ -4,6 +4,7 @@ import (
 	"strings"
 
 	"github.com/arquillian/ike-prow-plugins/pkg/config"
+	. "github.com/arquillian/ike-prow-plugins/pkg/internal/test"
 	"github.com/arquillian/ike-prow-plugins/pkg/plugin/test-keeper"
 	"github.com/arquillian/ike-prow-plugins/pkg/scm"
 	"github.com/microcosm-cc/bluemonday"
@@ -46,11 +47,15 @@ var _ = Describe("Test keeper comment message creation", func() {
 	Context("Creation of default comment messages that are sent to a validated PR when custom message file is set", func() {
 
 		BeforeEach(func() {
-			gock.Off()
+			defer gock.OffAll()
 		})
+
+		AfterEach(EnsureGockRequestsHaveBeenMatched)
 
 		It("should create message taken from a file set in config using relative path", func() {
 			// given
+			NonExistingRawGitHubFiles("test-keeper.yaml", "test-keeper.yml")
+
 			gock.New("https://raw.githubusercontent.com").
 				Get("owner/repo/46cb8fac44709e4ccaae97448c65e8f7320cfea7/path/to/test-keeper_hint.md").
 				Reply(200).
@@ -80,9 +85,7 @@ var _ = Describe("Test keeper comment message creation", func() {
 
 		It("should create default message with no-found-custom-file suffix using wrong relative path", func() {
 			// given
-			gock.New("https://raw.githubusercontent.com").
-				Get("owner/repo/46cb8fac44709e4ccaae97448c65e8f7320cfea7/path/to/test-keeper_hint.md").
-				Reply(404)
+			NonExistingRawGitHubFiles("path/to/test-keeper_hint.md", "test-keeper.yaml", "test-keeper.yml")
 
 			url := "http://github.com/my/repo/test-keeper.yaml"
 			config := testkeeper.PluginConfiguration{
@@ -160,6 +163,8 @@ var _ = Describe("Test keeper comment message creation", func() {
 
 		It("should create default message with no-found-custom-file suffix using not-validate url", func() {
 			// given
+			NonExistingRawGitHubFiles("http/server.com/test-keeper_hint.md")
+
 			gock.New("https://raw.githubusercontent.com").
 				Get("owner/repo/46cb8fac44709e4ccaae97448c65e8f7320cfea7/path/to/test-keeper_hint.md").
 				Reply(404)

@@ -38,11 +38,14 @@ var _ = Describe("Permission service with permission checks features", func() {
 				BodyString(`{"permission": "read"}`)
 
 			// when
-			permissionStatus, err := user.Admin()
+			status, err := user.Admin()
 
 			// then
 			Ω(err).ShouldNot(HaveOccurred())
-			verifyStatusWithPredefinedUser(permissionStatus, false, "admin")
+			ExpectPermissionStatus(status).To(
+				HaveRejectedUser("user"),
+				HaveApprovedRoles(is.Admin),
+				HaveNoRejectedRoles())
 		})
 
 		It("should approve the user when the permission is admin", func() {
@@ -53,11 +56,14 @@ var _ = Describe("Permission service with permission checks features", func() {
 				BodyString(`{"permission": "admin"}`)
 
 			// when
-			permissionStatus, err := user.Admin()
+			status, err := user.Admin()
 
 			// then
 			Ω(err).ShouldNot(HaveOccurred())
-			verifyStatusWithPredefinedUser(permissionStatus, true, "admin")
+			ExpectPermissionStatus(status).To(
+				HaveApprovedUser("user"),
+				HaveApprovedRoles(is.Admin),
+				HaveNoRejectedRoles())
 		})
 
 		It("should not approve the user that is not the PR creator", func() {
@@ -68,11 +74,14 @@ var _ = Describe("Permission service with permission checks features", func() {
 				BodyString(`{"user": {"login": "creator"}}`)
 
 			// when
-			permissionStatus, err := user.PRCreator()
+			status, err := user.PRCreator()
 
 			// then
 			Ω(err).ShouldNot(HaveOccurred())
-			verifyStatusWithPredefinedUser(permissionStatus, false, "pull request creator")
+			ExpectPermissionStatus(status).To(
+				HaveRejectedUser("user"),
+				HaveApprovedRoles(is.PullRequestCreator),
+				HaveNoRejectedRoles())
 		})
 
 		It("should approve the user that is the PR creator", func() {
@@ -83,11 +92,14 @@ var _ = Describe("Permission service with permission checks features", func() {
 				BodyString(`{"user": {"login": "user"}}`)
 
 			// when
-			permissionStatus, err := user.PRCreator()
+			status, err := user.PRCreator()
 
 			// then
 			Ω(err).ShouldNot(HaveOccurred())
-			verifyStatusWithPredefinedUser(permissionStatus, true, "pull request creator")
+			ExpectPermissionStatus(status).To(
+				HaveApprovedUser("user"),
+				HaveApprovedRoles(is.PullRequestCreator),
+				HaveNoRejectedRoles())
 		})
 
 		It("should not approve the user that is not the requested PR reviewer", func() {
@@ -98,11 +110,14 @@ var _ = Describe("Permission service with permission checks features", func() {
 				BodyString(`{"requested_reviewers": [{"login": "reviewer1"}, {"login": "reviewer2"}]}`)
 
 			// when
-			permissionStatus, err := user.PRReviewer()
+			status, err := user.PRReviewer()
 
 			// then
 			Ω(err).ShouldNot(HaveOccurred())
-			verifyStatusWithPredefinedUser(permissionStatus, false, "requested reviewer")
+			ExpectPermissionStatus(status).To(
+				HaveRejectedUser("user"),
+				HaveApprovedRoles(is.RequestReviewer),
+				HaveNoRejectedRoles())
 		})
 
 		It("should approve the user that is one of the requested PR reviewers", func() {
@@ -113,83 +128,100 @@ var _ = Describe("Permission service with permission checks features", func() {
 				BodyString(`{"requested_reviewers": [{"login": "reviewer1"}, {"login": "user"}]}`)
 
 			// when
-			permissionStatus, err := user.PRReviewer()
+			status, err := user.PRReviewer()
 
 			// then
 			Ω(err).ShouldNot(HaveOccurred())
-			verifyStatusWithPredefinedUser(permissionStatus, true, "requested reviewer")
+			ExpectPermissionStatus(status).To(
+				HaveApprovedUser("user"),
+				HaveApprovedRoles(is.RequestReviewer),
+				HaveNoRejectedRoles())
 		})
 	})
 
 	Context("Permission check functions", func() {
 
-		rejected := is.PermissionStatus{
-			User:           "user",
-			UserIsApproved: false,
-			ApprovedRoles:  []string{"role in rejected"},
-		}
-		approved := is.PermissionStatus{
-			User:           "user",
-			UserIsApproved: true,
-			ApprovedRoles:  []string{"role in approved"},
-		}
+		rejected := *is.NewPermissionStatus("user", false, []string{"role in rejected"}, []string{})
+		approved := *is.NewPermissionStatus("user", true, []string{"role in approved"}, []string{})
 
 		It("should approve everyone", func() {
 			// when
-			permissionStatus, err := is.Anybody()
+			status, err := is.Anybody()
 
 			// then
 			Ω(err).ShouldNot(HaveOccurred())
-			verifyStatusWithoutUsersRoles(permissionStatus, "", true, "anyone")
+			ExpectPermissionStatus(status).To(
+				HaveApprovedUser(""),
+				HaveApprovedRoles(is.Anyone),
+				HaveNoRejectedRoles())
 		})
 
 		It("should approve everyone when no restrictions are set", func() {
-			permissionStatus, err := is.AnyOf()()
+			status, err := is.AnyOf()()
 
 			// then
 			Ω(err).ShouldNot(HaveOccurred())
-			verifyStatusWithoutUsersRoles(permissionStatus, "unknown", true, "anyone")
+			ExpectPermissionStatus(status).To(
+				HaveApprovedUser(is.Unknown),
+				HaveApprovedRoles(is.Anyone),
+				HaveNoRejectedRoles())
 		})
 
 		It("should approve when at least one restriction is fulfilled", func() {
-			// given
-
 			// when
-			permissionStatus, err := is.AnyOf(newCheck(rejected), newCheck(approved))()
+			status, err := is.AnyOf(newCheck(rejected), newCheck(approved))()
 
 			// then
 			Ω(err).ShouldNot(HaveOccurred())
-			verifyStatusWithoutUsersRoles(permissionStatus, "user", true, "role in rejected", "role in approved")
+			ExpectPermissionStatus(status).To(
+				HaveApprovedUser("user"),
+				HaveApprovedRoles("role in rejected", "role in approved"),
+				HaveNoRejectedRoles())
 		})
 
 		It("should not approve when no restriction is fulfilled", func() {
+			// given
+			secondRejected := *is.NewPermissionStatus("user", false, []string{is.Admin}, []string{})
+
 			// when
-			permissionStatus, err := is.AnyOf(newCheck(rejected), newCheck(rejected))()
+			status, err := is.AnyOf(newCheck(rejected), newCheck(secondRejected))()
 
 			// then
 			Ω(err).ShouldNot(HaveOccurred())
-			verifyStatusWithoutUsersRoles(permissionStatus, "user", false, "role in rejected", "role in rejected")
+			ExpectPermissionStatus(status).To(
+				HaveRejectedUser("user"),
+				HaveApprovedRoles("role in rejected", is.Admin),
+				HaveNoRejectedRoles())
 		})
 
 		It("should not approve when at least one restriction is not fulfilled", func() {
+			// given
+			secondApproved := *is.NewPermissionStatus("user", true, []string{is.Admin}, []string{})
+
 			// when
-			permissionStatus, err := is.AllOf(newCheck(approved), newCheck(rejected), newCheck(approved))()
+			status, err := is.AllOf(newCheck(approved), newCheck(rejected), newCheck(secondApproved))()
 
 			// then
 			Ω(err).ShouldNot(HaveOccurred())
-			verifyStatusWithoutUsersRoles(
-				permissionStatus, "user", false, "role in approved", "role in rejected", "role in approved")
+			ExpectPermissionStatus(status).To(
+				HaveRejectedUser("user"),
+				HaveApprovedRoles("role in approved", "role in rejected", is.Admin),
+				HaveNoRejectedRoles())
 		})
 
 		It("should approve when all restrictions are fulfilled", func() {
 			// given
+			secondApproved := *is.NewPermissionStatus("user", true, []string{is.Admin}, []string{})
 
 			// when
-			permissionStatus, err := is.AllOf(newCheck(approved), newCheck(approved))()
+			status, err := is.AllOf(newCheck(approved), newCheck(secondApproved))()
 
 			// then
 			Ω(err).ShouldNot(HaveOccurred())
-			verifyStatusWithoutUsersRoles(permissionStatus, "user", true, "role in approved", "role in approved")
+			ExpectPermissionStatus(status).To(
+				HaveApprovedUser("user"),
+				HaveApprovedRoles("role in approved", is.Admin),
+				HaveNoRejectedRoles())
 		})
 
 		It("should reverse the approval to rejection", func() {
@@ -198,28 +230,13 @@ var _ = Describe("Permission service with permission checks features", func() {
 
 			// then
 			Ω(err).ShouldNot(HaveOccurred())
-			Expect(status.User).To(Equal("user"))
-			Expect(status.UserIsApproved).To(Equal(false))
-			Expect(status.ApprovedRoles).To(BeEmpty())
-			Expect(status.RejectedRoles).To(ConsistOf("role in approved"))
+			ExpectPermissionStatus(status).To(
+				HaveRejectedUser("user"),
+				HaveRejectedRoles("role in approved"),
+				HaveNoApprovedRoles())
 		})
 	})
 })
-
-func verifyStatusWithPredefinedUser(status *is.PermissionStatus, userIsApproved bool, approvedRole ...string) {
-	verifyStatus(status, "user", userIsApproved, approvedRole...)
-}
-
-func verifyStatusWithoutUsersRoles(status *is.PermissionStatus, userName string, userIsApproved bool, approvedRole ...string) {
-	verifyStatus(status, userName, userIsApproved, approvedRole...)
-}
-
-func verifyStatus(status *is.PermissionStatus, userName string, userIsApproved bool, approvedRole ...string) {
-	Expect(status.User).To(Equal(userName))
-	Expect(status.UserIsApproved).To(Equal(userIsApproved))
-	Expect(status.ApprovedRoles).To(ConsistOf(approvedRole))
-	Expect(status.RejectedRoles).To(BeEmpty())
-}
 
 func newCheck(status is.PermissionStatus) func() (*is.PermissionStatus, error) {
 	return func() (*is.PermissionStatus, error) {
