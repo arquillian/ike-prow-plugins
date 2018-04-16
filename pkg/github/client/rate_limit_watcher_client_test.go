@@ -15,56 +15,53 @@ var _ = Describe("GitHub rate limit watcher client", func() {
 
 	client := ghclient.NewRateLimitWatcherClient(NewDefaultGitHubClient(), logger, 10)
 
-	Context("Client should watch rate limits when decorated", func() {
+	BeforeEach(func() {
+		defer gock.OffAll()
+		hook.Reset()
+	})
 
-		BeforeEach(func() {
-			defer gock.OffAll()
-			hook.Reset()
-		})
+	AfterEach(EnsureGockRequestsHaveBeenMatched)
 
-		AfterEach(EnsureGockRequestsHaveBeenMatched)
+	It("should not log rate limit when within the threshold", func() {
+		// given
+		gock.New("https://api.github.com").
+			Get("/rate_limit").
+			Persist().
+			Reply(200).
+			Body(FromFile("test_fixtures/gh/high_rate_limit.json"))
 
-		It("should not log rate limit when within the threshold", func() {
-			// given
-			gock.New("https://api.github.com").
-				Get("/rate_limit").
-				Persist().
-				Reply(200).
-				Body(FromFile("test_fixtures/gh/high_rate_limit.json"))
+		gock.New("https://api.github.com").
+			Get("/repos/owner/repo/pulls/123/files").
+			Reply(200).
+			BodyString("[]")
 
-			gock.New("https://api.github.com").
-				Get("/repos/owner/repo/pulls/123/files").
-				Reply(200).
-				BodyString("[]")
+		// when
+		_, err := client.ListPullRequestFiles("owner", "repo", 123)
 
-			// when
-			_, err := client.ListPullRequestFiles("owner", "repo", 123)
+		// then
+		Ω(err).ShouldNot(HaveOccurred())
+		Expect(hook.Entries).To(BeEmpty())
+	})
 
-			// then
-			Ω(err).ShouldNot(HaveOccurred())
-			Expect(hook.Entries).To(BeEmpty())
-		})
+	It("should log rate limit when within the threshold", func() {
+		// given
+		gock.New("https://api.github.com").
+			Get("/rate_limit").
+			Persist().
+			Reply(200).
+			Body(FromFile("test_fixtures/gh/low_rate_limit.json"))
 
-		It("should log rate limit when within the threshold", func() {
-			// given
-			gock.New("https://api.github.com").
-				Get("/rate_limit").
-				Persist().
-				Reply(200).
-				Body(FromFile("test_fixtures/gh/low_rate_limit.json"))
+		gock.New("https://api.github.com").
+			Get("/repos/owner/repo/pulls/123/files").
+			Reply(200).
+			BodyString("[]")
 
-			gock.New("https://api.github.com").
-				Get("/repos/owner/repo/pulls/123/files").
-				Reply(200).
-				BodyString("[]")
+		// when
+		_, err := client.ListPullRequestFiles("owner", "repo", 123)
 
-			// when
-			_, err := client.ListPullRequestFiles("owner", "repo", 123)
-
-			// then
-			Ω(err).ShouldNot(HaveOccurred())
-			Expect(hook.Entries).To(HaveLen(2))
-			Expect(hook.LastEntry().Message).To(HavePrefix("reaching limit for GH API calls. 8/20 left. resetting at"))
-		})
+		// then
+		Ω(err).ShouldNot(HaveOccurred())
+		Expect(hook.Entries).To(HaveLen(2))
+		Expect(hook.LastEntry().Message).To(HavePrefix("reaching limit for GH API calls. 8/20 left. resetting at"))
 	})
 })
