@@ -23,6 +23,10 @@ DOCKER?=$(if $(or $(in_docker_group),$(is_root)),docker,sudo docker)
 
 .DEFAULT_GOAL := all
 
+CUR_DIR = $(shell pwd)
+
+include ./Makefile.docker
+
 .PHONY: all
 all: clean generate install build build-images push-images oc-deploy-plugins ## (default) Performs clean build  and container packaging
 
