@@ -24,11 +24,11 @@ var _ = Describe("Retry client features", func() {
 
 		It("should try to get the response 3 times and then fail when client gets only 404", func() {
 			// given
-			counter := 0
+			calls := 0
 
 			gock.New("https://api.github.com").
 				Get("/repos/owner/repo/pulls/123/files").
-				SetMatcher(createCounterMatcher(&counter)).
+				SetMatcher(spyOnCalls(&calls)).
 				Persist().
 				Reply(404).
 				BodyString("Not Found")
@@ -38,22 +38,22 @@ var _ = Describe("Retry client features", func() {
 
 			// then
 			Ω(err).Should(HaveOccurred())
-			Expect(counter).To(Equal(3))
+			Expect(calls).To(Equal(3))
 		})
 
 		It("should stop resending requests and not fail when client gets 408 and then 200", func() {
 			// given
-			counter := 0
+			calls := 0
 
 			gock.New("https://api.github.com").
 				Get("/repos/owner/repo/pulls/123/files").
-				SetMatcher(createCounterMatcher(&counter)).
+				SetMatcher(spyOnCalls(&calls)).
 				Reply(408).
 				BodyString("Request Timeout")
 
 			gock.New("https://api.github.com").
 				Get("/repos/owner/repo/pulls/123/files").
-				SetMatcher(createCounterMatcher(&counter)).
+				SetMatcher(spyOnCalls(&calls)).
 				Reply(200).
 				BodyString("[]")
 
@@ -62,13 +62,13 @@ var _ = Describe("Retry client features", func() {
 
 			// then
 			Ω(err).ShouldNot(HaveOccurred())
-			Expect(counter).To(Equal(2))
+			Expect(calls).To(Equal(2))
 		})
 	})
 
 })
 
-func createCounterMatcher(counter *int) gock.Matcher {
+func spyOnCalls(counter *int) gock.Matcher {
 	matcher := gock.NewBasicMatcher()
 	matcher.Add(func(_ *http.Request, _ *gock.Request) (bool, error) {
 		*counter++

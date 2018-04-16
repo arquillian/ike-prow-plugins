@@ -39,12 +39,6 @@ func NewTestLogger() Logger {
 	return logrus.NewEntry(nullLogger)
 }
 
-// StdLogger returns global logger instance with preconfigured formatting
-func StdLogger() Logger {
-	logrusSettings()
-	return logrus.StandardLogger()
-}
-
 func logrusSettings() {
 	logrus.SetFormatter(&logrus.JSONFormatter{})
 	logrus.SetLevel(logrus.WarnLevel)
