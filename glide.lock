@@ -1,5 +1,5 @@
-hash: 9e58d0df4ed98b4a19f8cdfe0c441a7b738376cb7850a8ac8d8f3514e788a904
-updated: 2018-04-16T21:03:59.205559947+02:00
+hash: 90b646987701797ee0e40672db6a434d38167a6d4247d64f15c48b853dca9dab
+updated: 2018-04-16T21:13:42.259125631+02:00
 imports:
 - name: github.com/bazelbuild/buildtools
   version: c98ff0c6395f09b1942e6f7c42bf3ec15e3b9ca7
@@ -140,9 +140,13 @@ imports:
   - ident
   - internal/jsonutil
 - name: github.com/sirupsen/logrus
-  version: 4b6ea7319e214d98c938f12692336f7ca9348d6b
+  version: c155da19408a8799da419ed3eeb0cb5db0ad5dbc
 - name: github.com/spf13/pflag
   version: 9ff6c6923cfffbcd502984b8e0c80539a94968b7
+- name: golang.org/x/crypto
+  version: d172538b2cfce0c13cee31e647d0367aa8cd2486
+  subpackages:
+  - ssh/terminal
 - name: golang.org/x/net
   version: 1c05540f6879653db88113bc4a2b70aec4bd491f
   subpackages:

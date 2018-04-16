@@ -3,7 +3,7 @@ homepage: https://github.com/arquillian/ike-prow-plugins
 license: Apache-2.0
 import:
 - package: github.com/sirupsen/logrus
-  version: 0.10.0
+  version: 1.0.5
 - package: github.com/google/go-github
   # Using this latest tag until a new version containing the
   # commit cc3c003dafcc1261f914368c8bae8c7be1a6e2dc is released (so if anything newer than v15.0.0 is out
