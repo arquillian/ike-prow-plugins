@@ -40,6 +40,13 @@ function prepare() {
   make docker-install
 }
 
+function cleanup_env {
+  EXIT_CODE=$?
+  echo "CICO: Cleanup environment"
+  make docker-rm
+  echo "CICO: Exiting with $EXIT_CODE"
+}
+
 function cico_setup() {
   load_jenkins_vars;
   install_deps;
