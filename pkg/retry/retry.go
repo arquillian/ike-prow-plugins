@@ -4,16 +4,20 @@ import (
 	"time"
 )
 
-// Do invokes a function for the given amount of retries with the given sleep before each one of them
-func Do(retries int, sleep time.Duration, onRetry func() error) []error {
+// RetryFunc is a function type which wraps actual logic to be retried and returns error if that needs to happen
+type RetryFunc func() error // nolint: golint
+
+// Do invokes a function and if invocation fails retries defined amount of time with sleep in between
+// Returns accumulated errors if all attempts failed or empty slice otherwise
+func Do(retries int, sleep time.Duration, toRetry RetryFunc) []error {
 	errs := make([]error, 0, retries)
 
-	err := onRetry()
+	err := toRetry()
 
 	for i := 0; i < retries-1 && err != nil; i++ {
 		errs = append(errs, err)
 		time.Sleep(sleep)
-		err = onRetry()
+		err = toRetry()
 	}
 
 	if err != nil {

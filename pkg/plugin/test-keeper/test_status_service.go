@@ -30,7 +30,7 @@ const (
 	// OkOnlySkippedFilesDetailsLink is a link to an anchor in arq documentation that contains additional status details for OkOnlySkippedFilesMessage
 	OkOnlySkippedFilesDetailsLink = plugin.DocumentationURL + "#only-skipped"
 
-	// FailureMessage is a message used in GH Status as description when failure occured
+	// FailureMessage is a message used in GH Status as description when failure occurred
 	FailureMessage = "Failed while check for tests"
 
 	// ApprovedByMessage is a message used in GH Status as description when it's commented to skip the check
