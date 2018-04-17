@@ -1,9 +1,9 @@
 package command
 
 import (
+	"bytes"
 	"fmt"
 	"strings"
-	"bytes"
 )
 
 var (
@@ -37,7 +37,6 @@ func NewPermissionStatus(user string, userIsApproved bool, approvedRoles []strin
 	}
 }
 
-
 func (s *PermissionStatus) reject() *PermissionStatus {
 	s.UserIsApproved = false
 	return s
@@ -70,4 +69,3 @@ func (s *PermissionStatus) constructMessage(operation, command string) string {
 	msg.WriteString(" for this command to take an effect. ")
 	return msg.String()
 }
-

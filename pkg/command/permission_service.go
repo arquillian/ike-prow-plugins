@@ -66,4 +66,3 @@ func (s *PermissionService) PRCreator() (*PermissionStatus, error) {
 	}
 	return status.reject(), nil
 }
-
