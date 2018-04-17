@@ -43,21 +43,21 @@ func NewPermissionStatus(user string, userIsApproved bool, approvedRoles []strin
 	}
 }
 
-func (s PermissionService) newPermissionStatus(allowedRoles ...string) *PermissionStatus {
+func (s *PermissionService) newPermissionStatus(allowedRoles ...string) *PermissionStatus {
 	return &PermissionStatus{User: s.User, ApprovedRoles: allowedRoles}
 }
 
-func (s PermissionStatus) reject() *PermissionStatus {
+func (s *PermissionStatus) reject() *PermissionStatus {
 	s.UserIsApproved = false
-	return &s
+	return s
 }
 
-func (s PermissionStatus) allow() *PermissionStatus {
+func (s *PermissionStatus) allow() *PermissionStatus {
 	s.UserIsApproved = true
-	return &s
+	return s
 }
 
-func (s PermissionStatus) constructMessage(operation, command string) string {
+func (s *PermissionStatus) constructMessage(operation, command string) string {
 	var msg bytes.Buffer
 
 	msg.WriteString(fmt.Sprintf(
@@ -112,7 +112,7 @@ var (
 )
 
 // Admin checks if the user is admin
-func (s PermissionService) Admin() (*PermissionStatus, error) {
+func (s *PermissionService) Admin() (*PermissionStatus, error) {
 	status := s.newPermissionStatus(Admin)
 	permissionLevel, err := s.Client.GetPermissionLevel(s.PRLoader.RepoOwner, s.PRLoader.RepoName, s.User)
 	if err != nil {
@@ -126,7 +126,7 @@ func (s PermissionService) Admin() (*PermissionStatus, error) {
 }
 
 // PRReviewer checks if the user is pull request reviewer
-func (s PermissionService) PRReviewer() (*PermissionStatus, error) {
+func (s *PermissionService) PRReviewer() (*PermissionStatus, error) {
 	status := s.newPermissionStatus(RequestReviewer)
 	pr, err := s.PRLoader.Load()
 	if err != nil {
@@ -141,7 +141,7 @@ func (s PermissionService) PRReviewer() (*PermissionStatus, error) {
 }
 
 // PRCreator checks if the user is pull request creator
-func (s PermissionService) PRCreator() (*PermissionStatus, error) {
+func (s *PermissionService) PRCreator() (*PermissionStatus, error) {
 	status := s.newPermissionStatus(PullRequestCreator)
 	pr, err := s.PRLoader.Load()
 	if err != nil {
