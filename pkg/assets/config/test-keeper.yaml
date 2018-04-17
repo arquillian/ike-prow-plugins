@@ -32,11 +32,11 @@ test_patterns:
 skip_validation_for:
   # Build tools files
 
-  # Go
+  ## Go
   - 'regex{{glide.*}}'
   - 'regex{{Gopkg.*}}'
   
-  # Java
+  ## Java
   - 'pom.xml'
   - 'mvnw'
   - 'mvnw.cmd'
@@ -45,23 +45,23 @@ skip_validation_for:
   - 'gradlew.bat'
   - 'build.gradle'
   
-  # JavaScript
+  ## JavaScript
   - 'regex{{package.*\.json$}}'
   - 'gulpfile.js'
   - 'Gruntfile.js'
   
-  # Ruby
+  ## Ruby
   - 'Gemfile'
   - 'gemfile'
   
-  # Python
+  ## Python
   - 'regex{{requirements.*}}'
   
-  # Docker
+  ## Docker
   - 'regex{{docker-compose*.yml}}'
   - 'Dockerfile*'
 
-  # Others
+  ## Others
   - 'Makefile'
   - 'Rakefile'
     
@@ -122,7 +122,8 @@ skip_validation_for:
   - 'regex{{\.go.+_exclude}}'
   - 'pylint.rc'
   - 'pcp.repo'
-
+  - '.github/'
+  
   # Shell
   - '*.sh'
   - '*.bat'
