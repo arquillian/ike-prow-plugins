@@ -44,8 +44,7 @@ include::../../pkg/plugin/test-keeper/test_fixtures/github_calls/prs/with_tests/
 <1> Defines set of <<file-patterns, file patterns>> which will be used to match files changeset and determine if Pull Requests comes with any changed test files.
 <2> These <<file-patterns, file patterns>> will be used against changeset in the Pull Requests to exclude files that don't have to be verified by any test. If only such files exists the check will be marked as "Success" as no tests are expected for such a PR.
 <3> Allows you to decide if you want to combine your patterns with predefined defaults (`true` by default).
-<4> Sets plugin hint comment message to be added to the Pull Request when no test is found. It can be set either as a relative path or absolute URL to a file that contains a plugin hint and having case insensitive filename PLUGIN_NAME_HINT.md  
-or as an inline string comment. (if nothing is set then a link:https://github.com/arquillian/ike-prow-plugins/tree/master/pkg/plugin/test-keeper/comment_message.go[default message] is used).
+<4> Sets plugin hint comment message to be added to the Pull Request when no test is found. It can be set either as a relative path or absolute URL to a file that contains a plugin hint and having case insensitive filename `PLUGINNAME_HINT.md`  or as an inline string comment. (if nothing is set then a link:https://github.com/arquillian/ike-prow-plugins/tree/master/pkg/plugin/test-keeper/comment_message.go[default message] is used).
 
 IMPORTANT: Both the configuration file and the file with plugin hint are always loaded from the `HEAD` of the Pull Request.
 
