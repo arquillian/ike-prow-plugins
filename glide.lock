@@ -1,8 +1,8 @@
 hash: 3e5727a2513de16dfd9a343097a2ab65d4c32ed5d3e25f586281b0ad32bf4692
-updated: 2018-04-17T19:49:55.479234278+02:00
+updated: 2018-04-17T20:11:31.222717691+02:00
 imports:
 - name: github.com/bazelbuild/buildtools
-  version: a6baf7df1e358187d43bb6b9f3debc6da8454922
+  version: c98ff0c6395f09b1942e6f7c42bf3ec15e3b9ca7
   subpackages:
   - build
   - tables
@@ -21,7 +21,15 @@ imports:
 - name: github.com/getsentry/raven-go
   version: 563b81fc02b75d664e54da31f787c2cc2186780b
 - name: github.com/ghodss/yaml
-  version: 0ca9ea5df5451ffdf184b4428c902747c2c11cd7
+  version: 73d445a93680fa1a78ae23a5839bad48f32ba1ee
+- name: github.com/go-openapi/jsonpointer
+  version: 46af16f9f7b149af66e5d1bd010e3574dc06de98
+- name: github.com/go-openapi/jsonreference
+  version: 13c6e3589ad90f49bd3e3bbe2c2cb3d7a4142272
+- name: github.com/go-openapi/spec
+  version: 6aced65f8501fe1217321abf0749d354824ba2ff
+- name: github.com/go-openapi/swag
+  version: 1d0bd113de87027671077d3c71eb3ac5d7dbba72
 - name: github.com/gogo/protobuf
   version: c0656edd0d9eab7c66d1eb0c568f9039345796f7
   subpackages:
@@ -32,7 +40,7 @@ imports:
 - name: github.com/golang/lint
   version: c7bacac2b21ca01afa1dee0acf64df3ce047c28f
 - name: github.com/golang/protobuf
-  version: 1643683e1b54a9e88ad26d98f81400c8c9d9f4f9
+  version: 8ee79997227bf9b34611aee7946ae64735e6fd93
   subpackages:
   - proto
 - name: github.com/google/go-github
@@ -97,9 +105,9 @@ imports:
   - matchers/support/goraph/util
   - types
 - name: github.com/pkg/errors
-  version: a22138067af1c4942683050411a841ade67fe1eb
+  version: 645ef00459ed84a119197bfb8d8205042c6df63d
 - name: github.com/prometheus/client_golang
-  version: f504d69affe11ec1ccb2e5948127f86878c9fd57
+  version: e51041b3fa41cece0dca035740ba6411905be473
   subpackages:
   - prometheus
 - name: github.com/prometheus/client_model
@@ -113,11 +121,11 @@ imports:
   - internal/bitbucket.org/ww/goautoneg
   - model
 - name: github.com/prometheus/procfs
-  version: 780932d4fbbe0e69b84c34c20f5c8d0981e109ea
-  subpackages:
-  - internal/util
-  - nfs
-  - xfs
+  version: 454a56f35412459b5e684fd5ec0f9211b94f002a
+- name: github.com/PuerkitoBio/purell
+  version: 8a290539e2e8629dbc4e6bad948158f790ec31f4
+- name: github.com/PuerkitoBio/urlesc
+  version: 5bd2802263f21d8788851d5305584c82a5c75d7e
 - name: github.com/satori/go.uuid
   version: 879c5887cd475cd7864858769793b2ceb0d44feb
 - name: github.com/shurcooL/githubql
@@ -153,11 +161,11 @@ imports:
   - idna
   - lex/httplex
 - name: golang.org/x/oauth2
-  version: fdc9e635145ae97e6c2cb777c48305600cf515cb
+  version: a6bd8cefa1811bd24b86f8902872e4e8225f74c4
   subpackages:
   - internal
 - name: golang.org/x/sys
-  version: a646d33e2ee3172a661fc09bca23bb4889a41bc8
+  version: 8f0908ab3b2457e2e15403d3697c9ef5cb4b57a9
   subpackages:
   - unix
 - name: golang.org/x/text
@@ -186,13 +194,11 @@ imports:
   - unicode/norm
   - width
 - name: golang.org/x/tools
-  version: 77106db15f689a60e7d4e085d967ac557b918fb2
+  version: a888bfdffa4526cc6987572bca9a2c6b7758290f
   subpackages:
-  - go/ast/astutil
-  - go/gcexportdata
   - go/gcimporter15
 - name: google.golang.org/appengine
-  version: 138cbf02a83223cf40a1e4b7834cc0a732fb383b
+  version: 12d5545dc1cfa6047a286d5e853841b6471f4c19
   subpackages:
   - internal
   - internal/base
@@ -208,13 +214,13 @@ imports:
 - name: gopkg.in/robfig/cron.v2
   version: be2e0b0deed5a68ffee390b4583a13aff8321535
 - name: gopkg.in/yaml.v2
-  version: 86f5ed62f8a0ee96bd888d2efdfd6d4fb100a4eb
+  version: a5b47d31c556af34a302ce5d659e6fea44d90de0
 - name: k8s.io/api
-  version: c4ebf33f93081f8c7602d29a59944e4a9f684ac2
+  version: 4df58c811fe2e65feb879227b2b245e4dc26e7ad
   subpackages:
   - core/v1
 - name: k8s.io/apimachinery
-  version: 0ed326127d3068118ef128c76673dad6005736ba
+  version: 019ae5ada31de202164b118aee88ee2d14075c31
   subpackages:
   - pkg/api/resource
   - pkg/apis/meta/v1
