@@ -31,29 +31,40 @@ test_patterns:
 
 skip_validation_for:
   # Build tools files
+
+  # Go
   - 'regex{{glide.*}}'
   - 'regex{{Gopkg.*}}'
+  
+  # Java
   - 'pom.xml'
   - 'mvnw'
   - 'mvnw.cmd'
   - 'mvnw.bat'
-  - 'package.json'
-  - 'build.gradle'
   - 'gradlew'
   - 'gradlew.bat'
-  - 'Makefile'
-  - 'Rakefile'
+  - 'build.gradle'
+  
+  # JavaScript
+  - 'regex{{package.*\.json$}}'
   - 'gulpfile.js'
   - 'Gruntfile.js'
+  
+  # Ruby
   - 'Gemfile'
   - 'gemfile'
-  - 'requirements.in'
-  - 'requirements.txt'
+  
+  # Python
+  - 'regex{{requirements.*}}'
+  
+  # Docker
   - 'regex{{docker-compose*.yml}}'
   - 'Dockerfile*'
-  - 'Gopkg.toml'
-  - 'Gopkg.lock'
 
+  # Others
+  - 'Makefile'
+  - 'Rakefile'
+    
   # Build tools directories
   - 'gradle/'
   - 'vendor/'
@@ -70,16 +81,21 @@ skip_validation_for:
   # UI assets
   - '*.jpg'
   - '*.jpeg'
+  - '*.bmp'
+  - '*.tif'
+  - '*.tiff'
   - '*.png'
   - '*.ico'
   - '*.svg'
   - '*.gif'
+  - '*.eps'
   - '*.css'
   - '*.scss'
   - '*.sass'
   - '*.less'
   - 'regex{{.*\.[xsd]?html$}}'
   - '*.ejs'
+  - '*.raw'
 
   # Text assets
   - '*.md'
@@ -96,12 +112,16 @@ skip_validation_for:
   - '.editorconfig'
   - 'regex{{\..+rc}}'
   - 'regex{{tsconfig.*\.json$}}'
-  - 'karma.conf.js'
+  - 'tslint.json' 
+  - 'typedoc.json'
   - '.codecov.yml'
   - 'webpack.config.js'
   - 'codeship-services.yml'
-  - 'pylint.rc'
+  - '.sass-lint.yml'
   - '*.gpg'
+  - 'regex{{\.go.+_exclude}}'
+  - 'pylint.rc'
+  - 'pcp.repo'
 
   # Shell
   - '*.sh'
