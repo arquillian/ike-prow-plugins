@@ -12,22 +12,23 @@ import (
 var (
 	buildAssets = []string{
 		"src/github.com/arquillian/ike-prow-plugins/Makefile", "src/main/java/pom.xml",
-		"mvnw", "mvnw.cmd", "mvnw.bat", "build.gradle", "gulpfile.js",
-		"gradlew", "gradlew.bat",
-		"glide.yaml", "glide.lock", "pom.xml", "package.json",
-		"vendor/github.com/arquillian/runner.go",
+		"mvnw", "mvnw.cmd", "mvnw.bat", "build.gradle", "gulpfile.js", "Gruntfile.js",
+		"gradlew", "gradlew.bat", "Rakefile",
+		"glide.yaml", "glide.lock", "pom.xml", "package.json", "package-lock.json",
+		"vendor/github.com/arquillian/runner.go", "Gopkg.toml", "Gopkg.lock",
 		"docker-compose.yml", "Dockerfile", "Dockerfile.builder", "Dockerfile.deploy",
 	}
 
 	configFiles = []string{
-		".nvmrc", ".htmlhintrc", ".stylelintrc", ".editorconfig",
+		".nvmrc", ".htmlhintrc", ".stylelintrc", ".editorconfig", "typedoc.json",
 		"protractor.config.js", "protractorEE.config.js", "project/js/config/karma.conf.js",
-		"project/js/config/tsconfig.json", "requirements.txt", "gulpfile.js",
-		"0034A06D9D9B0064CE8ADF6BF1747F4AD2306D93.gpg",
+		"project/js/config/tsconfig.json", "requirements.txt", "gulpfile.js", "tslint.json",
+		"0034A06D9D9B0064CE8ADF6BF1747F4AD2306D93.gpg", "webpack.config.js", "pylint.rc",
+		"codeship-services.yml", ".golint_exclude", ".gofmt_exclude", "pcp.repo", ".sass-lint.yml",
 	}
 
 	shellScripts = []string{
-		"openshift-prod-cluster.sh", "test.bat",
+		"openshift-prod-cluster.sh", "test.bat", "cico_build_deploy.sh",
 	}
 
 	ignoreFiles = []string{
@@ -40,9 +41,9 @@ var (
 	}
 
 	visualAssets = []string{
-		"style.sass", "style.css", "style.less", "style.scss",
-		"meme.png", "chart.svg", "photo.jpg", "pic.jpeg", "reaction.gif",
-		"index.html", "fav.ico", "index.shtml", "template.ejs",
+		"style.sass", "style.css", "style.less", "style.scss", 
+		"meme.png", "chart.svg", "photo.jpg", "pic.jpeg", "reaction.gif", "image.bmp", "image.tiff",
+		"index.html", "fav.ico", "index.shtml", "template.ejs", "vector.eps", "image.raw", 
 	}
 
 	testSourceCode = []string{
