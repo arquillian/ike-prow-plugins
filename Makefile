@@ -15,7 +15,7 @@ PUSH_IMAGES:=$(patsubst %,push-%, $(PLUGINS))
 CLEAN_IMAGES:=$(patsubst %,clean-%, $(PLUGINS))
 OC_DEPLOYMENTS:=$(patsubst %,oc-%, $(PLUGINS))
 OC_RESTART:=$(patsubst %,dc-%, $(PLUGINS))
-PROW_VERSION=$(shell grep "k8s.io/test-infra/prow/hook" ${PWD}/glide.yaml -A 1 | grep version | awk '{print $$2}')
+PROW_VERSION:=$(shell grep "k8s.io/test-infra/prow/hook" ${PWD}/glide.yaml -A 1 | grep version | awk '{print $$2}')
 
 in_docker_group:=$(filter docker,$(shell groups))
 is_root:=$(filter 0,$(shell id -u))
