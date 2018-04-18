@@ -11,7 +11,7 @@ import (
 )
 
 type client struct {
-	Client *gogh.Client
+	gh *gogh.Client
 }
 
 // Client manages communication with the GitHub API.
@@ -42,20 +42,20 @@ func NewClient(c *gogh.Client) Client {
 
 // GetPermissionLevel retrieves the specific permission level a collaborator has for a given repository.
 func (c client) GetPermissionLevel(owner, repo, user string) (*gogh.RepositoryPermissionLevel, error) {
-	permissionLevel, response, err := c.Client.Repositories.GetPermissionLevel(context.Background(), owner, repo, user)
+	permissionLevel, response, err := c.gh.Repositories.GetPermissionLevel(context.Background(), owner, repo, user)
 	return permissionLevel, responseFailureCodeOrErr(response, err)
 }
 
 // GetPullRequest retrieves information about a single pull request.
 func (c client) GetPullRequest(owner, repo string, prNumber int) (*gogh.PullRequest, error) {
-	pr, response, err := c.Client.PullRequests.Get(context.Background(), owner, repo, prNumber)
+	pr, response, err := c.gh.PullRequests.Get(context.Background(), owner, repo, prNumber)
 
 	return pr, responseFailureCodeOrErr(response, err)
 }
 
 // ListPullRequestFiles lists the changed files in a pull request.
 func (c client) ListPullRequestFiles(owner, repo string, prNumber int) ([]scm.ChangedFile, error) {
-	files, response, err := c.Client.PullRequests.ListFiles(context.Background(), owner, repo, prNumber, nil)
+	files, response, err := c.gh.PullRequests.ListFiles(context.Background(), owner, repo, prNumber, nil)
 	changedFiles := make([]scm.ChangedFile, 0, len(files))
 	for _, file := range files {
 		changedFiles = append(changedFiles, *scm.NewChangedFile(file))
@@ -66,7 +66,7 @@ func (c client) ListPullRequestFiles(owner, repo string, prNumber int) ([]scm.Ch
 // ListIssueComments lists all comments on the specified issue.
 func (c client) ListIssueComments(issue scm.RepositoryIssue) ([]*gogh.IssueComment, error) {
 	comments, response, err :=
-		c.Client.Issues.ListComments(context.Background(), issue.Owner, issue.RepoName, issue.Number, &gogh.IssueListCommentsOptions{})
+		c.gh.Issues.ListComments(context.Background(), issue.Owner, issue.RepoName, issue.Number, &gogh.IssueListCommentsOptions{})
 
 	return comments, responseFailureCodeOrErr(response, err)
 }
@@ -76,19 +76,19 @@ func (c client) CreateIssueComment(issue scm.RepositoryIssue, commentMsg *string
 	comment := &gogh.IssueComment{
 		Body: commentMsg,
 	}
-	_, response, err := c.Client.Issues.CreateComment(context.Background(), issue.Owner, issue.RepoName, issue.Number, comment)
+	_, response, err := c.gh.Issues.CreateComment(context.Background(), issue.Owner, issue.RepoName, issue.Number, comment)
 	return responseFailureCodeOrErr(response, err)
 }
 
 // CreateStatus creates a new status for a repository at the specified reference represented by a RepositoryChange
 func (c client) CreateStatus(change scm.RepositoryChange, repoStatus *gogh.RepoStatus) error {
 	_, response, err :=
-		c.Client.Repositories.CreateStatus(context.Background(), change.Owner, change.RepoName, change.Hash, repoStatus)
+		c.gh.Repositories.CreateStatus(context.Background(), change.Owner, change.RepoName, change.Hash, repoStatus)
 	return responseFailureCodeOrErr(response, err)
 }
 
 func (c client) unwrap() *gogh.Client {
-	return c.Client
+	return c.gh
 }
 
 func responseFailureCodeOrErr(response *gogh.Response, e error) error {
