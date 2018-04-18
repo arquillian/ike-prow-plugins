@@ -7,6 +7,9 @@ parameters:
 - name: DOCKER_REPO
   required: true
   value: k8s-prow
+- name: HOOK_NAME
+  required: true
+  value: hook
 - name: VERSION
   value: v20180403-2f3ad698f
   required: true
@@ -16,9 +19,9 @@ objects:
   - kind: DeploymentConfig
     apiVersion: v1
     metadata:
-      name: hook
+      name: ${HOOK_NAME}
       labels:
-        app: hook
+        app: ${HOOK_NAME}
         type: prow-core
     spec:
       replicas: 1
@@ -35,12 +38,12 @@ objects:
       template:
         metadata:
           labels:
-            app: hook
+            app: ${HOOK_NAME}
             type: prow-core
         spec:
           terminationGracePeriodSeconds: 180
           containers:
-          - name: hook
+          - name: ${HOOK_NAME}
             image: ${REGISTRY}/${DOCKER_REPO}/hook:${VERSION}
             imagePullPolicy: Always
             resources:
@@ -84,19 +87,19 @@ objects:
   - kind: Service
     apiVersion: v1
     metadata:
-      name: hook
+      name: ${HOOK_NAME}
     spec:
       selector:
-        app: hook
+        app: ${HOOK_NAME}
       ports:
       - port: 8888
       type: NodePort
   - kind: Route
     apiVersion: v1
     metadata:
-      name: hook
+      name: ${HOOK_NAME}
     spec:
       host: ${HOOK_HOSTNAME}
       to:
         kind: Service
-        name: hook
+        name: ${HOOK_NAME}
