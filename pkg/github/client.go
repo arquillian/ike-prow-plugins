@@ -61,6 +61,20 @@ func (c *Client) GetPullRequest(owner, repo string, prNumber int) (*gogh.PullReq
 	return pr, err
 }
 
+// GetPullRequestReviews retrieves a list of reviews submitted to the pull request.
+func (c *Client) GetPullRequestReviews(owner, repo string, prNumber int) ([]*gogh.PullRequestReview, error) {
+	var prReviews []*gogh.PullRequestReview
+
+	err := c.do(func() (*gogh.Response, error) {
+		var response *gogh.Response
+		var err error
+		prReviews, response, err = c.Client.PullRequests.ListReviews(context.Background(), owner, repo, prNumber, nil)
+		return response, err
+	})
+
+	return prReviews, err
+}
+
 // ListPullRequestFiles lists the changed files in a pull request.
 func (c *Client) ListPullRequestFiles(owner, repo string, prNumber int) ([]scm.ChangedFile, error) {
 	var files []*gogh.CommitFile
