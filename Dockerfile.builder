@@ -1,9 +1,12 @@
-FROM gcr.io/k8s-prow/git:0.1
+FROM centos:7
 LABEL maintainer="Devtools <devtools@redhat.com>"
-LABEL author="Bartosz Majsak <bartosz@redhat.com>"
+LABEL maintainer="Devtools-test <devtools-test@redhat.com>"
+
+RUN yum install -y git
+RUN yum install -y ca-certificates
 
 ENV LANG=en_US.utf8
-ARG PLUGIN_NAME=0
+ARG BINARY=0
 
-COPY ./bin/${PLUGIN_NAME} /plugin
-ENTRYPOINT ["/plugin"]
+COPY ./bin/${BINARY} /binary
+ENTRYPOINT ["/binary"]
