@@ -123,6 +123,7 @@ skip_validation_for:
   - 'pylint.rc'
   - 'pcp.repo'
   - '.github/'
+  - '.gometalinter.json'
   
   # Shell
   - '*.sh'
