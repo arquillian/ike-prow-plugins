@@ -771,20 +771,7 @@ kubernetes v1.7.6</code></pre>
 </ul>
 </div>
 <div class="paragraph">
-<p>At this point you have new Openshift project created and before you will be able to deploy plugins you can select one of following targets:</p>
-</div>
-<div class="olist arabic">
-<ol class="arabic">
-<li>
-<p><code>oc-deploy-hook</code> will only deploy <code>hook</code> service responsible for dispatching incoming GitHub events.</p>
-</li>
-<li>
-<p><code>oc-deploy-starter</code> will deploy key Prow services next to <code>hook</code>. For the explanation head over to the <a href="https://github.com/kubernetes/test-infra/blob/8a2cb8faf150750fd308f6d92a32773c386a3da9/prow/README.md">official documentation</a>.</p>
-</li>
-</ol>
-</div>
-<div class="paragraph">
-<p>The key piece of both deployments is the <code>hook</code> service which listens to GitHub events and dispatches them to relevant plugins.</p>
+<p>At this point you have new Openshift project created and before you will be able to deploy plugins you need to run the target <code>oc-deploy-hook</code> that will deploy <code>hook</code> service responsible for listening to GitHub events and dispatching them to relevant plugins.</p>
 </div>
 </div>
 <div class="sect3">
@@ -1271,7 +1258,7 @@ If you need to reconfigure the plugin then read the section <a href="#test-keepe
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2018-04-18 14:12:07 UTC
+Last updated 2018-04-18 15:16:46 UTC
 </div>
 </div>
 <script>
