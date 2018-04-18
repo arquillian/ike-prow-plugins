@@ -137,6 +137,43 @@ var _ = Describe("Permission service with permission checks features", func() {
 				HaveApprovedRoles(is.RequestReviewer),
 				HaveNoRejectedRoles())
 		})
+
+		It("should not approve the user that is not the PR approver", func() {
+			// given
+			gock.New("https://api.github.com").
+				Get("/repos/owner/repo/pulls/1/reviews").
+				Reply(200).
+				BodyString(`[{"user": {"login": "user"}, "state": "CHANGES_REQUESTED"},` +
+				`{"user": {"login": "user"}, "state": "COMMENTED"}]`)
+
+			// when
+			status, err := user.PRApprover()
+
+			// then
+			Ω(err).ShouldNot(HaveOccurred())
+			ExpectPermissionStatus(status).To(
+				HaveRejectedUser("user"),
+				HaveApprovedRoles(is.PullRequestApprover),
+				HaveNoRejectedRoles())
+		})
+
+		It("should approve the user that is a PR approver", func() {
+			// given
+			gock.New("https://api.github.com").
+				Get("/repos/owner/repo/pulls/1/reviews").
+				Reply(200).
+				BodyString(`[{"user": {"login": "user"}, "state": "APPROVED"}]`)
+
+			// when
+			status, err := user.PRApprover()
+
+			// then
+			Ω(err).ShouldNot(HaveOccurred())
+			ExpectPermissionStatus(status).To(
+				HaveApprovedUser("user"),
+				HaveApprovedRoles(is.PullRequestApprover),
+				HaveNoRejectedRoles())
+		})
 	})
 
 	Context("Permission check functions", func() {
