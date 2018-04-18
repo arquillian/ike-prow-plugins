@@ -10,13 +10,13 @@ import (
 
 type rateLimitWatcher struct {
 	Client
-	log.Logger
+	log       log.Logger
 	threshold int
 }
 
 // NewRateLimitWatcherClient wraps github client with calls watching GH API ratelimits
 func NewRateLimitWatcherClient(c Client, log log.Logger, threshold int) Client {
-	return &rateLimitWatcher{Client: c, Logger: log, threshold: threshold}
+	return &rateLimitWatcher{Client: c, log: log, threshold: threshold}
 }
 
 func (r rateLimitWatcher) logRateLimitsAround(f func()) {
@@ -29,12 +29,12 @@ func (r rateLimitWatcher) logRateLimits() {
 	ghclient := r.unwrap()
 	limits, _, e := ghclient.RateLimits(context.Background())
 	if e != nil {
-		r.Logger.Errorf("failed to load rate limits %s", e)
+		r.log.Errorf("failed to load rate limits %s", e)
 		return
 	}
 	core := limits.GetCore()
 	if core.Remaining < r.threshold {
-		r.Logger.Warnf("reaching limit for GH API calls. %d/%d left. resetting at [%s]", core.Remaining, core.Limit, core.Reset.Format("2006-01-01 15:15:15"))
+		r.log.Warnf("reaching limit for GH API calls. %d/%d left. resetting at [%s]", core.Remaining, core.Limit, core.Reset.Format("2006-01-01 15:15:15"))
 	}
 }
 
