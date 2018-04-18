@@ -134,10 +134,10 @@ oc-deploy-starter: ## Deploys basic prow infrastructure
 oc-deploy-hook: build-hook build-hook-image push-hook-image ## Deploys hook service only
 	@echo "Deploys hook service ${PROW_VERSION}"
 	@oc process -f $(CLUSTER_DIR)/hook-template.yaml \
-			-p REGISTRY=$(REGISTRY) \
-    		-p DOCKER_REPO=$(DOCKER_REPO) \
-    		-p VERSION=$(PROW_VERSION) \
-    		-o yaml | oc apply -f -
+		-p REGISTRY=$(REGISTRY) \
+		-p DOCKER_REPO=$(DOCKER_REPO) \
+		-p VERSION=$(PROW_VERSION) \
+		-o yaml | oc apply -f -
 
 .PHONY: build-hook
 build-hook: up-skip-test-quick
