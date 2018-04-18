@@ -125,11 +125,6 @@ oc-init-project: ## Initializes new project with config maps and secrets
 	$(call populate_secret,hmac.token,hmac-token,hmac)
 	$(call populate_secret,sentry.dsn,sentry-dsn,sentry)
 
-.PHONY: oc-deploy-starter
-oc-deploy-starter: ## Deploys basic prow infrastructure
-	@echo "Deploying prow infrastructure"
-	@oc apply -f cluster/starter.yaml
-
 .PHONY: oc-deploy-hook
 oc-deploy-hook: build-hook build-hook-image push-hook-image ## Deploys hook service only
 	@echo "Deploys hook service ${PROW_VERSION}"
