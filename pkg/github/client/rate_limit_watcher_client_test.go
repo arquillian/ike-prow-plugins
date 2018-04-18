@@ -61,7 +61,7 @@ var _ = Describe("GitHub rate limit watcher client", func() {
 
 		// then
 		Ω(err).ShouldNot(HaveOccurred())
-		Expect(hook.Entries).To(HaveLen(2))
+		Expect(hook.Entries).To(HaveLen(1))
 		Expect(hook.LastEntry().Message).To(HavePrefix("reaching limit for GH API calls. 8/20 left. resetting at"))
 	})
 })

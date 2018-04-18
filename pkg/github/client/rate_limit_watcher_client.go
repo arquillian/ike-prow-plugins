@@ -14,13 +14,12 @@ type rateLimitWatcher struct {
 	threshold int
 }
 
-// NewRateLimitWatcherClient wraps github client with calls watching GH API ratelimits
+// NewRateLimitWatcherClient wraps github client with calls watching GH API rate limits
 func NewRateLimitWatcherClient(c Client, log log.Logger, threshold int) Client {
 	return &rateLimitWatcher{Client: c, log: log, threshold: threshold}
 }
 
-func (r rateLimitWatcher) logRateLimitsAround(f func()) {
-	r.logRateLimits()
+func (r rateLimitWatcher) logRateLimitsAfter(f func()) {
 	f()
 	r.logRateLimits()
 }
@@ -41,7 +40,7 @@ func (r rateLimitWatcher) logRateLimits() {
 func (r rateLimitWatcher) GetPermissionLevel(owner, repo, user string) (*gogh.RepositoryPermissionLevel, error) {
 	var level *gogh.RepositoryPermissionLevel
 	var err error
-	r.logRateLimitsAround(func() {
+	r.logRateLimitsAfter(func() {
 		level, err = r.Client.GetPermissionLevel(owner, repo, user)
 	})
 	return level, err
@@ -50,7 +49,7 @@ func (r rateLimitWatcher) GetPermissionLevel(owner, repo, user string) (*gogh.Re
 func (r rateLimitWatcher) GetPullRequest(owner, repo string, prNumber int) (*gogh.PullRequest, error) {
 	var pr *gogh.PullRequest
 	var err error
-	r.logRateLimitsAround(func() {
+	r.logRateLimitsAfter(func() {
 		pr, err = r.Client.GetPullRequest(owner, repo, prNumber)
 	})
 	return pr, err
@@ -59,7 +58,7 @@ func (r rateLimitWatcher) GetPullRequest(owner, repo string, prNumber int) (*gog
 func (r rateLimitWatcher) ListPullRequestFiles(owner, repo string, prNumber int) ([]scm.ChangedFile, error) {
 	var files []scm.ChangedFile
 	var err error
-	r.logRateLimitsAround(func() {
+	r.logRateLimitsAfter(func() {
 		files, err = r.Client.ListPullRequestFiles(owner, repo, prNumber)
 	})
 	return files, err
@@ -68,7 +67,7 @@ func (r rateLimitWatcher) ListPullRequestFiles(owner, repo string, prNumber int)
 func (r rateLimitWatcher) ListIssueComments(issue scm.RepositoryIssue) ([]*gogh.IssueComment, error) {
 	var issues []*gogh.IssueComment
 	var err error
-	r.logRateLimitsAround(func() {
+	r.logRateLimitsAfter(func() {
 		issues, err = r.Client.ListIssueComments(issue)
 	})
 	return issues, err
@@ -76,7 +75,7 @@ func (r rateLimitWatcher) ListIssueComments(issue scm.RepositoryIssue) ([]*gogh.
 
 func (r rateLimitWatcher) CreateIssueComment(issue scm.RepositoryIssue, commentMsg *string) error {
 	var err error
-	r.logRateLimitsAround(func() {
+	r.logRateLimitsAfter(func() {
 		err = r.Client.CreateIssueComment(issue, commentMsg)
 	})
 	return err
@@ -84,7 +83,7 @@ func (r rateLimitWatcher) CreateIssueComment(issue scm.RepositoryIssue, commentM
 
 func (r rateLimitWatcher) CreateStatus(change scm.RepositoryChange, repoStatus *gogh.RepoStatus) error {
 	var err error
-	r.logRateLimitsAround(func() {
+	r.logRateLimitsAfter(func() {
 		err = r.Client.CreateStatus(change, repoStatus)
 	})
 	return err
