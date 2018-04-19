@@ -19,6 +19,7 @@ type Client interface {
 	GetPermissionLevel(owner, repo, user string) (*gogh.RepositoryPermissionLevel, error)
 	GetPullRequest(owner, repo string, prNumber int) (*gogh.PullRequest, error)
 	ListPullRequestFiles(owner, repo string, prNumber int) ([]scm.ChangedFile, error)
+	GetPullRequestReviews(owner, repo string, prNumber int) ([]*gogh.PullRequestReview, error)
 	ListIssueComments(issue scm.RepositoryIssue) ([]*gogh.IssueComment, error)
 	CreateIssueComment(issue scm.RepositoryIssue, commentMsg *string) error
 	CreateStatus(change scm.RepositoryChange, repoStatus *gogh.RepoStatus) error
@@ -51,6 +52,12 @@ func (c client) GetPullRequest(owner, repo string, prNumber int) (*gogh.PullRequ
 	pr, response, err := c.gh.PullRequests.Get(context.Background(), owner, repo, prNumber)
 
 	return pr, responseFailureCodeOrErr(response, err)
+}
+
+// GetPullRequestReviews retrieves a list of reviews submitted to the pull request.
+func (c client) GetPullRequestReviews(owner, repo string, prNumber int) ([]*gogh.PullRequestReview, error) {
+	prReviews, response, err := c.gh.PullRequests.ListReviews(context.Background(), owner, repo, prNumber, nil)
+	return prReviews, responseFailureCodeOrErr(response, err)
 }
 
 // ListPullRequestFiles lists the changed files in a pull request.

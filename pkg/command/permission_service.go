@@ -66,3 +66,18 @@ func (s *PermissionService) PRCreator() (*PermissionStatus, error) {
 	}
 	return status.reject(), nil
 }
+
+// PRApprover checks if the user approved the pull request
+func (s *PermissionService) PRApprover() (*PermissionStatus, error) {
+	status := s.newPermissionStatus(PullRequestApprover)
+	prReviews, err := s.Client.GetPullRequestReviews(s.PRLoader.RepoOwner, s.PRLoader.RepoName, s.PRLoader.Number)
+	if err != nil {
+		return status.reject(), err
+	}
+	for _, review := range prReviews {
+		if *review.State == "APPROVED" && *review.User.Login == s.User {
+			return status.allow(), nil
+		}
+	}
+	return status.reject(), nil
+}

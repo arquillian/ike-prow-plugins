@@ -55,6 +55,15 @@ func (r rateLimitWatcher) GetPullRequest(owner, repo string, prNumber int) (*gog
 	return pr, err
 }
 
+func (r rateLimitWatcher) GetPullRequestReviews(owner, repo string, prNumber int) ([]*gogh.PullRequestReview, error) {
+	var reviews []*gogh.PullRequestReview
+	var err error
+	r.logRateLimitsAfter(func() {
+		reviews, err = r.Client.GetPullRequestReviews(owner, repo, prNumber)
+	})
+	return reviews, err
+}
+
 func (r rateLimitWatcher) ListPullRequestFiles(owner, repo string, prNumber int) ([]scm.ChangedFile, error) {
 	var files []scm.ChangedFile
 	var err error

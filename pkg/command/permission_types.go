@@ -13,6 +13,8 @@ var (
 	RequestReviewer = "requested reviewer"
 	// PullRequestCreator is a name of the pull request creator role
 	PullRequestCreator = "pull request creator"
+	// PullRequestApprover is a name of a person who gave an approval to the PR
+	PullRequestApprover = "pull request approver"
 	// Unknown represents an unknown user
 	Unknown = "unknown"
 	// Anyone represents any user/role

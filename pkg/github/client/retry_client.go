@@ -61,6 +61,16 @@ func (r retryClient) GetPullRequest(owner, repo string, prNumber int) (*gogh.Pul
 	return pr, err
 }
 
+func (r retryClient) GetPullRequestReviews(owner, repo string, prNumber int) ([]*gogh.PullRequestReview, error) {
+	var reviews []*gogh.PullRequestReview
+	err := r.retry(func() error {
+		var e error
+		reviews, e = r.Client.GetPullRequestReviews(owner, repo, prNumber)
+		return e
+	})
+	return reviews, err
+}
+
 func (r retryClient) ListPullRequestFiles(owner, repo string, prNumber int) ([]scm.ChangedFile, error) {
 	var files []scm.ChangedFile
 	err := r.retry(func() error {

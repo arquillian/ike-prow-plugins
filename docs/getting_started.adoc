@@ -91,12 +91,7 @@ For this purpose use login to your OpenShift cluster using `oc login` and execut
 * Add config maps for Prow configuration (`config.yaml`) and its plugins (`plugins.yaml`)
 * Add required secrets (see <<gh-settings>> for details)
 
-At this point you have new Openshift project created and before you will be able to deploy plugins you can select one of following targets:
-
-. `oc-deploy-hook` will only deploy `hook` service responsible for dispatching incoming GitHub events.
-. `oc-deploy-starter` will deploy key Prow services next to `hook`. For the explanation head over to the link:https://github.com/kubernetes/test-infra/blob/8a2cb8faf150750fd308f6d92a32773c386a3da9/prow/README.md[official documentation].
-
-The key piece of both deployments is the `hook` service which listens to GitHub events and dispatches them to relevant plugins.
+At this point you have new Openshift project created and before you will be able to deploy plugins you need to run the target `oc-deploy-hook` that will deploy `hook` service responsible for listening to GitHub events and dispatching them to relevant plugins.
 
 ==== Pushing to local Minishift repository
 
