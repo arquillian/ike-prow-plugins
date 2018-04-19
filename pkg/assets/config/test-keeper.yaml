@@ -58,7 +58,7 @@ skip_validation_for:
   - 'regex{{requirements.*}}'
   
   ## Docker
-  - 'regex{{docker-compose*.yml}}'
+  - 'regex{{docker-compose.*\.yml}}'
   - 'Dockerfile*'
 
   ## Others
@@ -69,6 +69,7 @@ skip_validation_for:
   - 'gradle/'
   - 'vendor/'
   - '.mvn/'
+  - '.make/'
   - 'node_modules/'
 
   # CI tools
