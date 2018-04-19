@@ -34,20 +34,20 @@ const (
 )
 
 // CreateCommentMessage creates a comment message for the test-keeper plugin. If the comment message is set in config then it takes that one, the default otherwise.
-func CreateCommentMessage(pluginName string, configuration PluginConfiguration, change scm.RepositoryChange) string {
+func CreateCommentMessage(configuration PluginConfiguration, change scm.RepositoryChange) string {
 	var msg string
 	if configuration.LocationURL == "" {
 		msg = sadIke + paragraph + beginning + paragraph + noConfig
 	} else if configuration.PluginHint != "" {
-		msg = getMsgFromConfigHint(pluginName, configuration, change)
+		msg = getMsgFromConfigHint(configuration, change)
 	} else {
 		msg = sadIke + paragraph + getMsgWithConfigRef(configuration.LocationURL)
 	}
 	return msg
 }
 
-func getMsgFromConfigHint(pluginName string, configuration PluginConfiguration, change scm.RepositoryChange) string {
-	fileRegex := "(?mi)" + pluginName + "_hint.md$"
+func getMsgFromConfigHint(configuration PluginConfiguration, change scm.RepositoryChange) string {
+	fileRegex := "(?mi)" + configuration.PluginName + "_hint.md$"
 
 	isFilePath, _ := regexp.MatchString(fileRegex, configuration.PluginHint)
 	if isFilePath {

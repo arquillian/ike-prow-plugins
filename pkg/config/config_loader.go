@@ -14,6 +14,7 @@ type Source func() ([]byte, error)
 
 // PluginConfiguration holds common configuration for all the plugins
 type PluginConfiguration struct {
+	PluginName 	string
 	LocationURL string
 	PluginHint  string `yaml:"plugin_hint,omitempty"`
 }

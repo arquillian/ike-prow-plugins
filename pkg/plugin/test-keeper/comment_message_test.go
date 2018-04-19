@@ -19,10 +19,10 @@ var _ = Describe("Test keeper comment message creation", func() {
 
 		It("should create default message referencing to documentation when url to config is empty", func() {
 			// given
-			config := testkeeper.PluginConfiguration{PluginConfiguration: config.PluginConfiguration{PluginHint: "any-file"}}
+			config := testkeeper.PluginConfiguration{PluginConfiguration: config.PluginConfiguration{PluginName: testkeeper.ProwPluginName}}
 
 			// when
-			msg := testkeeper.CreateCommentMessage(testkeeper.ProwPluginName, config, scm.RepositoryChange{})
+			msg := testkeeper.CreateCommentMessage(config, scm.RepositoryChange{})
 
 			// then
 			Expect(msg).To(ContainSubstring("http://arquillian.org/ike-prow-plugins/#_test_keeper_plugin"))
@@ -35,7 +35,7 @@ var _ = Describe("Test keeper comment message creation", func() {
 			config := testkeeper.PluginConfiguration{PluginConfiguration: config.PluginConfiguration{LocationURL: url}}
 
 			// when
-			msg := testkeeper.CreateCommentMessage(testkeeper.ProwPluginName, config, scm.RepositoryChange{})
+			msg := testkeeper.CreateCommentMessage(config, scm.RepositoryChange{})
 
 			// then
 			Expect(msg).NotTo(ContainSubstring("http://arquillian.org/ike-prow-plugins/#_test_keeper_plugin"))
@@ -65,6 +65,7 @@ var _ = Describe("Test keeper comment message creation", func() {
 			config := testkeeper.PluginConfiguration{
 				PluginConfiguration: config.PluginConfiguration{
 					LocationURL: url,
+					PluginName: testkeeper.ProwPluginName,
 					PluginHint:  "path/to/test-keeper_hint.md",
 				},
 			}
@@ -76,7 +77,7 @@ var _ = Describe("Test keeper comment message creation", func() {
 			}
 
 			// when
-			msg := testkeeper.CreateCommentMessage(testkeeper.ProwPluginName, config, change)
+			msg := testkeeper.CreateCommentMessage(config, change)
 			sanitizedMsg := removeHtmlElements(msg)
 
 			// then
@@ -91,6 +92,7 @@ var _ = Describe("Test keeper comment message creation", func() {
 			config := testkeeper.PluginConfiguration{
 				PluginConfiguration: config.PluginConfiguration{
 					LocationURL: url,
+					PluginName: testkeeper.ProwPluginName,
 					PluginHint:  "path/to/test-keeper_hint.md",
 				},
 			}
@@ -102,7 +104,7 @@ var _ = Describe("Test keeper comment message creation", func() {
 			}
 
 			// when
-			msg := testkeeper.CreateCommentMessage(testkeeper.ProwPluginName, config, change)
+			msg := testkeeper.CreateCommentMessage(config, change)
 
 			// then
 			Expect(msg).NotTo(ContainSubstring("http://arquillian.org/ike-prow-plugins/#_test_keeper_plugin"))
@@ -124,12 +126,13 @@ var _ = Describe("Test keeper comment message creation", func() {
 			config := testkeeper.PluginConfiguration{
 				PluginConfiguration: config.PluginConfiguration{
 					LocationURL: url,
+					PluginName: testkeeper.ProwPluginName,
 					PluginHint:  "http://my.server.com/path/to/test-keeper_hint.md",
 				},
 			}
 
 			// when
-			msg := testkeeper.CreateCommentMessage(testkeeper.ProwPluginName, config, scm.RepositoryChange{})
+			msg := testkeeper.CreateCommentMessage(config, scm.RepositoryChange{})
 			sanitizedMsg := removeHtmlElements(msg)
 
 			// then
@@ -147,12 +150,13 @@ var _ = Describe("Test keeper comment message creation", func() {
 			config := testkeeper.PluginConfiguration{
 				PluginConfiguration: config.PluginConfiguration{
 					LocationURL: url,
+					PluginName: testkeeper.ProwPluginName,
 					PluginHint:  "http://my.server.com/path/to/TEST-KEEPER_HINT.MD",
 				},
 			}
 
 			// when
-			msg := testkeeper.CreateCommentMessage(testkeeper.ProwPluginName, config, scm.RepositoryChange{})
+			msg := testkeeper.CreateCommentMessage(config, scm.RepositoryChange{})
 			sanitizedMsg := removeHtmlElements(msg)
 
 			// then
@@ -169,12 +173,13 @@ var _ = Describe("Test keeper comment message creation", func() {
 			config := testkeeper.PluginConfiguration{
 				PluginConfiguration: config.PluginConfiguration{
 					LocationURL: url,
+					PluginName: testkeeper.ProwPluginName,
 					PluginHint:  "http://my.server.com/path/to/test-keeper_hint.md",
 				},
 			}
 
 			// when
-			msg := testkeeper.CreateCommentMessage(testkeeper.ProwPluginName, config, scm.RepositoryChange{})
+			msg := testkeeper.CreateCommentMessage(config, scm.RepositoryChange{})
 
 			// then
 			Expect(msg).NotTo(ContainSubstring("http://arquillian.org/ike-prow-plugins/#_test_keeper_plugin"))
@@ -196,6 +201,7 @@ var _ = Describe("Test keeper comment message creation", func() {
 			config := testkeeper.PluginConfiguration{
 				PluginConfiguration: config.PluginConfiguration{
 					LocationURL: url,
+					PluginName: testkeeper.ProwPluginName,
 					PluginHint:  "http/server.com/test-keeper_hint.md",
 				},
 			}
@@ -207,7 +213,7 @@ var _ = Describe("Test keeper comment message creation", func() {
 			}
 
 			// when
-			msg := testkeeper.CreateCommentMessage(testkeeper.ProwPluginName, config, change)
+			msg := testkeeper.CreateCommentMessage(config, change)
 
 			// then
 			Expect(msg).NotTo(ContainSubstring("http://arquillian.org/ike-prow-plugins/#_test_keeper_plugin"))
@@ -224,12 +230,13 @@ var _ = Describe("Test keeper comment message creation", func() {
 			config := testkeeper.PluginConfiguration{
 				PluginConfiguration: config.PluginConfiguration{
 					LocationURL: url,
+					PluginName: testkeeper.ProwPluginName,
 					PluginHint:  "Custom message",
 				},
 			}
 
 			// when
-			msg := testkeeper.CreateCommentMessage(testkeeper.ProwPluginName, config, scm.RepositoryChange{})
+			msg := testkeeper.CreateCommentMessage(config, scm.RepositoryChange{})
 
 			// then
 			Expect(msg).To(Equal("Custom message"))
@@ -245,12 +252,13 @@ var _ = Describe("Test keeper comment message creation", func() {
 			config := testkeeper.PluginConfiguration{
 				PluginConfiguration: config.PluginConfiguration{
 					LocationURL: url,
+					PluginName: testkeeper.ProwPluginName,
 					PluginHint:  "http://my.server.com/path/to/custom_message_file.md",
 				},
 			}
 
 			// when
-			msg := testkeeper.CreateCommentMessage(testkeeper.ProwPluginName, config, scm.RepositoryChange{})
+			msg := testkeeper.CreateCommentMessage(config, scm.RepositoryChange{})
 
 			// then
 			Expect(msg).NotTo(ContainSubstring("http://arquillian.org/ike-prow-plugins/#_test_keeper_plugin"))
