@@ -15,6 +15,7 @@ PUSH_IMAGES:=$(patsubst %,push-%, $(PLUGINS))
 CLEAN_IMAGES:=$(patsubst %,clean-%, $(PLUGINS))
 OC_DEPLOYMENTS:=$(patsubst %,oc-%, $(PLUGINS))
 OC_RESTART:=$(patsubst %,dc-%, $(PLUGINS))
+PROW_VERSION:=$(shell grep "k8s.io/test-infra/prow/hook" ${PWD}/glide.yaml -A 1 | grep version | awk '{print $$2}')
 
 in_docker_group:=$(filter docker,$(shell groups))
 is_root:=$(filter 0,$(shell id -u))
@@ -48,6 +49,10 @@ install: generate ## Fetches all dependencies using Glide
 .PHONY: up
 up: generate ## Updates all dependencies defined for glide
 	glide up -v
+
+.PHONY: up-skip-test-quick
+up-skip-test-quick:
+	glide update --skip-test --quick ## Updates only things in glide.yaml and skips tests
 
 .PHONY: compile
 compile: up compile-only ## Compiles all plugins and puts them in the bin/ folder (calls up target)
@@ -120,21 +125,33 @@ oc-init-project: ## Initializes new project with config maps and secrets
 	$(call populate_secret,hmac.token,hmac-token,hmac)
 	$(call populate_secret,sentry.dsn,sentry-dsn,sentry)
 
-.PHONY: oc-deploy-starter
-oc-deploy-starter: ## Deploys basic prow infrastructure
-	@echo "Deploying prow infrastructure"
-	@oc apply -f cluster/starter.yaml
-
-HOOK_VERSION?=v20180403-2f3ad698f
 .PHONY: oc-deploy-hook
-oc-deploy-hook: ## Deploys hook service only
-	@echo "Deploys hook service ${HOOK_VERSION}"
+oc-deploy-hook: build-hook build-hook-image push-hook-image ## Deploys hook service only
+	@echo "Deploys hook service ${PROW_VERSION}"
 	@oc process -f $(CLUSTER_DIR)/hook-template.yaml \
-    		-p VERSION=$(HOOK_VERSION) \
-    		-o yaml | oc apply -f -
+		-p REGISTRY=$(REGISTRY) \
+		-p DOCKER_REPO=$(DOCKER_REPO) \
+		-p VERSION=$(PROW_VERSION) \
+		-o yaml | oc apply -f -
+
+.PHONY: build-hook
+build-hook: up-skip-test-quick
+	CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o bin/hook ./vendor/k8s.io/test-infra/prow/cmd/hook
+
+.PHONY: build-hook-image
+build-hook-image:
+	$(DOCKER) build --build-arg BINARY=hook -t $(REGISTRY)/$(DOCKER_REPO)/hook:$(PROW_VERSION) -f Dockerfile.builder .
+
+.PHONY: push-hook-image
+push-hook-image: build-hook-image
+	$(DOCKER) push $(REGISTRY)/$(DOCKER_REPO)/hook:$(PROW_VERSION)
+
+.PHONY: clean-hook-image
+clean-hook-image:
+	$(DOCKER) rmi -f $(REGISTRY)/$(DOCKER_REPO)/hook:$(PROW_VERSION)
 
 .PHONY: oc-deploy-plugins ## Builds plugin images, updates configuration and deploys new version of ike-plugins
-oc-deploy-plugins: oc-init-project build-images push-images oc-generate-deployments
+oc-deploy-plugins: oc-init-project build-plugin-images push-plugin-images oc-generate-deployments
 	@echo "Updating cluster configuration for '$(OC_PROJECT_NAME)'..."
 
 $(OC_DEPLOYMENTS): oc-%: %
@@ -161,17 +178,17 @@ oc-restart-plugins: $(OC_RESTART)
 $(OC_RESTART): dc-%: %
 	$(call restart_dc,$<)
 
-.PHONY: build-images $(PLUGINS)
-build-images: compile $(BUILD_IMAGES)
+.PHONY: build-plugin-images $(PLUGINS)
+build-plugin-images: compile $(BUILD_IMAGES)
 $(BUILD_IMAGES): build-%: %
-	$(DOCKER) build --build-arg PLUGIN_NAME=$< -t $(REGISTRY)/$(DOCKER_REPO)/$<:$(TAG) -f Dockerfile.builder .
+	$(DOCKER) build --build-arg BINARY=$< -t $(REGISTRY)/$(DOCKER_REPO)/$<:$(TAG) -f Dockerfile.builder .
 
-.PHONY: clean-images
-clean-images: $(CLEAN_IMAGES)
+.PHONY: clean-plugin-images
+clean-plugin-images: $(CLEAN_IMAGES)
 $(CLEAN_IMAGES): clean-%: %
 	$(DOCKER) rmi -f $(REGISTRY)/$(DOCKER_REPO)/$<:$(TAG)
 
-.PHONY: push-images
-push-images: build-images $(PUSH_IMAGES)
+.PHONY: push-plugin-images
+push-plugin-images: build-plugin-images $(PUSH_IMAGES)
 $(PUSH_IMAGES): push-%: %
 	$(DOCKER) push $(REGISTRY)/$(DOCKER_REPO)/$<:$(TAG)

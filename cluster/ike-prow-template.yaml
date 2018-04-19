@@ -10,7 +10,6 @@ parameters:
 - name: PLUGIN_NAME
   required: true
 - name: VERSION
-  value: latest
   required: true
 objects:
   - kind: DeploymentConfig
