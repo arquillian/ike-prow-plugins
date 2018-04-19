@@ -19,6 +19,7 @@ objects:
       labels:
         app: hook
         type: prow-core
+        version: ${VERSION}
     spec:
       replicas: 1
       triggers:
@@ -49,6 +50,9 @@ objects:
               limits:
                 memory: "256Mi"
                 cpu: "200m"
+            env:
+              - name: VERSION
+                value: ${VERSION}
             args:
             - --dry-run=false
             ports:
