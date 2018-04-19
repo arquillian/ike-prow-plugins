@@ -298,6 +298,11 @@ var _ = Describe("Test Keeper Plugin features", func() {
 				Reply(200).
 				Body(FromFile("test_fixtures/github_calls/collaborators_repo-admin_permission.json"))
 
+			gock.New("https://api.github.com").
+				Get("/repos/" + repositoryName + "/pulls/1/reviews").
+				Reply(200).
+				BodyString(`[]`)
+
 			toHaveEnforcedSuccessState := SoftlySatisfyAll(
 				HaveState(github.StatusSuccess),
 				HaveDescription(fmt.Sprintf(testkeeper.ApprovedByMessage, "bartoszmajsak")),
@@ -337,11 +342,16 @@ var _ = Describe("Test Keeper Plugin features", func() {
 				Reply(201)
 
 			gock.New("https://api.github.com").
+				Get("/repos/" + repositoryName + "/pulls/1/reviews").
+				Reply(200).
+				BodyString(`[]`)
+
+			gock.New("https://api.github.com").
 				Post("/repos/" + repositoryName + "/issues/1/comments").
 				SetMatcher(
 					ExpectPayload(To(
 							HaveBodyThatContains("Hey @bartoszmajsak-test! It seems you tried to trigger `/ok-without-tests` command"),
-							HaveBodyThatContains("You have to be admin or requested reviewer, but not pull request creator")))).
+							HaveBodyThatContains("You have to be admin or requested reviewer or pull request approver, but not pull request creator")))).
 				Reply(201) // This way we implicitly verify that call happened after `HandleEvent` call
 
 			statusPayload := LoadFromFile("test_fixtures/github_calls/prs/without_tests/skip_comment_by_external.json")
