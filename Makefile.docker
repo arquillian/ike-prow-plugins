@@ -27,7 +27,7 @@ docker-image-builder:
 		--build-arg GOPATH=$(GOPATH_IN_CONTAINER) \
 		--build-arg PROJECT_PATH=$(PACKAGE_PATH) \
 		-t $(DOCKER_IMAGE_CORE) \
-		-f $(CUR_DIR)/Dockerfile $(CUR_DIR)
+		-f $(CUR_DIR)/Dockerfile.builder $(CUR_DIR)
 
 .PHONY: docker-start
 ## Starts the docker build container in the background (detached mode).

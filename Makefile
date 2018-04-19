@@ -185,7 +185,7 @@ $(OC_RESTART): dc-%: %
 .PHONY: build-plugin-images $(PLUGINS)
 build-plugin-images: compile $(BUILD_IMAGES)
 $(BUILD_IMAGES): build-%: %
-	$(DOCKER) build --build-arg BINARY=$< -t $(REGISTRY)/$(DOCKER_REPO)/$<:$(TAG) -f Dockerfile.builder .
+	$(DOCKER) build --build-arg BINARY=$< -t $(REGISTRY)/$(DOCKER_REPO)/$<:$(TAG) -f Dockerfile.prow .
 
 .PHONY: clean-plugin-images
 clean-plugin-images: $(CLEAN_IMAGES)
