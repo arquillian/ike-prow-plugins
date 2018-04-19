@@ -16,7 +16,7 @@ var (
 		"gradlew", "gradlew.bat", "Rakefile",
 		"glide.yaml", "glide.lock", "pom.xml", "package.json", "package-lock.json",
 		"vendor/github.com/arquillian/runner.go", "Gopkg.toml", "Gopkg.lock",
-		"docker-compose.yml", "docker-compose.dev.yml", "docker-compose.macos.yml",
+		"docker-compose.yml", "docker-compose.dev.yml", "docker-compose.macos.yaml",
 		"Dockerfile", "Dockerfile.builder", "Dockerfile.deploy",
 	}
 
@@ -44,7 +44,8 @@ var (
 	visualAssets = []string{
 		"style.sass", "style.css", "style.less", "style.scss", 
 		"meme.png", "chart.svg", "photo.jpg", "pic.jpeg", "reaction.gif", "image.bmp", "image.tiff",
-		"index.html", "fav.ico", "index.shtml", "template.ejs", "vector.eps", "image.raw", 
+		"index.html", "fav.ico", "index.shtml", "index.dhtml", "index.xhtml",
+		"template.ejs", "vector.eps", "image.raw",
 	}
 
 	testSourceCode = []string{

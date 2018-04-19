@@ -58,7 +58,7 @@ skip_validation_for:
   - 'regex{{requirements.*}}'
   
   ## Docker
-  - 'regex{{docker-compose.*\.yml}}'
+  - 'regex{{docker-compose.*\.y[a]?ml$}}'
   - 'Dockerfile*'
 
   ## Others
@@ -73,11 +73,12 @@ skip_validation_for:
   - 'node_modules/'
 
   # CI tools
-  - '.travis.yml'
   - 'Jenkinsfile'
-  - '.gitlab-ci.yml'
-  - 'wercker.yml'
-  - 'circle.yml'
+  - 'regex{{\.travis\.y[a]?ml$}}'
+  - 'regex{{\.gitlab-ci\.y[a]?ml$}}'
+  - 'regex{{wercker\.y[a]?ml$}}'
+  - 'regex{{circle\.y[a]?ml$}}'
+  - 'regex{{codeship-services\.y[a]?ml$}}'
 
   # UI assets
   - '*.jpg'
@@ -115,21 +116,20 @@ skip_validation_for:
   - 'regex{{tsconfig.*\.json$}}'
   - 'tslint.json' 
   - 'typedoc.json'
-  - '.codecov.yml'
+  - 'regex{{.codecov\.y[a]?ml$}}'
   - 'webpack.config.js'
-  - 'codeship-services.yml'
-  - '.sass-lint.yml'
+  - 'regex{{\.sass-lint\.y[a]?ml$}}'
   - '*.gpg'
   - 'regex{{\.go.+_exclude}}'
   - 'pylint.rc'
   - 'pcp.repo'
   - '.github/'
   - '.gometalinter.json'
+  - 'checkstyle.xml'
   
   # Shell
   - '*.sh'
   - '*.bat'
 
   # Our own configurations
-  - 'test-keeper.yaml'
-  - 'test-keeper.yml'
+  - 'regex{{test-keeper\.y[a]?ml$}}'
