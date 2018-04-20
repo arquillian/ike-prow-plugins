@@ -15,7 +15,7 @@ DOCKER_CONTAINER_NAME := $(BUILD_TAG)
 
 HOME_IN_CONTAINER=/tmp/home
 # Where is the GOPATH inside the build container?
-GOPATH_IN_CONTAINER=${HOME_IN_CONTAINER}/go
+GOPATH_IN_CONTAINER=${HOME_IN_CONTAINER}/go-workspace
 PACKAGE_PATH=$(GOPATH_IN_CONTAINER)/src/$(PACKAGE_NAME)
 
 .PHONY: docker-image-builder
