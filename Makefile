@@ -30,7 +30,6 @@ include ./.make/Makefile.deploy
 include ./.make/Makefile.deploy.prow
 include ./.make/Makefile.docker.build
 
-
 .PHONY: all
 all: clean generate install build oc-deploy-hook oc-deploy-plugins ## (default) Performs clean build  and container packaging
 

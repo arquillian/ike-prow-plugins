@@ -7,7 +7,6 @@ if [ -n "$(which sudo 2>/dev/null)" ]; then
     SUDO=sudo
 fi
 
-
 function install_packages() {
   echo -e "${CLEAR}${LIGHT_GREEN}Install prerequisites${CLEAR}"
 
