@@ -1,0 +1,64 @@
+.PHONY: clean
+clean: ## Removes binary, cache folder and docker images
+	@rm -rf ${BINARY_DIR}
+	@rm -rf $(PLUGIN_DEPLOYMENTS_DIR)
+
+.PHONY: tools
+tools: ## Installs required go tools
+	@go get -u github.com/alecthomas/gometalinter && gometalinter --install
+	@go get -u github.com/onsi/ginkgo/ginkgo
+	@go get -u github.com/onsi/gomega
+	@go get -u golang.org/x/tools/cmd/goimports
+	@go get -u github.com/jteeuwen/go-bindata/...
+
+.PHONY: install
+install: generate ## Fetches all dependencies using Glide
+	glide install -v
+
+.PHONY: up
+up: generate ## Updates all dependencies defined for glide
+	glide up -v
+
+.PHONY: up-skip-test-quick
+up-skip-test-quick:
+	glide update --skip-test --quick ## Updates only things in glide.yaml and skips tests
+
+.PHONY: compile
+compile: up compile-only ## Compiles all plugins and puts them in the bin/ folder (calls up target)
+
+.PHONY: compile-only
+compile-only: generate $(BINARIES)
+
+.PHONY: generate ## Generates any necessary assets using go-bindata library
+generate:
+	go generate ./pkg/assets/...
+
+.PHONY: test
+test:
+	ginkgo -r
+
+.PHONY: build
+build: compile test check
+
+.PHONY: format ## Removes unneeded imports and formats source code
+format:
+	@goimports -l -w pkg
+
+# Build configuration
+BUILD_TIME=$(shell date -u '+%Y-%m-%dT%H:%M:%SZ')
+COMMIT:=$(shell git rev-parse --short HEAD)
+TIMESTAMP:=$(shell date +%s)
+TAG:=$(COMMIT)-$(TIMESTAMP)
+GITUNTRACKEDCHANGES:=$(shell git status --porcelain --untracked-files=no)
+ifneq ($(GITUNTRACKEDCHANGES),)
+  COMMIT := $(COMMIT)-dirty
+endif
+LDFLAGS="-X main.Commit=${COMMIT} -X main.BuildTime=${BUILD_TIME}"
+
+$(BINARIES): binaries-%: %
+	@echo "Building $< binary"
+	@cd ./pkg/plugin/$</cmd && CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -ldflags ${LDFLAGS} -o ${BINARY_DIR}/$<
+
+.PHONY: check
+check: ## Concurrently runs a whole bunch of static analysis tools
+	gometalinter --enable=misspell --enable=gosimple --enable-gc --vendor --deadline 300s ./...
