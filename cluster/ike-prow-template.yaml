@@ -62,6 +62,18 @@ objects:
             - name: sentry-dsn
               mountPath: /etc/sentry-dsn
               readOnly: true
+            readinessProbe:
+              httpGet:
+                path: /version
+                port: 8888
+              initialDelaySeconds: 5
+              periodSeconds: 5
+            livenessProbe:
+              httpGet:
+                path: /version
+                port: 8888
+              initialDelaySeconds: 5
+              periodSeconds: 5  
           volumes:
           - name: hmac
             secret:
@@ -85,4 +97,4 @@ objects:
       ports:
       - port: 80
         targetPort: 8888
-      type: NodePort
+      type: NodePort  
