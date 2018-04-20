@@ -65,7 +65,7 @@ generate:
 	go generate ./pkg/assets/...
 
 .PHONY: test
-test:
+test: compile-only
 	ginkgo -r
 
 .PHONY: build
