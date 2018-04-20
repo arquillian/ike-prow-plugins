@@ -19,6 +19,8 @@ var _ = Describe("Test keeper config loader features", func() {
 
 	Context("Loading test-keeper configuration file from GitHub repository", func() {
 
+		logger := NewDiscardOutLogger()
+		
 		It("should load test-keeper configuration yml file", func() {
 			// given
 			gock.New("https://raw.githubusercontent.com").
@@ -35,10 +37,12 @@ var _ = Describe("Test keeper config loader features", func() {
 			}
 
 			// when
-			configuration := testkeeper.LoadConfiguration(NewDiscardOutLogger(), change)
+			configuration := testkeeper.LoadConfiguration(logger, change)
 
 			// then
 			Expect(configuration.LocationURL).To(Equal("https://github.com/owner/repo/46cb8fac44709e4ccaae97448c65e8f7320cfea7/test-keeper.yml"))
+			Expect(configuration.PluginName).To(Equal(testkeeper.ProwPluginName))
+			Expect(configuration.PluginHint).To(Equal("http://my.server.com/message.md"))
 		})
 
 		It("should load test-keeper configuration yml file", func() {
@@ -57,7 +61,7 @@ var _ = Describe("Test keeper config loader features", func() {
 			}
 
 			// when
-			configuration := testkeeper.LoadConfiguration(NewDiscardOutLogger(), change)
+			configuration := testkeeper.LoadConfiguration(logger, change)
 
 			// then
 			Expect(configuration.PluginHint).To(Equal("http://my.server.com/message.md"))
@@ -84,7 +88,7 @@ var _ = Describe("Test keeper config loader features", func() {
 			}
 
 			// when
-			configuration := testkeeper.LoadConfiguration(NewDiscardOutLogger(), change)
+			configuration := testkeeper.LoadConfiguration(logger, change)
 
 			// then
 			Expect(configuration.PluginHint).To(Equal("http://my.server.com/message.md"))
@@ -108,7 +112,7 @@ var _ = Describe("Test keeper config loader features", func() {
 			}
 
 			// when
-			configuration := testkeeper.LoadConfiguration(NewDiscardOutLogger(), change)
+			configuration := testkeeper.LoadConfiguration(logger, change)
 
 			// then
 			Expect(configuration.LocationURL).To(BeEmpty())
