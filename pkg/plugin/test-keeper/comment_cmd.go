@@ -28,7 +28,7 @@ func (c *BypassCmd) Perform(client *github.Client, log log.Logger, comment *gogh
 
 	BypassCommand.
 		When(is.Triggered).
-		By(is.AnyOf(user.Admin, user.PRReviewer), is.Not(user.PRCreator)).
+		By(is.AnyOf(user.Admin, user.PRReviewer, user.PRApprover), is.Not(user.PRCreator)).
 		Then(c.whenAddedOrCreated)
 
 	return BypassCommand.Execute(client, log, comment)

@@ -31,51 +31,73 @@ test_patterns:
 
 skip_validation_for:
   # Build tools files
-  - 'glide.yaml'
-  - 'glide.lock'
+
+  ## Go
+  - 'regex{{glide.*}}'
+  - 'regex{{Gopkg.*}}'
+  
+  ## Java
   - 'pom.xml'
   - 'mvnw'
   - 'mvnw.cmd'
   - 'mvnw.bat'
-  - 'package.json'
-  - 'build.gradle'
   - 'gradlew'
   - 'gradlew.bat'
-  - 'Makefile'
+  - 'build.gradle'
+  
+  ## JavaScript
+  - 'regex{{package.*\.json$}}'
   - 'gulpfile.js'
+  - 'Gruntfile.js'
+  
+  ## Ruby
   - 'Gemfile'
   - 'gemfile'
-  - 'requirements.in'
-  - 'requirements.txt'
-  - 'docker-compose.yml'
+  
+  ## Python
+  - 'regex{{requirements.*}}'
+  
+  ## Docker
+  - 'regex{{docker-compose.*\.y[a]?ml$}}'
   - 'Dockerfile*'
 
+  ## Others
+  - 'Makefile'
+  - 'Rakefile'
+    
   # Build tools directories
   - 'gradle/'
   - 'vendor/'
   - '.mvn/'
+  - '.make/'
   - 'node_modules/'
 
   # CI tools
-  - '.travis.yml'
   - 'Jenkinsfile'
-  - '.gitlab-ci.yml'
-  - 'wercker.yml'
-  - 'circle.yml'
+  - 'regex{{\.travis\.y[a]?ml$}}'
+  - 'regex{{\.gitlab-ci\.y[a]?ml$}}'
+  - 'regex{{wercker\.y[a]?ml$}}'
+  - 'regex{{circle\.y[a]?ml$}}'
+  - 'regex{{codeship-services\.y[a]?ml$}}'
 
   # UI assets
   - '*.jpg'
   - '*.jpeg'
+  - '*.bmp'
+  - '*.tif'
+  - '*.tiff'
   - '*.png'
   - '*.ico'
   - '*.svg'
   - '*.gif'
+  - '*.eps'
   - '*.css'
   - '*.scss'
   - '*.sass'
   - '*.less'
   - 'regex{{.*\.[xsd]?html$}}'
   - '*.ejs'
+  - '*.raw'
 
   # Text assets
   - '*.md'
@@ -92,15 +114,22 @@ skip_validation_for:
   - '.editorconfig'
   - 'regex{{\..+rc}}'
   - 'regex{{tsconfig.*\.json$}}'
-  - 'karma.conf.js'
-  - '.codecov.yml'
-  - 'pylint.rc'
+  - 'tslint.json' 
+  - 'typedoc.json'
+  - 'regex{{.codecov\.y[a]?ml$}}'
+  - 'webpack.config.js'
+  - 'regex{{\.sass-lint\.y[a]?ml$}}'
   - '*.gpg'
-
+  - 'regex{{\.go.+_exclude}}'
+  - 'pylint.rc'
+  - 'pcp.repo'
+  - '.github/'
+  - '.gometalinter.json'
+  - 'checkstyle.xml'
+  
   # Shell
   - '*.sh'
   - '*.bat'
 
   # Our own configurations
-  - 'test-keeper.yaml'
-  - 'test-keeper.yml'
+  - 'regex{{test-keeper\.y[a]?ml$}}'

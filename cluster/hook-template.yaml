@@ -3,30 +3,35 @@ apiVersion: v1
 parameters:
 - name: REGISTRY
   required: true
-  value: gcr.io
+  value: docker.io
 - name: DOCKER_REPO
   required: true
-  value: k8s-prow
+  value: arquillian
 - name: VERSION
-  value: v20180403-2f3ad698f
   required: true
 - name: HOOK_HOSTNAME
   value: ""
 objects:
-  - kind: Deployment
-    apiVersion: extensions/v1beta1
+  - kind: DeploymentConfig
+    apiVersion: v1
     metadata:
       name: hook
       labels:
         app: hook
         type: prow-core
+        version: ${VERSION}
     spec:
       replicas: 1
+      triggers:
+        - type: ConfigChange
       strategy:
-        type: RollingUpdate
-        rollingUpdate:
-          maxSurge: 1
-          maxUnavailable: 1
+        type: Rolling
+        rollingParams:
+          intervalSeconds: 1
+          updatePeriodSeconds: 1
+          maxSurge: 25%
+          maxUnavailable: 25%
+          timeoutSeconds: 600
       template:
         metadata:
           labels:
@@ -45,6 +50,9 @@ objects:
               limits:
                 memory: "256Mi"
                 cpu: "200m"
+            env:
+              - name: VERSION
+                value: ${VERSION}
             args:
             - --dry-run=false
             ports:

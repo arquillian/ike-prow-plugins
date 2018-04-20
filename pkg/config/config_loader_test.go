@@ -2,7 +2,7 @@ package config_test
 
 import (
 	"github.com/arquillian/ike-prow-plugins/pkg/config"
-	"github.com/arquillian/ike-prow-plugins/pkg/internal/test"
+	. "github.com/arquillian/ike-prow-plugins/pkg/internal/test"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	"github.com/pkg/errors"
@@ -44,7 +44,7 @@ var _ = Describe("Config loader features", func() {
 			// when
 			err := config.Load(&sampleConfig, testConfigProvider(func() []config.Source {
 				return []config.Source{func() ([]byte, error) {
-					return test.LoadFromFile("test_fixtures/sample_configuration.yaml"), nil
+					return LoadFromFile("test_fixtures/sample_configuration.yaml"), nil
 				}}
 			}))
 
