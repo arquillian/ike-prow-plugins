@@ -9,7 +9,7 @@ CLUSTER_DIR?=${PWD}/cluster
 PLUGIN_DEPLOYMENTS_DIR?=$(CLUSTER_DIR)/generated
 
 REGISTRY?=docker.io
-DOCKER_REPO?=arquillian
+DOCKER_REPO?=ike-prow-plugins
 BUILD_IMAGES:=$(patsubst %,build-%, $(PLUGINS))
 PUSH_IMAGES:=$(patsubst %,push-%, $(PLUGINS))
 CLEAN_IMAGES:=$(patsubst %,clean-%, $(PLUGINS))
