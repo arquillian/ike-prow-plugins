@@ -12,7 +12,7 @@ RUN yum install -y \
     git \
     wget \
     make \
-    which
+    which && yum clean all
 
 ENV LANG=en_US.utf8
 

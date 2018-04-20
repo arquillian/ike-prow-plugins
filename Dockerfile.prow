@@ -2,8 +2,8 @@ FROM centos:7
 LABEL maintainer="Devtools <devtools@redhat.com>"
 LABEL maintainer="Devtools-test <devtools-test@redhat.com>"
 
-RUN yum install -y git
-RUN yum install -y ca-certificates
+RUN yum install -y git ca-certificates \
+    && yum clean all
 
 ENV LANG=en_US.utf8
 ARG BINARY=0
