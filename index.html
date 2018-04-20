@@ -913,7 +913,26 @@ organization. Be aware however, that adding an external plugin both to the repos
 </table>
 </div>
 <div class="sect3">
-<h4 id="gh-settings"><a class="anchor" href="#gh-settings"></a>3.1.1. GitHub settings</h4>
+<h4 id="_creating_custom_plugin_hint_messages"><a class="anchor" href="#_creating_custom_plugin_hint_messages"></a>3.1.1. Creating custom plugin hint messages</h4>
+<div class="paragraph">
+<p>Customized comment message can be configured as <code>plugin hint</code> to express suggestions regarding the plugin&#8217;s intented behavior.<br>
+Eg. Configuring <code>plugin hint</code> for the <code>test-keeper</code> plugin adds comment message to the Pull Request when no test is found.</p>
+</div>
+<div class="paragraph">
+<p>To enable customized plugin hint comment messages edit plugin&#8217;s configuration file (eg. test-keeper.yaml) adding the <code>plugin_hint</code> property.</p>
+</div>
+<div class="listingblock">
+<div class="title">test-keeper.yaml</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="yml"><span class="key">plugin_hint</span>: <span class="string"><span class="content">plugins/test-keeper_hint.md</span></span></code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>The <code>plugin_hint</code> property can either have an inline string directly written inside of the config file or another file with case insensitive filename PLUGINNAME_HINT.md that contains the hint. The location of the file can be set by either a relative path or an absolute URL. If nothing is set then a default message is used.</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="gh-settings"><a class="anchor" href="#gh-settings"></a>3.1.2. GitHub settings</h4>
 <div class="paragraph">
 <p>You will need two secrets to be able to integrate with GitHub. The <code>config/hmac.token</code> file should contain the token that
 you give to GitHub for validating webhooks. You can generate it using any reasonable randomness-generator, for example
@@ -939,7 +958,7 @@ targets rely on them.
 </div>
 </div>
 <div class="sect3">
-<h4 id="webhook"><a class="anchor" href="#webhook"></a>3.1.2. Setting up the web hook</h4>
+<h4 id="webhook"><a class="anchor" href="#webhook"></a>3.1.3. Setting up the web hook</h4>
 <div class="paragraph">
 <p>In order to setup webhook for your repository go to <code><a href="https://github.com/{org}/{repo}/settings/hooks/new" class="bare">https://github.com/{org}/{repo}/settings/hooks/new</a></code> and provide:</p>
 </div>
@@ -1056,13 +1075,14 @@ If we missed some important patterns feel free to open an <a href="https://githu
 <p>To configure Test Keeper plugin place <code>test-keeper.yml</code> (or <code>test-keeper.yaml</code>) file in the root of your project and use properties described below.</p>
 </div>
 <div class="listingblock">
+<div class="title">test-keeper.yaml</div>
 <div class="content">
 <pre class="CodeRay highlight"><code data-lang="yml"><span class="key">test_patterns</span>:
   - <span class="string"><span class="content">'**/__test.go'                         </span></span><i class="conum" data-value="1"></i><b>(1)</b>
 <span class="key">skip_validation_for</span>:
   - <span class="string"><span class="content">'regex{{.*\.[xsd]?html$}}'             </span></span><i class="conum" data-value="2"></i><b>(2)</b>
 <span class="key">combine_defaults</span>: <span class="string"><span class="content">false                    </span></span><i class="conum" data-value="3"></i><b>(3)</b>
-<span class="key">plugin_hint</span>: <span class="string"><span class="content">plugins/keeper-file-hint.md  </span></span> <i class="conum" data-value="4"></i><b>(4)</b></code></pre>
+<span class="key">plugin_hint</span>: <span class="string"><span class="content">plugins/test-keeper_hint.md  </span></span> <i class="conum" data-value="4"></i><b>(4)</b></code></pre>
 </div>
 </div>
 <div class="colist arabic">
@@ -1081,7 +1101,7 @@ If we missed some important patterns feel free to open an <a href="https://githu
 </tr>
 <tr>
 <td><i class="conum" data-value="4"></i><b>4</b></td>
-<td>Sets either relative path or absolute URL to a file that contains a plugin hint to be added to the Pull Request when no test is found (if nothing is set then a <a href="https://github.com/arquillian/ike-prow-plugins/tree/master/pkg/plugin/test-keeper/comment_message.go">default message</a> is used).</td>
+<td>Sets plugin hint comment message to be added to the Pull Request when no test is found. It can be set either as a relative path or absolute URL to a file that contains a plugin hint and having case insensitive filename <code>PLUGINNAME_HINT.md</code>  or as an inline string comment. (if nothing is set then a <a href="https://github.com/arquillian/ike-prow-plugins/tree/master/pkg/plugin/test-keeper/comment_message.go">default message</a> is used).</td>
 </tr>
 </table>
 </div>
@@ -1258,7 +1278,7 @@ If you need to reconfigure the plugin then read the section <a href="#test-keepe
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2018-04-20 07:35:08 UTC
+Last updated 2018-04-20 08:46:36 UTC
 </div>
 </div>
 <script>
