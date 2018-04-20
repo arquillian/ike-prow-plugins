@@ -43,6 +43,7 @@ func (l *LoadableConfig) loadFromRawFile(pathTemplate string) config.Source {
 		}
 
 		l.BaseConfig.LocationURL = githubBaseURL + rawFileService.GetRelativePath(filePath)
+		l.BaseConfig.PluginName = l.PluginName
 		return downloadedConfig, nil
 	}
 }
