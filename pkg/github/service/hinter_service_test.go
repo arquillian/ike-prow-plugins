@@ -4,6 +4,7 @@ import (
 	"github.com/arquillian/ike-prow-plugins/pkg/github/client"
 	"github.com/arquillian/ike-prow-plugins/pkg/github/service"
 	. "github.com/arquillian/ike-prow-plugins/pkg/internal/test"
+	"github.com/arquillian/ike-prow-plugins/pkg/log"
 	"github.com/arquillian/ike-prow-plugins/pkg/scm"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -40,7 +41,7 @@ var _ = Describe("Config loader features", func() {
 				PluginName: "my-plugin-name",
 				Assignee:   "toAssign",
 			}
-			hinter := ghservice.NewHinter(client, NewDiscardOutLogger(), change, 2, hintContext)
+			hinter := ghservice.NewHinter(client, log.NewTestLogger(), change, 2, hintContext)
 
 			toHaveBodyWithWholePluginsComment := SoftlySatisfyAll(
 				HaveBodyThatContains("### Ike Plugins (my-plugin-name)"),
@@ -77,7 +78,7 @@ var _ = Describe("Config loader features", func() {
 				Assignee:   "toAssign",
 			}
 
-			hinter := ghservice.NewHinter(client, NewDiscardOutLogger(), change, 2, hintContext)
+			hinter := ghservice.NewHinter(client, log.NewTestLogger(), change, 2, hintContext)
 
 			// when
 			err := hinter.PluginComment("New comment")
@@ -115,7 +116,7 @@ var _ = Describe("Config loader features", func() {
 				SetMatcher(ExpectPayload(toHaveModifiedBody)).
 				Reply(200)
 
-			hinter := ghservice.NewHinter(client, NewDiscardOutLogger(), change, 2, hintContext)
+			hinter := ghservice.NewHinter(client, log.NewTestLogger(), change, 2, hintContext)
 
 			// when
 			err := hinter.PluginComment("New comment")

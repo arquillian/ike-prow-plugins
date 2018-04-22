@@ -32,13 +32,7 @@ func FromFile(filePath string) io.Reader {
 	return file
 }
 
-// NewDiscardOutLogger creates a logger instance not logging any output to Out Writer
-// unless "LOG_TESTS" environment variable is set to "true"
-func NewDiscardOutLogger() log.Logger {
-	return log.NewTestLogger()
-}
-
 // NewDefaultGitHubClient creates a GH client with default go-github client (without any authentication token)
 func NewDefaultGitHubClient() ghclient.Client {
-	return ghclient.NewClient(gogh.NewClient(nil))
+	return ghclient.NewClient(gogh.NewClient(nil), log.NewTestLogger())
 }

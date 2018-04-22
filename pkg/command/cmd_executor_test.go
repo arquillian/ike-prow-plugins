@@ -4,6 +4,7 @@ import (
 	is "github.com/arquillian/ike-prow-plugins/pkg/command"
 	"github.com/arquillian/ike-prow-plugins/pkg/github/service"
 	. "github.com/arquillian/ike-prow-plugins/pkg/internal/test"
+	"github.com/arquillian/ike-prow-plugins/pkg/log"
 	"github.com/arquillian/ike-prow-plugins/pkg/utils"
 	gogh "github.com/google/go-github/github"
 	. "github.com/onsi/ginkgo"
@@ -16,7 +17,7 @@ var _ = Describe("Command executor features", func() {
 	var (
 		deletedCommand, triggeredCommand *gogh.IssueCommentEvent
 		client                           = NewDefaultGitHubClient()
-		log                              = NewDiscardOutLogger()
+		log                              = log.NewTestLogger()
 	)
 
 	BeforeEach(func() {

@@ -7,6 +7,7 @@ import (
 	"github.com/arquillian/ike-prow-plugins/pkg/github"
 	"github.com/arquillian/ike-prow-plugins/pkg/github/service"
 	. "github.com/arquillian/ike-prow-plugins/pkg/internal/test"
+	"github.com/arquillian/ike-prow-plugins/pkg/log"
 	"github.com/arquillian/ike-prow-plugins/pkg/plugin/test-keeper"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -26,7 +27,7 @@ var _ = Describe("Test Keeper Plugin features", func() {
 
 		var handler *testkeeper.GitHubTestEventsHandler
 
-		log := NewDiscardOutLogger()
+		log := log.NewTestLogger()
 
 		toBe := func(status, description, context, detailsLink string) SoftMatcher {
 			return SoftlySatisfyAll(

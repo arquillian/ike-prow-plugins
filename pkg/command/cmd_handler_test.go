@@ -34,7 +34,7 @@ func (c *configurableCommentCommand) Matches(comment *gogh.IssueCommentEvent) bo
 var _ = Describe("Command handler features", func() {
 
 	client := NewDefaultGitHubClient()
-	log := NewDiscardOutLogger()
+	log := log.NewTestLogger()
 
 	commentEvent := &gogh.IssueCommentEvent{
 		Comment: &gogh.IssueComment{
