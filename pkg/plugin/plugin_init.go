@@ -85,7 +85,7 @@ func InitPlugin(pluginName string, newEventHandler EventHandlerCreator, newServe
 		ghclient.NewRetryClient(
 			ghclient.NewOauthClient(oauthSecret, logger),
 			4,
-			time.Second),
+			30 * time.Second),
 		logger,
 		100)
 
