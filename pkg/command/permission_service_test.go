@@ -146,7 +146,7 @@ var _ = Describe("Permission service with permission checks features", func() {
 				Get("/repos/owner/repo/pulls/1/reviews").
 				Reply(200).
 				BodyString(`[{"user": {"login": "user"}, "state": "CHANGES_REQUESTED"},` +
-				`{"user": {"login": "user"}, "state": "COMMENTED"}]`)
+					`{"user": {"login": "user"}, "state": "COMMENTED"}]`)
 
 			// when
 			status, err := user.PRApprover()
