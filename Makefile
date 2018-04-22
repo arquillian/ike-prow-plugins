@@ -35,3 +35,4 @@ all: clean generate install build oc-deploy-hook oc-deploy-plugins ## (default) 
 
 help: ## Hey! That's me!
 	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-10s\033[0m %s\n", $$1, $$2}'
+  
