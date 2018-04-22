@@ -65,8 +65,7 @@ var _ = Describe("Test keeper comment message creation", func() {
 			config := testkeeper.PluginConfiguration{
 				PluginConfiguration: config.PluginConfiguration{
 					LocationURL: url,
-					PluginName:  testkeeper.ProwPluginName,
-					PluginHint:  "path/to/test-keeper_hint.md",
+					PluginName:  testkeeper.ProwPluginName,PluginHint:  "path/to/test-keeper_hint.md",
 				},
 			}
 
@@ -92,8 +91,7 @@ var _ = Describe("Test keeper comment message creation", func() {
 			config := testkeeper.PluginConfiguration{
 				PluginConfiguration: config.PluginConfiguration{
 					LocationURL: url,
-					PluginName:  testkeeper.ProwPluginName,
-					PluginHint:  "path/to/test-keeper_hint.md",
+					PluginName:  testkeeper.ProwPluginName,PluginHint:  "path/to/test-keeper_hint.md",
 				},
 			}
 
@@ -118,8 +116,7 @@ var _ = Describe("Test keeper comment message creation", func() {
 		It("should create message taken from a file set in config using url", func() {
 			// given
 			gock.New("http://my.server.com").
-				Get("path/to/test-keeper_hint.md").
-				Reply(200).
+				Get("path/to/test-keeper_hint.md").Reply(200).
 				BodyString("Custom message")
 
 			url := "http://github.com/my/repo/test-keeper.yaml"
@@ -150,8 +147,7 @@ var _ = Describe("Test keeper comment message creation", func() {
 			config := testkeeper.PluginConfiguration{
 				PluginConfiguration: config.PluginConfiguration{
 					LocationURL: url,
-					PluginName:  testkeeper.ProwPluginName,
-					PluginHint:  "http://my.server.com/path/to/TEST-KEEPER_HINT.MD",
+					PluginName:  testkeeper.ProwPluginName,PluginHint:  "http://my.server.com/path/to/TEST-KEEPER_HINT.MD",
 				},
 			}
 
@@ -173,8 +169,7 @@ var _ = Describe("Test keeper comment message creation", func() {
 			config := testkeeper.PluginConfiguration{
 				PluginConfiguration: config.PluginConfiguration{
 					LocationURL: url,
-					PluginName:  testkeeper.ProwPluginName,
-					PluginHint:  "http://my.server.com/path/to/test-keeper_hint.md",
+					PluginName:  testkeeper.ProwPluginName,PluginHint:  "http://my.server.com/path/to/test-keeper_hint.md",
 				},
 			}
 
@@ -201,8 +196,7 @@ var _ = Describe("Test keeper comment message creation", func() {
 			config := testkeeper.PluginConfiguration{
 				PluginConfiguration: config.PluginConfiguration{
 					LocationURL: url,
-					PluginName:  testkeeper.ProwPluginName,
-					PluginHint:  "http/server.com/test-keeper_hint.md",
+					PluginName:  testkeeper.ProwPluginName,PluginHint:  "http/server.com/test-keeper_hint.md",
 				},
 			}
 
