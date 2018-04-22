@@ -26,7 +26,7 @@ DOCKER?=$(if $(or $(in_docker_group),$(is_root)),docker,sudo docker)
 CUR_DIR = $(shell pwd)
 
 include ./.make/Makefile.build
-include ./.make/Makefile.deploy
+include ./.make/Makefile.openshift
 include ./.make/Makefile.deploy.prow
 include ./.make/Makefile.docker.build
 

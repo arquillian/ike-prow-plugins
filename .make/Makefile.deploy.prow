@@ -42,18 +42,6 @@ $(OC_DEPLOYMENTS): oc-%: %
 
 	@oc apply -f $(PLUGIN_DEPLOYMENTS_DIR)/$<.yaml
 
-.PHONY: oc-restart-all ## Restarts all deploymentconfigs by patching it
-oc-restart-all: oc-restart-hook oc-restart-plugins
-
-.PHONY: oc-restart-hook ## Restarts hook deploymentconfig by patching it
-oc-restart-hook:
-	$(call restart_dc,hook)
-
-.PHONY: oc-restart-plugins ## Restarts plugin deploymentconfigs by patching it
-oc-restart-plugins: $(OC_RESTART)
-$(OC_RESTART): dc-%: %
-	$(call restart_dc,$<)
-
 .PHONY: build-plugin-images $(PLUGINS)
 build-plugin-images: compile $(BUILD_IMAGES)
 $(BUILD_IMAGES): build-%: %

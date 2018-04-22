@@ -25,3 +25,15 @@ oc-init-project: ## Initializes new project with config maps and secrets
 	$(call populate_secret,oauth.token,oauth-token,oauth)
 	$(call populate_secret,hmac.token,hmac-token,hmac)
 	$(call populate_secret,sentry.dsn,sentry-dsn,sentry)
+
+.PHONY: oc-restart-all ## Restarts all deploymentconfigs by patching it
+oc-restart-all: oc-restart-hook oc-restart-plugins
+
+.PHONY: oc-restart-hook ## Restarts hook deploymentconfig by patching it
+oc-restart-hook:
+	$(call restart_dc,hook)
+
+.PHONY: oc-restart-plugins ## Restarts plugin deploymentconfigs by patching it
+oc-restart-plugins: $(OC_RESTART)
+$(OC_RESTART): dc-%: %
+	$(call restart_dc,$<)

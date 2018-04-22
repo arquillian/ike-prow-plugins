@@ -10,4 +10,4 @@ ENV LANG=en_US.utf8
 ARG BINARY=0
 
 COPY ./bin/${BINARY} /binary
-ENTRYPOINT ["/binary"] 
+ENTRYPOINT ["/binary"]
