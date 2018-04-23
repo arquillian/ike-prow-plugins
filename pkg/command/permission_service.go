@@ -33,6 +33,16 @@ type PermissionStatus struct {
 	RejectedRoles  []string
 }
 
+// NewPermissionStatus creates a new instance of PermissionStatus with the given values
+func NewPermissionStatus(user string, userIsApproved bool, approvedRoles []string, rejectedRoles []string) *PermissionStatus {
+	return &PermissionStatus{
+		User:           user,
+		UserIsApproved: userIsApproved,
+		ApprovedRoles:  approvedRoles,
+		RejectedRoles:  rejectedRoles,
+	}
+}
+
 func (s *PermissionService) newPermissionStatus(allowedRoles ...string) *PermissionStatus {
 	return &PermissionStatus{User: s.User, ApprovedRoles: allowedRoles}
 }
@@ -84,6 +94,8 @@ var (
 	Unknown = "unknown"
 	// Anyone represents any user/role
 	Anyone = "anyone"
+	// PullRequestApprover is a name of a person who gave an approval to the PR
+	PullRequestApprover = "pull request approver"
 
 	// Anybody allows to any user
 	Anybody = func() (*PermissionStatus, error) {
@@ -139,6 +151,21 @@ func (s *PermissionService) PRCreator() (*PermissionStatus, error) {
 	}
 	if s.User == *pr.User.Login {
 		return status.allow(), nil
+	}
+	return status.reject(), nil
+}
+
+// PRApprover checks if the user approved the pull request
+func (s *PermissionService) PRApprover() (*PermissionStatus, error) {
+	status := s.newPermissionStatus(PullRequestApprover)
+	prReviews, err := s.Client.GetPullRequestReviews(s.PRLoader.RepoOwner, s.PRLoader.RepoName, s.PRLoader.Number)
+	if err != nil {
+		return status.reject(), err
+	}
+	for _, review := range prReviews {
+		if *review.State == "APPROVED" && *review.User.Login == s.User {
+			return status.allow(), nil
+		}
 	}
 	return status.reject(), nil
 }

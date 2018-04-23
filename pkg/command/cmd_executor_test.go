@@ -189,9 +189,9 @@ var _ = Describe("Command executor features", func() {
 				gock.New("https://api.github.com").
 					Post("/repos/owner/repo/issues/1/comments").
 					SetMatcher(
-						ExpectPayload(
-								ToHaveBodyContaining("Hey @sender! It seems you tried to trigger `/command` command"),
-								ToHaveBodyContaining("You have to be admin"))).
+						ExpectPayload(To(
+								HaveBodyThatContains("Hey @sender! It seems you tried to trigger `/command` command"),
+								HaveBodyThatContains("You have to be admin")))).
 					Reply(201) // This way we implicitly verify that call happened after `HandleEvent` call
 
 				// when

@@ -3,6 +3,7 @@ package testkeeper
 import (
 	"fmt"
 	"net/url"
+	"regexp"
 
 	"github.com/arquillian/ike-prow-plugins/pkg/github"
 	"github.com/arquillian/ike-prow-plugins/pkg/http"
@@ -16,7 +17,7 @@ const (
 		paragraph +
 		"Automated tests give us confidence in shipping reliable software. Please add some as part of this change." +
 		paragraph +
-		"If you are an admin and you are sure that no test is needed then you can use the command `" + BypassCheckComment + "` " +
+		"If you are an admin or the reviewer of this PR and you are sure that no test is needed then you can use the command `" + BypassCheckComment + "` " +
 		"as a comment to make the status green.\n"
 
 	noConfig = "For more information please head over to official " +
@@ -36,13 +37,23 @@ const (
 func CreateCommentMessage(configuration PluginConfiguration, change scm.RepositoryChange) string {
 	var msg string
 	if configuration.LocationURL == "" {
-		msg = beginning + paragraph + noConfig
+		msg = sadIke + paragraph + beginning + paragraph + noConfig
 	} else if configuration.PluginHint != "" {
-		msg = getMsgFromFile(configuration, change)
+		msg = getMsgFromConfigHint(configuration, change)
 	} else {
-		msg = getMsgWithConfigRef(configuration.LocationURL)
+		msg = sadIke + paragraph + getMsgWithConfigRef(configuration.LocationURL)
 	}
-	return sadIke + paragraph + msg
+	return msg
+}
+
+func getMsgFromConfigHint(configuration PluginConfiguration, change scm.RepositoryChange) string {
+	fileRegex := "(?mi)" + configuration.PluginName + "_hint.md$"
+
+	isFilePath, _ := regexp.MatchString(fileRegex, configuration.PluginHint)
+	if isFilePath {
+		return getMsgFromFile(configuration, change)
+	}
+	return configuration.PluginHint
 }
 
 func getMsgFromFile(configuration PluginConfiguration, change scm.RepositoryChange) string {

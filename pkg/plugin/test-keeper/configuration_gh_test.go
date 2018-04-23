@@ -1,7 +1,7 @@
 package testkeeper_test
 
 import (
-	"github.com/arquillian/ike-prow-plugins/pkg/internal/test"
+	. "github.com/arquillian/ike-prow-plugins/pkg/internal/test"
 	"github.com/arquillian/ike-prow-plugins/pkg/plugin/test-keeper"
 	"github.com/arquillian/ike-prow-plugins/pkg/scm"
 	. "github.com/onsi/ginkgo"
@@ -12,11 +12,15 @@ import (
 var _ = Describe("Test keeper config loader features", func() {
 
 	BeforeEach(func() {
-		gock.Off()
+		defer gock.OffAll()
 	})
+
+	AfterEach(EnsureGockRequestsHaveBeenMatched)
 
 	Context("Loading test-keeper configuration file from GitHub repository", func() {
 
+		logger := NewDiscardOutLogger()
+		
 		It("should load test-keeper configuration yml file", func() {
 			// given
 			gock.New("https://raw.githubusercontent.com").
@@ -33,10 +37,12 @@ var _ = Describe("Test keeper config loader features", func() {
 			}
 
 			// when
-			configuration := testkeeper.LoadConfiguration(test.NewDiscardOutLogger(), change)
+			configuration := testkeeper.LoadConfiguration(logger, change)
 
 			// then
 			Expect(configuration.LocationURL).To(Equal("https://github.com/owner/repo/46cb8fac44709e4ccaae97448c65e8f7320cfea7/test-keeper.yml"))
+			Expect(configuration.PluginName).To(Equal(testkeeper.ProwPluginName))
+			Expect(configuration.PluginHint).To(Equal("http://my.server.com/message.md"))
 		})
 
 		It("should load test-keeper configuration yml file", func() {
@@ -55,7 +61,7 @@ var _ = Describe("Test keeper config loader features", func() {
 			}
 
 			// when
-			configuration := testkeeper.LoadConfiguration(test.NewDiscardOutLogger(), change)
+			configuration := testkeeper.LoadConfiguration(logger, change)
 
 			// then
 			Expect(configuration.PluginHint).To(Equal("http://my.server.com/message.md"))
@@ -66,6 +72,8 @@ var _ = Describe("Test keeper config loader features", func() {
 
 		It("should load test-keeper configuration yaml file", func() {
 			// given
+			NonExistingRawGitHubFiles("test-keeper.yml")
+
 			gock.New("https://raw.githubusercontent.com").
 				Get("owner/repo/46cb8fac44709e4ccaae97448c65e8f7320cfea7/" + testkeeper.ProwPluginName + ".yaml").
 				Reply(200).
@@ -80,7 +88,7 @@ var _ = Describe("Test keeper config loader features", func() {
 			}
 
 			// when
-			configuration := testkeeper.LoadConfiguration(test.NewDiscardOutLogger(), change)
+			configuration := testkeeper.LoadConfiguration(logger, change)
 
 			// then
 			Expect(configuration.PluginHint).To(Equal("http://my.server.com/message.md"))
@@ -91,6 +99,8 @@ var _ = Describe("Test keeper config loader features", func() {
 
 		It("should not load test-keeper configuration yaml file and return empty url when config is not accessible", func() {
 			// given
+			NonExistingRawGitHubFiles("test-keeper.yml")
+
 			gock.New("https://raw.githubusercontent.com").
 				Get("owner/repo/46cb8fac44709e4ccaae97448c65e8f7320cfea7/" + testkeeper.ProwPluginName + ".yaml").
 				Reply(404)
@@ -102,7 +112,7 @@ var _ = Describe("Test keeper config loader features", func() {
 			}
 
 			// when
-			configuration := testkeeper.LoadConfiguration(test.NewDiscardOutLogger(), change)
+			configuration := testkeeper.LoadConfiguration(logger, change)
 
 			// then
 			Expect(configuration.LocationURL).To(BeEmpty())
