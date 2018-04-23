@@ -20,7 +20,7 @@ var _ = Describe("Test keeper config loader features", func() {
 
 	Context("Loading test-keeper configuration file from GitHub repository", func() {
 
-		logger := NewDiscardOutLogger()
+		logger := log.NewTestLogger()
 
 		It("should load test-keeper configuration yml file", func() {
 			// given
