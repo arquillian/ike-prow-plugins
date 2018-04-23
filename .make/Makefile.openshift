@@ -1,0 +1,39 @@
+define populate_secret ## params: secret filename, secret name, secret key
+	@touch config/$(1)
+	@oc create secret generic $(2) --from-file=$(3)=config/$(1) || true
+	@oc create secret generic $(2) --from-file=$(3)=config/$(1) --dry-run -o yaml | oc replace secret generic $(2) -f -
+endef
+
+define populate_configmap ## params: configmap name, configmap file
+	@oc create configmap $(1) || true
+	@oc create configmap $(1) --from-file=$(1)=$(2) --dry-run -o yaml | oc replace configmap $(1) -f -
+endef
+
+define restart_dc ## params: deploymentconfig name
+	@oc patch deploymentconfig $(1) --type json -p='[{"op": "replace", "path": "/spec/template/metadata/labels/timestamp", "value":'"'$(TIMESTAMP)'"'}]' || true
+endef
+
+OC_PROJECT_NAME?=ike-prow-plugins
+PLUGINS_CONFIG?=plugins.yaml
+.PHONY: oc-init-project
+oc-init-project: ## Initializes new project with config maps and secrets
+	@echo "Setting up project '$(OC_PROJECT_NAME)' in the cluster (ignoring potential errors if entries already exist)"
+	@oc new-project $(OC_PROJECT_NAME) || true
+
+	$(call populate_configmap,plugins,$(PLUGINS_CONFIG))
+	$(call populate_configmap,config,config.yaml)
+	$(call populate_secret,oauth.token,oauth-token,oauth)
+	$(call populate_secret,hmac.token,hmac-token,hmac)
+	$(call populate_secret,sentry.dsn,sentry-dsn,sentry)
+
+.PHONY: oc-restart-all ## Restarts all deploymentconfigs by patching it
+oc-restart-all: oc-restart-hook oc-restart-plugins
+
+.PHONY: oc-restart-hook ## Restarts hook deploymentconfig by patching it
+oc-restart-hook:
+	$(call restart_dc,hook)
+
+.PHONY: oc-restart-plugins ## Restarts plugin deploymentconfigs by patching it
+oc-restart-plugins: $(OC_RESTART)
+$(OC_RESTART): dc-%: %
+	$(call restart_dc,$<)
