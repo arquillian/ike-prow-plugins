@@ -1,11 +1,11 @@
-package github
+package ghservice
 
 import (
 	"fmt"
 
 	"github.com/arquillian/ike-prow-plugins/pkg/config"
-	"github.com/arquillian/ike-prow-plugins/pkg/http"
 	"github.com/arquillian/ike-prow-plugins/pkg/scm"
+	"github.com/arquillian/ike-prow-plugins/pkg/utils"
 )
 
 const githubBaseURL = "https://github.com/"
@@ -36,7 +36,7 @@ func (l *LoadableConfig) loadFromRawFile(pathTemplate string) config.Source {
 
 	return func() ([]byte, error) {
 		configURL := rawFileService.GetRawFileURL(filePath)
-		downloadedConfig, err := http.GetFileFromURL(configURL)
+		downloadedConfig, err := utils.GetFileFromURL(configURL)
 
 		if err != nil {
 			return nil, err

@@ -1,4 +1,4 @@
-package github_test
+package retry_test
 
 import (
 	"testing"
@@ -8,7 +8,7 @@ import (
 	. "github.com/onsi/gomega"
 )
 
-func TestGithub(t *testing.T) {
+func TestRetry(t *testing.T) {
 	RegisterFailHandler(Fail)
-	RunSpecWithJUnitReporter(t, "GitHub Services Suite")
+	RunSpecWithJUnitReporter(t, "Retry Suite")
 }

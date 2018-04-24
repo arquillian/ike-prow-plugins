@@ -1,8 +1,10 @@
-package github
+package ghservice
 
 import (
 	"fmt"
 
+	github_type "github.com/arquillian/ike-prow-plugins/pkg/github"
+	"github.com/arquillian/ike-prow-plugins/pkg/github/client"
 	"github.com/arquillian/ike-prow-plugins/pkg/log"
 	"github.com/arquillian/ike-prow-plugins/pkg/scm"
 	"github.com/arquillian/ike-prow-plugins/pkg/utils"
@@ -11,14 +13,14 @@ import (
 
 // StatusService is a struct
 type StatusService struct {
-	client        *Client
+	client        ghclient.Client
 	log           log.Logger
-	statusContext StatusContext
+	statusContext github_type.StatusContext
 	change        scm.RepositoryChange
 }
 
 // NewStatusService creates an instance of GitHub StatusService
-func NewStatusService(client *Client, log log.Logger, change scm.RepositoryChange, context StatusContext) scm.StatusService {
+func NewStatusService(client ghclient.Client, log log.Logger, change scm.RepositoryChange, context github_type.StatusContext) scm.StatusService {
 	return &StatusService{
 		client:        client,
 		log:           log,
@@ -29,22 +31,22 @@ func NewStatusService(client *Client, log log.Logger, change scm.RepositoryChang
 
 // Success marks given change as a success.
 func (s *StatusService) Success(reason, detailsLink string) error {
-	return s.setStatus(StatusSuccess, reason, detailsLink)
+	return s.setStatus(github_type.StatusSuccess, reason, detailsLink)
 }
 
 // Failure marks given change as a failure.
 func (s *StatusService) Failure(reason, detailsLink string) error {
-	return s.setStatus(StatusFailure, reason, detailsLink)
+	return s.setStatus(github_type.StatusFailure, reason, detailsLink)
 }
 
 // Pending marks given change as a pending.
 func (s *StatusService) Pending(reason string) error {
-	return s.setStatus(StatusPending, reason, "")
+	return s.setStatus(github_type.StatusPending, reason, "")
 }
 
 // Error marks given change as a error.
 func (s *StatusService) Error(reason string) error {
-	return s.setStatus(StatusError, reason, "")
+	return s.setStatus(github_type.StatusError, reason, "")
 }
 
 // setStatus sets the given status with the given reason to the related commit

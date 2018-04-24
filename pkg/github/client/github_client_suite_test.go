@@ -1,4 +1,4 @@
-package http_test
+package ghclient_test
 
 import (
 	"testing"
@@ -8,7 +8,7 @@ import (
 	. "github.com/onsi/gomega"
 )
 
-func TestHttp(t *testing.T) {
+func TestGithub(t *testing.T) {
 	RegisterFailHandler(Fail)
-	RunSpecWithJUnitReporter(t, "Http Suite")
+	RunSpecWithJUnitReporter(t, "GitHub Client Suite")
 }

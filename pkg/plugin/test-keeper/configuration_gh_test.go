@@ -2,6 +2,7 @@ package testkeeper_test
 
 import (
 	. "github.com/arquillian/ike-prow-plugins/pkg/internal/test"
+	"github.com/arquillian/ike-prow-plugins/pkg/log"
 	"github.com/arquillian/ike-prow-plugins/pkg/plugin/test-keeper"
 	"github.com/arquillian/ike-prow-plugins/pkg/scm"
 	. "github.com/onsi/ginkgo"
@@ -19,7 +20,7 @@ var _ = Describe("Test keeper config loader features", func() {
 
 	Context("Loading test-keeper configuration file from GitHub repository", func() {
 
-		logger := NewDiscardOutLogger()
+		logger := log.NewTestLogger()
 
 		It("should load test-keeper configuration yml file", func() {
 			// given

@@ -4,6 +4,7 @@ import (
 	"k8s.io/test-infra/prow/pluginhelp"
 
 	"github.com/arquillian/ike-prow-plugins/pkg/github"
+	"github.com/arquillian/ike-prow-plugins/pkg/github/client"
 	"github.com/arquillian/ike-prow-plugins/pkg/log"
 	pluginBootstrap "github.com/arquillian/ike-prow-plugins/pkg/plugin"
 	"github.com/arquillian/ike-prow-plugins/pkg/server"
@@ -15,7 +16,7 @@ const ProwPluginName = "pr-sanitizer"
 // GitHubLabelsEventsHandler is the event handler for the plugin.
 // Implements server.GitHubEventHandler interface which contains the logic for incoming GitHub events
 type GitHubLabelsEventsHandler struct {
-	Client  *github.Client
+	Client  ghclient.Client
 	BotName string
 }
 
@@ -23,7 +24,7 @@ func main() {
 	pluginBootstrap.InitPlugin(ProwPluginName, handlerCreator, serverCreator, helpProvider)
 }
 
-func handlerCreator(githubClient *github.Client, botName string) server.GitHubEventHandler {
+func handlerCreator(githubClient ghclient.Client, botName string) server.GitHubEventHandler {
 	return &GitHubLabelsEventsHandler{Client: githubClient, BotName: botName}
 }
 

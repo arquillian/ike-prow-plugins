@@ -118,8 +118,7 @@ var _ = Describe("Test keeper comment message creation", func() {
 		It("should create message taken from a file set in config using url", func() {
 			// given
 			gock.New("http://my.server.com").
-				Get("path/to/test-keeper_hint.md").
-				Reply(200).
+				Get("path/to/test-keeper_hint.md").Reply(200).
 				BodyString("Custom message")
 
 			url := "http://github.com/my/repo/test-keeper.yaml"

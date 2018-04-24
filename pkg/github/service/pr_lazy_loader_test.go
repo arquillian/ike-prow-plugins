@@ -1,7 +1,9 @@
-package github_test
+package ghservice_test
 
 import (
-	"github.com/arquillian/ike-prow-plugins/pkg/github"
+	"net/http"
+
+	"github.com/arquillian/ike-prow-plugins/pkg/github/service"
 	. "github.com/arquillian/ike-prow-plugins/pkg/internal/test"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -13,26 +15,28 @@ var _ = Describe("Pull Request lazy loading", func() {
 	client := NewDefaultGitHubClient()
 
 	BeforeEach(func() {
-		gock.Off()
+		defer gock.OffAll()
 	})
+
+	AfterEach(EnsureGockRequestsHaveBeenMatched)
 
 	It("should load pull request when load() method is called", func() {
 		// given
-		counter := 0
+		calls := 0
 		gock.New("https://api.github.com").
 			Get("/repos/owner/repo/pulls/123").
-			SetMatcher(createCounterMather(&counter)).
+			SetMatcher(spyOnCalls(&calls)).
 			Reply(200).
 			BodyString(`{"title":"Loaded PR"}`)
-		loader := &github.PullRequestLazyLoader{Client: client, RepoOwner: "owner", RepoName: "repo", Number: 123}
-		Expect(counter).To(Equal(0))
+		loader := &ghservice.PullRequestLazyLoader{Client: client, RepoOwner: "owner", RepoName: "repo", Number: 123}
+		Expect(calls).To(Equal(0))
 
 		// when
 		pullRequest, err := loader.Load()
 
 		// then
 		Ω(err).ShouldNot(HaveOccurred())
-		Expect(counter).To(Equal(1))
+		Expect(calls).To(Equal(1))
 		Expect(*pullRequest.Title).To(Equal("Loaded PR"))
 	})
 
@@ -41,11 +45,11 @@ var _ = Describe("Pull Request lazy loading", func() {
 		counter := 0
 		gock.New("https://api.github.com").
 			Get("/repos/owner/repo/pulls/123").
-			SetMatcher(createCounterMather(&counter)).
+			SetMatcher(spyOnCalls(&counter)).
 			Persist().
 			Reply(200).
 			BodyString(`{"title":"Loaded PR"}`)
-		loader := &github.PullRequestLazyLoader{Client: client, RepoOwner: "owner", RepoName: "repo", Number: 123}
+		loader := &ghservice.PullRequestLazyLoader{Client: client, RepoOwner: "owner", RepoName: "repo", Number: 123}
 		loader.Load()
 
 		// when
@@ -57,3 +61,12 @@ var _ = Describe("Pull Request lazy loading", func() {
 		Expect(*pullRequest.Title).To(Equal("Loaded PR"))
 	})
 })
+
+func spyOnCalls(counter *int) gock.Matcher {
+	matcher := gock.NewBasicMatcher()
+	matcher.Add(func(_ *http.Request, _ *gock.Request) (bool, error) {
+		*counter++
+		return true, nil
+	})
+	return matcher
+}

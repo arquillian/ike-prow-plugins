@@ -2,8 +2,9 @@ package command_test
 
 import (
 	is "github.com/arquillian/ike-prow-plugins/pkg/command"
-	"github.com/arquillian/ike-prow-plugins/pkg/github"
+	"github.com/arquillian/ike-prow-plugins/pkg/github/service"
 	. "github.com/arquillian/ike-prow-plugins/pkg/internal/test"
+	"github.com/arquillian/ike-prow-plugins/pkg/log"
 	"github.com/arquillian/ike-prow-plugins/pkg/utils"
 	gogh "github.com/google/go-github/github"
 	. "github.com/onsi/ginkgo"
@@ -16,7 +17,7 @@ var _ = Describe("Command executor features", func() {
 	var (
 		deletedCommand, triggeredCommand *gogh.IssueCommentEvent
 		client                           = NewDefaultGitHubClient()
-		log                              = NewDiscardOutLogger()
+		log                              = log.NewTestLogger()
 	)
 
 	BeforeEach(func() {
@@ -160,7 +161,7 @@ var _ = Describe("Command executor features", func() {
 		Context("Executing of predefined commands when comments are activated", func() {
 
 			BeforeEach(func() {
-				gock.Off()
+				gock.OffAll()
 			})
 
 			It("should not execute command when command name is not matching", func() {
@@ -171,7 +172,7 @@ var _ = Describe("Command executor features", func() {
 				user := is.PermissionService{
 					Client:   client,
 					User:     "sender",
-					PRLoader: github.NewPullRequestLazyLoader(client, triggeredCommand),
+					PRLoader: ghservice.NewPullRequestLazyLoader(client, triggeredCommand),
 				}
 
 				executed := false
@@ -238,7 +239,6 @@ var _ = Describe("Command executor features", func() {
 
 			It("should return gock-not-matching-error when not quite mode and user doesn't have permissions", func() {
 				// given
-				client.Retries = 1
 				executed := false
 				command := is.CmdExecutor{Command: "/command"}
 				command.When(is.Triggered).By(is.Not(is.Anybody)).Then(func() error {

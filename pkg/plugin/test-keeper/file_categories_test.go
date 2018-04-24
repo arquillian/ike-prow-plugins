@@ -123,8 +123,8 @@ var _ = Describe("Test fileCategoryCounter features", func() {
 			})
 
 			changedFiles := changedFilesSet(
-				"path/to/github_service.rb",
-				"path/to/github_service_test.rb")
+				"path/to/ghservice.rb",
+				"path/to/ghservice_test.rb")
 
 			fileCategoryCounter := testkeeper.FileCategoryCounter{Matcher: matcher}
 
