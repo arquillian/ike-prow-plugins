@@ -30,7 +30,7 @@ function install_deps() {
 }
 
 function run_build() {
-  make build
+  make docker-build
   echo "CICO: ran build"
 }
 
@@ -45,6 +45,27 @@ function cleanup_env {
   echo "CICO: Cleanup environment"
   make docker-rm
   echo "CICO: Exiting with $EXIT_CODE"
+}
+
+function deploy() {
+  # Login first
+  export REGISTRY="push.registry.devshift.net"
+
+  if [ -n "${DEVSHIFT_USERNAME}" -a -n "${DEVSHIFT_PASSWORD}" ]; then
+    docker login -u ${DEVSHIFT_USERNAME} -p ${DEVSHIFT_PASSWORD} ${REGISTRY}
+  else
+    echo "Could not login, missing credentials for the registry"
+  fi
+
+  # compile, build and deploy the hook
+  export PROW_VERSION=`./prow_version.sh | cut -c1-${DEVSHIFT_TAG_LEN}`
+  make deploy-hook
+
+  # compile, build and deploy plugins
+  export TAG=$(echo ${GIT_COMMIT} | cut -c1-${DEVSHIFT_TAG_LEN})
+  make deploy-plugins
+
+  echo 'CICO: Image pushed, ready to update deployed app'
 }
 
 function cico_setup() {

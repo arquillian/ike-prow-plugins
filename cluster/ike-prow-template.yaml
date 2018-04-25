@@ -11,6 +11,7 @@ parameters:
   required: true
 - name: VERSION
   required: true
+  value: latest
 objects:
   - kind: DeploymentConfig
     apiVersion: v1
