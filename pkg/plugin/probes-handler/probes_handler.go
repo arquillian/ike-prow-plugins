@@ -10,7 +10,11 @@ import (
 func NewProbesHandler() http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusOK)
-		_, err := w.Write([]byte(os.Getenv("VERSION")))
+		version, found := os.LookupEnv("VERSION")
+		if !found {
+			version = "UNKNOWN"
+		}
+		_, err := w.Write([]byte("version: " + version))
 		if err != nil {
 			log.Printf("Write failed: %v", err)
 		}

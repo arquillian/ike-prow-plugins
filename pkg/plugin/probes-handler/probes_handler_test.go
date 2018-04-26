@@ -15,7 +15,7 @@ var _ = Describe("Test liveliness and readiness probes.", func() {
 
 	const (
 		probesEndpoint = "/version"
-		version        = "406ea76-1524559762"
+		version        = "xxxxxxxx-xxxxxxxxxx"
 	)
 
 	var _ = BeforeSuite(func() {
@@ -39,7 +39,7 @@ var _ = Describe("Test liveliness and readiness probes.", func() {
 
 			// then
 			responseBody, _ := ioutil.ReadAll(response.Result().Body)
-			Expect(string(responseBody)).To(Equal(version))
+			Expect(string(responseBody)).To(Equal("version: " + version))
 		})
 	})
 
