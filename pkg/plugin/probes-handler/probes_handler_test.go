@@ -13,8 +13,10 @@ import (
 
 var _ = Describe("Test liveliness and readiness probes.", func() {
 
-	probesEndpoint := "/version"
-	version := "406ea76-1524559762"
+	const (
+		probesEndpoint = "/version"
+		version        = "406ea76-1524559762"
+	)
 
 	var _ = BeforeSuite(func() {
 		os.Setenv("VERSION", version)
@@ -32,7 +34,7 @@ var _ = Describe("Test liveliness and readiness probes.", func() {
 			response := httptest.NewRecorder()
 
 			// when
-			http.Handle("/version", probesHandler)
+			http.Handle(probesEndpoint, probesHandler)
 			probesHandler.ServeHTTP(response, request)
 
 			// then
