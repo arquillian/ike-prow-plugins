@@ -2,7 +2,7 @@
 oc-generate-deployments: $(OC_DEPLOYMENTS) ## Creates openshift deployments for ike-prow plugins
 
 .PHONY: oc-deploy-hook
-oc-deploy-hook: deploy-hook ## Deploys hook service only
+oc-deploy-hook: build-hook deploy-hook ## Deploys hook service only
 	@echo "Deploys hook service ${PROW_VERSION}"
 	@oc process -f $(CLUSTER_DIR)/hook-template.yaml \
 		-p REGISTRY=$(REGISTRY) \
@@ -11,7 +11,7 @@ oc-deploy-hook: deploy-hook ## Deploys hook service only
 		-o yaml | oc apply -f -
 
 .PHONY: deploy-hook
-deploy-hook: build-hook build-hook-image push-hook-image
+deploy-hook: build-hook-image push-hook-image
 
 .PHONY: build-hook
 build-hook: up-skip-test-quick
@@ -31,7 +31,7 @@ clean-hook-image:
 	$(DOCKER) rmi -f $(REGISTRY)/$(DOCKER_REPO)/hook
 
 .PHONY: oc-deploy-plugins ## Builds plugin images, updates configuration and deploys new version of ike-plugins
-oc-deploy-plugins: oc-init-project deploy-plugins oc-generate-deployments
+oc-deploy-plugins: oc-init-project compile deploy-plugins oc-generate-deployments
 	@echo "Updating cluster configuration for '$(OC_PROJECT_NAME)'..."
 
 $(OC_DEPLOYMENTS): oc-%: %
@@ -50,7 +50,7 @@ $(OC_DEPLOYMENTS): oc-%: %
 deploy-plugins: build-plugin-images push-plugin-images
 
 .PHONY: build-plugin-images $(PLUGINS)
-build-plugin-images: compile $(BUILD_IMAGES)
+build-plugin-images: $(BUILD_IMAGES)
 $(BUILD_IMAGES): build-%: %
 	$(DOCKER) build --build-arg BINARY=$< -t $(REGISTRY)/$(DOCKER_REPO)/$< -f Dockerfile.prow .
 	$(DOCKER) tag $(REGISTRY)/$(DOCKER_REPO)/$< $(REGISTRY)/$(DOCKER_REPO)/$<:$(TAG)
