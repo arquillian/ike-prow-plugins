@@ -2,12 +2,33 @@ FROM centos:7
 LABEL maintainer="Devtools <devtools@redhat.com>"
 LABEL maintainer="Devtools-test <devtools-test@redhat.com>"
 
+ENV LANG=en_US.utf8
+ENV INSTALL_PREFIX=/usr/local/prow
+
+# Create a non-root user and a group with the same name: "wit"
+ENV USER_NAME=prow
+RUN useradd --no-create-home -s /bin/bash ${USER_NAME}
+
+ARG BINARY=0
+
 RUN yum install -y git ca-certificates \
     && yum clean all \
     && rm -rf /var/cache/yum
 
-ENV LANG=en_US.utf8
-ARG BINARY=0
+# Install little pcp pmcd server for metrics collection
+# would prefer only pmcd, and not the /bin/pm*tools etc.
+COPY pcp.repo /etc/yum.repos.d/pcp.repo
+RUN yum install -y pcp pcp-pmda-prometheus && yum clean all && \
+    mkdir -p /etc/pcp /var/run/pcp /var/lib/pcp /var/log/pcp  && \
+    chgrp -R root /etc/pcp /var/run/pcp /var/lib/pcp /var/log/pcp && \
+    chmod -R g+rwX /etc/pcp /var/run/pcp /var/lib/pcp /var/log/pcp
+COPY ./prow+pmcd.sh /prow+pmcd.sh
+EXPOSE 44321
 
-COPY ./bin/${BINARY} /binary
-ENTRYPOINT ["/binary"]
+COPY bin/${BINARY} ${INSTALL_PREFIX}/binary
+
+# From here onwards, any RUN, CMD, or ENTRYPOINT will be run under the following user
+USER ${USER_NAME}
+
+WORKDIR ${INSTALL_PREFIX}
+ENTRYPOINT [ "/prow+pmcd.sh" ]

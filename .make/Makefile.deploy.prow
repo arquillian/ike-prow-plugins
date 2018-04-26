@@ -16,7 +16,7 @@ build-hook: up-skip-test-quick
 
 .PHONY: build-hook-image
 build-hook-image:
-	$(DOCKER) build --build-arg BINARY=hook -t $(REGISTRY)/$(DOCKER_REPO)/hook:$(PROW_VERSION) -f Dockerfile.prow .
+	$(DOCKER) build --build-arg BINARY=hook -t $(REGISTRY)/$(DOCKER_REPO)/hook:$(PROW_VERSION) -f Dockerfile.hook .
 
 .PHONY: push-hook-image
 push-hook-image: build-hook-image
