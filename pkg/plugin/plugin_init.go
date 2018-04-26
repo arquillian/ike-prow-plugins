@@ -8,6 +8,7 @@ import (
 
 	"strconv"
 
+	probeshandler "github.com/arquillian/ike-prow-plugins/pkg/plugin/probes-handler"
 	"github.com/arquillian/ike-prow-plugins/pkg/utils"
 	"k8s.io/test-infra/prow/pluginhelp/externalplugins"
 	"k8s.io/test-infra/prow/plugins"
@@ -90,7 +91,7 @@ func InitPlugin(pluginName string, newEventHandler EventHandlerCreator, newServe
 	logger.Infof("Starting server on port %s", port)
 
 	http.Handle("/", pluginServer)
-	http.Handle("/version", NewProbesHandler())
+	http.Handle("/version", probeshandler.NewProbesHandler())
 
 	externalplugins.ServeExternalPluginHelp(http.DefaultServeMux, logger, helpProvider)
 	if err := http.ListenAndServe(":"+port, nil); err != nil {

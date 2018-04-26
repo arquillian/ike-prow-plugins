@@ -75,14 +75,10 @@ objects:
               httpGet:
                 path: /version
                 port: 8888
-              initialDelaySeconds: 5
-              periodSeconds: 5
             livenessProbe:
               httpGet:
                 path: /version
-                port: 8888
-              initialDelaySeconds: 5
-              periodSeconds: 5  
+                port: 8888            
           volumes:
           - name: hmac
             secret:
