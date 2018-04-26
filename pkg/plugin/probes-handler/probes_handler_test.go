@@ -1,7 +1,7 @@
 package probeshandler_test
 
 import (
-	"io/ioutil"
+	"encoding/json"
 	"net/http"
 	"net/http/httptest"
 	"os"
@@ -32,14 +32,16 @@ var _ = Describe("Test liveliness and readiness probes.", func() {
 			probesHandler := probeshandler.NewProbesHandler()
 			request := httptest.NewRequest("GET", probesEndpoint, nil)
 			response := httptest.NewRecorder()
+			expectedBody := probeshandler.Probe{Version: version}
 
 			// when
 			http.Handle(probesEndpoint, probesHandler)
 			probesHandler.ServeHTTP(response, request)
 
 			// then
-			responseBody, _ := ioutil.ReadAll(response.Result().Body)
-			Expect(string(responseBody)).To(Equal("version: " + version))
+			actualBody := probeshandler.Probe{}
+			json.Unmarshal(response.Body.Bytes(), &actualBody)
+			Expect(actualBody).To(Equal(expectedBody))
 		})
 	})
 
@@ -56,8 +58,7 @@ var _ = Describe("Test liveliness and readiness probes.", func() {
 			handler(response, request)
 
 			// then
-			responseBody, _ := ioutil.ReadAll(response.Result().Body)
-			Expect(string(responseBody)).To(Equal(""))
+			Expect(response.Body.String()).To(Equal(""))
 		})
 	})
 })
