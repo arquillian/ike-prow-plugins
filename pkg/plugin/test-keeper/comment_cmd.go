@@ -4,7 +4,7 @@ import (
 	"strings"
 
 	is "github.com/arquillian/ike-prow-plugins/pkg/command"
-	"github.com/arquillian/ike-prow-plugins/pkg/github"
+	"github.com/arquillian/ike-prow-plugins/pkg/github/client"
 	"github.com/arquillian/ike-prow-plugins/pkg/log"
 	gogh "github.com/google/go-github/github"
 )
@@ -20,7 +20,7 @@ type BypassCmd struct {
 }
 
 // Perform executes the set DoFunctions for the given IssueCommentEvent (when all conditions are fulfilled)
-func (c *BypassCmd) Perform(client *github.Client, log log.Logger, comment *gogh.IssueCommentEvent) error {
+func (c *BypassCmd) Perform(client ghclient.Client, log log.Logger, comment *gogh.IssueCommentEvent) error {
 	user := c.userPermissionService
 	var BypassCommand = &is.CmdExecutor{Command: BypassCheckComment}
 

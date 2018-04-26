@@ -2,7 +2,7 @@ package command_test
 
 import (
 	is "github.com/arquillian/ike-prow-plugins/pkg/command"
-	"github.com/arquillian/ike-prow-plugins/pkg/github"
+	"github.com/arquillian/ike-prow-plugins/pkg/github/service"
 	. "github.com/arquillian/ike-prow-plugins/pkg/internal/test"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -21,7 +21,7 @@ var _ = Describe("Permission service with permission checks features", func() {
 			user = is.PermissionService{
 				Client: client,
 				User:   "user",
-				PRLoader: &github.PullRequestLazyLoader{
+				PRLoader: &ghservice.PullRequestLazyLoader{
 					Client:    client,
 					RepoOwner: "owner",
 					RepoName:  "repo",
@@ -29,6 +29,8 @@ var _ = Describe("Permission service with permission checks features", func() {
 				},
 			}
 		})
+
+		AfterEach(EnsureGockRequestsHaveBeenMatched)
 
 		It("should not approve the user when the permission is read", func() {
 			// given
@@ -144,7 +146,7 @@ var _ = Describe("Permission service with permission checks features", func() {
 				Get("/repos/owner/repo/pulls/1/reviews").
 				Reply(200).
 				BodyString(`[{"user": {"login": "user"}, "state": "CHANGES_REQUESTED"},` +
-				`{"user": {"login": "user"}, "state": "COMMENTED"}]`)
+					`{"user": {"login": "user"}, "state": "COMMENTED"}]`)
 
 			// when
 			status, err := user.PRApprover()

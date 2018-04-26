@@ -1,0 +1,73 @@
+PROJECT_NAME := ike-prow-plugins
+DOCKER_IMAGE_CORE := $(PROJECT_NAME)-docker
+
+# If running in Jenkins we don't allow for interactively running the container
+ifneq ($(BUILD_TAG),)
+	DOCKER_RUN_INTERACTIVE_SWITCH :=
+else
+	DOCKER_RUN_INTERACTIVE_SWITCH := -i
+endif
+
+# The BUILD_TAG environment variable will be set by jenkins
+# to reflect jenkins-${JOB_NAME}-${BUILD_NUMBER}
+BUILD_TAG ?= $(PROJECT_NAME)-local-build
+DOCKER_CONTAINER_NAME := $(BUILD_TAG)
+
+HOME_IN_CONTAINER=/tmp/home
+# Where is the GOPATH inside the build container?
+GOPATH_IN_CONTAINER=${HOME_IN_CONTAINER}/go-workspace
+PACKAGE_PATH=$(GOPATH_IN_CONTAINER)/src/$(PACKAGE_NAME)
+
+.PHONY: docker-image-builder
+## Builds the docker image used to build the software.
+docker-image-builder:
+	@echo "Building docker image $(DOCKER_IMAGE_CORE)"
+	$(DOCKER) build \
+		--build-arg HOME=$(HOME_IN_CONTAINER) \
+		--build-arg GOPATH=$(GOPATH_IN_CONTAINER) \
+		--build-arg PROJECT_PATH=$(PACKAGE_PATH) \
+		-t $(DOCKER_IMAGE_CORE) \
+		-f $(CUR_DIR)/Dockerfile.builder $(CUR_DIR)
+
+.PHONY: docker-start
+## Starts the docker build container in the background (detached mode).
+## After calling this command you can invoke all the make targets from the
+## normal Makefile (e.g. up, compile, build) inside the build container
+## by prefixing them with "docker-". For example to execute "make compile"
+## inside the build container, just run "make docker-compile".
+## To remove the container when no longer needed, call "make docker-rm".
+docker-start: docker-image-builder
+ifneq ($(strip $(shell docker ps -qa --filter "name=$(DOCKER_CONTAINER_NAME)" 2>/dev/null)),)
+	@echo "Docker container \"$(DOCKER_CONTAINER_NAME)\" already exists. To recreate, run \"make docker-rm\"."
+else
+	$(DOCKER) run \
+		--detach=true \
+		-t \
+		$(DOCKER_RUN_INTERACTIVE_SWITCH) \
+		--name="$(DOCKER_CONTAINER_NAME)" \
+		-v $(CUR_DIR):$(PACKAGE_PATH) \
+		-u $(shell id -u $(USER)):$(shell id -g $(USER)) \
+		-w $(PACKAGE_PATH) \
+		$(DOCKER_IMAGE_CORE)
+		@echo "Docker container \"$(DOCKER_CONTAINER_NAME)\" created. Continue with \"make docker-tools\" and \"make docker-install\"."
+endif
+
+.PHONY: docker-rm
+## Removes the docker build container, if any (see "make docker-start").
+docker-rm:
+ifneq ($(strip $(shell docker ps -qa --filter "name=$(DOCKER_CONTAINER_NAME)" 2>/dev/null)),)
+	docker rm -f "$(DOCKER_CONTAINER_NAME)"
+else
+	@echo "No container named \"$(DOCKER_CONTAINER_NAME)\" to remove."
+endif
+
+# This is a wildcard target to let you call any make target from the normal makefile
+# but it will run inside the docker container. This target will only get executed if
+# there's no specialized form available. For example if you call "make docker-start"
+# not this target gets executed but the "docker-start" target.
+docker-%:
+	$(eval makecommand:=$(subst docker-,,$@))
+ifeq ($(strip $(shell docker ps -qa --filter "name=$(DOCKER_CONTAINER_NAME)" 2>/dev/null)),)
+	$(error No container name "$(DOCKER_CONTAINER_NAME)" exists to run the command "make $(makecommand)")
+endif
+	docker exec -t $(DOCKER_RUN_INTERACTIVE_SWITCH) "$(DOCKER_CONTAINER_NAME)" bash -login -ec 'make $(makecommand)'

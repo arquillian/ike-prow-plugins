@@ -3,12 +3,14 @@ package wip_test
 import (
 	"strings"
 
-	"github.com/arquillian/ike-prow-plugins/pkg/github"
 	. "github.com/arquillian/ike-prow-plugins/pkg/internal/test"
+	"github.com/arquillian/ike-prow-plugins/pkg/log"
 	"github.com/arquillian/ike-prow-plugins/pkg/plugin/work-in-progress"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	"gopkg.in/h2non/gock.v1"
+
+	"github.com/arquillian/ike-prow-plugins/pkg/github"
 )
 
 const (
@@ -23,7 +25,7 @@ var _ = Describe("Test Keeper Plugin features", func() {
 
 		var handler *wip.GitHubWIPPRHandler
 
-		log := NewDiscardOutLogger()
+		log := log.NewTestLogger()
 
 		toHaveSuccessState := SoftlySatisfyAll(
 			HaveState(github.StatusSuccess),

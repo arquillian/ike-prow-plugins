@@ -2,7 +2,7 @@ package testkeeper
 
 import (
 	"github.com/arquillian/ike-prow-plugins/pkg/config"
-	"github.com/arquillian/ike-prow-plugins/pkg/github"
+	"github.com/arquillian/ike-prow-plugins/pkg/github/service"
 	"github.com/arquillian/ike-prow-plugins/pkg/log"
 	"github.com/arquillian/ike-prow-plugins/pkg/scm"
 )
@@ -20,7 +20,7 @@ type PluginConfiguration struct {
 func LoadConfiguration(log log.Logger, change scm.RepositoryChange) PluginConfiguration {
 
 	configuration := PluginConfiguration{Combine: true}
-	loadableConfig := &github.LoadableConfig{PluginName: ProwPluginName, Change: change, BaseConfig: &configuration.PluginConfiguration}
+	loadableConfig := &ghservice.LoadableConfig{PluginName: ProwPluginName, Change: change, BaseConfig: &configuration.PluginConfiguration}
 
 	err := config.Load(&configuration, loadableConfig)
 

@@ -1,5 +1,5 @@
 hash: 3e5727a2513de16dfd9a343097a2ab65d4c32ed5d3e25f586281b0ad32bf4692
-updated: 2018-04-17T22:47:30.259706914+02:00
+updated: 2018-04-20T18:24:45.550898489+02:00
 imports:
 - name: github.com/bazelbuild/buildtools
   version: c98ff0c6395f09b1942e6f7c42bf3ec15e3b9ca7
@@ -141,6 +141,8 @@ imports:
   - internal/jsonutil
 - name: github.com/sirupsen/logrus
   version: c155da19408a8799da419ed3eeb0cb5db0ad5dbc
+  subpackages:
+  - hooks/test
 - name: github.com/spf13/pflag
   version: 9ff6c6923cfffbcd502984b8e0c80539a94968b7
 - name: golang.org/x/crypto
