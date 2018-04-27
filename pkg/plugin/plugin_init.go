@@ -97,7 +97,7 @@ func InitPlugin(pluginName string, newEventHandler EventHandlerCreator, newServe
 	logger.Infof("Starting server on port %s", port)
 
 	http.Handle("/", pluginServer)
-	http.Handle("/version", probeshandler.NewProbesHandler())
+	http.Handle("/version", probeshandler.NewProbesHandler(logger))
 
 	externalplugins.ServeExternalPluginHelp(http.DefaultServeMux, logger, helpProvider)
 	if err := http.ListenAndServe(":"+port, nil); err != nil {

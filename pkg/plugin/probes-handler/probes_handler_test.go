@@ -9,6 +9,7 @@ import (
 	probeshandler "github.com/arquillian/ike-prow-plugins/pkg/plugin/probes-handler"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
+	"github.com/sirupsen/logrus"
 )
 
 var _ = Describe("Test liveliness and readiness probes.", func() {
@@ -29,7 +30,8 @@ var _ = Describe("Test liveliness and readiness probes.", func() {
 	Context("When in healthy state", func() {
 		It("should return plugin version in response body", func() {
 			// given
-			probesHandler := probeshandler.NewProbesHandler()
+			var log *logrus.Entry
+			probesHandler := probeshandler.NewProbesHandler(log)
 			request := httptest.NewRequest("GET", probesEndpoint, nil)
 			response := httptest.NewRecorder()
 			expectedBody := probeshandler.Probe{Version: version}
