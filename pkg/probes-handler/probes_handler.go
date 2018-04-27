@@ -19,8 +19,10 @@ func NewProbesHandler(log log.Logger) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 
 		serverError := func(action string, err error) {
-			log.Errorf("Probe handler failed when %s: %v.", action, err)
-			msg := fmt.Sprintf("Internal server error %d %s: %v", http.StatusInternalServerError, action, err)
+			msg := fmt.Sprintf("Probe handler failed while %s: %v.", action, err)
+			log.Errorf(msg)
+			msg = fmt.Sprintf("%d %s:\n%s",
+				http.StatusInternalServerError, http.StatusText(http.StatusInternalServerError), msg)
 			http.Error(w, msg, http.StatusInternalServerError)
 		}
 
