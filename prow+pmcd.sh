@@ -48,4 +48,4 @@ exec /usr/libexec/pcp/bin/pmcd -l /dev/force-logging-to-stderr -f -A -H $PCP_HOS
 sleep 5 # give time for pmcd's startup messages, so it doesn't intermix with PROW
 
 
-exec ./binary ${1+"$@"}
+exec bin/binary ${1+"$@"}
