@@ -67,8 +67,32 @@ func (gh *GitHubTestEventsHandler) handlePrEvent(log log.Logger, event *gogh.Pul
 	if !utils.Contains(handledPrActions, *event.Action) {
 		return nil
 	}
+	commentsLoader := ghservice.NewIssueCommentsLazyLoader(gh.Client, event.PullRequest)
 
-	return gh.checkTestsAndSetStatus(log, event.PullRequest)
+	bypassed, user := gh.checkIfBypassed(log, commentsLoader, event.PullRequest)
+	if bypassed {
+		change := ghservice.NewRepositoryChangeForPR(event.PullRequest)
+		statusService := gh.newTestStatusService(log, change)
+		return statusService.okWithoutTests(user)
+	}
+
+	return gh.checkTestsAndSetStatus(log, event.PullRequest, commentsLoader)
+}
+
+func (gh *GitHubTestEventsHandler) checkIfBypassed(log log.Logger, commentsLoader *ghservice.IssueCommentsLazyLoader, pr *gogh.PullRequest) (bool, string) {
+	comments, err := commentsLoader.Load()
+	if err != nil {
+		log.Errorf("Getting all comments failed with an error: %s", err)
+		return false, ""
+	}
+
+	prLoader := ghservice.NewPullRequestLazyLoaderWithPR(gh.Client, pr)
+	for _, comment := range comments {
+		if IsValidBypassCmd(comment, prLoader) {
+			return true, *comment.User.Login
+		}
+	}
+	return false, ""
 }
 
 func (gh *GitHubTestEventsHandler) handlePrComment(log log.Logger, comment *gogh.IssueCommentEvent) error {
@@ -76,7 +100,7 @@ func (gh *GitHubTestEventsHandler) handlePrComment(log log.Logger, comment *gogh
 		return nil
 	}
 
-	prLoader := ghservice.NewPullRequestLazyLoader(gh.Client, comment)
+	prLoader := ghservice.NewPullRequestLazyLoaderFromComment(gh.Client, comment)
 	userPerm := command.NewPermissionService(gh.Client, *comment.Sender.Login, prLoader)
 
 	cmdHandler := command.CommentCmdHandler{Client: gh.Client}
@@ -89,7 +113,8 @@ func (gh *GitHubTestEventsHandler) handlePrComment(log log.Logger, comment *gogh
 				if err != nil {
 					return err
 				}
-				return gh.checkTestsAndSetStatus(log, pullRequest)
+				commentsLoader := ghservice.NewIssueCommentsLazyLoader(gh.Client, pullRequest)
+				return gh.checkTestsAndSetStatus(log, pullRequest, commentsLoader)
 			},
 			whenAddedOrCreated: func() error {
 				pullRequest, err := prLoader.Load()
@@ -108,7 +133,7 @@ func (gh *GitHubTestEventsHandler) handlePrComment(log log.Logger, comment *gogh
 	return err
 }
 
-func (gh *GitHubTestEventsHandler) checkTestsAndSetStatus(log log.Logger, pr *gogh.PullRequest) error {
+func (gh *GitHubTestEventsHandler) checkTestsAndSetStatus(log log.Logger, pr *gogh.PullRequest, commentsLoader *ghservice.IssueCommentsLazyLoader) error {
 	change := ghservice.NewRepositoryChangeForPR(pr)
 	statusService := gh.newTestStatusService(log, change)
 	configuration := LoadConfiguration(log, change)
@@ -134,7 +159,7 @@ func (gh *GitHubTestEventsHandler) checkTestsAndSetStatus(log log.Logger, pr *go
 	}
 
 	hintContext := ghservice.HintContext{PluginName: ProwPluginName, Assignee: *pr.User.Login}
-	hinter := ghservice.NewHinter(gh.Client, log, change, *pr.Number, hintContext)
+	hinter := ghservice.NewHinter(gh.Client, log, commentsLoader, hintContext)
 
 	cerr := hinter.PluginComment(CreateCommentMessage(configuration, change))
 	if cerr != nil {
