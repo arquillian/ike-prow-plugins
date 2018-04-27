@@ -98,7 +98,6 @@ func (c client) unwrap() *gogh.Client {
 }
 
 func (c client) logHTTPError(response *gogh.Response, e error) error {
-	c.log.Errorf("failed while trying to call GitHub API %s.", e)
 	if response != nil && response.StatusCode >= 404 {
 		c.log.Errorf("server responded with %d status", response.StatusCode)
 	}
