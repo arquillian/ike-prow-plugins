@@ -6,35 +6,39 @@ import (
 	"net/http/httptest"
 	"os"
 
-	probeshandler "github.com/arquillian/ike-prow-plugins/pkg/plugin/probes-handler"
+	"github.com/arquillian/ike-prow-plugins/pkg/log"
+	probeshandler "github.com/arquillian/ike-prow-plugins/pkg/probes-handler"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
-	"github.com/sirupsen/logrus"
 )
 
 var _ = Describe("Test liveliness and readiness probes.", func() {
 
 	const (
 		probesEndpoint = "/version"
-		version        = "xxxxxxxx-xxxxxxxxxx"
+		defaultVersion = "xxxxxxxx-xxxxxxxxxx"
 	)
 
+	var versionEnv string
+	
 	var _ = BeforeSuite(func() {
-		os.Setenv("VERSION", version)
+		var found bool
+		if versionEnv, found = os.LookupEnv("VERSION"); !found {
+			os.Setenv("VERSION", defaultVersion)
+		}
 	})
 
 	var _ = AfterSuite(func() {
-		os.Clearenv()
+		os.Setenv("VERSION", versionEnv)
 	})
 
 	Context("When in healthy state", func() {
 		It("should return plugin version in response body", func() {
 			// given
-			var log *logrus.Entry
-			probesHandler := probeshandler.NewProbesHandler(log)
+			probesHandler := probeshandler.NewProbesHandler(log.NewTestLogger())
 			request := httptest.NewRequest("GET", probesEndpoint, nil)
 			response := httptest.NewRecorder()
-			expectedBody := probeshandler.Probe{Version: version}
+			expectedBody := probeshandler.Probe{Version: os.Getenv("VERSION")}
 
 			// when
 			http.Handle(probesEndpoint, probesHandler)
@@ -44,23 +48,6 @@ var _ = Describe("Test liveliness and readiness probes.", func() {
 			actualBody := probeshandler.Probe{}
 			json.Unmarshal(response.Body.Bytes(), &actualBody)
 			Expect(actualBody).To(Equal(expectedBody))
-		})
-	})
-
-	Context("When in unhealthy state", func() {
-		It("should return empty response body", func() {
-			// given
-			handler := func(w http.ResponseWriter, r *http.Request) {
-				w.WriteHeader(http.StatusBadGateway)
-			}
-			request := httptest.NewRequest("GET", probesEndpoint, nil)
-			response := httptest.NewRecorder()
-
-			// when
-			handler(response, request)
-
-			// then
-			Expect(response.Body.String()).To(Equal(""))
 		})
 	})
 })

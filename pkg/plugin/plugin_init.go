@@ -8,7 +8,7 @@ import (
 
 	"strconv"
 
-	probeshandler "github.com/arquillian/ike-prow-plugins/pkg/plugin/probes-handler"
+	probeshandler "github.com/arquillian/ike-prow-plugins/pkg/probes-handler"
 	"github.com/arquillian/ike-prow-plugins/pkg/utils"
 	"k8s.io/test-infra/prow/pluginhelp/externalplugins"
 	"k8s.io/test-infra/prow/plugins"
