@@ -6,6 +6,7 @@ import (
 	"github.com/arquillian/ike-prow-plugins/pkg/log"
 	"github.com/arquillian/ike-prow-plugins/pkg/scm"
 	gogh "github.com/google/go-github/github"
+	"github.com/arquillian/ike-prow-plugins/pkg/server"
 )
 
 type rateLimitWatcher struct {
@@ -32,6 +33,7 @@ func (r rateLimitWatcher) logRateLimits() {
 		return
 	}
 	core := limits.GetCore()
+	server.ReportRateLimit(limits)
 	if core.Remaining < r.threshold {
 		r.log.Warnf("reaching limit for GH API calls. %d/%d left. resetting at [%s]", core.Remaining, core.Limit, core.Reset.Format("2006-01-01 15:15:15"))
 	}
