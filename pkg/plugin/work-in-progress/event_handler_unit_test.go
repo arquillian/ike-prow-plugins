@@ -25,6 +25,12 @@ var _ = Describe("Work-in-progress Plugin features", func() {
 			Entry("Uppercase WIP prefix", "WIP fix(#1): off-by one bug"),
 			Entry("Lowercase WIP prefix", "wip fix(#1): off-by one bug"),
 			Entry("Wip prefix", "Wip fix(#1): off-by one bug"),
+			Entry("Wip prefix within square brackets", "[WIP] fix(#1): off-by one bug"),
+			Entry("Wip prefix within brackets", "(WIP) fix(#1): off-by one bug"),
+			Entry("Wip prefix with brackets and colon", "(WIP): fix(#1): off-by one bug"),
+			Entry("Wip prefix with colon ", "WIP: fix(#1): off-by one bug"),
+			Entry("Do Not Merge prefix", "Do Not Merge fix(#1): off-by one bug"),
+			Entry("Work In Progress prefix", "WORK-IN-PROGRESS fix(#1): off-by one bug"),
 		)
 
 		DescribeTable("should not recognize PR as work-in-progress if title doesn't start with WIP",
