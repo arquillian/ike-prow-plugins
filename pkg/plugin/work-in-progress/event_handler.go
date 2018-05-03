@@ -63,7 +63,8 @@ func (gh *GitHubWIPPRHandler) HandleEvent(log log.Logger, eventType github.Event
 		}
 		statusContext := github.StatusContext{BotName: gh.BotName, PluginName: ProwPluginName}
 		statusService := ghservice.NewStatusService(gh.Client, log, change, statusContext)
-		if gh.IsWorkInProgress(event.PullRequest.Title) {
+		configuration := LoadConfiguration(log, change)
+		if gh.IsWorkInProgress(event.PullRequest.Title, configuration) {
 			return statusService.Failure(InProgressMessage, InProgressDetailsLink)
 		}
 		return statusService.Success(ReadyForReviewMessage, ReadyForReviewDetailsLink)
@@ -76,11 +77,19 @@ func (gh *GitHubWIPPRHandler) HandleEvent(log log.Logger, eventType github.Event
 }
 
 // IsWorkInProgress checks if title is marked as Work In Progress
-func (gh *GitHubWIPPRHandler) IsWorkInProgress(title *string) bool {
+func (gh *GitHubWIPPRHandler) IsWorkInProgress(title *string, config PluginConfiguration) bool {
+	transformedTitle := strings.ToLower(*title)
+	if (len(config.Prefix)) > 0 {
+		defaultPrefixes = append(defaultPrefixes, config.Prefix...)
+	}
+	return gh.hasDefaultPrefix(transformedTitle)
+}
+
+func (gh *GitHubWIPPRHandler) hasDefaultPrefix(title string) bool {
 	for _, prefix := range defaultPrefixes {
 		pattern := `(?mi)^(\[|\()?` + prefix + `(\]|\))?(:|[[:blank:]])+`
 		re := regexp.MustCompile(pattern)
-		if re.FindString(strings.ToLower(*title)) != "" {
+		if re.FindString(title) != "" {
 			return true
 		}
 	}

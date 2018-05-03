@@ -50,6 +50,8 @@ var _ = Describe("Test Keeper Plugin features", func() {
 
 		It("should mark opened PR as ready for review if not prefixed with WIP", func() {
 			// given
+			NonExistingRawGitHubFiles("work-in-progress.yml", "work-in-progress.yaml")
+
 			gock.New("https://api.github.com").
 				Post("/repos/bartoszmajsak/wfswarm-booster-pipeline-test/statuses").
 				SetMatcher(ExpectPayload(toHaveSuccessState)).
@@ -66,6 +68,8 @@ var _ = Describe("Test Keeper Plugin features", func() {
 
 		It("should mark opened PR as work-in-progress when prefixed with WIP", func() {
 			// given
+			NonExistingRawGitHubFiles("work-in-progress.yml", "work-in-progress.yaml")
+
 			gock.New("https://api.github.com").
 				Post("/repos/bartoszmajsak/wfswarm-booster-pipeline-test/statuses").
 				SetMatcher(ExpectPayload(toHaveFailureState)).
@@ -82,6 +86,8 @@ var _ = Describe("Test Keeper Plugin features", func() {
 
 		It("should mark status as failed (thus block PR merge) when title updated to contain WIP", func() {
 			// given
+			NonExistingRawGitHubFiles("work-in-progress.yml", "work-in-progress.yaml")
+
 			gock.New("https://api.github.com").
 				Post("/repos/bartoszmajsak/wfswarm-booster-pipeline-test/statuses").
 				SetMatcher(ExpectPayload(toHaveFailureState)).
@@ -99,6 +105,8 @@ var _ = Describe("Test Keeper Plugin features", func() {
 
 		It("should mark status as success (thus unblock PR merge) when title has WIP removed", func() {
 			// given
+			NonExistingRawGitHubFiles("work-in-progress.yml", "work-in-progress.yaml")
+
 			gock.New("https://api.github.com").
 				Post("/repos/bartoszmajsak/wfswarm-booster-pipeline-test/statuses").
 				SetMatcher(ExpectPayload(toHaveSuccessState)).
