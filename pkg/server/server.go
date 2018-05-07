@@ -67,7 +67,7 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if eventType == string(github.PullRequest) || eventType == string(github.IssueComment) {
-		s.Metrics.HandledEventsCounter.WithLabelValues(string(eventType)).Inc()
+		s.Metrics.HandledEventsCounter.WithLabelValues(eventType).Inc()
 	}
 
 	if err := s.GitHubEventHandler.HandleEvent(l, github.EventType(eventType), payload); err != nil {
