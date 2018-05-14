@@ -8,6 +8,7 @@ import (
 
 	"strconv"
 
+	probeshandler "github.com/arquillian/ike-prow-plugins/pkg/probes-handler"
 	"github.com/arquillian/ike-prow-plugins/pkg/utils"
 	"k8s.io/test-infra/prow/pluginhelp/externalplugins"
 	"k8s.io/test-infra/prow/plugins"
@@ -22,6 +23,7 @@ import (
 	"github.com/arquillian/ike-prow-plugins/pkg/log"
 	"github.com/arquillian/ike-prow-plugins/pkg/server"
 	"github.com/sirupsen/logrus"
+	"github.com/prometheus/client_golang/prometheus/promhttp"
 )
 
 // nolint
@@ -36,6 +38,8 @@ var (
 	sentryTimeout       = flag.Int("sentry-timeout", 1000, "Sentry server timeout in ms. Defaults to 1 second ")
 	environment         = flag.String("env", "tenant", "Environment plugin is running in. Used e.g. by Sentry for tagging.")
 	pluginBotName       = flag.String("bot-name", "alien-ike", "Bot Name used for the plugins.")
+	httpAddress         = flag.String("http.address", "0.0.0.0:"+strconv.Itoa(*port), "Http address at which prow server binds")
+	metricsHttpAddress  = flag.String("metrics.http.address", "0.0.0.0:"+strconv.Itoa(*port), "Address at which /metrics endpoint will be mounted.")
 )
 
 // DocumentationURL is a link to arquillian ike-prow-plugins documentation
@@ -96,7 +100,23 @@ func InitPlugin(pluginName string, newEventHandler EventHandlerCreator, newServe
 	logger.Infof("Starting server on port %s", port)
 
 	http.Handle("/", pluginServer)
+	http.Handle("/version", probeshandler.NewProbesHandler(logger))
+
 	externalplugins.ServeExternalPluginHelp(http.DefaultServeMux, logger, helpProvider)
+
+	if *httpAddress == *metricsHttpAddress {
+		http.Handle("/metrics", promhttp.Handler())
+	} else {
+		go func(metricAddress string) {
+			mx := http.NewServeMux()
+			mx.Handle("/metrics", promhttp.Handler())
+			if err := http.ListenAndServe(metricAddress, mx); err != nil {
+				logger.WithFields(logrus.Fields{"addr": metricAddress,
+					"err": err}).Fatalf("failed to connect to metrics server %s", metricAddress)
+			}
+		}(*metricsHttpAddress)
+	}
+
 	if err := http.ListenAndServe(":"+port, nil); err != nil {
 		logger.WithError(err).Fatalf("failed to start server on port %s", port)
 	}

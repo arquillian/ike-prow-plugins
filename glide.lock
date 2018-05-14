@@ -1,8 +1,8 @@
-hash: 3e5727a2513de16dfd9a343097a2ab65d4c32ed5d3e25f586281b0ad32bf4692
-updated: 2018-04-27T07:35:59.235279852+02:00
+hash: 89baf0cd29908af47405714762c68467df13cc85df8f24a51b297c51fc6a051c
+updated: 2018-05-14T17:34:53.362565762+02:00
 imports:
 - name: github.com/bazelbuild/buildtools
-  version: 7a46d39511ae917d3af53e0627f4b57489dd1bff
+  version: dbfff2ed97adbf9c55bfce1267913ed3c08707fb
   subpackages:
   - build
   - tables
@@ -26,9 +26,9 @@ imports:
 - name: github.com/golang/glog
   version: 44145f04b68cf362d9c4df2182967c2275eaefed
 - name: github.com/golang/lint
-  version: 1fb4e4796c08a9a18d8796a6aed584bf4b346bc9
+  version: 470b6b0bb3005eda157f0275e2e4895055396a81
 - name: github.com/golang/protobuf
-  version: e09c5db296004fbe3f74490e84dcd62c3c5ddb1b
+  version: 927b65914520a8b7d44f5c9057611cfec6b2e2d0
   subpackages:
   - proto
 - name: github.com/google/go-github
@@ -92,6 +92,7 @@ imports:
   version: 82f5ff156b29e276022b1a958f7d385870fb9814
   subpackages:
   - prometheus
+  - prometheus/promhttp
 - name: github.com/prometheus/client_model
   version: 99fa1f4be8e564e8a6b613da7fa6f46c9edafc6c
   subpackages:
@@ -111,13 +112,13 @@ imports:
 - name: github.com/satori/go.uuid
   version: 879c5887cd475cd7864858769793b2ceb0d44feb
 - name: github.com/shurcooL/githubql
-  version: d8297a7d5a840a2105de3f27796a6876d03b5da1
+  version: 2f1beebeca3383d6367f59e5f091dd4fe1c856de
 - name: github.com/shurcooL/go
-  version: 47fa5b7ceee66c60ac3a281416089035bf526a3c
+  version: 9e1955d9fb6e1ee2345ba1f5e71669263e719e27
   subpackages:
   - ctxhttp
 - name: github.com/shurcooL/graphql
-  version: 3d276b9dcc6b1e0adf19557a8de5cb8632c07697
+  version: 62c9ce094e75302d560f7adcdf16c06d05aaa958
   subpackages:
   - ident
   - internal/jsonutil
@@ -128,7 +129,7 @@ imports:
 - name: github.com/spf13/pflag
   version: 583c0c0531f06d5278b7d917446061adc344b5cd
 - name: golang.org/x/crypto
-  version: b49d69b5da943f7ef3c9cf91c8777c1f78a0cc3c
+  version: 034e5325b6ab92faa14d15c30e86919e911cf8e0
   subpackages:
   - ssh/terminal
 - name: golang.org/x/net
@@ -144,11 +145,11 @@ imports:
   - idna
   - lex/httplex
 - name: golang.org/x/oauth2
-  version: 6881fee410a5daf86371371f9ad451b95e168b71
+  version: cdc340f7c179dbbfa4afd43b7614e8fcadde4269
   subpackages:
   - internal
 - name: golang.org/x/sys
-  version: bb9c189858d91f42db229b04d45a4c3d23a7662a
+  version: 7c87d13f8e835d2fb3a70a2912c811ed0c1d241b
   subpackages:
   - unix
   - windows
@@ -174,13 +175,13 @@ imports:
   - unicode/bidi
   - unicode/norm
 - name: golang.org/x/tools
-  version: 0b5ca0b0400f3828340b1302bc811fa777cb5958
+  version: 48418e5732e1b1e2a10207c8007a5f959e422f20
   subpackages:
   - go/ast/astutil
   - go/gcexportdata
   - go/internal/gcimporter
 - name: google.golang.org/appengine
-  version: 0a24098c0ec68416ec050f567f75df563d6b231e
+  version: 962cbd1200af94a5a35ba8d512e9f91271b4d01a
   subpackages:
   - internal
   - internal/base
@@ -198,11 +199,11 @@ imports:
 - name: gopkg.in/yaml.v2
   version: 5420a8b6744d3b0345ab293f6fcba19c978f1183
 - name: k8s.io/api
-  version: e8df68e6b4a0eb60c21b9ba3a0b3e049bc041a31
+  version: 53d615ae3f440f957cb9989d989d597f047262d9
   subpackages:
   - core/v1
 - name: k8s.io/apimachinery
-  version: 501cb7399c8d23c1183ac38f1051d185188ecf12
+  version: dd7876c087d16d10b82489a4dac9e3f4427176ca
   subpackages:
   - pkg/api/resource
   - pkg/apis/meta/v1
