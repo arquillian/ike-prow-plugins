@@ -72,6 +72,14 @@ objects:
             - name: plugins
               mountPath: /etc/plugins
               readOnly: true
+            readinessProbe:
+              httpGet:
+                path: /
+                port: 8888
+            livenessProbe:
+              httpGet:
+                path: /
+                port: 8888  
           volumes:
           - name: hmac
             secret:
