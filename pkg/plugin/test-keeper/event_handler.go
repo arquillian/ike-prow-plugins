@@ -8,9 +8,9 @@ import (
 	"github.com/arquillian/ike-prow-plugins/pkg/github/client"
 	"github.com/arquillian/ike-prow-plugins/pkg/github/service"
 	"github.com/arquillian/ike-prow-plugins/pkg/log"
-	"github.com/arquillian/ike-prow-plugins/pkg/scm"
 	"github.com/arquillian/ike-prow-plugins/pkg/utils"
 	gogh "github.com/google/go-github/github"
+	"github.com/arquillian/ike-prow-plugins/pkg/scm"
 )
 
 // GitHubTestEventsHandler is the event handler for the plugin.
@@ -81,25 +81,41 @@ func (gh *GitHubTestEventsHandler) handlePrComment(log log.Logger, comment *gogh
 
 	cmdHandler := command.CommentCmdHandler{Client: gh.Client}
 
-	cmdHandler.Register(
-		&BypassCmd{
-			userPermissionService: userPerm,
-			whenDeleted: func() error {
-				pullRequest, err := prLoader.Load()
-				if err != nil {
-					return err
-				}
-				return gh.checkTestsAndSetStatus(log, pullRequest)
-			},
-			whenAddedOrCreated: func() error {
-				pullRequest, err := prLoader.Load()
-				if err != nil {
-					return err
-				}
-				statusService := gh.newTestStatusService(log, ghservice.NewRepositoryChangeForPR(pullRequest))
-				return statusService.okWithoutTests(*comment.Sender.Login)
-			},
-		})
+	runCmd := &command.RunCmd{
+		UserPermissionService: userPerm,
+		WhenAddedOrCreated: func() error {
+			pullRequest, err := prLoader.Load()
+			if err != nil {
+				return err
+			}
+			return gh.checkTestsAndSetStatus(log, pullRequest)
+		}}
+
+	if runCmd.ContainsRunCmdWithPluginNameOrAll(ProwPluginName, comment) {
+		cmdHandler.Register(runCmd)
+	}
+
+	bypassCmd := &BypassCmd{
+		userPermissionService: userPerm,
+		whenDeleted: func() error {
+			pullRequest, err := prLoader.Load()
+			if err != nil {
+				return err
+			}
+			return gh.checkTestsAndSetStatus(log, pullRequest)
+		},
+		whenAddedOrCreated: func() error {
+			pullRequest, err := prLoader.Load()
+			if err != nil {
+				return err
+			}
+			statusService := gh.newTestStatusService(log, ghservice.NewRepositoryChangeForPR(pullRequest))
+			return statusService.okWithoutTests(*comment.Sender.Login)
+		}}
+
+	if bypassCmd.Matches(comment) {
+		cmdHandler.Register(bypassCmd)
+	}
 
 	err := cmdHandler.Handle(log, comment)
 	if err != nil {

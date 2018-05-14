@@ -12,6 +12,7 @@ import (
 	"github.com/arquillian/ike-prow-plugins/pkg/scm"
 	"github.com/arquillian/ike-prow-plugins/pkg/utils"
 	gogh "github.com/google/go-github/github"
+	"github.com/arquillian/ike-prow-plugins/pkg/command"
 )
 
 const (
@@ -39,7 +40,8 @@ type GitHubWIPPRHandler struct {
 }
 
 var (
-	handledPrActions = []string{"opened", "reopened", "edited"}
+	handledPrActions      = []string{"opened", "reopened", "edited"}
+	handledCommentActions = []string{"created"}
 )
 
 // HandleEvent is an entry point for the plugin logic. This method is invoked by the Server when
@@ -69,6 +71,18 @@ func (gh *GitHubWIPPRHandler) HandleEvent(log log.Logger, eventType github.Event
 		}
 		return statusService.Success(ReadyForReviewMessage, ReadyForReviewDetailsLink)
 
+	case github.IssueComment:
+		var event gogh.IssueCommentEvent
+		if err := json.Unmarshal(payload, &event); err != nil {
+			log.Errorf("Failed while parsing '%q' event with payload: %q. Cause: %q", github.IssueComment, event, err)
+			return err
+		}
+
+		if err := gh.handlePrComment(log, &event); err != nil {
+			log.Errorf("Error handling '%q' event with payload %q. Cause: %q", github.IssueComment, event, err)
+			return err
+		}
+
 	default:
 		log.Warnf("received an event of type %q but didn't ask for it", eventType)
 	}
@@ -79,4 +93,46 @@ func (gh *GitHubWIPPRHandler) HandleEvent(log log.Logger, eventType github.Event
 // IsWorkInProgress checks if title is marked as Work In Progress
 func (gh *GitHubWIPPRHandler) IsWorkInProgress(title *string) bool {
 	return strings.HasPrefix(strings.ToLower(*title), WipPrefix)
+}
+
+func (gh *GitHubWIPPRHandler) handlePrComment(log log.Logger, comment *gogh.IssueCommentEvent) error {
+	if !utils.Contains(handledCommentActions, *comment.Action) {
+		return nil
+	}
+
+	prLoader := ghservice.NewPullRequestLazyLoader(gh.Client, comment)
+	userPerm := command.NewPermissionService(gh.Client, *comment.Sender.Login, prLoader)
+
+	cmdHandler := command.CommentCmdHandler{Client: gh.Client}
+	runCmd := &command.RunCmd{
+		UserPermissionService: userPerm,
+		WhenAddedOrCreated: func() error {
+			pullRequest, err := prLoader.Load()
+			if err != nil {
+				return err
+			}
+
+			change := scm.RepositoryChange{
+				Owner:    *comment.Repo.Owner.Login,
+				RepoName: *comment.Repo.Name,
+				Hash:     *pullRequest.Head.SHA,
+			}
+
+			statusContext := github.StatusContext{BotName: gh.BotName, PluginName: ProwPluginName}
+			statusService := ghservice.NewStatusService(gh.Client, log, change, statusContext)
+			if gh.IsWorkInProgress(pullRequest.Title) {
+				return statusService.Failure(InProgressMessage, InProgressDetailsLink)
+			}
+			return statusService.Success(ReadyForReviewMessage, ReadyForReviewDetailsLink)
+		}}
+
+	if runCmd.ContainsRunCmdWithPluginNameOrAll(ProwPluginName, comment) {
+		cmdHandler.Register(runCmd)
+	}
+
+	err := cmdHandler.Handle(log, comment)
+	if err != nil {
+		log.Error(err)
+	}
+	return err
 }
