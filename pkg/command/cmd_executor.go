@@ -1,8 +1,6 @@
 package command
 
 import (
-	"strings"
-
 	"github.com/arquillian/ike-prow-plugins/pkg/github/client"
 	"github.com/arquillian/ike-prow-plugins/pkg/github/service"
 	"github.com/arquillian/ike-prow-plugins/pkg/log"
@@ -97,9 +95,6 @@ func (p *DoFunctionProvider) getMatchingAction(comment *gogh.IssueCommentEvent) 
 
 // Execute triggers the given DoFunctions (when all checks are fulfilled) for the given pr comment
 func (e *CmdExecutor) Execute(client ghclient.Client, log log.Logger, comment *gogh.IssueCommentEvent) error {
-	if e.Command != strings.TrimSpace(*comment.Comment.Body) {
-		return nil
-	}
 	for _, doExecutor := range e.executors {
 		err := doExecutor(client, log, comment)
 		if err != nil {

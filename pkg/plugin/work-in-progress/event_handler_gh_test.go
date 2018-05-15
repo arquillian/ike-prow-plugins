@@ -10,11 +10,13 @@ import (
 	. "github.com/onsi/gomega"
 	"gopkg.in/h2non/gock.v1"
 
+	"github.com/arquillian/ike-prow-plugins/pkg/command"
 	"github.com/arquillian/ike-prow-plugins/pkg/github"
 )
 
 const (
-	botName = "alien-ike"
+	botName        = "alien-ike"
+	repositoryName = "bartoszmajsak/wfswarm-booster-pipeline-test"
 )
 
 var expectedContext = strings.Join([]string{botName, wip.ProwPluginName}, "/")
@@ -108,6 +110,68 @@ var _ = Describe("Test Keeper Plugin features", func() {
 
 			// when
 			err := handler.HandleEvent(log, github.PullRequest, statusPayload)
+
+			// then - implicit verification of /statuses call occurrence with proper payload
+			Ω(err).ShouldNot(HaveOccurred())
+		})
+
+		It("should mark opened PR as ready for review if not prefixed with WIP when "+command.RunCommentPrefix+" all command is used by external user", func() {
+			// given
+			gock.New("https://api.github.com").
+				Get("/repos/" + repositoryName + "/pulls/11").
+				Reply(200).
+				Body(FromFile("test_fixtures/github_calls//pr_details.json"))
+
+			gock.New("https://api.github.com").
+				Get("/repos/" + repositoryName + "/pulls/11/reviews").
+				Reply(200).
+				BodyString(`[]`)
+
+			gock.New("https://api.github.com").
+				Get("/repos/" + repositoryName + "/collaborators/bartoszmajsak-test/permission").
+				Reply(200).
+				Body(FromFile("test_fixtures/github_calls/collaborators_external-user_permission.json"))
+
+			gock.New("https://api.github.com").
+				Post("/repos/bartoszmajsak/wfswarm-booster-pipeline-test/statuses").
+				SetMatcher(ExpectPayload(toHaveSuccessState)).
+				Reply(201) // This way we implicitly verify that call happened after `HandleEvent` call
+
+			statusPayload := LoadFromFile("test_fixtures/github_calls/run_comment_pr_by_external.json")
+
+			// when
+			err := handler.HandleEvent(log, github.IssueComment, statusPayload)
+
+			// then - implicit verification of /statuses call occurrence with proper payload
+			Ω(err).ShouldNot(HaveOccurred())
+		})
+
+		It("should mark opened PR as work-in-progress if prefixed with WIP when "+command.RunCommentPrefix+" all command is used by admin", func() {
+			// given
+			gock.New("https://api.github.com").
+				Get("/repos/" + repositoryName + "/pulls/11").
+				Reply(200).
+				Body(FromFile("test_fixtures/github_calls//pr_details_wip.json"))
+
+			gock.New("https://api.github.com").
+				Get("/repos/" + repositoryName + "/pulls/11/reviews").
+				Reply(200).
+				BodyString(`[]`)
+
+			gock.New("https://api.github.com").
+				Get("/repos/" + repositoryName + "/collaborators/bartoszmajsak/permission").
+				Reply(200).
+				Body(FromFile("test_fixtures/github_calls/collaborators_repo-admin_permission.json"))
+
+			gock.New("https://api.github.com").
+				Post("/repos/bartoszmajsak/wfswarm-booster-pipeline-test/statuses").
+				SetMatcher(ExpectPayload(toHaveFailureState)).
+				Reply(201) // This way we implicitly verify that call happened after `HandleEvent` call
+
+			statusPayload := LoadFromFile("test_fixtures/github_calls/run_comment_wip_pr_by_pr_creator.json")
+
+			// when
+			err := handler.HandleEvent(log, github.IssueComment, statusPayload)
 
 			// then - implicit verification of /statuses call occurrence with proper payload
 			Ω(err).ShouldNot(HaveOccurred())
