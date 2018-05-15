@@ -40,6 +40,7 @@ type GitHubWIPPRHandler struct {
 
 var (
 	handledPrActions = []string{"opened", "reopened", "edited"}
+	wipLabel         = []string{"work-in-progress"}
 )
 
 // HandleEvent is an entry point for the plugin logic. This method is invoked by the Server when
@@ -65,6 +66,7 @@ func (gh *GitHubWIPPRHandler) HandleEvent(log log.Logger, eventType github.Event
 		statusContext := github.StatusContext{BotName: gh.BotName, PluginName: ProwPluginName}
 		statusService := ghservice.NewStatusService(gh.Client, log, change, statusContext)
 		if gh.IsWorkInProgress(event.PullRequest.Title) {
+			gh.Client.AddLabelToPullRequest(change.Owner, change.RepoName, *event.PullRequest.Number, wipLabel)
 			return statusService.Failure(InProgressMessage, InProgressDetailsLink)
 		}
 		return statusService.Success(ReadyForReviewMessage, ReadyForReviewDetailsLink)
