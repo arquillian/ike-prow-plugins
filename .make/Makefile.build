@@ -46,9 +46,6 @@ format:
 
 # Build configuration
 BUILD_TIME=$(shell date -u '+%Y-%m-%dT%H:%M:%SZ')
-COMMIT:=$(shell git rev-parse --short HEAD)
-TIMESTAMP:=$(shell date +%s)
-TAG:=$(COMMIT)-$(TIMESTAMP)
 GITUNTRACKEDCHANGES:=$(shell git status --porcelain --untracked-files=no)
 ifneq ($(GITUNTRACKEDCHANGES),)
   COMMIT := $(COMMIT)-dirty
