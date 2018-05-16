@@ -48,9 +48,11 @@ function cleanup_env {
 }
 
 function deploy() {
-  # Login first
   export REGISTRY="push.registry.devshift.net"
+  export PLUGINS='work-in-progress test-keeper'
+  export PLUGINS_CONFIG='cluster/osio-plugins.yaml'
 
+  # Login first
   if [ -n "${DEVSHIFT_USERNAME}" -a -n "${DEVSHIFT_PASSWORD}" ]; then
     docker login -u ${DEVSHIFT_USERNAME} -p ${DEVSHIFT_PASSWORD} ${REGISTRY}
   else
