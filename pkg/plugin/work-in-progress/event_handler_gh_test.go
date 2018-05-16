@@ -51,6 +51,11 @@ var _ = Describe("Test Keeper Plugin features", func() {
 		It("should mark opened PR as ready for review if not prefixed with WIP", func() {
 			// given
 			gock.New("https://api.github.com").
+				Post("/repos/bartoszmajsak/wfswarm-booster-pipeline-test/issues/4/labels").
+				Reply(200).
+				Body(FromFile("test_fixtures/github_calls/pr_with_label.json"))
+
+			gock.New("https://api.github.com").
 				Post("/repos/bartoszmajsak/wfswarm-booster-pipeline-test/statuses").
 				SetMatcher(ExpectPayload(toHaveSuccessState)).
 				Reply(201) // This way we implicitly verify that call happened after `HandleEvent` call
@@ -66,6 +71,11 @@ var _ = Describe("Test Keeper Plugin features", func() {
 
 		It("should mark opened PR as work-in-progress when prefixed with WIP", func() {
 			// given
+			gock.New("https://api.github.com").
+				Post("/repos/bartoszmajsak/wfswarm-booster-pipeline-test/issues/4/labels").
+				Reply(200).
+				Body(FromFile("test_fixtures/github_calls/pr_with_label.json"))
+
 			gock.New("https://api.github.com").
 				Post("/repos/bartoszmajsak/wfswarm-booster-pipeline-test/statuses").
 				SetMatcher(ExpectPayload(toHaveFailureState)).
@@ -83,6 +93,11 @@ var _ = Describe("Test Keeper Plugin features", func() {
 		It("should mark status as failed (thus block PR merge) when title updated to contain WIP", func() {
 			// given
 			gock.New("https://api.github.com").
+				Post("/repos/bartoszmajsak/wfswarm-booster-pipeline-test/issues/4/labels").
+				Reply(200).
+				Body(FromFile("test_fixtures/github_calls/pr_with_label.json"))
+
+			gock.New("https://api.github.com").
 				Post("/repos/bartoszmajsak/wfswarm-booster-pipeline-test/statuses").
 				SetMatcher(ExpectPayload(toHaveFailureState)).
 				Reply(201) // This way we implicitly verify that call happened after `HandleEvent` call
@@ -99,6 +114,11 @@ var _ = Describe("Test Keeper Plugin features", func() {
 
 		It("should mark status as success (thus unblock PR merge) when title has WIP removed", func() {
 			// given
+			gock.New("https://api.github.com").
+				Post("/repos/bartoszmajsak/wfswarm-booster-pipeline-test/issues/4/labels").
+				Reply(200).
+				Body(FromFile("test_fixtures/github_calls/pr_with_label.json"))
+
 			gock.New("https://api.github.com").
 				Post("/repos/bartoszmajsak/wfswarm-booster-pipeline-test/statuses").
 				SetMatcher(ExpectPayload(toHaveSuccessState)).
