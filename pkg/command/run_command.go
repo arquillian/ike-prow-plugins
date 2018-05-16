@@ -8,10 +8,10 @@ import (
 	gogh "github.com/google/go-github/github"
 )
 
-// RunCommentPrefix is used as a command to bypass test presence validation
+// RunCommentPrefix is used as a command prefix to trigger plugin with it's name
 const RunCommentPrefix = "/run"
 
-// RunCmd represents a command that is triggered by "/run"
+// RunCmd represents a command that is triggered by "/run plugin-name" or "/run all"
 type RunCmd struct {
 	UserPermissionService *PermissionService
 	WhenAddedOrCreated    DoFunction

@@ -115,12 +115,12 @@ var _ = Describe("Test Keeper Plugin features", func() {
 			Ω(err).ShouldNot(HaveOccurred())
 		})
 
-		It("should mark opened PR as ready for review if not prefixed with WIP when "+command.RunCommentPrefix+" all command is used by external user", func() {
+		It("should mark opened PR as ready for review if not prefixed with WIP when "+command.RunCommentPrefix+" "+wip.ProwPluginName+" command is triggered by pr creator", func() {
 			// given
 			gock.New("https://api.github.com").
 				Get("/repos/" + repositoryName + "/pulls/11").
 				Reply(200).
-				Body(FromFile("test_fixtures/github_calls//pr_details.json"))
+				Body(FromFile("test_fixtures/github_calls/pr_details.json"))
 
 			gock.New("https://api.github.com").
 				Get("/repos/" + repositoryName + "/pulls/11/reviews").
@@ -137,7 +137,7 @@ var _ = Describe("Test Keeper Plugin features", func() {
 				SetMatcher(ExpectPayload(toHaveSuccessState)).
 				Reply(201) // This way we implicitly verify that call happened after `HandleEvent` call
 
-			statusPayload := LoadFromFile("test_fixtures/github_calls/run_comment_pr_by_external.json")
+			statusPayload := LoadFromFile("test_fixtures/github_calls/trigger_run_work-in-progress_on_pr_by_pr_creator.json")
 
 			// when
 			err := handler.HandleEvent(log, github.IssueComment, statusPayload)
@@ -168,7 +168,7 @@ var _ = Describe("Test Keeper Plugin features", func() {
 				SetMatcher(ExpectPayload(toHaveFailureState)).
 				Reply(201) // This way we implicitly verify that call happened after `HandleEvent` call
 
-			statusPayload := LoadFromFile("test_fixtures/github_calls/run_comment_wip_pr_by_pr_creator.json")
+			statusPayload := LoadFromFile("test_fixtures/github_calls/trigger_run_all_on_wip_pr_by_admin.json")
 
 			// when
 			err := handler.HandleEvent(log, github.IssueComment, statusPayload)

@@ -1,15 +1,15 @@
 {
   "action": "created",
   "issue": {
-    "url": "https://api.github.com/repos/bartoszmajsak/wfswarm-booster-pipeline-test/issues/1",
+    "url": "https://api.github.com/repos/bartoszmajsak/wfswarm-booster-pipeline-test/issues/2",
     "repository_url": "https://api.github.com/repos/bartoszmajsak/wfswarm-booster-pipeline-test",
-    "labels_url": "https://api.github.com/repos/bartoszmajsak/wfswarm-booster-pipeline-test/issues/1/labels{/name}",
-    "comments_url": "https://api.github.com/repos/bartoszmajsak/wfswarm-booster-pipeline-test/issues/1/comments",
-    "events_url": "https://api.github.com/repos/bartoszmajsak/wfswarm-booster-pipeline-test/issues/1/events",
-    "html_url": "https://github.com/bartoszmajsak/wfswarm-booster-pipeline-test/pull/1",
-    "id": 297784834,
-    "number": 1,
-    "title": "chore: let's trigger PR build",
+    "labels_url": "https://api.github.com/repos/bartoszmajsak/wfswarm-booster-pipeline-test/issues/2/labels{/name}",
+    "comments_url": "https://api.github.com/repos/bartoszmajsak/wfswarm-booster-pipeline-test/issues/2/comments",
+    "events_url": "https://api.github.com/repos/bartoszmajsak/wfswarm-booster-pipeline-test/issues/2/events",
+    "html_url": "https://github.com/bartoszmajsak/wfswarm-booster-pipeline-test/pull/2",
+    "id": 170854539,
+    "number": 2,
+    "title": "feat: some new fancy feature with tests",
     "user": {
       "login": "bartoszmajsak",
       "id": 719616,
@@ -45,15 +45,42 @@
     "closed_at": null,
     "author_association": "OWNER",
     "pull_request": {
-      "url": "https://api.github.com/repos/bartoszmajsak/wfswarm-booster-pipeline-test/pulls/1",
-      "html_url": "https://github.com/bartoszmajsak/wfswarm-booster-pipeline-test/pull/1",
-      "diff_url": "https://github.com/bartoszmajsak/wfswarm-booster-pipeline-test/pull/1.diff",
-      "patch_url": "https://github.com/bartoszmajsak/wfswarm-booster-pipeline-test/pull/1.patch"
+      "url": "https://api.github.com/repos/bartoszmajsak/wfswarm-booster-pipeline-test/pulls/2",
+      "html_url": "https://github.com/bartoszmajsak/wfswarm-booster-pipeline-test/pull/2",
+      "diff_url": "https://github.com/bartoszmajsak/wfswarm-booster-pipeline-test/pull/2.diff",
+      "patch_url": "https://github.com/bartoszmajsak/wfswarm-booster-pipeline-test/pull/2.patch"
     },
     "body": ""
   },
-
-
+  "comment": {
+    "url": "https://api.github.com/repos/bartoszmajsak/wfswarm-booster-pipeline-test/issues/comments/369970212",
+    "html_url": "https://github.com/bartoszmajsak/wfswarm-booster-pipeline-test/pull/2#issuecomment-369970212",
+    "issue_url": "https://api.github.com/repos/bartoszmajsak/wfswarm-booster-pipeline-test/issues/2",
+    "id": 369970212,
+    "user": {
+      "login": "bartoszmajsak-test",
+      "id": 34574692,
+      "avatar_url": "https://avatars3.githubusercontent.com/u/34574692?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/bartoszmajsak-test",
+      "html_url": "https://github.com/bartoszmajsak-test",
+      "followers_url": "https://api.github.com/users/bartoszmajsak-test/followers",
+      "following_url": "https://api.github.com/users/bartoszmajsak-test/following{/other_user}",
+      "gists_url": "https://api.github.com/users/bartoszmajsak-test/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/bartoszmajsak-test/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/bartoszmajsak-test/subscriptions",
+      "organizations_url": "https://api.github.com/users/bartoszmajsak-test/orgs",
+      "repos_url": "https://api.github.com/users/bartoszmajsak-test/repos",
+      "events_url": "https://api.github.com/users/bartoszmajsak-test/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/bartoszmajsak-test/received_events",
+      "type": "User",
+      "site_admin": false
+    },
+    "created_at": "2018-03-02T16:19:29Z",
+    "updated_at": "2018-03-02T16:19:29Z",
+    "author_association": "COLLABORATOR",
+    "body": "/run test-keeper"
+  },
   "repository": {
     "id": 121737972,
     "name": "wfswarm-booster-pipeline-test",

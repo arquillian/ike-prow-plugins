@@ -6,6 +6,7 @@ import (
 	"github.com/arquillian/ike-prow-plugins/pkg/log"
 	"github.com/arquillian/ike-prow-plugins/pkg/utils"
 	gogh "github.com/google/go-github/github"
+	"strings"
 )
 
 // DoFunction is used for performing operations related to command actions
@@ -95,6 +96,10 @@ func (p *DoFunctionProvider) getMatchingAction(comment *gogh.IssueCommentEvent) 
 
 // Execute triggers the given DoFunctions (when all checks are fulfilled) for the given pr comment
 func (e *CmdExecutor) Execute(client ghclient.Client, log log.Logger, comment *gogh.IssueCommentEvent) error {
+	body := strings.TrimSpace(*comment.Comment.Body)
+	if e.Command != body && !strings.HasPrefix(body, e.Command){
+		return nil
+	}
 	for _, doExecutor := range e.executors {
 		err := doExecutor(client, log, comment)
 		if err != nil {

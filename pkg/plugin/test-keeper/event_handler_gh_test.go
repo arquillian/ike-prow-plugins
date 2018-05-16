@@ -411,7 +411,7 @@ var _ = Describe("Test Keeper Plugin features", func() {
 				SetMatcher(ExpectPayload(toHaveEnforcedFailureState)).
 				Reply(201)
 
-			statusPayload := LoadFromFile("test_fixtures/github_calls/prs/without_tests/run_all_comment_by_admin.json")
+			statusPayload := LoadFromFile("test_fixtures/github_calls/prs/without_tests/trigger_run_all_comment_by_admin.json")
 
 			// when
 			err := handler.HandleEvent(log, github.IssueComment, statusPayload)
@@ -420,21 +420,21 @@ var _ = Describe("Test Keeper Plugin features", func() {
 			Ω(err).ShouldNot(HaveOccurred())
 		})
 
-		It("should approve newly created pull request with tests when "+command.RunCommentPrefix+" "+testkeeper.ProwPluginName+" command is used by external user", func() {
+		It("should approve newly created pull request with tests when "+command.RunCommentPrefix+" "+testkeeper.ProwPluginName+" command is triggered by pr creator", func() {
 			NonExistingRawGitHubFiles("test-keeper.yml", "test-keeper.yaml")
 
 			gock.New("https://api.github.com").
-				Get("/repos/" + repositoryName + "/pulls/1").
+				Get("/repos/" + repositoryName + "/pulls/2").
 				Reply(200).
-				Body(FromFile("test_fixtures/github_calls/prs/without_tests/pr_details.json"))
+				Body(FromFile("test_fixtures/github_calls/prs/with_tests/pr_details.json"))
 
 			gock.New("https://api.github.com").
-				Get("/repos/" + repositoryName + "/pulls/1/files").
+				Get("/repos/" + repositoryName + "/pulls/2/files").
 				Reply(200).
-				Body(FromFile("test_fixtures/github_calls/prs/without_tests/changes.json"))
+				Body(FromFile("test_fixtures/github_calls/prs/with_tests/changes.json"))
 
 			gock.New("https://api.github.com").
-				Get("/repos/" + repositoryName + "/issues/1/comments").
+				Get("/repos/" + repositoryName + "/issues/2/comments").
 				Reply(200).
 				BodyString("[]")
 
@@ -444,29 +444,22 @@ var _ = Describe("Test Keeper Plugin features", func() {
 				Body(FromFile("test_fixtures/github_calls/collaborators_external-user_permission.json"))
 
 			gock.New("https://api.github.com").
-				Get("/repos/" + repositoryName + "/pulls/1/reviews").
+				Get("/repos/" + repositoryName + "/pulls/2/reviews").
 				Reply(200).
 				BodyString(`[]`)
 
-			toHaveEnforcedFailureState := SoftlySatisfyAll(
-				HaveState(github.StatusFailure),
-				HaveContext(expectedContext),
-				HaveDescription(testkeeper.NoTestsMessage),
-				HaveTargetURL(testkeeper.NoTestsDetailsLink),
-			)
-
 			// This way we implicitly verify that call happened after `HandleEvent` call
 			gock.New("https://api.github.com").
-				Post("/repos/" + repositoryName + "/issues/1/comments").
+				Post("/repos/" + repositoryName + "/issues/2/comments").
 				SetMatcher(ExpectPayload(toHaveBodyWithWholePluginsComment)).
 				Reply(201)
 
 			gock.New("https://api.github.com").
 				Post("/repos/" + repositoryName + "/statuses").
-				SetMatcher(ExpectPayload(toHaveEnforcedFailureState)).
-				Reply(201)
+				SetMatcher(ExpectPayload(toBe(github.StatusSuccess, testkeeper.TestsExistMessage, expectedContext, testkeeper.TestsExistDetailsLink))).
+				Reply(201) // This way we implicitly verify that call happened after `HandleEvent` call
 
-			statusPayload := LoadFromFile("test_fixtures/github_calls/prs/without_tests/run_test-keeper_comment_by_external.json")
+			statusPayload := LoadFromFile("test_fixtures/github_calls/prs/with_tests/trigger_run_test-keeper_comment_by_pr_reviewer.json")
 
 			// when
 			err := handler.HandleEvent(log, github.IssueComment, statusPayload)
