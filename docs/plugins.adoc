@@ -23,7 +23,7 @@ To enable customized plugin hint comment messages edit plugin's configuration fi
 .test-keeper.yaml
 [source, yml, indent=0]
 ----
-plugin_hint: plugins/test-keeper_hint.md 
+plugin_hint: .ike-prow/test-keeper_hint.md
 ----
 
 The `plugin_hint` property can either have an inline string directly written inside of the config file or another file with case insensitive filename PLUGINNAME_HINT.md that contains the hint. The location of the file can be set by either a relative path or an absolute URL. If nothing is set then a default message is used.
