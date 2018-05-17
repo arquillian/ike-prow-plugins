@@ -4,5 +4,4 @@
 
 cico_setup;
 
-trap cleanup_env EXIT;
 run_build;
