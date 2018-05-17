@@ -79,6 +79,7 @@ skip_validation_for:
   - 'regex{{wercker\.y[a]?ml$}}'
   - 'regex{{circle\.y[a]?ml$}}'
   - 'regex{{codeship-services\.y[a]?ml$}}'
+  - 'regex{{[\.]?codecov\.yml$}}'
 
   # UI assets
   - '*.jpg'

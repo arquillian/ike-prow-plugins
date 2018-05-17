@@ -7,6 +7,10 @@ ARG GOPATH
 ARG PROJECT_PATH
 ARG GO_VERSION=go1.9.4
 
+ENV HOME=${HOME}
+ENV GOPATH=${GOPATH}
+ENV GO_VERSION=${GO_VERSION}
+
 RUN yum install -y \
     gcc \
     git \

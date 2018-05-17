@@ -9,6 +9,7 @@ parameters:
   value: arquillian
 - name: VERSION
   required: true
+  value: latest
 - name: HOOK_HOSTNAME
   value: ""
 objects:
