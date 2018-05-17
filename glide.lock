@@ -1,8 +1,8 @@
-hash: 89baf0cd29908af47405714762c68467df13cc85df8f24a51b297c51fc6a051c
-updated: 2018-05-14T16:34:12.693490958+02:00
+hash: 3e5727a2513de16dfd9a343097a2ab65d4c32ed5d3e25f586281b0ad32bf4692
+updated: 2018-04-25T15:13:01.817023112+02:00
 imports:
 - name: github.com/bazelbuild/buildtools
-  version: dbfff2ed97adbf9c55bfce1267913ed3c08707fb
+  version: 89c235029d7102b5af8bf0cd40e74f8e1ae4041b
   subpackages:
   - build
   - tables
