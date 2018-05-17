@@ -30,6 +30,7 @@ function install_deps() {
 }
 
 function run_build() {
+  trap cleanup_env EXIT;
   make docker-build
   echo "CICO: ran build"
 }
