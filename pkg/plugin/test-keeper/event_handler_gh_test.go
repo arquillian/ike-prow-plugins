@@ -77,7 +77,7 @@ var _ = Describe("Test Keeper Plugin features", func() {
 		It("should approve opened pull request when tests included based on configured pattern and defaults (implicitly combined)", func() {
 			// given
 			gock.New("https://raw.githubusercontent.com").
-				Get(repositoryName + "/5d6e9b25da90edfc19f488e595e0645c081c1575/test-keeper.yml").
+				Get(repositoryName + "/5d6e9b25da90edfc19f488e595e0645c081c1575/.ike-prow/test-keeper.yml").
 				Reply(200).
 				BodyString("test_patterns: ['**/*_test_suite.go']\n" +
 					"skip_validation_for: ['README.adoc']")
@@ -104,7 +104,7 @@ var _ = Describe("Test Keeper Plugin features", func() {
 		It("should approve new pull request without tests when it comes with configuration excluding all files from test presence check (implicitly combined)", func() {
 			// given
 			gock.New("https://raw.githubusercontent.com").
-				Get(repositoryName + "/5d6e9b25da90edfc19f488e595e0645c081c1575/test-keeper.yml").
+				Get(repositoryName + "/5d6e9b25da90edfc19f488e595e0645c081c1575/.ike-prow/test-keeper.yml").
 				Reply(200).
 				Body(FromFile("test_fixtures/github_calls/prs/without_tests/test-keeper-ignore-randomfile.yml"))
 
@@ -130,10 +130,10 @@ var _ = Describe("Test Keeper Plugin features", func() {
 		It("should reject opened pull request when no tests are matching defined pattern with no defaults implicitly combined", func() {
 			// given
 
-			NonExistingRawGitHubFiles("plugins/test-keeper_hint.md")
+			NonExistingRawGitHubFiles(".ike-prow/test-keeper_hint.md")
 
 			gock.New("https://raw.githubusercontent.com").
-				Get(repositoryName + "/5d6e9b25da90edfc19f488e595e0645c081c1575/test-keeper.yml").
+				Get(repositoryName + "/5d6e9b25da90edfc19f488e595e0645c081c1575/.ike-prow/test-keeper.yml").
 				Reply(200).
 				Body(FromFile("test_fixtures/github_calls/prs/with_tests/test-keeper.yml"))
 
