@@ -277,8 +277,9 @@ var _ = Describe("Test Keeper Plugin features", func() {
 			Ω(err).ShouldNot(HaveOccurred())
 		})
 
-		It("should skip validation and send ok status when PR contains a comment with bypass command", func() {
+		It("should send ok status when PR contains no test but a comment with bypass command is present", func() {
 			//given
+			NonExistingRawGitHubFiles("test-keeper.yml", "test-keeper.yaml")
 			gock.New("https://api.github.com").
 				Get("/repos/" + repositoryName + "/issues/1/comments").
 				Reply(200).
@@ -288,6 +289,11 @@ var _ = Describe("Test Keeper Plugin features", func() {
 				Get("/repos/" + repositoryName + "/pulls/1/reviews").
 				Reply(200).
 				BodyString(`[]`)
+
+			gock.New("https://api.github.com").
+				Get("/repos/" + repositoryName + "/pulls/1/files").
+				Reply(200).
+				Body(FromFile("test_fixtures/github_calls/prs/without_tests/changes.json"))
 
 			gock.New("https://api.github.com").
 				Get("/repos/" + repositoryName + "/collaborators/bartoszmajsak/permission").
