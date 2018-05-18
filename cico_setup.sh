@@ -30,7 +30,8 @@ function install_deps() {
 }
 
 function run_build() {
-  make build
+  trap cleanup_env EXIT;
+  make docker-build
   echo "CICO: ran build"
 }
 
@@ -45,6 +46,34 @@ function cleanup_env {
   echo "CICO: Cleanup environment"
   make docker-rm
   echo "CICO: Exiting with $EXIT_CODE"
+}
+
+function deploy() {
+  export REGISTRY="push.registry.devshift.net"
+  export PLUGINS='work-in-progress test-keeper'
+
+  if [ "${TARGET}" = "rhel" ]; then
+    export DEPLOY_DOCKERFILE='Dockerfile.deploy.rhel'
+    export DOCKER_REPO="osio-prod/ike-prow-plugins"
+  fi
+
+  # Login first
+  if [ -n "${DEVSHIFT_USERNAME}" -a -n "${DEVSHIFT_PASSWORD}" ]; then
+    docker login -u ${DEVSHIFT_USERNAME} -p ${DEVSHIFT_PASSWORD} ${REGISTRY}
+  else
+    echo "Could not login, missing credentials for the registry"
+  fi
+
+  # compile, build and deploy the hook
+  export PROW_VERSION=`./prow_version.sh | cut -c1-${DEVSHIFT_TAG_LEN}`
+  make docker-build-hook
+  make deploy-hook
+
+  # compile, build and deploy plugins
+  export TAG=$(echo ${GIT_COMMIT} | cut -c1-${DEVSHIFT_TAG_LEN})
+  make deploy-plugins
+
+  echo 'CICO: Image pushed, ready to update deployed app'
 }
 
 function cico_setup() {

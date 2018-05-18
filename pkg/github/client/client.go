@@ -7,6 +7,7 @@ import (
 	"github.com/arquillian/ike-prow-plugins/pkg/scm"
 	gogh "github.com/google/go-github/github"
 	"golang.org/x/oauth2"
+	"fmt"
 )
 
 type client struct {
@@ -47,19 +48,19 @@ func NewClient(c *gogh.Client, log log.Logger) Client {
 // GetPermissionLevel retrieves the specific permission level a collaborator has for a given repository.
 func (c client) GetPermissionLevel(owner, repo, user string) (*gogh.RepositoryPermissionLevel, error) {
 	permissionLevel, response, err := c.gh.Repositories.GetPermissionLevel(context.Background(), owner, repo, user)
-	return permissionLevel, c.logHTTPError(response, err)
+	return permissionLevel, c.checkHTTPCode(response, err)
 }
 
 // GetPullRequest retrieves information about a single pull request.
 func (c client) GetPullRequest(owner, repo string, prNumber int) (*gogh.PullRequest, error) {
 	pr, response, err := c.gh.PullRequests.Get(context.Background(), owner, repo, prNumber)
-	return pr, c.logHTTPError(response, err)
+	return pr, c.checkHTTPCode(response, err)
 }
 
 // GetPullRequestReviews retrieves a list of reviews submitted to the pull request.
 func (c client) GetPullRequestReviews(owner, repo string, prNumber int) ([]*gogh.PullRequestReview, error) {
 	prReviews, response, err := c.gh.PullRequests.ListReviews(context.Background(), owner, repo, prNumber, nil)
-	return prReviews, c.logHTTPError(response, err)
+	return prReviews, c.checkHTTPCode(response, err)
 }
 
 // ListPullRequestFiles lists the changed files in a pull request.
@@ -69,7 +70,7 @@ func (c client) ListPullRequestFiles(owner, repo string, prNumber int) ([]scm.Ch
 	for _, file := range files {
 		changedFiles = append(changedFiles, *scm.NewChangedFile(file))
 	}
-	return changedFiles, c.logHTTPError(response, err)
+	return changedFiles, c.checkHTTPCode(response, err)
 }
 
 // ListIssueComments lists all comments on the specified issue.
@@ -77,7 +78,7 @@ func (c client) ListIssueComments(issue scm.RepositoryIssue) ([]*gogh.IssueComme
 	comments, response, err :=
 		c.gh.Issues.ListComments(context.Background(), issue.Owner, issue.RepoName, issue.Number, &gogh.IssueListCommentsOptions{})
 
-	return comments, c.logHTTPError(response, err)
+	return comments, c.checkHTTPCode(response, err)
 }
 
 // CreateIssueComment creates a new comment on the specified issue.
@@ -86,14 +87,14 @@ func (c client) CreateIssueComment(issue scm.RepositoryIssue, commentMsg *string
 		Body: commentMsg,
 	}
 	_, response, err := c.gh.Issues.CreateComment(context.Background(), issue.Owner, issue.RepoName, issue.Number, comment)
-	return c.logHTTPError(response, err)
+	return c.checkHTTPCode(response, err)
 }
 
 // CreateStatus creates a new status for a repository at the specified reference represented by a RepositoryChange
 func (c client) CreateStatus(change scm.RepositoryChange, repoStatus *gogh.RepoStatus) error {
 	_, response, err :=
 		c.gh.Repositories.CreateStatus(context.Background(), change.Owner, change.RepoName, change.Hash, repoStatus)
-	return c.logHTTPError(response, err)
+	return c.checkHTTPCode(response, err)
 }
 
 func (c client) ListPullRequestLabels(owner, repo string, prNumber int) ([]*gogh.Label, error) {
@@ -115,10 +116,9 @@ func (c client) unwrap() *gogh.Client {
 	return c.gh
 }
 
-func (c client) logHTTPError(response *gogh.Response, e error) error {
-	c.log.Errorf("failed while trying to call GitHub API %s.", e)
-	if response != nil && response.StatusCode >= 404 {
-		c.log.Errorf("server responded with %d status", response.StatusCode)
+func (c client) checkHTTPCode(response *gogh.Response, e error) error {
+	if e == nil && response != nil && response.StatusCode >= 404 {
+		return fmt.Errorf("server responded with %d status", response.StatusCode)
 	}
 	return e
 }
