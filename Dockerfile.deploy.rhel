@@ -1,0 +1,24 @@
+FROM prod.registry.devshift.net/osio-prod/base/pcp:latest
+
+LABEL maintainer="Devtools <devtools@redhat.com>"
+LABEL maintainer="Devtools-test <devtools-test@redhat.com>"
+
+ENV LANG=en_US.utf8
+ENV INSTALL_PREFIX=/usr/local/prow
+
+# Create a non-root user and a group with the same name: "prow"
+ENV USER_NAME=prow
+RUN useradd --no-create-home -s /bin/bash ${USER_NAME}
+
+COPY ./prow+pmcd.sh /prow+pmcd.sh
+EXPOSE 44321
+
+ARG BINARY=0
+
+COPY bin/${BINARY} ${INSTALL_PREFIX}/bin/binary
+
+# From here onwards, any RUN, CMD, or ENTRYPOINT will be run under the following user
+USER ${USER_NAME}
+
+WORKDIR ${INSTALL_PREFIX}
+ENTRYPOINT [ "/prow+pmcd.sh" ]

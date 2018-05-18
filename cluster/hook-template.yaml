@@ -9,6 +9,7 @@ parameters:
   value: arquillian
 - name: VERSION
   required: true
+  value: latest
 - name: HOOK_HOSTNAME
   value: ""
 objects:
@@ -71,6 +72,14 @@ objects:
             - name: plugins
               mountPath: /etc/plugins
               readOnly: true
+            readinessProbe:
+              httpGet:
+                path: /
+                port: 8888
+            livenessProbe:
+              httpGet:
+                path: /
+                port: 8888  
           volumes:
           - name: hmac
             secret:
