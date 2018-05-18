@@ -20,11 +20,11 @@ oc-init-project: ## Initializes new project with config maps and secrets
 	@echo "Setting up project '$(OC_PROJECT_NAME)' in the cluster (ignoring potential errors if entries already exist)"
 	@oc new-project $(OC_PROJECT_NAME) || true
 
-	$(call populate_configmap,plugins,$(PLUGINS_CONFIG))
-	$(call populate_configmap,config,config.yaml)
-	$(call populate_secret,oauth.token,oauth-token,oauth)
-	$(call populate_secret,hmac.token,hmac-token,hmac)
-	$(call populate_secret,sentry.dsn,sentry-dsn,sentry)
+	$(call populate_configmap,ike-prow-plugins-plugins,$(PLUGINS_CONFIG))
+	$(call populate_configmap,ike-prow-plugins-config,config.yaml)
+	$(call populate_secret,oauth.token,ike-prow-plugins-oauth-token,oauth)
+	$(call populate_secret,hmac.token,ike-prow-plugins-hmac-token,hmac)
+	$(call populate_secret,sentry.dsn,ike-prow-plugins-sentry-dsn,sentry)
 
 .PHONY: oc-restart-all ## Restarts all deploymentconfigs by patching it
 oc-restart-all: oc-restart-hook oc-restart-plugins
