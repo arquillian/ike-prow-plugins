@@ -139,7 +139,7 @@ var _ = Describe("Test Keeper Plugin features", func() {
 				Reply(200).
 				BodyString(`[{"id": 934813958,` +
 					`"url": "https://api.github.com/repos/bartoszmajsak/wfswarm-booster-pipeline-test/labels/work-in-progress",` +
-					`gs"name": "work-in-progress", "color": "ededed", "default": false}]`)
+					`"name": "work-in-progress", "color": "ededed", "default": false}]`)
 
 			gock.New("https://api.github.com").
 				Delete("/repos/bartoszmajsak/wfswarm-booster-pipeline-test/issues/4/labels/work-in-progress").

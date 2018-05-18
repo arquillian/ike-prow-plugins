@@ -66,7 +66,12 @@ func (gh *GitHubWIPPRHandler) HandleEvent(log log.Logger, eventType github.Event
 		statusContext := github.StatusContext{BotName: gh.BotName, PluginName: ProwPluginName}
 		statusService := ghservice.NewStatusService(gh.Client, log, change, statusContext)
 
-		labelExists := gh.pullRequestLabelExists(change.Owner, change.RepoName, *event.PullRequest.Number, wipLabel[0])
+		labels, err := gh.Client.ListPullRequestLabels(change.Owner, change.RepoName, *event.PullRequest.Number)
+		if err != nil {
+			log.Warnf("failed to list labels on PR [%q]. cause: %s", *event.PullRequest, err)
+		}
+
+		labelExists := gh.hasWorkInProgressLabel(labels, wipLabel[0])
 
 		if gh.IsWorkInProgress(event.PullRequest.Title) {
 			if !labelExists {
@@ -90,8 +95,7 @@ func (gh *GitHubWIPPRHandler) HandleEvent(log log.Logger, eventType github.Event
 	return nil
 }
 
-func (gh *GitHubWIPPRHandler) pullRequestLabelExists(owner, repo string, prNumber int, wipLabel string) bool {
-	labels, _ := gh.Client.ListPullRequestLabels(owner, repo, prNumber)
+func (gh *GitHubWIPPRHandler) hasWorkInProgressLabel(labels []*gogh.Label, wipLabel string) bool {
 	for _, label := range labels {
 		if label.GetName() == wipLabel {
 			return true

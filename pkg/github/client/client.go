@@ -99,17 +99,17 @@ func (c client) CreateStatus(change scm.RepositoryChange, repoStatus *gogh.RepoS
 
 func (c client) ListPullRequestLabels(owner, repo string, prNumber int) ([]*gogh.Label, error) {
 	labels, response, err := c.gh.Issues.ListLabelsByIssue(context.Background(), owner, repo, prNumber, nil)
-	return labels, c.logHTTPError(response, err)
+	return labels, c.checkHTTPCode(response, err)
 }
 
 func (c client) AddPullRequestLabel(owner, repo string, prNumber int, label []string) ([]*gogh.Label, error) {
 	labels, response, err := c.gh.Issues.AddLabelsToIssue(context.Background(), owner, repo, prNumber, label)
-	return labels, c.logHTTPError(response, err)
+	return labels, c.checkHTTPCode(response, err)
 }
 
 func (c client) RemovePullRequestLabel(owner, repo string, prNumber int, label string) error {
 	response, err := c.gh.Issues.RemoveLabelForIssue(context.Background(), owner, repo, prNumber, label)
-	return c.logHTTPError(response, err)
+	return c.checkHTTPCode(response, err)
 }
 
 func (c client) unwrap() *gogh.Client {
