@@ -44,6 +44,16 @@ func (l *LoadableConfig) loadFromRawFile(pathTemplate string) config.Source {
 
 		l.BaseConfig.LocationURL = githubBaseURL + rawFileService.GetRelativePath(filePath)
 		l.BaseConfig.PluginName = l.PluginName
+
+		pluginHintPath := fmt.Sprintf(".ike-prow/%s_hint.md", l.PluginName)
+		hintURL := rawFileService.GetRawFileURL(pluginHintPath)
+
+		_, e := utils.GetFileFromURL(hintURL)
+
+		if e == nil {
+			l.BaseConfig.PluginHint = githubBaseURL + rawFileService.GetRelativePath(pluginHintPath)
+		}
+
 		return downloadedConfig, nil
 	}
 }
