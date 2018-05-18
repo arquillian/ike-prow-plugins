@@ -30,6 +30,7 @@ function install_deps() {
 }
 
 function run_build() {
+  trap cleanup_env EXIT;
   make docker-build
   echo "CICO: ran build"
 }
@@ -50,7 +51,11 @@ function cleanup_env {
 function deploy() {
   export REGISTRY="push.registry.devshift.net"
   export PLUGINS='work-in-progress test-keeper'
-  export PLUGINS_CONFIG='cluster/osio-plugins.yaml'
+
+  if [ "${TARGET}" = "rhel" ]; then
+    export DEPLOY_DOCKERFILE='Dockerfile.deploy.rhel'
+    export DOCKER_REPO="osio-prod/ike-prow-plugins"
+  fi
 
   # Login first
   if [ -n "${DEVSHIFT_USERNAME}" -a -n "${DEVSHIFT_PASSWORD}" ]; then
