@@ -79,17 +79,20 @@ func (gh *GitHubWIPPRHandler) HandleEvent(log log.Logger, eventType github.Event
 // IsWorkInProgress checks if title is marked as Work In Progress
 func (gh *GitHubWIPPRHandler) IsWorkInProgress(title *string, config PluginConfiguration) bool {
 	transformedTitle := strings.ToLower(*title)
-	if (len(config.Prefix)) > 0 {
-		defaultPrefixes = append(defaultPrefixes, config.Prefix...)
+	if len(config.Prefix) != 0 {
+		if config.Combine {
+			defaultPrefixes = append(defaultPrefixes, config.Prefix...)
+		} else {
+			defaultPrefixes = config.Prefix
+		}
 	}
 	return gh.hasDefaultPrefix(transformedTitle)
 }
 
 func (gh *GitHubWIPPRHandler) hasDefaultPrefix(title string) bool {
 	for _, prefix := range defaultPrefixes {
-		pattern := `(?mi)^(\[|\()?` + prefix + `(\]|\))?(:|[[:blank:]])+`
-		re := regexp.MustCompile(pattern)
-		if re.FindString(title) != "" {
+		pattern := `(?mi)^(\[|\()?` + prefix + `(\]|\))?(:| )+`
+		if match, _ := regexp.MatchString(pattern, title); match {
 			return true
 		}
 	}

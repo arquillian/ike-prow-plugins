@@ -18,9 +18,9 @@ var _ = Describe("Work-in-progress Plugin features", func() {
 			handler = &wip.GitHubWIPPRHandler{Client: NewDefaultGitHubClient()}
 		})
 
-		DescribeTable("should recognize PR as work-in-progress if title starts with configured prefix",
+		DescribeTable("should recognize PR as work-in-progress if title starts with configured or default prefix",
 			func(title string) {
-				Expect(handler.IsWorkInProgress(&title, wip.PluginConfiguration{Prefix: []string{`On Hold`}})).To(BeTrue())
+				Expect(handler.IsWorkInProgress(&title, wip.PluginConfiguration{Prefix: []string{`On Hold`}, Combine: true})).To(BeTrue())
 			},
 			Entry("Default Wip prefix", "Wip fix(#1): off-by one bug"),
 			Entry("Custom Work In Progress prefix", "On Hold fix(#1): off-by one bug"),
@@ -50,6 +50,13 @@ var _ = Describe("Work-in-progress Plugin features", func() {
 			Entry("not a supported wip prefix", "wip-fix off-by one bug"),
 			Entry("empty title", ""),
 			Entry("nil title", nil),
+		)
+
+		DescribeTable("should not recognize PR as work-in-progress if title starts with default prefix when custom prefix is configured with combine false",
+			func(title string) {
+				Expect(handler.IsWorkInProgress(&title, wip.PluginConfiguration{Prefix: []string{`On Hold`}, Combine: false})).To(BeFalse())
+			},
+			Entry("Default Wip prefix", "Wip fix(#1): off-by one bug"),
 		)
 
 	})

@@ -11,7 +11,8 @@ import (
 // It's unmarshaled from work-in-progress.yml configuration file
 type PluginConfiguration struct {
 	config.PluginConfiguration `yaml:",inline,omitempty"`
-	Prefix                     []string `yaml:"pr_prefix_patterns,omitempty"`
+	Prefix                     []string `yaml:"title_prefixes,omitempty"`
+	Combine                    bool     `yaml:"combine_defaults,omitempty"`
 }
 
 // LoadConfiguration loads a PluginConfiguration for the given change

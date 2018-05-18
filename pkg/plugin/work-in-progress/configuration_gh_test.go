@@ -27,7 +27,7 @@ var _ = Describe("Work In Progress config loader features", func() {
 			gock.New("https://raw.githubusercontent.com").
 				Get("owner/repo/46cb8fac44709e4ccaae97448c65e8f7320cfea7/" + wip.ProwPluginName + ".yml").
 				Reply(200).
-				BodyString("pr_prefix_patterns: ['[work in progress]', 'work in progress']")
+				BodyString("title_prefixes: ['[work in progress]', 'work in progress']")
 
 			change := scm.RepositoryChange{
 				Owner:    "owner",
