@@ -134,5 +134,4 @@ skip_validation_for:
   - '*.bat'
 
   # Our own configurations
-  - 'regex{{test-keeper\.y[a]?ml$}}'
   - '.ike-prow/'
