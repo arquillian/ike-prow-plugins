@@ -65,9 +65,21 @@ func (gh *GitHubWIPPRHandler) HandleEvent(log log.Logger, eventType github.Event
 		}
 		statusContext := github.StatusContext{BotName: gh.BotName, PluginName: ProwPluginName}
 		statusService := ghservice.NewStatusService(gh.Client, log, change, statusContext)
+
+		labelExists := gh.pullRequestLabelExists(change.Owner, change.RepoName, *event.PullRequest.Number, wipLabel[0])
+
 		if gh.IsWorkInProgress(event.PullRequest.Title) {
-			gh.Client.AddLabelToPullRequest(change.Owner, change.RepoName, *event.PullRequest.Number, wipLabel)
+			if !labelExists {
+				if _, err := gh.Client.AddPullRequestLabel(change.Owner, change.RepoName, *event.PullRequest.Number, wipLabel); err != nil {
+					log.Errorf("failed to add label on PR [%q]. cause: %s", *event.PullRequest, err)
+				}
+			}
 			return statusService.Failure(InProgressMessage, InProgressDetailsLink)
+		}
+		if labelExists {
+			if err := gh.Client.RemovePullRequestLabel(change.Owner, change.RepoName, *event.PullRequest.Number, wipLabel[0]); err != nil {
+				log.Errorf("failed to remove label on PR [%q]. cause: %s", *event.PullRequest, err)
+			}
 		}
 		return statusService.Success(ReadyForReviewMessage, ReadyForReviewDetailsLink)
 
@@ -76,6 +88,16 @@ func (gh *GitHubWIPPRHandler) HandleEvent(log log.Logger, eventType github.Event
 	}
 
 	return nil
+}
+
+func (gh *GitHubWIPPRHandler) pullRequestLabelExists(owner, repo string, prNumber int, wipLabel string) bool {
+	labels, _ := gh.Client.ListPullRequestLabels(owner, repo, prNumber)
+	for _, label := range labels {
+		if label.GetName() == wipLabel {
+			return true
+		}
+	}
+	return false
 }
 
 // IsWorkInProgress checks if title is marked as Work In Progress

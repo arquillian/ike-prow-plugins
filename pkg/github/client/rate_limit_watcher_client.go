@@ -97,3 +97,29 @@ func (r rateLimitWatcher) CreateStatus(change scm.RepositoryChange, repoStatus *
 	})
 	return err
 }
+
+func (r rateLimitWatcher) ListPullRequestLabels(owner, repo string, prNumber int) ([]*gogh.Label, error) {
+	var labels []*gogh.Label
+	var err error
+	r.logRateLimitsAfter(func() {
+		labels, err = r.Client.ListPullRequestLabels(owner, repo, prNumber)
+	})
+	return labels, err
+}
+
+func (r rateLimitWatcher) AddPullRequestLabel(owner, repo string, prNumber int, label []string) ([]*gogh.Label, error) {
+	var labels []*gogh.Label
+	var err error
+	r.logRateLimitsAfter(func() {
+		labels, err = r.Client.AddPullRequestLabel(owner, repo, prNumber, label)
+	})
+	return labels, err
+}
+
+func (r rateLimitWatcher) RemovePullRequestLabel(owner, repo string, prNumber int, label string) error {
+	var err error
+	r.logRateLimitsAfter(func() {
+		err = r.Client.RemovePullRequestLabel(owner, repo, prNumber, label)
+	})
+	return err
+}

@@ -23,8 +23,9 @@ type Client interface {
 	ListIssueComments(issue scm.RepositoryIssue) ([]*gogh.IssueComment, error)
 	CreateIssueComment(issue scm.RepositoryIssue, commentMsg *string) error
 	CreateStatus(change scm.RepositoryChange, repoStatus *gogh.RepoStatus) error
-	AddLabelToPullRequest(owner, repo string, prNumber int, label []string) ([]*gogh.Label, error)
-	RemoveLabelFromPullRequest(owner, repo string, prNumber int, label string) error
+	ListPullRequestLabels(owner, repo string, prNumber int) ([]*gogh.Label, error)
+	AddPullRequestLabel(owner, repo string, prNumber int, label []string) ([]*gogh.Label, error)
+	RemovePullRequestLabel(owner, repo string, prNumber int, label string) error
 	// This method is intended to be used by client decorators which need access to GH API methods not (yet)
 	// exposed by this interface
 	unwrap() *gogh.Client
@@ -95,12 +96,17 @@ func (c client) CreateStatus(change scm.RepositoryChange, repoStatus *gogh.RepoS
 	return c.logHTTPError(response, err)
 }
 
-func (c client) AddLabelToPullRequest(owner, repo string, prNumber int, label []string) ([]*gogh.Label, error) {
+func (c client) ListPullRequestLabels(owner, repo string, prNumber int) ([]*gogh.Label, error) {
+	labels, response, err := c.gh.Issues.ListLabelsByIssue(context.Background(), owner, repo, prNumber, nil)
+	return labels, c.logHTTPError(response, err)
+}
+
+func (c client) AddPullRequestLabel(owner, repo string, prNumber int, label []string) ([]*gogh.Label, error) {
 	labels, response, err := c.gh.Issues.AddLabelsToIssue(context.Background(), owner, repo, prNumber, label)
 	return labels, c.logHTTPError(response, err)
 }
 
-func (c client) RemoveLabelFromPullRequest(owner, repo string, prNumber int, label string) error {
+func (c client) RemovePullRequestLabel(owner, repo string, prNumber int, label string) error {
 	response, err := c.gh.Issues.RemoveLabelForIssue(context.Background(), owner, repo, prNumber, label)
 	return c.logHTTPError(response, err)
 }

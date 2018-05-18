@@ -102,3 +102,29 @@ func (r retryClient) CreateStatus(change scm.RepositoryChange, repoStatus *gogh.
 		return r.Client.CreateStatus(change, repoStatus)
 	})
 }
+
+func (r retryClient) ListPullRequestLabels(owner, repo string, prNumber int) ([]*gogh.Label, error) {
+	var labels []*gogh.Label
+	err := r.retry(func() error {
+		var e error
+		labels, e = r.Client.ListPullRequestLabels(owner, repo, prNumber)
+		return e
+	})
+	return labels, err
+}
+
+func (r retryClient) AddPullRequestLabel(owner, repo string, prNumber int, label []string) ([]*gogh.Label, error) {
+	var labels []*gogh.Label
+	err := r.retry(func() error {
+		var e error
+		labels, e = r.Client.AddPullRequestLabel(owner, repo, prNumber, label)
+		return e
+	})
+	return labels, err
+}
+
+func (r retryClient) RemovePullRequestLabel(owner, repo string, prNumber int, label string) error {
+	return r.retry(func() error {
+		return r.Client.RemovePullRequestLabel(owner, repo, prNumber, label)
+	})
+}
