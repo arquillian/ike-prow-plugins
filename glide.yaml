@@ -18,6 +18,9 @@ import:
   - prow/pluginhelp
   - prow/pluginhelp/externalplugins
   - prow/plugins
+  # we need explicit shurcooL version due to conflicts with test-infra code
+- package: github.com/shurcooL/githubql
+  version: 2f1beebeca3383d6367f59e5f091dd4fe1c856de
 - package: github.com/sirupsen/logrus
   version: 1.0.5
 - package: github.com/evalphobia/logrus_sentry

@@ -56,7 +56,7 @@ endif
 ## Removes the docker build container, if any (see "make docker-start").
 docker-rm:
 ifneq ($(strip $(shell docker ps -qa --filter "name=$(DOCKER_CONTAINER_NAME)" 2>/dev/null)),)
-	docker rm -f "$(DOCKER_CONTAINER_NAME)"
+	$(DOCKER) rm -f "$(DOCKER_CONTAINER_NAME)"
 else
 	@echo "No container named \"$(DOCKER_CONTAINER_NAME)\" to remove."
 endif
@@ -70,4 +70,4 @@ docker-%:
 ifeq ($(strip $(shell docker ps -qa --filter "name=$(DOCKER_CONTAINER_NAME)" 2>/dev/null)),)
 	$(error No container name "$(DOCKER_CONTAINER_NAME)" exists to run the command "make $(makecommand)")
 endif
-	docker exec -t $(DOCKER_RUN_INTERACTIVE_SWITCH) "$(DOCKER_CONTAINER_NAME)" bash -login -ec 'make $(makecommand)'
+	$(DOCKER) exec -t $(DOCKER_RUN_INTERACTIVE_SWITCH) "$(DOCKER_CONTAINER_NAME)" bash -login -ec 'make $(makecommand)'

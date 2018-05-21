@@ -9,6 +9,7 @@ parameters:
   value: arquillian
 - name: VERSION
   required: true
+  value: latest
 - name: HOOK_HOSTNAME
   value: ""
 objects:
@@ -71,19 +72,27 @@ objects:
             - name: plugins
               mountPath: /etc/plugins
               readOnly: true
+            readinessProbe:
+              httpGet:
+                path: /
+                port: 8888
+            livenessProbe:
+              httpGet:
+                path: /
+                port: 8888  
           volumes:
           - name: hmac
             secret:
-              secretName: hmac-token
+              secretName: ike-prow-plugins-hmac-token
           - name: oauth
             secret:
-              secretName: oauth-token
+              secretName: ike-prow-plugins-oauth-token
           - name: config
             configMap:
-              name: config
+              name: ike-prow-plugins-config
           - name: plugins
             configMap:
-              name: plugins
+              name: ike-prow-plugins-plugins
   - kind: Service
     apiVersion: v1
     metadata:

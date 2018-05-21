@@ -30,6 +30,7 @@ crashlytics-build.properties
 fabric.properties
 
 # Sensitive files
+config/
 hmac.token
 oauth.token
 sentry.dsn
