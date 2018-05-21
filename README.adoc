@@ -19,6 +19,14 @@ endif::generated-doc[]
 :data-uri:
 :imagesdir: docs/images
 
+[cols="a,a"]
+|===
+| .Jenkins
+image:https://ci.centos.org/buildStatus/icon?job=devtools-ike-prow-plugins-build-master["Jenkins",link="https://ci.centos.org/view/Devtools/job/devtools-ike-prow-plugins-build-master/lastBuild/"]
+| .Travis
+image:https://travis-ci.org/arquillian/ike-prow-plugins.svg["Travis", link="https://travis-ci.org/arquillian/ike-prow-plugins"]
+|===
+
 ifndef::generated-doc[]
 
 Welcome in PR automation plugins Arquillian project. These plugins are based on link:https://github.com/kubernetes/test-infra/tree/master/prow[Prow] sub project of
