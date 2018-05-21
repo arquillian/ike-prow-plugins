@@ -77,8 +77,7 @@ var _ = Describe("Test keeper config loader features", func() {
 
 		It("should load test-keeper configuration yaml file", func() {
 			// given
-			NonExistingRawGitHubFiles(".ike-prow/test-keeper.yml")
-			NonExistingRawGitHubFiles(".ike-prow/test-keeper_hint.md")
+			NonExistingRawGitHubFiles(".ike-prow/test-keeper.yml", ".ike-prow/test-keeper_hint.md")
 
 			gock.New("https://raw.githubusercontent.com").
 				Get("owner/repo/46cb8fac44709e4ccaae97448c65e8f7320cfea7/.ike-prow/" + testkeeper.ProwPluginName + ".yaml").
