@@ -22,7 +22,7 @@ function install_deps() {
   # We need to disable selinux for now, XXX
   /usr/sbin/setenforce 0 || :
 
-  yum -y install docker make
+  yum -y install git docker make
 
   service docker start
 
