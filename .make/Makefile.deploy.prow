@@ -5,11 +5,10 @@ oc-generate-deployments: $(OC_DEPLOYMENTS) ## Creates openshift deployments for 
 
 .PHONY: oc-deploy-hook
 oc-deploy-hook: build-hook deploy-hook ## Deploys hook service only
-	@echo "Deploys hook service ${PROW_VERSION}"
+	@echo "Deploys hook service ${TAG}"
 	@oc process -f $(CLUSTER_DIR)/hook-template.yaml \
 		-p REGISTRY=$(REGISTRY) \
 		-p DOCKER_REPO=$(DOCKER_REPO) \
-		-p VERSION=$(PROW_VERSION) \
 		-p IMAGE_TAG=$(TAG) \
 		-o yaml | oc apply -f -
 
@@ -44,7 +43,6 @@ $(OC_DEPLOYMENTS): oc-%: %
 		-p REGISTRY=$(REGISTRY) \
 		-p DOCKER_REPO=$(DOCKER_REPO) \
 		-p PLUGIN_NAME=$< \
-		-p VERSION=$(TAG) \
 		-p IMAGE_TAG=$(TAG) \
 		-o yaml > $(PLUGIN_DEPLOYMENTS_DIR)/$<.yaml
 

@@ -65,7 +65,6 @@ function deploy() {
   fi
 
   # compile, build and deploy the hook
-  export PROW_VERSION=`./prow_version.sh | cut -c1-${DEVSHIFT_TAG_LEN}`
   export TAG=$(echo ${GIT_COMMIT} | cut -c1-${DEVSHIFT_TAG_LEN})
 
   make docker-build-hook
