@@ -7,6 +7,7 @@ import (
 	"github.com/arquillian/ike-prow-plugins/pkg/github/client"
 	"github.com/arquillian/ike-prow-plugins/pkg/log"
 	gogh "github.com/google/go-github/github"
+	"github.com/arquillian/ike-prow-plugins/pkg/github/service"
 )
 
 // BypassCheckComment is used as a command to bypass test presence validation
@@ -28,7 +29,7 @@ func (c *BypassCmd) Perform(client ghclient.Client, log log.Logger, comment *gog
 
 	BypassCommand.
 		When(is.Triggered).
-		By(is.AnyOf(user.Admin, user.PRReviewer, user.PRApprover), is.Not(user.PRCreator)).
+		By(whoCanTrigger(user)...).
 		Then(c.whenAddedOrCreated)
 
 	return BypassCommand.Execute(client, log, comment)
@@ -38,4 +39,23 @@ func (c *BypassCmd) Perform(client ghclient.Client, log log.Logger, comment *gog
 func (c *BypassCmd) Matches(comment *gogh.IssueCommentEvent) bool {
 	body := strings.TrimSpace(*comment.Comment.Body)
 	return body == BypassCheckComment
+}
+
+func whoCanTrigger(user *is.PermissionService) []is.PermissionCheck {
+	return []is.PermissionCheck{is.AnyOf(user.Admin, user.PRReviewer, user.PRApprover), is.Not(user.PRCreator)}
+}
+
+// IsValidBypassCmd checks if the given comment contains expected string and was added by user with sufficient permissions
+func IsValidBypassCmd(comment *gogh.IssueComment, prLoader *ghservice.PullRequestLazyLoader) bool {
+	if BypassCheckComment != strings.TrimSpace(*comment.Body) {
+		return false
+	}
+
+	user := is.NewPermissionService(prLoader.Client, *comment.User.Login, prLoader)
+
+	status, err := is.AllOf(whoCanTrigger(user)...)()
+	if err != nil || !status.UserIsApproved {
+		return false
+	}
+	return true
 }
