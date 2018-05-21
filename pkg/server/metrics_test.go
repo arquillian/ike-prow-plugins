@@ -34,40 +34,44 @@ var _ = Describe("Service Metrics", func() {
 			HmacSecret:         secret,
 			Metrics:            metrics,
 		})
+	})
 
+	AfterEach(func() {
+		s.Close()
+	})
+
+	It("should count incoming webhook", func() {
+		// given
+		fullName := "bartoszmajsak/wfswarm-booster-pipeline-test"
 		payload := test.LoadFromFile("../plugin/work-in-progress/test_fixtures/github_calls/ready_pr_opened.json")
 
 		if err := phony.SendHook(s.URL, "pull_request", payload, secret); err != nil {
 			logger.Errorf("Error sending hook: %v", err)
 		}
 
-		defer s.Close()
-	})
-
-	It("should count incoming webhook", func() {
-		// given
-		eventType := "pull_request"
-		expected := 1
-
 		// when
-		counter, err := metrics.WebhookCounter.GetMetricWithLabelValues(eventType)
+		counter, err := metrics.WebhookCounter.GetMetricWithLabelValues(fullName)
 
 		// then
 		Ω(err).ShouldNot(HaveOccurred())
-		Expect(count(counter)).To(Equal(expected))
+		Expect(count(counter)).To(Equal(1))
 	})
 
 	It("should count handled events", func() {
 		// given
-		eventType := "pull_request"
-		expected := 2
+		eventType := "issue_comment"
+		payload := test.LoadFromFile("../plugin/test-keeper/test_fixtures/github_calls/prs/without_tests/skip_comment_by_admin.json")
+
+		if err := phony.SendHook(s.URL, "issue_comment", payload, secret); err != nil {
+			logger.Errorf("Error sending hook: %v", err)
+		}
 
 		// when
 		counter, err := metrics.HandledEventsCounter.GetMetricWithLabelValues(eventType)
 
 		// then
 		Ω(err).ShouldNot(HaveOccurred())
-		Expect(count(counter)).To(Equal(expected))
+		Expect(count(counter)).To(Equal(1))
 	})
 
 	It("should get Rate limit for GitHub API calls", func() {
@@ -83,17 +87,13 @@ var _ = Describe("Service Metrics", func() {
 			Reply(200).
 			BodyString("[]")
 
+		// when
 		client := ghclient.NewRateLimitWatcherClient(test.NewDefaultGitHubClient(), logger, 10)
 		client.ListPullRequestFiles("owner", "repo", 123)
 
-		// when
-		core_counter := metrics.RateLimit.WithLabelValues("core")
-		search_counter := metrics.RateLimit.WithLabelValues("search")
-
-
 		// then
-		Expect(gaugeValue(core_counter)).To(Equal(8))
-		Expect(gaugeValue(search_counter)).To(Equal(10))
+		Expect(gaugeValue(metrics.RateLimit.WithLabelValues("core"))).To(Equal(8))
+		Expect(gaugeValue(metrics.RateLimit.WithLabelValues("search"))).To(Equal(10))
 	})
 })
 

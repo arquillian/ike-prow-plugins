@@ -94,7 +94,10 @@ func InitPlugin(pluginName string, newEventHandler EventHandlerCreator, newServe
 		100)
 
 	handler := newEventHandler(githubClient, *pluginBotName)
+
+	server.RegisterMetrics(logger)
 	pluginServer := newServer(webhookSecret, handler)
+	pluginServer.Metrics = server.NewMetrics()
 
 	port := strconv.Itoa(*port)
 	logger.Infof("Starting server on port %s", port)

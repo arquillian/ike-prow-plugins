@@ -3,9 +3,13 @@ package server
 import (
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/google/go-github/github"
+	"github.com/arquillian/ike-prow-plugins/pkg/log"
 )
 
 var (
+	namespace = ""
+	subsystem = "ike-prow-plugins"
+
 	rateLimit = prometheus.NewGaugeVec(prometheus.GaugeOpts{
 		Name: "github_rate_limits",
 		Help: "Rate limit for GitHub API calls",
@@ -14,7 +18,7 @@ var (
 	webhookCounter = prometheus.NewCounterVec(prometheus.CounterOpts{
 		Name: "webhook_counter",
 		Help: "A counter of the webhooks made to service.",
-	}, []string{"event_type"})
+	}, []string{"full_name"})
 
 	handledEventsCounter = prometheus.NewCounterVec(prometheus.CounterOpts{
 		Name: "handled_events_counter",
@@ -22,10 +26,26 @@ var (
 	}, []string{"event_type"})
 )
 
-func init() {
-	prometheus.MustRegister(rateLimit)
-	prometheus.MustRegister(webhookCounter)
-	prometheus.MustRegister(handledEventsCounter)
+// RegisterMetrics registers prometheus collectors to collect metrics
+func RegisterMetrics(log log.Logger) {
+	rateLimit = register(rateLimit, "github_rate_limits", log).(*prometheus.GaugeVec)
+	webhookCounter = register(webhookCounter, "webhook_counter", log).(*prometheus.CounterVec)
+	handledEventsCounter = register(handledEventsCounter, "handled_events_counter", log).(*prometheus.CounterVec)
+}
+
+func register(c prometheus.Collector, name string, log log.Logger) prometheus.Collector {
+	err := prometheus.Register(c)
+	if err != nil {
+		if are, ok := err.(prometheus.AlreadyRegisteredError); ok {
+			return are.ExistingCollector
+		}
+
+		log.Panic(map[string]interface{}{
+			"metric_name": prometheus.BuildFQName(namespace, subsystem, name),
+			"err":         err,
+		}, "failed to register the prometheus metric")
+	}
+	return c
 }
 
 // Metrics is a set of metrics gathered by the Ike Prow Plugin.
