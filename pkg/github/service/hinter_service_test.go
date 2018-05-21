@@ -32,16 +32,15 @@ var _ = Describe("Config loader features", func() {
 				Reply(200).
 				BodyString("[]")
 
-			change := scm.RepositoryChange{
-				Owner:    "owner",
-				RepoName: "repo",
-				Hash:     "46cb8fac44709e4ccaae97448c65e8f7320cfea7",
+			commentsLoader := &ghservice.IssueCommentsLazyLoader{
+				Client: client,
+				Issue: *scm.NewRepositoryIssue("owner", "repo", 2),
 			}
 			hintContext := ghservice.HintContext{
 				PluginName: "my-plugin-name",
 				Assignee:   "toAssign",
 			}
-			hinter := ghservice.NewHinter(client, log.NewTestLogger(), change, 2, hintContext)
+			hinter := ghservice.NewHinter(client, log.NewTestLogger(), commentsLoader, hintContext)
 
 			toHaveBodyWithWholePluginsComment := SoftlySatisfyAll(
 				HaveBodyThatContains("### Ike Plugins (my-plugin-name)"),
@@ -68,17 +67,16 @@ var _ = Describe("Config loader features", func() {
 				Reply(200).
 				Body(FromFile("test_fixtures/github_calls/prs/comments_with_tests_keeper_message.json"))
 
-			change := scm.RepositoryChange{
-				Owner:    "owner",
-				RepoName: "repo",
-				Hash:     "46cb8fac44709e4ccaae97448c65e8f7320cfea7",
+			commentsLoader := &ghservice.IssueCommentsLazyLoader{
+				Client: client,
+				Issue: *scm.NewRepositoryIssue("owner", "repo", 2),
 			}
 			hintContext := ghservice.HintContext{
 				PluginName: "test-keeper",
 				Assignee:   "toAssign",
 			}
 
-			hinter := ghservice.NewHinter(client, log.NewTestLogger(), change, 2, hintContext)
+			hinter := ghservice.NewHinter(client, log.NewTestLogger(), commentsLoader, hintContext)
 
 			// when
 			err := hinter.PluginComment("New comment")
@@ -94,10 +92,9 @@ var _ = Describe("Config loader features", func() {
 				Reply(200).
 				Body(FromFile("test_fixtures/github_calls/prs/comments_with_tests_keeper_message.json"))
 
-			change := scm.RepositoryChange{
-				Owner:    "owner",
-				RepoName: "repo",
-				Hash:     "46cb8fac44709e4ccaae97448c65e8f7320cfea7",
+			commentsLoader := &ghservice.IssueCommentsLazyLoader{
+				Client: client,
+				Issue: *scm.NewRepositoryIssue("owner", "repo", 2),
 			}
 			hintContext := ghservice.HintContext{
 				PluginName: "another-plugin",
@@ -116,7 +113,7 @@ var _ = Describe("Config loader features", func() {
 				SetMatcher(ExpectPayload(toHaveModifiedBody)).
 				Reply(200)
 
-			hinter := ghservice.NewHinter(client, log.NewTestLogger(), change, 2, hintContext)
+			hinter := ghservice.NewHinter(client, log.NewTestLogger(), commentsLoader, hintContext)
 
 			// when
 			err := hinter.PluginComment("New comment")

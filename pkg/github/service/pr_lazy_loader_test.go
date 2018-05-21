@@ -1,8 +1,6 @@
 package ghservice_test
 
 import (
-	"net/http"
-
 	"github.com/arquillian/ike-prow-plugins/pkg/github/service"
 	. "github.com/arquillian/ike-prow-plugins/pkg/internal/test"
 	. "github.com/onsi/ginkgo"
@@ -25,7 +23,7 @@ var _ = Describe("Pull Request lazy loading", func() {
 		calls := 0
 		gock.New("https://api.github.com").
 			Get("/repos/owner/repo/pulls/123").
-			SetMatcher(spyOnCalls(&calls)).
+			SetMatcher(SpyOnCalls(&calls)).
 			Reply(200).
 			BodyString(`{"title":"Loaded PR"}`)
 		loader := &ghservice.PullRequestLazyLoader{Client: client, RepoOwner: "owner", RepoName: "repo", Number: 123}
@@ -45,7 +43,7 @@ var _ = Describe("Pull Request lazy loading", func() {
 		counter := 0
 		gock.New("https://api.github.com").
 			Get("/repos/owner/repo/pulls/123").
-			SetMatcher(spyOnCalls(&counter)).
+			SetMatcher(SpyOnCalls(&counter)).
 			Persist().
 			Reply(200).
 			BodyString(`{"title":"Loaded PR"}`)
@@ -61,12 +59,3 @@ var _ = Describe("Pull Request lazy loading", func() {
 		Expect(*pullRequest.Title).To(Equal("Loaded PR"))
 	})
 })
-
-func spyOnCalls(counter *int) gock.Matcher {
-	matcher := gock.NewBasicMatcher()
-	matcher.Add(func(_ *http.Request, _ *gock.Request) (bool, error) {
-		*counter++
-		return true, nil
-	})
-	return matcher
-}

@@ -149,7 +149,7 @@ imports:
   subpackages:
   - internal
 - name: golang.org/x/sys
-  version: d0faeb539838e250bd0a9db4182d48d4a1915181
+  version: 7c87d13f8e835d2fb3a70a2912c811ed0c1d241b
   subpackages:
   - unix
   - windows

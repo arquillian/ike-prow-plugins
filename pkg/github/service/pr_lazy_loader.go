@@ -15,13 +15,24 @@ type PullRequestLazyLoader struct {
 	err         error
 }
 
-// NewPullRequestLazyLoader creates a new instance of PullRequestLazyLoader with information retrieved from the given IssueCommentEvent
-func NewPullRequestLazyLoader(client ghclient.Client, comment *gogh.IssueCommentEvent) *PullRequestLazyLoader {
+// NewPullRequestLazyLoaderFromComment creates a new instance of PullRequestLazyLoader with information retrieved from the given IssueCommentEvent
+func NewPullRequestLazyLoaderFromComment(client ghclient.Client, comment *gogh.IssueCommentEvent) *PullRequestLazyLoader {
 	return &PullRequestLazyLoader{
 		Client:    client,
 		RepoOwner: *comment.Repo.Owner.Login,
 		RepoName:  *comment.Repo.Name,
 		Number:    *comment.Issue.Number,
+	}
+}
+
+// NewPullRequestLazyLoaderWithPR creates a new instance of PullRequestLazyLoader with the given already loaded gogh.PullRequest instance
+func NewPullRequestLazyLoaderWithPR(client ghclient.Client, pullRequest *gogh.PullRequest) *PullRequestLazyLoader {
+	return &PullRequestLazyLoader{
+		Client:      client,
+		RepoOwner:   *pullRequest.Base.Repo.Owner.Login,
+		RepoName:    *pullRequest.Base.Repo.Name,
+		Number:      *pullRequest.Number,
+		pullRequest: pullRequest,
 	}
 }
 

@@ -67,8 +67,23 @@ func (gh *GitHubTestEventsHandler) handlePrEvent(log log.Logger, event *gogh.Pul
 	if !utils.Contains(handledPrActions, *event.Action) {
 		return nil
 	}
-
 	return gh.checkTestsAndSetStatus(log, event.PullRequest)
+}
+
+func (gh *GitHubTestEventsHandler) checkIfBypassed(log log.Logger, commentsLoader *ghservice.IssueCommentsLazyLoader, pr *gogh.PullRequest) (bool, string) {
+	comments, err := commentsLoader.Load()
+	if err != nil {
+		log.Errorf("Getting all comments failed with an error: %s", err)
+		return false, ""
+	}
+
+	prLoader := ghservice.NewPullRequestLazyLoaderWithPR(gh.Client, pr)
+	for _, comment := range comments {
+		if IsValidBypassCmd(comment, prLoader) {
+			return true, *comment.User.Login
+		}
+	}
+	return false, ""
 }
 
 func (gh *GitHubTestEventsHandler) handlePrComment(log log.Logger, comment *gogh.IssueCommentEvent) error {
@@ -76,7 +91,7 @@ func (gh *GitHubTestEventsHandler) handlePrComment(log log.Logger, comment *gogh
 		return nil
 	}
 
-	prLoader := ghservice.NewPullRequestLazyLoader(gh.Client, comment)
+	prLoader := ghservice.NewPullRequestLazyLoaderFromComment(gh.Client, comment)
 	userPerm := command.NewPermissionService(gh.Client, *comment.Sender.Login, prLoader)
 
 	cmdHandler := command.CommentCmdHandler{Client: gh.Client}
@@ -128,13 +143,19 @@ func (gh *GitHubTestEventsHandler) checkTestsAndSetStatus(log log.Logger, pr *go
 		return statusService.okTestsExist()
 	}
 
+	commentsLoader := ghservice.NewIssueCommentsLazyLoader(gh.Client, pr)
+	bypassed, user := gh.checkIfBypassed(log, commentsLoader, pr)
+	if bypassed {
+		return statusService.okWithoutTests(user)
+	}
+
 	err = statusService.failNoTests()
 	if err != nil {
 		log.Errorf("failed to report status on PR [%q]. cause: %s", *pr, err)
 	}
 
 	hintContext := ghservice.HintContext{PluginName: ProwPluginName, Assignee: *pr.User.Login}
-	hinter := ghservice.NewHinter(gh.Client, log, change, *pr.Number, hintContext)
+	hinter := ghservice.NewHinter(gh.Client, log, commentsLoader, hintContext)
 
 	cerr := hinter.PluginComment(CreateCommentMessage(configuration, change))
 	if cerr != nil {

@@ -23,26 +23,26 @@ var expectedContext = strings.Join([]string{botName, testkeeper.ProwPluginName},
 
 var _ = Describe("Test Keeper Plugin features", func() {
 
-	Context("Pull Request handling", func() {
+	var handler *testkeeper.GitHubTestEventsHandler
 
-		var handler *testkeeper.GitHubTestEventsHandler
+	log := log.NewTestLogger()
 
-		log := log.NewTestLogger()
-
-		toBe := func(status, description, context, detailsLink string) SoftMatcher {
-			return SoftlySatisfyAll(
-				HaveState(status),
-				HaveDescription(description),
-				HaveContext(context),
-				HaveTargetURL(detailsLink),
-			)
-
-		}
-
-		toHaveBodyWithWholePluginsComment := SoftlySatisfyAll(
-			HaveBodyThatContains(fmt.Sprintf(ghservice.PluginTitleTemplate, testkeeper.ProwPluginName)),
-			HaveBodyThatContains("@bartoszmajsak"),
+	toBe := func(status, description, context, detailsLink string) SoftMatcher {
+		return SoftlySatisfyAll(
+			HaveState(status),
+			HaveDescription(description),
+			HaveContext(context),
+			HaveTargetURL(detailsLink),
 		)
+
+	}
+
+	toHaveBodyWithWholePluginsComment := SoftlySatisfyAll(
+		HaveBodyThatContains(fmt.Sprintf(ghservice.PluginTitleTemplate, testkeeper.ProwPluginName)),
+		HaveBodyThatContains("@bartoszmajsak"),
+	)
+
+	Context("Pull Request event handling", func() {
 
 		BeforeEach(func() {
 			defer gock.OffAll()
@@ -54,6 +54,7 @@ var _ = Describe("Test Keeper Plugin features", func() {
 		It("should approve opened pull request when tests included", func() {
 			// given
 			NonExistingRawGitHubFiles("test-keeper.yml", "test-keeper.yaml")
+			gockEmptyComments(2)
 
 			gock.New("https://api.github.com").
 				Get("/repos/" + repositoryName + "/pulls/2/files").
@@ -77,6 +78,7 @@ var _ = Describe("Test Keeper Plugin features", func() {
 		It("should approve opened pull request when tests included based on configured pattern and defaults (implicitly combined)", func() {
 			// given
 			NonExistingRawGitHubFiles(".ike-prow/test-keeper_hint.md")
+			gockEmptyComments(2)
 
 			gock.New("https://raw.githubusercontent.com").
 				Get(repositoryName + "/5d6e9b25da90edfc19f488e595e0645c081c1575/.ike-prow/test-keeper.yml").
@@ -106,6 +108,7 @@ var _ = Describe("Test Keeper Plugin features", func() {
 		It("should approve new pull request without tests when it comes with configuration excluding all files from test presence check (implicitly combined)", func() {
 			// given
 			NonExistingRawGitHubFiles(".ike-prow/test-keeper_hint.md")
+			gockEmptyComments(1)
 
 			gock.New("https://raw.githubusercontent.com").
 				Get(repositoryName + "/5d6e9b25da90edfc19f488e595e0645c081c1575/.ike-prow/test-keeper.yml").
@@ -134,8 +137,8 @@ var _ = Describe("Test Keeper Plugin features", func() {
 		It("should reject opened pull request when no tests are matching defined pattern with no defaults implicitly combined", func() {
 			// given
 
-			NonExistingRawGitHubFiles(".ike-prow/test-keeper_hint.md")
-			NonExistingRawGitHubFiles(".ike-prow/test-keeper_hint.md")
+			NonExistingRawGitHubFiles(".ike-prow/test-keeper_hint.md", ".ike-prow/test-keeper_hint.md")
+			gockEmptyComments(2)
 
 			gock.New("https://raw.githubusercontent.com").
 				Get(repositoryName + "/5d6e9b25da90edfc19f488e595e0645c081c1575/.ike-prow/test-keeper.yml").
@@ -146,11 +149,6 @@ var _ = Describe("Test Keeper Plugin features", func() {
 				Get("/repos/" + repositoryName + "/pulls/2/files").
 				Reply(200).
 				Body(FromFile("test_fixtures/github_calls/prs/with_tests/changes_go_files.json"))
-
-			gock.New("https://api.github.com").
-				Get("/repos/" + repositoryName + "/issues/2/comments").
-				Reply(200).
-				BodyString("[]")
 
 			// This way we implicitly verify that call happened after `HandleEvent` call
 			gock.New("https://api.github.com").
@@ -174,16 +172,12 @@ var _ = Describe("Test Keeper Plugin features", func() {
 		It("should block newly created pull request when no tests are included", func() {
 			// given
 			NonExistingRawGitHubFiles("test-keeper.yml", "test-keeper.yaml")
+			gockEmptyComments(1)
 
 			gock.New("https://api.github.com").
 				Get("/repos/" + repositoryName + "/pulls/1/files").
 				Reply(200).
 				Body(FromFile("test_fixtures/github_calls/prs/without_tests/changes.json"))
-
-			gock.New("https://api.github.com").
-				Get("/repos/" + repositoryName + "/issues/1/comments").
-				Reply(200).
-				BodyString("[]")
 
 			// This way we implicitly verify that call happened after `HandleEvent` call
 			gock.New("https://api.github.com").
@@ -207,6 +201,7 @@ var _ = Describe("Test Keeper Plugin features", func() {
 		It("should not block newly created pull request when documentation and build files are the only changes", func() {
 			// given
 			NonExistingRawGitHubFiles("test-keeper.yml", "test-keeper.yaml")
+			gockEmptyComments(1)
 
 			gock.New("https://api.github.com").
 				Get("/repos/" + repositoryName + "/pulls/1/files").
@@ -230,15 +225,12 @@ var _ = Describe("Test Keeper Plugin features", func() {
 		It("should block newly created pull request when deletions in the tests are the only changes", func() {
 			// given
 			NonExistingRawGitHubFiles("test-keeper.yml", "test-keeper.yaml")
+			gockEmptyComments(1)
 
 			gock.New("https://api.github.com").
 				Get("/repos/" + repositoryName + "/pulls/1/files").
 				Reply(200).
 				Body(FromFile("test_fixtures/github_calls/prs/without_tests/deletions_only_changes_in_tests.json"))
-			gock.New("https://api.github.com").
-				Get("/repos/" + repositoryName + "/issues/1/comments").
-				Reply(200).
-				BodyString("[]")
 
 			gock.New("https://api.github.com").
 				Post("/repos/" + repositoryName + "/statuses").
@@ -262,15 +254,12 @@ var _ = Describe("Test Keeper Plugin features", func() {
 		It("should block newly created pull request when there are changes in the business logic but only deletions in the tests", func() {
 			// given
 			NonExistingRawGitHubFiles("test-keeper.yml", "test-keeper.yaml")
+			gockEmptyComments(1)
 
 			gock.New("https://api.github.com").
 				Get("/repos/" + repositoryName + "/pulls/1/files").
 				Reply(200).
 				Body(FromFile("test_fixtures/github_calls/prs/without_tests/prod_code_changes_with_deletion_only_in_tests.json"))
-			gock.New("https://api.github.com").
-				Get("/repos/" + repositoryName + "/issues/1/comments").
-				Reply(200).
-				BodyString("[]")
 
 			gock.New("https://api.github.com").
 				Post("/repos/" + repositoryName + "/statuses").
@@ -290,6 +279,98 @@ var _ = Describe("Test Keeper Plugin features", func() {
 			// then - implicit verification of /statuses call occurrence with proper payload
 			Ω(err).ShouldNot(HaveOccurred())
 		})
+
+		It("should send ok status when PR contains no test but a comment with bypass command is present", func() {
+			//given
+			NonExistingRawGitHubFiles("test-keeper.yml", "test-keeper.yaml")
+			gock.New("https://api.github.com").
+				Get("/repos/" + repositoryName + "/issues/1/comments").
+				Reply(200).
+				BodyString(`[{"user":{"login":"bartoszmajsak"}, "body":"` + testkeeper.BypassCheckComment + `"}]`)
+
+			gock.New("https://api.github.com").
+				Get("/repos/" + repositoryName + "/pulls/1/reviews").
+				Reply(200).
+				BodyString(`[]`)
+
+			gock.New("https://api.github.com").
+				Get("/repos/" + repositoryName + "/pulls/1/files").
+				Reply(200).
+				Body(FromFile("test_fixtures/github_calls/prs/without_tests/changes.json"))
+
+			gock.New("https://api.github.com").
+				Get("/repos/" + repositoryName + "/collaborators/bartoszmajsak/permission").
+				Reply(200).
+				Body(FromFile("test_fixtures/github_calls/collaborators_repo-admin_permission.json"))
+
+			toHaveEnforcedSuccessState := SoftlySatisfyAll(
+				HaveState(github.StatusSuccess),
+				HaveDescription(fmt.Sprintf(testkeeper.ApprovedByMessage, "bartoszmajsak")),
+			)
+
+			gock.New("https://api.github.com").
+				Post("/repos/" + repositoryName + "/statuses").
+				SetMatcher(ExpectPayload(toHaveEnforcedSuccessState)).
+				Reply(201) // This way we implicitly verify that call happened after `HandleEvent` call
+
+			statusPayload := LoadFromFile("test_fixtures/github_calls/prs/without_tests/status_opened_by_external_user.json")
+
+			// when
+			err := handler.HandleEvent(log, github.PullRequest, statusPayload)
+
+			// then - should not expect any additional request mocking
+			Ω(err).ShouldNot(HaveOccurred())
+		})
+
+		It("should block pull request without tests and with comments containing bypass message added by user with insufficient permissions", func() {
+			// given
+			NonExistingRawGitHubFiles("test-keeper.yml", "test-keeper.yaml")
+
+			gock.New("https://api.github.com").
+				Get("/repos/" + repositoryName + "/issues/1/comments").
+				Reply(200).
+				BodyString(`[{"user":{"login":"bartoszmajsak-test"}, "body":"` + testkeeper.BypassCheckComment + `"},` +
+				`{"body":"` + fmt.Sprintf(ghservice.PluginTitleTemplate, testkeeper.ProwPluginName) + `"}]`)
+
+			gock.New("https://api.github.com").
+				Get("/repos/" + repositoryName + "/pulls/1/reviews").
+				Reply(200).
+				BodyString(`[]`)
+
+			gock.New("https://api.github.com").
+				Get("/repos/" + repositoryName + "/collaborators/bartoszmajsak-test/permission").
+				Reply(200).
+				Body(FromFile("test_fixtures/github_calls/collaborators_external-user_permission.json"))
+
+			gock.New("https://api.github.com").
+				Get("/repos/" + repositoryName + "/pulls/1/files").
+				Reply(200).
+				Body(FromFile("test_fixtures/github_calls/prs/without_tests/changes.json"))
+
+			// This way we implicitly verify that call happened after `HandleEvent` call
+			gock.New("https://api.github.com").
+				Post("/repos/" + repositoryName + "/statuses").
+				SetMatcher(ExpectPayload(toBe(github.StatusFailure, testkeeper.NoTestsMessage, expectedContext, testkeeper.NoTestsDetailsLink))).
+				Reply(201)
+
+			statusPayload := LoadFromFile("test_fixtures/github_calls/prs/without_tests/status_opened_by_external_user.json")
+
+			// when
+			err := handler.HandleEvent(log, github.PullRequest, statusPayload)
+
+			// then - implicit verification of /statuses call occurrence with proper payload
+			Ω(err).ShouldNot(HaveOccurred())
+		})
+	})
+
+	Context("Pull Request comment event handling", func() {
+
+		BeforeEach(func() {
+			defer gock.OffAll()
+			handler = &testkeeper.GitHubTestEventsHandler{Client: NewDefaultGitHubClient(), BotName: botName}
+		})
+
+		AfterEach(EnsureGockRequestsHaveBeenMatched)
 
 		It("should skip test existence check when "+testkeeper.BypassCheckComment+" command is used by admin user", func() {
 			// given
@@ -356,9 +437,9 @@ var _ = Describe("Test Keeper Plugin features", func() {
 			gock.New("https://api.github.com").
 				Post("/repos/" + repositoryName + "/issues/1/comments").
 				SetMatcher(
-					ExpectPayload(To(
-							HaveBodyThatContains("Hey @bartoszmajsak-test! It seems you tried to trigger `/ok-without-tests` command"),
-							HaveBodyThatContains("You have to be admin or requested reviewer or pull request approver, but not pull request creator")))).
+				ExpectPayload(To(
+					HaveBodyThatContains("Hey @bartoszmajsak-test! It seems you tried to trigger `/ok-without-tests` command"),
+					HaveBodyThatContains("You have to be admin or requested reviewer or pull request approver, but not pull request creator")))).
 				Reply(201) // This way we implicitly verify that call happened after `HandleEvent` call
 
 			statusPayload := LoadFromFile("test_fixtures/github_calls/prs/without_tests/skip_comment_by_external.json")
@@ -371,3 +452,10 @@ var _ = Describe("Test Keeper Plugin features", func() {
 		})
 	})
 })
+
+func gockEmptyComments(prNumber int) {
+	gock.New("https://api.github.com").
+		Get(fmt.Sprintf("/repos/%s/issues/%d/comments", repositoryName, prNumber)).
+		Reply(200).
+		BodyString("[]")
+}
