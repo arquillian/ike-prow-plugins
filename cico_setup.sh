@@ -66,11 +66,12 @@ function deploy() {
 
   # compile, build and deploy the hook
   export PROW_VERSION=`./prow_version.sh | cut -c1-${DEVSHIFT_TAG_LEN}`
+  export TAG=$(echo ${GIT_COMMIT} | cut -c1-${DEVSHIFT_TAG_LEN})
+
   make docker-build-hook
   make deploy-hook
 
   # compile, build and deploy plugins
-  export TAG=$(echo ${GIT_COMMIT} | cut -c1-${DEVSHIFT_TAG_LEN})
   make deploy-plugins
 
   echo 'CICO: Image pushed, ready to update deployed app'
