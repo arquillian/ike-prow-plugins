@@ -78,9 +78,7 @@ func (gh *GitHubWIPPRHandler) HandleEvent(log log.Logger, eventType github.Event
 
 // IsWorkInProgress checks if title is marked as Work In Progress
 func (gh *GitHubWIPPRHandler) IsWorkInProgress(title *string, config PluginConfiguration) bool {
-	transformedTitle := strings.ToLower(*title)
 	prefixes := defaultPrefixes
-
 	if len(config.Prefix) != 0 {
 		if config.Combine {
 			prefixes = append(prefixes, config.Prefix...)
@@ -88,7 +86,7 @@ func (gh *GitHubWIPPRHandler) IsWorkInProgress(title *string, config PluginConfi
 			prefixes = config.Prefix
 		}
 	}
-	return gh.hasPrefix(transformedTitle, prefixes)
+	return gh.hasPrefix(strings.ToLower(*title), prefixes)
 }
 
 func (gh *GitHubWIPPRHandler) hasPrefix(title string, prefixes []string) bool {
