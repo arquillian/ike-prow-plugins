@@ -2,16 +2,29 @@
 
 This plugin can help reviewers with focusing on work that really matters so they don't need to spend time with Pull Requests that are still in progress unless they were requested to do partial reviews.
 
-If the PR title starts with "const:pkg/plugin/work-in-progress/event_handler.go[name="WipPrefix"]" prefix (non-case sensitive) then the plugin marks its check as **Failure**, or as **Success** otherwise.
+If the PR title starts with any of the default prefixes such as `WIP`, `DO NOT MERGE`, `DON'T MERGE`, `WORK-IN-PROGRESS` with combinations of `( )`, `[ ]`, `:` or any of the user configured prefixes as described below (non-case sensitive) then the plugin marks its check as **Failure**, or as **Success** otherwise.
+
+=== Plugin Configuration [[work-in-progress-config]]
+
+To configure Work In Progress plugin place `work-in-progress.yml` (or `work-in-progress.yaml`) file in the root of your project and use properties described below.
+
+.work-in-progress.yaml
+[source, yml, indent=0]
+----
+include::../../pkg/plugin/work-in-progress/test_fixtures/github_calls/work-in-progress.yml[]
+----
+
+<1> Defines set of custom-prefixes which will be used to match titles prefixes in changeset and determine if Pull Requests are still in progress.
+<2> Allows you to decide if you want to combine your patterns with predefined defaults (`true` by default).
 
 === Status details
 
 ==== Success [[wip-success]]
 
-Your Pull Request has been approved as the plugin didn't detect any sign of work in progress (the PR title doesn't start with "const:pkg/plugin/work-in-progress/event_handler.go[name="WipPrefix"]" prefix).
+Your Pull Request has been approved as the plugin didn't detect any sign of work in progress (the PR title doesn't start with work-in-progress prefix).
 
 ==== Failed [[wip-failed]]
 
-Your Pull Request has been rejected because the plugin detected that the PR title starts with "const:pkg/plugin/work-in-progress/event_handler.go[name="WipPrefix"]" prefix, so it seems that there is still an ongoing work.
+Your Pull Request has been rejected because the plugin detected that the PR title starts with work-in-progress prefix, so it seems that there is still an ongoing work.
 
 When the PR is done and ready for review and merge, then remove the prefix from the title to make the status green.
