@@ -22,7 +22,7 @@ endif::generated-doc[]
 [cols="a,a"]
 |===
 | .Jenkins
-image:https://ci.centos.org/buildStatus/icon?job=devtools-ike-prow-plugins-build-master["Jenkins",link="https://ci.centos.org/view/Devtools/job/devtools-ike-prow-plugins-build-master/lastBuild/"]
+image:https://ci.centos.org/buildStatus/icon?job=devtools-ike-prow-plugins-ike-build-master["Jenkins",link="https://ci.centos.org/view/Devtools/job/devtools-ike-prow-plugins-ike-build-master/lastBuild/"]
 | .Travis
 image:https://travis-ci.org/arquillian/ike-prow-plugins.svg["Travis", link="https://travis-ci.org/arquillian/ike-prow-plugins"]
 |===
