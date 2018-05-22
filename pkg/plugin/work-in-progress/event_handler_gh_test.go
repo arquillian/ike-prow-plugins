@@ -84,7 +84,7 @@ var _ = Describe("Test Keeper Plugin features", func() {
 			Ω(err).ShouldNot(HaveOccurred())
 		})
 
-		It("should mark opened PR as work-in-progress when prefixed with configured prefix", func() {
+		It("should mark opened PR as work-in-progress when title starts with configured prefix", func() {
 			// given
 			gock.New("https://raw.githubusercontent.com").
 				Get("bartoszmajsak/wfswarm-booster-pipeline-test/8111c2d99b596877ff8e2059409688d83487da0e/work-in-progress.yml").

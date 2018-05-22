@@ -40,6 +40,7 @@ var _ = Describe("Work In Progress config loader features", func() {
 
 			// then
 			Expect(configuration.Prefix).To(ConsistOf("[work in progress]", "work in progress"))
+			Expect(configuration.Combine).To(Equal(true))
 		})
 
 		It("should not load work-in-progress configuration yaml file and return empty url when config is not accessible", func() {
@@ -61,6 +62,7 @@ var _ = Describe("Work In Progress config loader features", func() {
 
 			// then
 			Expect(configuration.Prefix).To(BeEmpty())
+			Expect(configuration.Combine).To(Equal(true))
 		})
 	})
 })

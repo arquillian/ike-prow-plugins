@@ -15,16 +15,16 @@ include::../../pkg/plugin/work-in-progress/test_fixtures/github_calls/work-in-pr
 ----
 
 <1> Defines set of custom-prefixes which will be used to match titles prefixes in changeset and determine if Pull Requests are still in progress.
-<2> Allows you to decide if you want to combine your patterns with predefined defaults (`true` by default).
+<2> Allows you to decide if you want to combine your patterns with the list (`WIP`, `DO NOT MERGE`, `DON'T MERGE`, `WORK-IN-PROGRESS`) of predefined defaults (`true` by default).
 
 === Status details
 
 ==== Success [[wip-success]]
 
-Your Pull Request has been approved as the plugin didn't detect any sign of work in progress (the PR title doesn't start with work-in-progress prefix).
+Your Pull Request has been approved as the plugin didn't detect any sign of work in progress (the PR title doesn't start with any of the "work-in-progress prefixes").
 
 ==== Failed [[wip-failed]]
 
-Your Pull Request has been rejected because the plugin detected that the PR title starts with work-in-progress prefix, so it seems that there is still an ongoing work.
+Your Pull Request has been rejected because the plugin detected that the PR title starts with one of the "work-in-progress prefixes", so it seems that there is still an ongoing work.
 
 When the PR is done and ready for review and merge, then remove the prefix from the title to make the status green.

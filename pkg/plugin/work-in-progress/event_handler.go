@@ -64,7 +64,7 @@ func (gh *GitHubWIPPRHandler) HandleEvent(log log.Logger, eventType github.Event
 		statusContext := github.StatusContext{BotName: gh.BotName, PluginName: ProwPluginName}
 		statusService := ghservice.NewStatusService(gh.Client, log, change, statusContext)
 		configuration := LoadConfiguration(log, change)
-		if gh.IsWorkInProgress(event.PullRequest.Title, configuration) {
+		if gh.IsWorkInProgress(*event.PullRequest.Title, configuration) {
 			return statusService.Failure(InProgressMessage, InProgressDetailsLink)
 		}
 		return statusService.Success(ReadyForReviewMessage, ReadyForReviewDetailsLink)
@@ -77,7 +77,7 @@ func (gh *GitHubWIPPRHandler) HandleEvent(log log.Logger, eventType github.Event
 }
 
 // IsWorkInProgress checks if title is marked as Work In Progress
-func (gh *GitHubWIPPRHandler) IsWorkInProgress(title *string, config PluginConfiguration) bool {
+func (gh *GitHubWIPPRHandler) IsWorkInProgress(title string, config PluginConfiguration) bool {
 	prefixes := defaultPrefixes
 	if len(config.Prefix) != 0 {
 		if config.Combine {
@@ -86,7 +86,7 @@ func (gh *GitHubWIPPRHandler) IsWorkInProgress(title *string, config PluginConfi
 			prefixes = config.Prefix
 		}
 	}
-	return gh.hasPrefix(strings.ToLower(*title), prefixes)
+	return gh.hasPrefix(strings.ToLower(title), prefixes)
 }
 
 func (gh *GitHubWIPPRHandler) hasPrefix(title string, prefixes []string) bool {
