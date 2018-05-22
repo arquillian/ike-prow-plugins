@@ -9,7 +9,7 @@ parameters:
   value: arquillian
 - name: PLUGIN_NAME
   required: true
-- name: VERSION
+- name: IMAGE_TAG
   required: true
   value: latest
 objects:
@@ -20,7 +20,7 @@ objects:
       labels:
         app: ${PLUGIN_NAME}
         type: ike-plugin
-        version: ${VERSION}
+        version: ${IMAGE_TAG}
     spec:
       replicas: 1
       triggers:
@@ -42,7 +42,7 @@ objects:
           terminationGracePeriodSeconds: 180
           containers:
           - name: ${PLUGIN_NAME}
-            image: ${REGISTRY}/${DOCKER_REPO}/${PLUGIN_NAME}:${VERSION}
+            image: ${REGISTRY}/${DOCKER_REPO}/${PLUGIN_NAME}:${IMAGE_TAG}
             imagePullPolicy: Always
             resources:
               requests:
@@ -53,7 +53,7 @@ objects:
                 cpu: "200m"
             env:
               - name: VERSION
-                value: ${VERSION}
+                value: ${IMAGE_TAG}
             args:
             - --dry-run=false
             ports:
