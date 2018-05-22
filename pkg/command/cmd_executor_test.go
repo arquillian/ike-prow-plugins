@@ -172,7 +172,7 @@ var _ = Describe("Command executor features", func() {
 				user := is.PermissionService{
 					Client:   client,
 					User:     "sender",
-					PRLoader: ghservice.NewPullRequestLazyLoader(client, triggeredCommand),
+					PRLoader: ghservice.NewPullRequestLazyLoaderFromComment(client, triggeredCommand),
 				}
 
 				executed := false

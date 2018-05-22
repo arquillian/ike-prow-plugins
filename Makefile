@@ -15,7 +15,6 @@ PUSH_IMAGES:=$(patsubst %,push-%, $(PLUGINS))
 CLEAN_IMAGES:=$(patsubst %,clean-%, $(PLUGINS))
 OC_DEPLOYMENTS:=$(patsubst %,oc-%, $(PLUGINS))
 OC_RESTART:=$(patsubst %,dc-%, $(PLUGINS))
-PROW_VERSION?=$(shell ./prow_version.sh)
 
 COMMIT:=$(shell git rev-parse --short HEAD)
 TIMESTAMP:=$(shell date +%s)
