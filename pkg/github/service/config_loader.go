@@ -9,6 +9,7 @@ import (
 )
 
 const githubBaseURL = "https://github.com/"
+const ConfigHome = ".ike-prow/"
 
 // LoadableConfig holds information about the plugin name, repository change and pointer to base config
 type LoadableConfig struct {
@@ -21,8 +22,8 @@ type LoadableConfig struct {
 // revision. Two files are expected to be found there plugin-name.yml or plugin-name.yaml (in that order)
 func (l *LoadableConfig) Sources() []config.Source {
 	return []config.Source{
-		l.loadFromRawFile(".ike-prow/%s.yml"),
-		l.loadFromRawFile(".ike-prow/%s.yaml"),
+		l.loadFromRawFile(ConfigHome + "%s.yml"),
+		l.loadFromRawFile(ConfigHome + "%s.yaml"),
 	}
 }
 
@@ -44,15 +45,6 @@ func (l *LoadableConfig) loadFromRawFile(pathTemplate string) config.Source {
 
 		l.BaseConfig.LocationURL = githubBaseURL + rawFileService.GetRelativePath(filePath)
 		l.BaseConfig.PluginName = l.PluginName
-
-		pluginHintPath := fmt.Sprintf(".ike-prow/%s_hint.md", l.PluginName)
-		hintURL := rawFileService.GetRawFileURL(pluginHintPath)
-
-		_, e := utils.GetFileFromURL(hintURL)
-
-		if e == nil {
-			l.BaseConfig.PluginHint = githubBaseURL + rawFileService.GetRelativePath(pluginHintPath)
-		}
 
 		return downloadedConfig, nil
 	}

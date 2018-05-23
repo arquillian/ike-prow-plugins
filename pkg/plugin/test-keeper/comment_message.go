@@ -40,6 +40,8 @@ func CreateCommentMessage(configuration PluginConfiguration, change scm.Reposito
 		msg = sadIke + paragraph + beginning + paragraph + noConfig
 	} else if configuration.PluginHint != "" {
 		msg = getMsgFromConfigHint(configuration, change)
+	} else if content := defaultFileContent(configuration, change); content != "" {
+		msg = content
 	} else {
 		msg = sadIke + paragraph + getMsgWithConfigRef(configuration.LocationURL)
 	}
@@ -54,6 +56,18 @@ func getMsgFromConfigHint(configuration PluginConfiguration, change scm.Reposito
 		return getMsgFromFile(configuration, change)
 	}
 	return configuration.PluginHint
+}
+
+func defaultFileContent(configuration PluginConfiguration, change scm.RepositoryChange) string {
+	pluginHintPath := fmt.Sprintf(ghservice.ConfigHome+"%s_hint.md", configuration.PluginName)
+	ghFileService := ghservice.RawFileService{Change: change}
+	hintURL := ghFileService.GetRawFileURL(pluginHintPath)
+
+	content, e := utils.GetFileFromURL(hintURL)
+	if e != nil {
+		return ""
+	}
+	return string(content)
 }
 
 func getMsgFromFile(configuration PluginConfiguration, change scm.RepositoryChange) string {
