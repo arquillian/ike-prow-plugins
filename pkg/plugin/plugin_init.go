@@ -38,7 +38,7 @@ var (
 	webhookSecretFile   = flag.String("hmac-secret-file", "/etc/webhook/hmac", "Path to the file containing the GitHub HMAC secret.")
 	sentryDsnSecretFile = flag.String("sentry-dsn-file", "/etc/sentry-dsn/sentry", "Path to the file containing the Sentry DSN url.")
 	sentryTimeout       = flag.Int("sentry-timeout", 1000, "Sentry server timeout in ms. Defaults to 1 second ")
-	environment         = flag.String("env", "tenant", "Environment plugin is running in. Used e.g. by Sentry for tagging.")
+	environment         = flag.String("env", "production", "Environment plugin is running in. Used e.g. by Sentry for tagging.")
 	pluginBotName       = flag.String("bot-name", "alien-ike", "Bot Name used for the plugins.")
 	httpAddress         = flag.String("http.address", "0.0.0.0:"+strconv.Itoa(*port), "Http address at which prow server binds")
 	metricsHttpAddress  = flag.String("metrics.http.address", "0.0.0.0:"+strconv.Itoa(*port), "Address at which /metrics endpoint will be mounted.")
