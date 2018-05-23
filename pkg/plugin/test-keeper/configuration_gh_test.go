@@ -25,7 +25,7 @@ var _ = Describe("Test keeper config loader features", func() {
 		configFilePath := ghservice.ConfigHome + testkeeper.ProwPluginName
 
 		It("should load test-keeper configuration yml file", func() {
-
+			// given
 			gock.New("https://raw.githubusercontent.com").
 				Get("owner/repo/46cb8fac44709e4ccaae97448c65e8f7320cfea7/" + configFilePath  + ".yml").
 				Reply(200).
