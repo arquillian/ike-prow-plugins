@@ -19,12 +19,5 @@ include::../../pkg/plugin/work-in-progress/test_fixtures/github_calls/work-in-pr
 
 === Status details
 
-==== Success [[wip-success]]
-
-Your Pull Request has been approved as the plugin didn't detect any sign of work in progress (the PR title doesn't start with any of the "work-in-progress prefixes").
-
-==== Failed [[wip-failed]]
-
-Your Pull Request has been rejected because the plugin detected that the PR title starts with one of the "work-in-progress prefixes", so it seems that there is still an ongoing work.
-
-When the PR is done and ready for review and merge, then remove the prefix from the title to make the status green.
+include::{asciidoctor-source}/fragments/status/work-in-progress/success/wip-success.adoc[leveloffset=1]
+include::{asciidoctor-source}/fragments/status/work-in-progress/failure/wip-failed.adoc[leveloffset=1]

@@ -1,0 +1,10 @@
+==== Failure [[no-tests]]
+
+Your Pull Request has been rejected because the plugin wasn't able to find any added or changed test file in the change-set.
+
+Automated tests give us confidence in shipping reliable software. Please add some as part of this change.
+
+If you are an admin and you are sure that no test is needed then you can use a command `const:pkg/plugin/test-keeper/comment_cmd.go[name="BypassCheckComment"]` as a comment to make the status green.
+
+For more information about the behavior, how the test files are detected and what the default file patterns are, see <<index#test-keeper-how,How does it work?>> section.
+If you need to reconfigure the plugin then read the section <<index#test-keeper-config,Plugin Configuration>>.

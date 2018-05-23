@@ -1,0 +1,5 @@
+==== Success - no test needed [[only-skipped]]
+
+Your Pull Request has been approved because it seems that it doesn't need to have additional tests. All changed files in the changeset match patterns for which the validation should be skipped.
+
+For more information about the behavior and what the default file patterns are, see <<index#test-keeper-how,How does it work?>> section. If you need to reconfigure the plugin then read the section <<index#test-keeper-config,Plugin Configuration>>.

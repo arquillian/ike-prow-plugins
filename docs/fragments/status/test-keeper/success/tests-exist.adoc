@@ -1,0 +1,7 @@
+==== Success - test is present [[tests-exist]]
+
+Your Pull Request has been approved because the plugin detected a test file that has been added or changed in the PR.
+
+It means that changeset in this PR has files matching any of the default test patterns, those you configured  or by a combination of both.
+
+For more information about the behavior and what the default file patterns are, see <<index#test-keeper-how,How does it work?>> section. If you need to reconfigure the plugin then read the section <<index#test-keeper-config,Plugin Configuration>>.

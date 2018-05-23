@@ -11,13 +11,18 @@ import (
 	"gopkg.in/h2non/gock.v1"
 
 	"github.com/arquillian/ike-prow-plugins/pkg/github"
+	"fmt"
+	"github.com/arquillian/ike-prow-plugins/pkg/plugin"
 )
 
 const (
 	botName = "alien-ike"
 )
 
-var expectedContext = strings.Join([]string{botName, wip.ProwPluginName}, "/")
+var (
+	expectedContext = strings.Join([]string{botName, wip.ProwPluginName}, "/")
+	docStatusRoot = fmt.Sprintf("%s/status/%s", plugin.DocumentationURL, wip.ProwPluginName)
+)
 
 var _ = Describe("Test Keeper Plugin features", func() {
 
@@ -31,14 +36,14 @@ var _ = Describe("Test Keeper Plugin features", func() {
 			HaveState(github.StatusSuccess),
 			HaveDescription(wip.ReadyForReviewMessage),
 			HaveContext(expectedContext),
-			HaveTargetURL(wip.ReadyForReviewDetailsLink),
+			HaveTargetURL(fmt.Sprintf("%s/%s/%s.html", docStatusRoot, "success", wip.ReadyForReviewDetailsPageName)),
 		)
 
 		toHaveFailureState := SoftlySatisfyAll(
 			HaveState(github.StatusFailure),
 			HaveDescription(wip.InProgressMessage),
 			HaveContext(expectedContext),
-			HaveTargetURL(wip.InProgressDetailsLink),
+			HaveTargetURL(fmt.Sprintf("%s/%s/%s.html", docStatusRoot, "failure", wip.InProgressDetailsPageName)),
 		)
 
 		BeforeEach(func() {
