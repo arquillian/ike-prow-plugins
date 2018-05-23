@@ -6,7 +6,6 @@ import (
 	"github.com/arquillian/ike-prow-plugins/pkg/log"
 	"github.com/arquillian/ike-prow-plugins/pkg/scm"
 	gogh "github.com/google/go-github/github"
-	"github.com/arquillian/ike-prow-plugins/pkg/server"
 )
 
 type rateLimitWatcher struct {
@@ -17,7 +16,7 @@ type rateLimitWatcher struct {
 
 // NewRateLimitWatcherClient wraps github client with calls watching GH API rate limits
 func NewRateLimitWatcherClient(c Client, log log.Logger, threshold int) Client {
-	return &rateLimitWatcher{Client: c, log: log, threshold: threshold}
+	return rateLimitWatcher{Client: c, log: log, threshold: threshold}
 }
 
 func (r rateLimitWatcher) logRateLimitsAfter(f func()) {
@@ -25,17 +24,29 @@ func (r rateLimitWatcher) logRateLimitsAfter(f func()) {
 	r.logRateLimits()
 }
 
-func (r rateLimitWatcher) logRateLimits() {
+// GetRateLimits retrieves the rate limits for the current GH client
+func GetRateLimits(c Client) *gogh.RateLimits {
+	limitWatcher := c.(rateLimitWatcher)
+	return rateLimits(limitWatcher)
+}
+
+func rateLimits(r rateLimitWatcher) *gogh.RateLimits {
 	ghclient := r.unwrap()
 	limits, _, e := ghclient.RateLimits(context.Background())
 	if e != nil {
 		r.log.Errorf("failed to load rate limits %s", e)
-		return
+		return nil
 	}
-	core := limits.GetCore()
-	server.ReportRateLimit(limits)
-	if core.Remaining < r.threshold {
-		r.log.Warnf("reaching limit for GH API calls. %d/%d left. resetting at [%s]", core.Remaining, core.Limit, core.Reset.Format("2006-01-01 15:15:15"))
+	return limits
+
+}
+
+func (r rateLimitWatcher) logRateLimits() {
+	if limits := rateLimits(r); limits != nil {
+		core := limits.Core
+		if core.Remaining < r.threshold {
+			r.log.Warnf("reaching limit for GH API calls. %d/%d left. resetting at [%s]", core.Remaining, core.Limit, core.Reset.Format("2006-01-01 15:15:15"))
+		}
 	}
 }
 

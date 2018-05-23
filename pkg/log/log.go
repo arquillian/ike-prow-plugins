@@ -17,7 +17,6 @@ type Logger interface {
 	Warnf(format string, args ...interface{})
 	Error(args ...interface{})
 	Errorf(format string, args ...interface{})
-	Panic(args ...interface{})
 }
 
 // ConfigureLogrus defines global formatting, level and fields used while logging

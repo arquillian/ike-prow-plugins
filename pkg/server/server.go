@@ -10,12 +10,14 @@ import (
 	gogh "github.com/google/go-github/github"
 	"github.com/sirupsen/logrus"
 	"k8s.io/test-infra/prow/hook"
+	"github.com/arquillian/ike-prow-plugins/pkg/github/client"
 )
 
 // GitHubEventHandler is a type which keeps the logic of handling GitHub events for the given plugin implementation.
 // It is used by Server implementation to handle incoming events.
 type GitHubEventHandler interface {
 	HandleEvent(log log.Logger, eventType github.EventType, payload []byte) error
+	GhClient () ghclient.Client
 }
 
 // Server implements http.Handler. It validates incoming GitHub webhooks and
@@ -61,27 +63,12 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	}
 
 	fullName := *event.Repo.FullName
-	recordIncomingWebHooks(s, l, fullName)
-	recordHandledEvents(s, l, eventType)
+	s.Metrics.reportIncomingWebHooks(l, fullName)
+	s.Metrics.reportHandledEvents(l, eventType)
+	s.Metrics.reportRateLimit(s.GitHubEventHandler.GhClient())
 
 	if err := s.GitHubEventHandler.HandleEvent(l, github.EventType(eventType), payload); err != nil {
 		l.WithError(err).Error("error parsing event.")
 		return
-	}
-}
-
-func recordIncomingWebHooks(s *Server, l log.Logger, label string) {
-	if counter, err := s.Metrics.WebhookCounter.GetMetricWithLabelValues(label); err != nil {
-		l.Errorf("Failed to get metric for Repository: %q. Cause: %q", label, err)
-	} else {
-		counter.Inc()
-	}
-}
-
-func recordHandledEvents(s *Server, l log.Logger, label string) {
-	if counter, err := s.Metrics.HandledEventsCounter.GetMetricWithLabelValues(label); err != nil {
-		l.Errorf("Failed to get metric for Event: %q. Cause: %q", label, err)
-	} else {
-		counter.Inc()
 	}
 }

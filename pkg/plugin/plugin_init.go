@@ -8,7 +8,7 @@ import (
 
 	"strconv"
 
-	probeshandler "github.com/arquillian/ike-prow-plugins/pkg/probes-handler"
+	"github.com/arquillian/ike-prow-plugins/pkg/probes-handler"
 	"github.com/arquillian/ike-prow-plugins/pkg/utils"
 	"k8s.io/test-infra/prow/pluginhelp/externalplugins"
 	"k8s.io/test-infra/prow/plugins"
@@ -24,6 +24,8 @@ import (
 	"github.com/arquillian/ike-prow-plugins/pkg/server"
 	"github.com/sirupsen/logrus"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
+	"fmt"
+	"errors"
 )
 
 // nolint
@@ -95,9 +97,15 @@ func InitPlugin(pluginName string, newEventHandler EventHandlerCreator, newServe
 
 	handler := newEventHandler(githubClient, *pluginBotName)
 
-	server.RegisterMetrics(logger)
 	pluginServer := newServer(webhookSecret, handler)
-	pluginServer.Metrics = server.NewMetrics()
+
+	if errs := pluginServer.RegisterMetrics(); len(errs) > 0 {
+		msg := ""
+		for index, e := range errs {
+			msg = msg + fmt.Sprintf("\n%d. [%s]", index+1, e.Error())
+		}
+		logger.WithError(errors.New(msg)).Fatal("Prometheus metrics registration failed!!!")
+	}
 
 	port := strconv.Itoa(*port)
 	logger.Infof("Starting server on port %s", port)

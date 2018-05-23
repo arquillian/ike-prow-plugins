@@ -6,13 +6,13 @@ import (
 	"net/http/httptest"
 	"github.com/arquillian/ike-prow-plugins/pkg/plugin/test-keeper"
 	"github.com/arquillian/ike-prow-plugins/pkg/server"
-	"k8s.io/test-infra/prow/phony"
 	dto "github.com/prometheus/client_model/go"
 	"github.com/arquillian/ike-prow-plugins/pkg/log"
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/arquillian/ike-prow-plugins/pkg/internal/test"
 	"gopkg.in/h2non/gock.v1"
 	"github.com/arquillian/ike-prow-plugins/pkg/github/client"
+	"k8s.io/test-infra/prow/phony"
 )
 
 var _ = Describe("Service Metrics", func() {
@@ -26,14 +26,16 @@ var _ = Describe("Service Metrics", func() {
 	)
 
 	BeforeEach(func() {
-		metrics = server.NewMetrics()
-		eventHandler := &testkeeper.GitHubTestEventsHandler{Client: test.NewDefaultGitHubClient(), BotName: "alien-ike"}
-		s = httptest.NewServer(&server.Server{
+		eventHandler := &testkeeper.GitHubTestEventsHandler{Client: ghclient.NewRateLimitWatcherClient(test.NewDefaultGitHubClient(), logger, 10), BotName: "alien-ike"}
+		server := &server.Server{
 			GitHubEventHandler: eventHandler,
 			PluginName:         pluginName,
 			HmacSecret:         secret,
-			Metrics:            metrics,
-		})
+		}
+		server.RegisterMetrics()
+
+		metrics = server.Metrics
+		s = httptest.NewServer(server)
 	})
 
 	AfterEach(func() {
@@ -50,7 +52,7 @@ var _ = Describe("Service Metrics", func() {
 		}
 
 		// when
-		counter, err := metrics.WebhookCounter.GetMetricWithLabelValues(fullName)
+		counter, err := metrics.WebHookCounter.GetMetricWithLabelValues(fullName)
 
 		// then
 		Ω(err).ShouldNot(HaveOccurred())
@@ -75,21 +77,23 @@ var _ = Describe("Service Metrics", func() {
 	})
 
 	It("should get Rate limit for GitHub API calls", func() {
-		//given
+		// given
+		defer gock.DisableNetworking()
+		gock.New(s.URL).
+			EnableNetworking()
+
 		gock.New("https://api.github.com").
 			Get("/rate_limit").
 			Persist().
 			Reply(200).
 			Body(test.FromFile("../github/client/test_fixtures/gh/low_rate_limit.json"))
 
-		gock.New("https://api.github.com").
-			Get("/repos/owner/repo/pulls/123/files").
-			Reply(200).
-			BodyString("[]")
+		payload := test.LoadFromFile("../plugin/test-keeper/test_fixtures/github_calls/prs/without_tests/skip_comment_by_admin.json")
 
 		// when
-		client := ghclient.NewRateLimitWatcherClient(test.NewDefaultGitHubClient(), logger, 10)
-		client.ListPullRequestFiles("owner", "repo", 123)
+		if err := phony.SendHook(s.URL, "issue_comment", payload, secret); err != nil {
+			logger.Errorf("Error sending hook: %v", err)
+		}
 
 		// then
 		Expect(gaugeValue(metrics.RateLimit.WithLabelValues("core"))).To(Equal(8))
