@@ -8,6 +8,7 @@ import (
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	"gopkg.in/h2non/gock.v1"
+	"github.com/arquillian/ike-prow-plugins/pkg/github/service"
 )
 
 var _ = Describe("Test keeper config loader features", func() {
@@ -21,13 +22,12 @@ var _ = Describe("Test keeper config loader features", func() {
 	Context("Loading test-keeper configuration file from GitHub repository", func() {
 
 		logger := log.NewTestLogger()
+		configFilePath := ghservice.ConfigHome + testkeeper.ProwPluginName
 
 		It("should load test-keeper configuration yml file", func() {
-			// given
-			NonExistingRawGitHubFiles(".ike-prow/test-keeper_hint.md")
 
 			gock.New("https://raw.githubusercontent.com").
-				Get("owner/repo/46cb8fac44709e4ccaae97448c65e8f7320cfea7/.ike-prow/" + testkeeper.ProwPluginName + ".yml").
+				Get("owner/repo/46cb8fac44709e4ccaae97448c65e8f7320cfea7/" + configFilePath  + ".yml").
 				Reply(200).
 				BodyString("test_patterns: ['*my', 'test.go', 'pattern.js']\n" +
 					"skip_validation_for: ['pom.xml', 'regex{{*\\.adoc}}']\n" +
@@ -50,10 +50,8 @@ var _ = Describe("Test keeper config loader features", func() {
 
 		It("should load test-keeper configuration yml file", func() {
 			// given
-			NonExistingRawGitHubFiles(".ike-prow/test-keeper_hint.md")
-
 			gock.New("https://raw.githubusercontent.com").
-				Get("owner/repo/46cb8fac44709e4ccaae97448c65e8f7320cfea7/.ike-prow/" + testkeeper.ProwPluginName + ".yml").
+				Get("owner/repo/46cb8fac44709e4ccaae97448c65e8f7320cfea7/" + configFilePath  + ".yml").
 				Reply(200).
 				BodyString("test_patterns: ['*my', 'test.go', 'pattern.js']\n" +
 					"skip_validation_for: ['pom.xml', 'regex{{*\\.adoc}}']\n" +
@@ -77,10 +75,10 @@ var _ = Describe("Test keeper config loader features", func() {
 
 		It("should load test-keeper configuration yaml file", func() {
 			// given
-			NonExistingRawGitHubFiles(".ike-prow/test-keeper.yml", ".ike-prow/test-keeper_hint.md")
+			NonExistingRawGitHubFiles(".ike-prow/test-keeper.yml")
 
 			gock.New("https://raw.githubusercontent.com").
-				Get("owner/repo/46cb8fac44709e4ccaae97448c65e8f7320cfea7/.ike-prow/" + testkeeper.ProwPluginName + ".yaml").
+				Get("owner/repo/46cb8fac44709e4ccaae97448c65e8f7320cfea7/" + configFilePath  + ".yaml").
 				Reply(200).
 				BodyString("test_patterns: ['*my', 'test.go', 'pattern.js']\n" +
 					"skip_validation_for: ['pom.xml', 'regex{{*\\.adoc}}']\n" +
@@ -102,43 +100,12 @@ var _ = Describe("Test keeper config loader features", func() {
 			Expect(configuration.Combine).To(BeTrue())
 		})
 
-		It("should load test-keeper configuration yaml file with default hint file if present and not mentioned in configuration", func() {
-			// given
-			NonExistingRawGitHubFiles(".ike-prow/test-keeper.yml")
-
-			gock.New("https://raw.githubusercontent.com").
-				Get("owner/repo/46cb8fac44709e4ccaae97448c65e8f7320cfea7/.ike-prow/" + testkeeper.ProwPluginName + ".yaml").
-				Reply(200).
-				BodyString("test_patterns: ['*my', 'test.go', 'pattern.js']\n" +
-				"skip_validation_for: ['pom.xml', 'regex{{*\\.adoc}}']\n")
-
-			gock.New("https://raw.githubusercontent.com").
-				Get("owner/repo/46cb8fac44709e4ccaae97448c65e8f7320cfea7/.ike-prow/" + testkeeper.ProwPluginName + "_hint.md").
-				Reply(200).
-				BodyString("custom hint for plugin")
-
-			change := scm.RepositoryChange{
-				Owner:    "owner",
-				RepoName: "repo",
-				Hash:     "46cb8fac44709e4ccaae97448c65e8f7320cfea7",
-			}
-
-			// when
-			configuration := testkeeper.LoadConfiguration(logger, change)
-
-			// then
-			Expect(configuration.PluginHint).To(Equal("https://github.com/owner/repo/46cb8fac44709e4ccaae97448c65e8f7320cfea7/.ike-prow/test-keeper_hint.md"))
-			Expect(configuration.Inclusions).To(ConsistOf("*my", "test.go", "pattern.js"))
-			Expect(configuration.Exclusions).To(ConsistOf("pom.xml", "regex{{*\\.adoc}}"))
-			Expect(configuration.Combine).To(BeTrue())
-		})
-
 		It("should not load test-keeper configuration yaml file and return empty url when config is not accessible", func() {
 			// given
 			NonExistingRawGitHubFiles(".ike-prow/test-keeper.yml")
 
 			gock.New("https://raw.githubusercontent.com").
-				Get("owner/repo/46cb8fac44709e4ccaae97448c65e8f7320cfea7/.ike-prow/" + testkeeper.ProwPluginName + ".yaml").
+				Get("owner/repo/46cb8fac44709e4ccaae97448c65e8f7320cfea7/" + configFilePath  + ".yaml").
 				Reply(404)
 
 			change := scm.RepositoryChange{
