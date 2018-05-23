@@ -9,6 +9,8 @@ import (
 )
 
 const githubBaseURL = "https://github.com/"
+
+// ConfigHome is a directory to keep prow configuration files
 const ConfigHome = ".ike-prow/"
 
 // LoadableConfig holds information about the plugin name, repository change and pointer to base config
