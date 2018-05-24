@@ -90,10 +90,8 @@ var _ = Describe("Test keeper comment message creation", func() {
 				Reply(200).
 				BodyString("Custom message")
 
-			url := "http://github.com/my/repo/test-keeper.yaml"
 			conf := testkeeper.PluginConfiguration{
 				PluginConfiguration: config.PluginConfiguration{
-					LocationURL: url,
 					PluginName:  testkeeper.ProwPluginName,
 				},
 			}
