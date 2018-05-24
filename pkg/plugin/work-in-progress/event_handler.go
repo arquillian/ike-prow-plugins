@@ -76,11 +76,6 @@ func (gh *GitHubWIPPRHandler) HandleEvent(log log.Logger, eventType github.Event
 	return nil
 }
 
-// GhClient created while event handler initialization which is used to communicate with the GitHub API
-func (gh *GitHubWIPPRHandler) GhClient() ghclient.Client {
-	return gh.Client
-}
-
 // IsWorkInProgress checks if title is marked as Work In Progress
 func (gh *GitHubWIPPRHandler) IsWorkInProgress(title *string) bool {
 	return strings.HasPrefix(strings.ToLower(*title), WipPrefix)

@@ -10,14 +10,12 @@ import (
 	gogh "github.com/google/go-github/github"
 	"github.com/sirupsen/logrus"
 	"k8s.io/test-infra/prow/hook"
-	"github.com/arquillian/ike-prow-plugins/pkg/github/client"
 )
 
 // GitHubEventHandler is a type which keeps the logic of handling GitHub events for the given plugin implementation.
 // It is used by Server implementation to handle incoming events.
 type GitHubEventHandler interface {
 	HandleEvent(log log.Logger, eventType github.EventType, payload []byte) error
-	GhClient () ghclient.Client
 }
 
 // Server implements http.Handler. It validates incoming GitHub webhooks and
@@ -65,7 +63,7 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	fullName := *event.Repo.FullName
 	s.Metrics.reportIncomingWebHooks(l, fullName)
 	s.Metrics.reportHandledEvents(l, eventType)
-	s.Metrics.reportRateLimit(s.GitHubEventHandler.GhClient())
+	s.Metrics.reportRateLimit(l)
 
 	if err := s.GitHubEventHandler.HandleEvent(l, github.EventType(eventType), payload); err != nil {
 		l.WithError(err).Error("error parsing event.")

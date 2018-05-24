@@ -11,7 +11,6 @@ import (
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/arquillian/ike-prow-plugins/pkg/internal/test"
 	"gopkg.in/h2non/gock.v1"
-	"github.com/arquillian/ike-prow-plugins/pkg/github/client"
 	"k8s.io/test-infra/prow/phony"
 )
 
@@ -19,6 +18,7 @@ var _ = Describe("Service Metrics", func() {
 
 	logger := log.NewTestLogger()
 	secret := []byte("123abc")
+	client := test.NewDefaultGitHubClient()
 	pluginName := testkeeper.ProwPluginName
 	var (
 		metrics *server.Metrics
@@ -26,16 +26,20 @@ var _ = Describe("Service Metrics", func() {
 	)
 
 	BeforeEach(func() {
-		eventHandler := &testkeeper.GitHubTestEventsHandler{Client: ghclient.NewRateLimitWatcherClient(test.NewDefaultGitHubClient(), logger, 10), BotName: "alien-ike"}
-		server := &server.Server{
+		eventHandler := &testkeeper.GitHubTestEventsHandler{Client: client, BotName: "alien-ike"}
+		prowServer := &server.Server{
 			GitHubEventHandler: eventHandler,
 			PluginName:         pluginName,
 			HmacSecret:         secret,
 		}
-		server.RegisterMetrics()
-
-		metrics = server.Metrics
-		s = httptest.NewServer(server)
+		m, errs := server.RegisterMetrics(client);
+		if  len(errs) > 0 {
+			logger.Errorf("Prometheus metrics registration failed!")
+		} else {
+			prowServer.Metrics = m
+			metrics = m
+		}
+		s = httptest.NewServer(prowServer)
 	})
 
 	AfterEach(func() {

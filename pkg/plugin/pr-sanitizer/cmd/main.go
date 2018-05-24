@@ -42,11 +42,6 @@ func (gh *GitHubLabelsEventsHandler) HandleEvent(log log.Logger, eventType githu
 	return nil
 }
 
-// GhClient created while event handler initialization which is used to communicate with the GitHub API
-func (gh *GitHubLabelsEventsHandler) GhClient() ghclient.Client {
-	return gh.Client
-}
-
 func helpProvider(enabledRepos []string) (*pluginhelp.PluginHelp, error) {
 	return &pluginhelp.PluginHelp{
 		Description: `PR Sanitizer plugin`,

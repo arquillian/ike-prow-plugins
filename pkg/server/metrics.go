@@ -7,9 +7,9 @@ import (
 )
 
 // RegisterMetrics registers prometheus collectors to collect metrics
-func (s *Server) RegisterMetrics() []error {
+func RegisterMetrics(client ghclient.Client) (*Metrics, []error) {
 	errors := make([]error, 0, 3)
-	metrics := NewMetrics()
+	metrics := NewMetrics(client)
 	if rateLimitCollector, e := registerOrGet(metrics.RateLimit); e == nil {
 		metrics.RateLimit = rateLimitCollector.(*prometheus.GaugeVec)
 	} else {
@@ -28,12 +28,7 @@ func (s *Server) RegisterMetrics() []error {
 		errors = append(errors, e)
 	}
 
-	if len(errors) > 0 {
-		return errors
-	}
-
-	s.Metrics = metrics
-	return make([]error, 0);
+	return metrics, errors
 }
 
 func registerOrGet(c prometheus.Collector) (prometheus.Collector, error) {
@@ -52,10 +47,11 @@ type Metrics struct {
 	RateLimit            *prometheus.GaugeVec
 	WebHookCounter       *prometheus.CounterVec
 	HandledEventsCounter *prometheus.CounterVec
+	GhClient             ghclient.Client
 }
 
 // NewMetrics creates a new set of metrics for the Ike Prow Plugin.
-func NewMetrics() *Metrics {
+func NewMetrics(client ghclient.Client) *Metrics {
 	return &Metrics{
 		RateLimit: prometheus.NewGaugeVec(prometheus.GaugeOpts{
 			Name: "github_rate_limits",
@@ -69,13 +65,16 @@ func NewMetrics() *Metrics {
 			Name: "handled_events_counter",
 			Help: "A counter of handled events.",
 		}, []string{"event_type"}),
+		GhClient: client,
 	}
 }
 
-func (metrics *Metrics) reportRateLimit(client ghclient.Client) {
-	if r := ghclient.GetRateLimits(client); r != nil {
-		metrics.RateLimit.WithLabelValues("core").Set(float64(r.Core.Remaining))
-		metrics.RateLimit.WithLabelValues("search").Set(float64(r.Search.Remaining))
+func (metrics *Metrics) reportRateLimit(l log.Logger) {
+	if limits, err := metrics.GhClient.GetRateLimit(); err != nil {
+		l.Errorf("Failed to get metric GH Client rate limit. Cause: %q", err)
+	} else {
+		metrics.RateLimit.WithLabelValues("core").Set(float64(limits.Core.Remaining))
+		metrics.RateLimit.WithLabelValues("search").Set(float64(limits.Search.Remaining))
 	}
 }
 

@@ -63,11 +63,6 @@ func (gh *GitHubTestEventsHandler) HandleEvent(log log.Logger, eventType github.
 	return nil
 }
 
-// GhClient created while event handler initialization which is used to communicate with the GitHub API
-func (gh *GitHubTestEventsHandler) GhClient() ghclient.Client {
-	return gh.Client
-}
-
 func (gh *GitHubTestEventsHandler) handlePrEvent(log log.Logger, event *gogh.PullRequestEvent) error {
 	if !utils.Contains(handledPrActions, *event.Action) {
 		return nil
