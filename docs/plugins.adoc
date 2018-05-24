@@ -26,7 +26,10 @@ To enable customized plugin hint comment messages edit plugin's configuration fi
 plugin_hint: .ike-prow/test-keeper_hint.md
 ----
 
-The `plugin_hint` property can either have an inline string directly written inside of the config file or another file with case insensitive filename PLUGINNAME_HINT.md that contains the hint. The location of the file can be set by either a relative path or an absolute URL. If nothing is set then a default message is used.
+The `plugin_hint` property can either have an inline string directly written inside of the config file or another file with case insensitive filename PLUGINNAME_HINT.md that contains the hint. The location of the file can be set by either a relative path or an absolute URL.
+
+NOTE: If you have `PLUGINNAME_HINT.md` file inside project's root `.ike-prow` directory and you are not using `plugin_hint` property in configuration file  or not using any configuration file `PLUGINNAME.y(a)ml` (e.g.`test-keeper.yaml`) then plugin hint comment messages will be loaded from
+default location `.ike-prow/PLUGINNAME_HINT.md` (e.g. `.ike-prow/test-keeper_hint.md`). If this is not the case then default message is used.
 
 ==== GitHub settings [[gh-settings]]
 
