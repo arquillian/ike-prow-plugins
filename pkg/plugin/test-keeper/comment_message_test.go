@@ -44,6 +44,73 @@ var _ = Describe("Test keeper comment message creation", func() {
 		})
 	})
 
+	Context("Creation of default comment messages from default location when config plugin hint is not set", func() {
+
+		BeforeEach(func() {
+			defer gock.OffAll()
+		})
+
+		It("should create message taken from a default hint file if plugin hint url is missing", func() {
+			// given
+			NonExistingRawGitHubFiles("test-keeper.yaml", "test-keeper.yml")
+
+			gock.New("https://raw.githubusercontent.com").
+				Get("owner/repo/46cb8fac44709e4ccaae97448c65e8f7320cfea7/.ike-prow/test-keeper_hint.md").
+				Reply(200).
+				BodyString("Custom message")
+
+			url := "http://github.com/my/repo/test-keeper.yaml"
+			conf := testkeeper.PluginConfiguration{
+				PluginConfiguration: config.PluginConfiguration{
+					LocationURL: url,
+					PluginName:  testkeeper.ProwPluginName,
+				},
+			}
+
+			change := scm.RepositoryChange{
+				Owner:    "owner",
+				RepoName: "repo",
+				Hash:     "46cb8fac44709e4ccaae97448c65e8f7320cfea7",
+			}
+
+			// when
+			msg := testkeeper.CreateCommentMessage(conf, change)
+			sanitizedMsg := removeHtmlElements(msg)
+
+			// then
+			Expect(sanitizedMsg).To(Equal("Custom message"))
+		})
+
+		It("should create message taken from a default hint file if location url is missing", func() {
+			// given
+			NonExistingRawGitHubFiles("test-keeper.yaml", "test-keeper.yml")
+
+			gock.New("https://raw.githubusercontent.com").
+				Get("owner/repo/46cb8fac44709e4ccaae97448c65e8f7320cfea7/.ike-prow/test-keeper_hint.md").
+				Reply(200).
+				BodyString("Custom message")
+
+			conf := testkeeper.PluginConfiguration{
+				PluginConfiguration: config.PluginConfiguration{
+					PluginName:  testkeeper.ProwPluginName,
+				},
+			}
+
+			change := scm.RepositoryChange{
+				Owner:    "owner",
+				RepoName: "repo",
+				Hash:     "46cb8fac44709e4ccaae97448c65e8f7320cfea7",
+			}
+
+			// when
+			msg := testkeeper.CreateCommentMessage(conf, change)
+			sanitizedMsg := removeHtmlElements(msg)
+
+			// then
+			Expect(sanitizedMsg).To(Equal("Custom message"))
+		})
+	})
+
 	Context("Creation of default comment messages that are sent to a validated PR when custom message file is set", func() {
 
 		BeforeEach(func() {

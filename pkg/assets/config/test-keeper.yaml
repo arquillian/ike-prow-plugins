@@ -60,6 +60,7 @@ skip_validation_for:
   ## Docker
   - 'regex{{docker-compose.*\.y[a]?ml$}}'
   - 'Dockerfile*'
+  - '.dockerignore'
 
   ## Others
   - 'Makefile'
@@ -133,4 +134,4 @@ skip_validation_for:
   - '*.bat'
 
   # Our own configurations
-  - 'regex{{test-keeper\.y[a]?ml$}}'
+  - '.ike-prow/'
