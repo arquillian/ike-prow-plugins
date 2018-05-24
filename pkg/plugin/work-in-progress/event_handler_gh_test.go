@@ -50,6 +50,8 @@ var _ = Describe("Test Keeper Plugin features", func() {
 
 		It("should mark opened PR as ready for review if not prefixed with WIP", func() {
 			// given
+			NonExistingRawGitHubFiles("work-in-progress.yml", "work-in-progress.yaml")
+
 			gock.New("https://api.github.com").
 				Post("/repos/bartoszmajsak/wfswarm-booster-pipeline-test/statuses").
 				SetMatcher(ExpectPayload(toHaveSuccessState)).
@@ -66,6 +68,8 @@ var _ = Describe("Test Keeper Plugin features", func() {
 
 		It("should mark opened PR as work-in-progress when prefixed with WIP", func() {
 			// given
+			NonExistingRawGitHubFiles("work-in-progress.yml", "work-in-progress.yaml")
+
 			gock.New("https://api.github.com").
 				Post("/repos/bartoszmajsak/wfswarm-booster-pipeline-test/statuses").
 				SetMatcher(ExpectPayload(toHaveFailureState)).
@@ -80,8 +84,31 @@ var _ = Describe("Test Keeper Plugin features", func() {
 			Ω(err).ShouldNot(HaveOccurred())
 		})
 
+		It("should mark opened PR as work-in-progress when title starts with configured prefix", func() {
+			// given
+			gock.New("https://raw.githubusercontent.com").
+				Get("bartoszmajsak/wfswarm-booster-pipeline-test/8111c2d99b596877ff8e2059409688d83487da0e/work-in-progress.yml").
+				Reply(200).
+				Body(FromFile("test_fixtures/github_calls/work-in-progress.yml"))
+
+			gock.New("https://api.github.com").
+				Post("/repos/bartoszmajsak/wfswarm-booster-pipeline-test/statuses").
+				SetMatcher(ExpectPayload(toHaveFailureState)).
+				Reply(201) // This way we implicitly verify that call happened after `HandleEvent` call
+
+			statusPayload := LoadFromFile("test_fixtures/github_calls/custom_prefix_pr_opened.json")
+
+			// when
+			err := handler.HandleEvent(log, github.PullRequest, statusPayload)
+
+			// then - implicit verification of /statuses call occurrence with proper payload
+			Ω(err).ShouldNot(HaveOccurred())
+		})
+
 		It("should mark status as failed (thus block PR merge) when title updated to contain WIP", func() {
 			// given
+			NonExistingRawGitHubFiles("work-in-progress.yml", "work-in-progress.yaml")
+
 			gock.New("https://api.github.com").
 				Post("/repos/bartoszmajsak/wfswarm-booster-pipeline-test/statuses").
 				SetMatcher(ExpectPayload(toHaveFailureState)).
@@ -99,6 +126,8 @@ var _ = Describe("Test Keeper Plugin features", func() {
 
 		It("should mark status as success (thus unblock PR merge) when title has WIP removed", func() {
 			// given
+			NonExistingRawGitHubFiles("work-in-progress.yml", "work-in-progress.yaml")
+
 			gock.New("https://api.github.com").
 				Post("/repos/bartoszmajsak/wfswarm-booster-pipeline-test/statuses").
 				SetMatcher(ExpectPayload(toHaveSuccessState)).
