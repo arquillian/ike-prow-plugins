@@ -36,14 +36,25 @@ const (
 // CreateCommentMessage creates a comment message for the test-keeper plugin. If the comment message is set in config then it takes that one, the default otherwise.
 func CreateCommentMessage(configuration PluginConfiguration, change scm.RepositoryChange) string {
 	var msg string
+	var fileContent []byte
 	if configuration.LocationURL == "" {
-		msg = sadIke + paragraph + beginning + paragraph + noConfig
+		fileContent = defaultFileContent(configuration, change);
+		if len(fileContent) > 0 {
+			msg = string(fileContent);
+		} else {
+			msg = sadIke + paragraph + beginning + paragraph + noConfig
+		}
 	} else if configuration.PluginHint != "" {
 		msg = getMsgFromConfigHint(configuration, change)
-	} else if content := defaultFileContent(configuration, change); content != "" {
-		msg = content
 	} else {
-		msg = sadIke + paragraph + getMsgWithConfigRef(configuration.LocationURL)
+		if fileContent == nil {
+			fileContent = defaultFileContent(configuration, change);
+		}
+		if len(fileContent) > 0 {
+			msg = string(fileContent)
+		} else {
+			msg = sadIke + paragraph + getMsgWithConfigRef(configuration.LocationURL)
+		}
 	}
 	return msg
 }
@@ -58,16 +69,16 @@ func getMsgFromConfigHint(configuration PluginConfiguration, change scm.Reposito
 	return configuration.PluginHint
 }
 
-func defaultFileContent(configuration PluginConfiguration, change scm.RepositoryChange) string {
+func defaultFileContent(configuration PluginConfiguration, change scm.RepositoryChange) ([]byte) {
 	pluginHintPath := fmt.Sprintf("%s%s_hint.md", ghservice.ConfigHome, configuration.PluginName)
 	ghFileService := ghservice.RawFileService{Change: change}
 	hintURL := ghFileService.GetRawFileURL(pluginHintPath)
 
 	content, e := utils.GetFileFromURL(hintURL)
 	if e != nil {
-		return ""
+		return make([]byte, 0)
 	}
-	return string(content)
+	return content
 }
 
 func getMsgFromFile(configuration PluginConfiguration, change scm.RepositoryChange) string {
