@@ -82,6 +82,7 @@ var _ = Describe("Test Keeper Plugin features", func() {
 
 			gock.New("https://api.github.com").
 				Post("/repos/bartoszmajsak/wfswarm-booster-pipeline-test/issues/4/labels").
+				SetMatcher(ExpectPayload(To(HaveBodyThatContains("work-in-progress")))).
 				Reply(200).
 				Body(FromFile("test_fixtures/github_calls/wip_pr_created_with_label.json"))
 
@@ -113,6 +114,7 @@ var _ = Describe("Test Keeper Plugin features", func() {
 
 			gock.New("https://api.github.com").
 				Post("/repos/bartoszmajsak/wfswarm-booster-pipeline-test/issues/4/labels").
+				SetMatcher(ExpectPayload(To(HaveBodyThatContains("wip")))).
 				Reply(200).
 				Body(FromFile("test_fixtures/github_calls/wip_pr_created_with_label.json"))
 
@@ -141,6 +143,7 @@ var _ = Describe("Test Keeper Plugin features", func() {
 
 			gock.New("https://api.github.com").
 				Post("/repos/bartoszmajsak/wfswarm-booster-pipeline-test/issues/4/labels").
+				SetMatcher(ExpectPayload(To(HaveBodyThatContains("work-in-progress")))).
 				Reply(200).
 				Body(FromFile("test_fixtures/github_calls/pr_edited_with_label.json"))
 
