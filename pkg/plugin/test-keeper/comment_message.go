@@ -39,7 +39,7 @@ func CreateCommentMessage(configuration PluginConfiguration, change scm.Reposito
 	if configuration.PluginHint != "" {
 		msg = getMsgFromConfigHint(configuration, change)
 	} else if content := defaultFileContent(configuration, change); content != "" {
-		msg = string(content)
+		msg = content
 	} else if configuration.LocationURL == "" {
 		msg = sadIke + paragraph + beginning + paragraph + noConfig
 	} else {
