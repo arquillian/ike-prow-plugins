@@ -1274,20 +1274,46 @@ If you need to reconfigure the plugin then read the section <a href="#test-keepe
 <p>This plugin can help reviewers with focusing on work that really matters so they don&#8217;t need to spend time with Pull Requests that are still in progress unless they were requested to do partial reviews.</p>
 </div>
 <div class="paragraph">
-<p>If the PR title starts with "work-in-progress" prefix (non-case sensitive) then the plugin marks its check as <strong>Failure</strong>, or as <strong>Success</strong> otherwise.</p>
+<p>If the PR title starts with any of the default prefixes such as <code>WIP</code>, <code>DO NOT MERGE</code>, <code>DON&#8217;T MERGE</code>, <code>WORK-IN-PROGRESS</code> with combinations of <code>( )</code>, <code>[ ]</code>, <code>:</code> or any of the user configured prefixes as described below (non-case sensitive) then the plugin marks its check as <strong>Failure</strong>, or as <strong>Success</strong> otherwise.</p>
 </div>
 <div class="sect3">
-<h4 id="_status_details_2"><a class="anchor" href="#_status_details_2"></a>3.3.1. Status details</h4>
+<h4 id="work-in-progress-config"><a class="anchor" href="#work-in-progress-config"></a>3.3.1. Plugin Configuration</h4>
+<div class="paragraph">
+<p>To configure Work In Progress plugin place <code>work-in-progress.yml</code> (or <code>work-in-progress.yaml</code>) file in the root of your project and use properties described below.</p>
+</div>
+<div class="listingblock">
+<div class="title">work-in-progress.yaml</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="yml"><span class="key">title_prefixes</span>:          <i class="conum" data-value="1"></i><b>(1)</b>
+  - <span class="string"><span class="content">'work in progress'</span></span>
+<span class="key">combine_defaults</span>: <span class="string"><span class="content">true   </span></span> <i class="conum" data-value="2"></i><b>(2)</b></code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>Defines set of custom-prefixes which will be used to match titles prefixes in changeset and determine if Pull Requests are still in progress.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>Allows you to decide if you want to combine your patterns with the list (<code>WIP</code>, <code>DO NOT MERGE</code>, <code>DON&#8217;T MERGE</code>, <code>WORK-IN-PROGRESS</code>) of predefined defaults (<code>true</code> by default).</td>
+</tr>
+</table>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_status_details_2"><a class="anchor" href="#_status_details_2"></a>3.3.2. Status details</h4>
 <div class="sect4">
 <h5 id="wip-success"><a class="anchor" href="#wip-success"></a>Success</h5>
 <div class="paragraph">
-<p>Your Pull Request has been approved as the plugin didn&#8217;t detect any sign of work in progress (the PR title doesn&#8217;t start with "work-in-progress" prefix).</p>
+<p>Your Pull Request has been approved as the plugin didn&#8217;t detect any sign of work in progress (the PR title doesn&#8217;t start with any of the "work-in-progress prefixes").</p>
 </div>
 </div>
 <div class="sect4">
 <h5 id="wip-failed"><a class="anchor" href="#wip-failed"></a>Failed</h5>
 <div class="paragraph">
-<p>Your Pull Request has been rejected because the plugin detected that the PR title starts with "work-in-progress" prefix, so it seems that there is still an ongoing work.</p>
+<p>Your Pull Request has been rejected because the plugin detected that the PR title starts with one of the "work-in-progress prefixes", so it seems that there is still an ongoing work.</p>
 </div>
 <div class="paragraph">
 <p>When the PR is done and ready for review and merge, then remove the prefix from the title to make the status green.</p>
@@ -1300,7 +1326,7 @@ If you need to reconfigure the plugin then read the section <a href="#test-keepe
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2018-05-22 13:25:13 UTC
+Last updated 2018-05-24 06:02:42 UTC
 </div>
 </div>
 <script>
