@@ -26,6 +26,7 @@ var _ = Describe("Test Keeper Plugin features", func() {
 	var handler *testkeeper.GitHubTestEventsHandler
 
 	log := log.NewTestLogger()
+	configFilePath := ghservice.ConfigHome + testkeeper.ProwPluginName
 
 	toBe := func(status, description, context, detailsLink string) SoftMatcher {
 		return SoftlySatisfyAll(
@@ -80,7 +81,7 @@ var _ = Describe("Test Keeper Plugin features", func() {
 			gockEmptyComments(2)
 
 			gock.New("https://raw.githubusercontent.com").
-				Get(repositoryName + "/5d6e9b25da90edfc19f488e595e0645c081c1575/" + ghservice.ConfigHome + "test-keeper.yml").
+				Get(repositoryName + "/5d6e9b25da90edfc19f488e595e0645c081c1575/" + configFilePath + ".yml").
 				Reply(200).
 				BodyString("test_patterns: ['**/*_test_suite.go']\n" +
 				"skip_validation_for: ['README.adoc']")
@@ -109,7 +110,7 @@ var _ = Describe("Test Keeper Plugin features", func() {
 			gockEmptyComments(1)
 
 			gock.New("https://raw.githubusercontent.com").
-				Get(repositoryName + "/5d6e9b25da90edfc19f488e595e0645c081c1575/" + ghservice.ConfigHome + "test-keeper.yml").
+				Get(repositoryName + "/5d6e9b25da90edfc19f488e595e0645c081c1575/" + configFilePath + ".yml").
 				Reply(200).
 				Body(FromFile("test_fixtures/github_calls/prs/without_tests/test-keeper-ignore-randomfile.yml"))
 
@@ -135,11 +136,11 @@ var _ = Describe("Test Keeper Plugin features", func() {
 		It("should reject opened pull request when no tests are matching defined pattern with no defaults implicitly combined", func() {
 			// given
 
-			NonExistingRawGitHubFiles(ghservice.ConfigHome + "test-keeper_hint.md")
+			NonExistingRawGitHubFiles(configFilePath + "_hint.md")
 			gockEmptyComments(2)
 
 			gock.New("https://raw.githubusercontent.com").
-				Get(repositoryName + "/5d6e9b25da90edfc19f488e595e0645c081c1575/" + ghservice.ConfigHome + "test-keeper.yml").
+				Get(repositoryName + "/5d6e9b25da90edfc19f488e595e0645c081c1575/" + configFilePath + ".yml").
 				Reply(200).
 				Body(FromFile("test_fixtures/github_calls/prs/with_tests/test-keeper.yml"))
 
