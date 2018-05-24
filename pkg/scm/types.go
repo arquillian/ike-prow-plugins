@@ -9,6 +9,15 @@ type RepositoryIssue struct {
 	Number   int
 }
 
+// NewRepositoryIssue creates a new instance of RepositoryIssue with the given values
+func NewRepositoryIssue(owner, repoName string, number int) *RepositoryIssue {
+	return &RepositoryIssue{
+		Owner:    owner,
+		RepoName: repoName,
+		Number:   number,
+	}
+}
+
 // ChangedFile is a type that contains information about created/modified/removed file within an scm repository
 type ChangedFile struct {
 	Name      string

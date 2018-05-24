@@ -29,3 +29,13 @@ func fileRequested(pathSuffix string) gock.Matcher {
 	})
 	return matcher
 }
+
+// SpyOnCalls checks the number of calls
+func SpyOnCalls(counter *int) gock.Matcher {
+	matcher := gock.NewBasicMatcher()
+	matcher.Add(func(_ *http.Request, _ *gock.Request) (bool, error) {
+		*counter++
+		return true, nil
+	})
+	return matcher
+}
