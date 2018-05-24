@@ -13,14 +13,14 @@
   },
   {
     "sha": "328a601724d79193c48e7828033f0908d14399cb",
-    "filename": "test-keeper.yml",
+    "filename": ".ike-prow/test-keeper.yml",
     "status": "added",
     "additions": 2,
     "deletions": 0,
     "changes": 2,
-    "blob_url": "https://github.com/bartoszmajsak/wfswarm-booster-pipeline-test/blob/78fe5f4d0ece3fe84793642e976563217277ca6b/test-keeper.yml",
-    "raw_url": "https://github.com/bartoszmajsak/wfswarm-booster-pipeline-test/raw/78fe5f4d0ece3fe84793642e976563217277ca6b/test-keeper.yml",
-    "contents_url": "https://api.github.com/repos/bartoszmajsak/wfswarm-booster-pipeline-test/contents/test-keeper.yml?ref=78fe5f4d0ece3fe84793642e976563217277ca6b",
+    "blob_url": "https://github.com/bartoszmajsak/wfswarm-booster-pipeline-test/blob/78fe5f4d0ece3fe84793642e976563217277ca6b/.ike-prow/test-keeper.yml",
+    "raw_url": "https://github.com/bartoszmajsak/wfswarm-booster-pipeline-test/raw/78fe5f4d0ece3fe84793642e976563217277ca6b/.ike-prow/test-keeper.yml",
+    "contents_url": "https://api.github.com/repos/bartoszmajsak/wfswarm-booster-pipeline-test/contents/.ike-prow/test-keeper.yml?ref=78fe5f4d0ece3fe84793642e976563217277ca6b",
     "patch": "@@ -0,0 +1,2 @@\n+skip_validation_for:\n+  - '**/Randomfile'"
   }
 ]

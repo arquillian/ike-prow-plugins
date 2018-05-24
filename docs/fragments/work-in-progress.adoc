@@ -6,7 +6,7 @@ If the PR title starts with any of the default prefixes such as `WIP`, `DO NOT M
 
 === Plugin Configuration [[work-in-progress-config]]
 
-To configure Work In Progress plugin place `work-in-progress.yml` (or `work-in-progress.yaml`) file in the root of your project and use properties described below.
+To configure Work In Progress plugin place `work-in-progress.yml` (or `work-in-progress.yaml`) file inside of the directory `.ike-prow/` in your project and use properties described below.
 
 .work-in-progress.yaml
 [source, yml, indent=0]

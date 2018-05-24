@@ -34,7 +34,7 @@ NOTE: If we missed some important patterns feel free to open an link:https://git
 
 === Plugin Configuration [[test-keeper-config]]
 
-To configure Test Keeper plugin place `test-keeper.yml` (or `test-keeper.yaml`) file in the root of your project and use properties described below.
+To configure Test Keeper plugin place `test-keeper.yml` (or `test-keeper.yaml`) file inside of the directory `.ike-prow/` in your project and use properties described below.
 
 .test-keeper.yaml
 [source, yml, indent=0]

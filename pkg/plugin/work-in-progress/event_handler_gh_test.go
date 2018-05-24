@@ -13,6 +13,7 @@ import (
 	"github.com/arquillian/ike-prow-plugins/pkg/github"
 	"fmt"
 	"github.com/arquillian/ike-prow-plugins/pkg/plugin"
+	"github.com/arquillian/ike-prow-plugins/pkg/github/service"
 )
 
 const (
@@ -31,6 +32,7 @@ var _ = Describe("Test Keeper Plugin features", func() {
 		var handler *wip.GitHubWIPPRHandler
 
 		log := log.NewTestLogger()
+		configFilePath := ghservice.ConfigHome + wip.ProwPluginName
 
 		toHaveSuccessState := SoftlySatisfyAll(
 			HaveState(github.StatusSuccess),
@@ -92,7 +94,7 @@ var _ = Describe("Test Keeper Plugin features", func() {
 		It("should mark opened PR as work-in-progress when title starts with configured prefix", func() {
 			// given
 			gock.New("https://raw.githubusercontent.com").
-				Get("bartoszmajsak/wfswarm-booster-pipeline-test/8111c2d99b596877ff8e2059409688d83487da0e/work-in-progress.yml").
+				Get("bartoszmajsak/wfswarm-booster-pipeline-test/8111c2d99b596877ff8e2059409688d83487da0e/" + configFilePath + ".yml").
 				Reply(200).
 				Body(FromFile("test_fixtures/github_calls/work-in-progress.yml"))
 

@@ -30,6 +30,7 @@ var _ = Describe("Test Keeper Plugin features", func() {
 	var handler *testkeeper.GitHubTestEventsHandler
 
 	log := log.NewTestLogger()
+	configFilePath := ghservice.ConfigHome + testkeeper.ProwPluginName
 
 	toBe := func(status, description, context, detailsLink string) SoftMatcher {
 		return SoftlySatisfyAll(
@@ -57,7 +58,7 @@ var _ = Describe("Test Keeper Plugin features", func() {
 
 		It("should approve opened pull request when tests included", func() {
 			// given
-			NonExistingRawGitHubFiles("test-keeper.yml", "test-keeper.yaml")
+			NonExistingRawGitHubFiles("test-keeper.yml", "test-keeper.yaml", "_hint.md")
 			gockEmptyComments(2)
 
 			gock.New("https://api.github.com").
@@ -84,10 +85,10 @@ var _ = Describe("Test Keeper Plugin features", func() {
 			gockEmptyComments(2)
 
 			gock.New("https://raw.githubusercontent.com").
-				Get(repositoryName + "/5d6e9b25da90edfc19f488e595e0645c081c1575/test-keeper.yml").
+				Get(repositoryName + "/5d6e9b25da90edfc19f488e595e0645c081c1575/" + configFilePath + ".yml").
 				Reply(200).
 				BodyString("test_patterns: ['**/*_test_suite.go']\n" +
-					"skip_validation_for: ['README.adoc']")
+				"skip_validation_for: ['README.adoc']")
 
 			gock.New("https://api.github.com").
 				Get("/repos/" + repositoryName + "/pulls/2/files").
@@ -113,7 +114,7 @@ var _ = Describe("Test Keeper Plugin features", func() {
 			gockEmptyComments(1)
 
 			gock.New("https://raw.githubusercontent.com").
-				Get(repositoryName + "/5d6e9b25da90edfc19f488e595e0645c081c1575/test-keeper.yml").
+				Get(repositoryName + "/5d6e9b25da90edfc19f488e595e0645c081c1575/" + configFilePath + ".yml").
 				Reply(200).
 				Body(FromFile("test_fixtures/github_calls/prs/without_tests/test-keeper-ignore-randomfile.yml"))
 
@@ -138,11 +139,12 @@ var _ = Describe("Test Keeper Plugin features", func() {
 
 		It("should reject opened pull request when no tests are matching defined pattern with no defaults implicitly combined", func() {
 			// given
-			NonExistingRawGitHubFiles("plugins/test-keeper_hint.md")
+
+			NonExistingRawGitHubFiles(configFilePath + "_hint.md")
 			gockEmptyComments(2)
 
 			gock.New("https://raw.githubusercontent.com").
-				Get(repositoryName + "/5d6e9b25da90edfc19f488e595e0645c081c1575/test-keeper.yml").
+				Get(repositoryName + "/5d6e9b25da90edfc19f488e595e0645c081c1575/" + configFilePath + ".yml").
 				Reply(200).
 				Body(FromFile("test_fixtures/github_calls/prs/with_tests/test-keeper.yml"))
 
@@ -172,7 +174,7 @@ var _ = Describe("Test Keeper Plugin features", func() {
 
 		It("should block newly created pull request when no tests are included", func() {
 			// given
-			NonExistingRawGitHubFiles("test-keeper.yml", "test-keeper.yaml")
+			NonExistingRawGitHubFiles("test-keeper.yml", "test-keeper.yaml","_hint.md")
 			gockEmptyComments(1)
 
 			gock.New("https://api.github.com").
@@ -225,7 +227,7 @@ var _ = Describe("Test Keeper Plugin features", func() {
 
 		It("should block newly created pull request when deletions in the tests are the only changes", func() {
 			// given
-			NonExistingRawGitHubFiles("test-keeper.yml", "test-keeper.yaml")
+			NonExistingRawGitHubFiles("test-keeper.yml", "test-keeper.yaml", "_hint.md")
 			gockEmptyComments(1)
 
 			gock.New("https://api.github.com").
@@ -254,7 +256,7 @@ var _ = Describe("Test Keeper Plugin features", func() {
 
 		It("should block newly created pull request when there are changes in the business logic but only deletions in the tests", func() {
 			// given
-			NonExistingRawGitHubFiles("test-keeper.yml", "test-keeper.yaml")
+			NonExistingRawGitHubFiles("test-keeper.yml", "test-keeper.yaml", "_hint.md")
 			gockEmptyComments(1)
 
 			gock.New("https://api.github.com").
@@ -325,7 +327,7 @@ var _ = Describe("Test Keeper Plugin features", func() {
 
 		It("should block pull request without tests and with comments containing bypass message added by user with insufficient permissions", func() {
 			// given
-			NonExistingRawGitHubFiles("test-keeper.yml", "test-keeper.yaml")
+			NonExistingRawGitHubFiles("test-keeper.yml", "test-keeper.yaml", "_hint.md")
 
 			gock.New("https://api.github.com").
 				Get("/repos/" + repositoryName + "/issues/1/comments").
