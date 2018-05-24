@@ -18,7 +18,7 @@ organization. Be aware however, that adding an external plugin both to the repos
 Customized comment message can be configured as `plugin hint` to express suggestions regarding the plugin's intented behavior. + 
 Eg. Configuring `plugin hint` for the `test-keeper` plugin adds comment message to the Pull Request when no test is found. 
 
-By default, the custom plugin hint message is loaded from a file `PLUGINNAME_HINT.md` located in ``.ike-prow/` directory (if present). The `PLUGINNAME` is a name of the plugin you want to set the custom hint message for, so for example `.ike-prow/test-keeper_hint.md`.
+By default, the custom plugin hint message is loaded from a file `PLUGINNAME_HINT.md` located in `.ike-prow/` directory (if present). The `PLUGINNAME` is a name of the plugin you want to set the custom hint message for, so for example `.ike-prow/test-keeper_hint.md`.
 It is also possible to set other location of the hint file or directly the content of the message by editing plugin's configuration file (eg. test-keeper.yaml) and adding the `plugin_hint` property there:
 
 .test-keeper.yaml
