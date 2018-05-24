@@ -5,3 +5,7 @@ Your Pull Request has been approved by any of the administrators or reviewers de
 If the PR contains only "non-production" changeset and some of them haven't been detected by any file patterns the validation should be skipped for, you can add them in your configuration file.
 
 For more information see <<index#test-keeper-how,How does it work?>> and <<index#test-keeper-config,Plugin Configuration>> sections.
+
+ifdef::only-status-details[]
+The complete documentation can be found at http://arquillian.org/ike-prow-plugins.
+endif::only-status-details[]
