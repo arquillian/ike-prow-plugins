@@ -76,15 +76,6 @@ func HaveTargetURL(expectedTargetURL string) SoftMatcher {
 		"target_url")
 }
 
-// HaveLabels gets "label" key from map[string]interface{} and compares its value with expectedLabels
-// This matcher is used to verify status labels sent to GitHub API
-func HaveLabels(expectedLabels string) SoftMatcher {
-	return TransformWithName(
-		func(s map[string]interface{}) interface{} { return s["labels"] },
-		gomega.Equal(expectedLabels),
-		"labels")
-}
-
 // HaveBody gets "body" key from map[string]interface{} and compares its value with expectedBody
 // This matcher is used to verify body content sent in request to GitHub API
 func HaveBody(expectedBody string) SoftMatcher {

@@ -90,10 +90,6 @@ var _ = Describe("Test Keeper Plugin features", func() {
 				Post("/repos/bartoszmajsak/wfswarm-booster-pipeline-test/statuses").
 				SetMatcher(ExpectPayload(toHaveFailureState)).
 				Reply(201)
-			gock.New("https://api.github.com").
-				Get("/repos/bartoszmajsak/wfswarm-booster-pipeline-test/issues/4/labels").
-				SetMatcher(ExpectPayload(To(HaveLabels("work-in-progess")))).
-				Reply(201)
 
 			statusPayload := LoadFromFile("test_fixtures/github_calls/wip_pr_opened.json")
 
@@ -154,10 +150,6 @@ var _ = Describe("Test Keeper Plugin features", func() {
 				Post("/repos/bartoszmajsak/wfswarm-booster-pipeline-test/statuses").
 				SetMatcher(ExpectPayload(toHaveFailureState)).
 				Reply(201)
-			gock.New("https://api.github.com").
-				Get("/repos/bartoszmajsak/wfswarm-booster-pipeline-test/issues/4/labels").
-				SetMatcher(ExpectPayload(To(HaveLabels("work-in-progess")))).
-				Reply(201)
 
 			statusPayload := LoadFromFile("test_fixtures/github_calls/pr_edited_wip_added.json")
 
@@ -189,10 +181,6 @@ var _ = Describe("Test Keeper Plugin features", func() {
 			gock.New("https://api.github.com").
 				Post("/repos/bartoszmajsak/wfswarm-booster-pipeline-test/statuses").
 				SetMatcher(ExpectPayload(toHaveSuccessState)).
-				Reply(201)
-			gock.New("https://api.github.com").
-				Get("/repos/bartoszmajsak/wfswarm-booster-pipeline-test/issues/4/labels").
-				SetMatcher(ExpectPayload(To(HaveLabels("")))).
 				Reply(201)
 
 			statusPayload := LoadFromFile("test_fixtures/github_calls/pr_edited_wip_removed.json")
