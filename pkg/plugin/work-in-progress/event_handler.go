@@ -38,7 +38,6 @@ type GitHubWIPPRHandler struct {
 
 var (
 	handledPrActions = []string{"opened", "reopened", "edited"}
-	wipLabel         = []string{"work-in-progress"}
 	defaultPrefixes  = []string{"WIP", "DO NOT MERGE", "DON'T MERGE", "WORK-IN-PROGRESS"}
 )
 
@@ -83,18 +82,18 @@ func (gh *GitHubWIPPRHandler) handlePrEvent(log log.Logger, event *gogh.PullRequ
 		log.Warnf("failed to list labels on PR [%q]. cause: %s", *event.PullRequest, err)
 	}
 
-	labelExists := gh.hasWorkInProgressLabel(labels, wipLabel[0])
 	configuration := LoadConfiguration(log, change)
+	labelExists := gh.hasWorkInProgressLabel(labels, configuration.Label)
 	if gh.IsWorkInProgress(*event.PullRequest.Title, configuration) {
 		if !labelExists {
-			if _, err := gh.Client.AddPullRequestLabel(change.Owner, change.RepoName, *event.PullRequest.Number, wipLabel); err != nil {
+			if _, err := gh.Client.AddPullRequestLabel(change.Owner, change.RepoName, *event.PullRequest.Number, strings.Fields(configuration.Label)); err != nil {
 				log.Errorf("failed to add label on PR [%q]. cause: %s", *event.PullRequest, err)
 			}
 		}
 		return statusService.Failure(InProgressMessage, InProgressDetailsLink)
 	}
 	if labelExists {
-		if err := gh.Client.RemovePullRequestLabel(change.Owner, change.RepoName, *event.PullRequest.Number, wipLabel[0]); err != nil {
+		if err := gh.Client.RemovePullRequestLabel(change.Owner, change.RepoName, *event.PullRequest.Number, configuration.Label); err != nil {
 			log.Errorf("failed to remove label on PR [%q]. cause: %s", *event.PullRequest, err)
 		}
 	}
