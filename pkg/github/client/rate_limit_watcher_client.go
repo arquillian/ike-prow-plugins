@@ -98,28 +98,28 @@ func (r rateLimitWatcher) CreateStatus(change scm.RepositoryChange, repoStatus *
 	return err
 }
 
-func (r rateLimitWatcher) ListPullRequestLabels(owner, repo string, prNumber int) ([]*gogh.Label, error) {
+func (r rateLimitWatcher) ListPullRequestLabels(change scm.RepositoryChange, prNumber int) ([]*gogh.Label, error) {
 	var labels []*gogh.Label
 	var err error
 	r.logRateLimitsAfter(func() {
-		labels, err = r.Client.ListPullRequestLabels(owner, repo, prNumber)
+		labels, err = r.Client.ListPullRequestLabels(change, prNumber)
 	})
 	return labels, err
 }
 
-func (r rateLimitWatcher) AddPullRequestLabel(owner, repo string, prNumber int, label []string) ([]*gogh.Label, error) {
+func (r rateLimitWatcher) AddPullRequestLabel(change scm.RepositoryChange, prNumber int, label []string) ([]*gogh.Label, error) {
 	var labels []*gogh.Label
 	var err error
 	r.logRateLimitsAfter(func() {
-		labels, err = r.Client.AddPullRequestLabel(owner, repo, prNumber, label)
+		labels, err = r.Client.AddPullRequestLabel(change, prNumber, label)
 	})
 	return labels, err
 }
 
-func (r rateLimitWatcher) RemovePullRequestLabel(owner, repo string, prNumber int, label string) error {
+func (r rateLimitWatcher) RemovePullRequestLabel(change scm.RepositoryChange, prNumber int, label string) error {
 	var err error
 	r.logRateLimitsAfter(func() {
-		err = r.Client.RemovePullRequestLabel(owner, repo, prNumber, label)
+		err = r.Client.RemovePullRequestLabel(change, prNumber, label)
 	})
 	return err
 }

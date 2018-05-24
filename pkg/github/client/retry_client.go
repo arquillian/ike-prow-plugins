@@ -103,28 +103,28 @@ func (r retryClient) CreateStatus(change scm.RepositoryChange, repoStatus *gogh.
 	})
 }
 
-func (r retryClient) ListPullRequestLabels(owner, repo string, prNumber int) ([]*gogh.Label, error) {
+func (r retryClient) ListPullRequestLabels(change scm.RepositoryChange, prNumber int) ([]*gogh.Label, error) {
 	var labels []*gogh.Label
 	err := r.retry(func() error {
 		var e error
-		labels, e = r.Client.ListPullRequestLabels(owner, repo, prNumber)
+		labels, e = r.Client.ListPullRequestLabels(change, prNumber)
 		return e
 	})
 	return labels, err
 }
 
-func (r retryClient) AddPullRequestLabel(owner, repo string, prNumber int, label []string) ([]*gogh.Label, error) {
+func (r retryClient) AddPullRequestLabel(change scm.RepositoryChange, prNumber int, label []string) ([]*gogh.Label, error) {
 	var labels []*gogh.Label
 	err := r.retry(func() error {
 		var e error
-		labels, e = r.Client.AddPullRequestLabel(owner, repo, prNumber, label)
+		labels, e = r.Client.AddPullRequestLabel(change, prNumber, label)
 		return e
 	})
 	return labels, err
 }
 
-func (r retryClient) RemovePullRequestLabel(owner, repo string, prNumber int, label string) error {
+func (r retryClient) RemovePullRequestLabel(change scm.RepositoryChange, prNumber int, label string) error {
 	return r.retry(func() error {
-		return r.Client.RemovePullRequestLabel(owner, repo, prNumber, label)
+		return r.Client.RemovePullRequestLabel(change, prNumber, label)
 	})
 }
