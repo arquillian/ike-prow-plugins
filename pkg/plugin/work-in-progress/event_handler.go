@@ -2,6 +2,7 @@ package wip
 
 import (
 	"encoding/json"
+	"regexp"
 	"strings"
 
 	"github.com/arquillian/ike-prow-plugins/pkg/github"
@@ -17,9 +18,6 @@ import (
 const (
 	// ProwPluginName is an external prow plugin name used to register this service
 	ProwPluginName = "work-in-progress"
-
-	// WipPrefix is a prefix which, when applied on the PR title, marks its state as "work-in-progress"
-	WipPrefix = "wip "
 
 	// InProgressMessage is a message used in GH Status as description when the PR is in progress
 	InProgressMessage = "PR is in progress and can't be merged yet. You might want to wait with review as well"
@@ -40,6 +38,7 @@ type GitHubWIPPRHandler struct {
 
 var (
 	handledPrActions = []string{"opened", "reopened", "edited"}
+	defaultPrefixes  = []string{"WIP", "DO NOT MERGE", "DON'T MERGE", "WORK-IN-PROGRESS"}
 )
 
 // HandleEvent is an entry point for the plugin logic. This method is invoked by the Server when
@@ -64,7 +63,8 @@ func (gh *GitHubWIPPRHandler) HandleEvent(log log.Logger, eventType github.Event
 		}
 		statusContext := github.StatusContext{BotName: gh.BotName, PluginName: ProwPluginName}
 		statusService := ghservice.NewStatusService(gh.Client, log, change, statusContext)
-		if gh.IsWorkInProgress(event.PullRequest.Title) {
+		configuration := LoadConfiguration(log, change)
+		if gh.IsWorkInProgress(*event.PullRequest.Title, configuration) {
 			return statusService.Failure(InProgressMessage, InProgressDetailsLink)
 		}
 		return statusService.Success(ReadyForReviewMessage, ReadyForReviewDetailsLink)
@@ -77,6 +77,24 @@ func (gh *GitHubWIPPRHandler) HandleEvent(log log.Logger, eventType github.Event
 }
 
 // IsWorkInProgress checks if title is marked as Work In Progress
-func (gh *GitHubWIPPRHandler) IsWorkInProgress(title *string) bool {
-	return strings.HasPrefix(strings.ToLower(*title), WipPrefix)
+func (gh *GitHubWIPPRHandler) IsWorkInProgress(title string, config PluginConfiguration) bool {
+	prefixes := defaultPrefixes
+	if len(config.Prefix) != 0 {
+		if config.Combine {
+			prefixes = append(prefixes, config.Prefix...)
+		} else {
+			prefixes = config.Prefix
+		}
+	}
+	return gh.hasPrefix(strings.ToLower(title), prefixes)
+}
+
+func (gh *GitHubWIPPRHandler) hasPrefix(title string, prefixes []string) bool {
+	for _, prefix := range prefixes {
+		pattern := `(?mi)^(\[|\()?` + prefix + `(\]|\))?(:| )+`
+		if match, _ := regexp.MatchString(pattern, title); match {
+			return true
+		}
+	}
+	return false
 }
