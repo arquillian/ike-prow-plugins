@@ -86,7 +86,7 @@ func (gh *GitHubWIPPRHandler) handlePrEvent(log log.Logger, event *gogh.PullRequ
 	labelExists := gh.hasWorkInProgressLabel(labels, configuration.Label)
 	if gh.IsWorkInProgress(*event.PullRequest.Title, configuration) {
 		if !labelExists {
-			if _, err := gh.Client.AddPullRequestLabel(change, *event.PullRequest.Number, strings.Fields(configuration.Label)); err != nil {
+			if err := gh.Client.AddPullRequestLabel(change, *event.PullRequest.Number, strings.Fields(configuration.Label)); err != nil {
 				log.Errorf("failed to add label on PR [%q]. cause: %s", *event.PullRequest, err)
 			}
 		}
