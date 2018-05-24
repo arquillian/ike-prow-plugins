@@ -85,11 +85,10 @@ var _ = Describe("Test Keeper Plugin features", func() {
 				Reply(200).
 				Body(FromFile("test_fixtures/github_calls/wip_pr_created_with_label.json"))
 
-			// This way we implicitly verify that call happened after `HandleEvent` call
 			gock.New("https://api.github.com").
 				Post("/repos/bartoszmajsak/wfswarm-booster-pipeline-test/statuses").
 				SetMatcher(ExpectPayload(toHaveFailureState)).
-				Reply(201)
+				Reply(201) // This way we implicitly verify that call happened after `HandleEvent` call
 
 			statusPayload := LoadFromFile("test_fixtures/github_calls/wip_pr_opened.json")
 
@@ -145,11 +144,10 @@ var _ = Describe("Test Keeper Plugin features", func() {
 				Reply(200).
 				Body(FromFile("test_fixtures/github_calls/pr_edited_with_label.json"))
 
-			// This way we implicitly verify that call happened after `HandleEvent` call
 			gock.New("https://api.github.com").
 				Post("/repos/bartoszmajsak/wfswarm-booster-pipeline-test/statuses").
 				SetMatcher(ExpectPayload(toHaveFailureState)).
-				Reply(201)
+				Reply(201) // This way we implicitly verify that call happened after `HandleEvent` call
 
 			statusPayload := LoadFromFile("test_fixtures/github_calls/pr_edited_wip_added.json")
 
@@ -177,11 +175,10 @@ var _ = Describe("Test Keeper Plugin features", func() {
 				Reply(200).
 				Body(FromFile("test_fixtures/github_calls/pr_edited_with_unlabel.json"))
 
-			// This way we implicitly verify that call happened after `HandleEvent` call
 			gock.New("https://api.github.com").
 				Post("/repos/bartoszmajsak/wfswarm-booster-pipeline-test/statuses").
 				SetMatcher(ExpectPayload(toHaveSuccessState)).
-				Reply(201)
+				Reply(201) // This way we implicitly verify that call happened after `HandleEvent` call
 
 			statusPayload := LoadFromFile("test_fixtures/github_calls/pr_edited_wip_removed.json")
 
