@@ -69,25 +69,25 @@ func NewMetrics(client ghclient.Client) *Metrics {
 	}
 }
 
-func (metrics *Metrics) reportRateLimit(l log.Logger) {
-	if limits, err := metrics.GhClient.GetRateLimit(); err != nil {
+func (m *Metrics) reportRateLimit(l log.Logger) {
+	if limits, err := m.GhClient.GetRateLimit(); err != nil {
 		l.Errorf("Failed to get metric GH Client rate limit. Cause: %q", err)
 	} else {
-		metrics.RateLimit.WithLabelValues("core").Set(float64(limits.Core.Remaining))
-		metrics.RateLimit.WithLabelValues("search").Set(float64(limits.Search.Remaining))
+		m.RateLimit.WithLabelValues("core").Set(float64(limits.Core.Remaining))
+		m.RateLimit.WithLabelValues("search").Set(float64(limits.Search.Remaining))
 	}
 }
 
-func (metrics *Metrics) reportIncomingWebHooks(l log.Logger, label string) {
-	if counter, err := metrics.WebHookCounter.GetMetricWithLabelValues(label); err != nil {
+func (m *Metrics) reportIncomingWebHooks(l log.Logger, label string) {
+	if counter, err := m.WebHookCounter.GetMetricWithLabelValues(label); err != nil {
 		l.Errorf("Failed to get metric for Repository: %q. Cause: %q", label, err)
 	} else {
 		counter.Inc()
 	}
 }
 
-func (metrics *Metrics) reportHandledEvents(l log.Logger, label string) {
-	if counter, err := metrics.HandledEventsCounter.GetMetricWithLabelValues(label); err != nil {
+func (m *Metrics) reportHandledEvents(l log.Logger, label string) {
+	if counter, err := m.HandledEventsCounter.GetMetricWithLabelValues(label); err != nil {
 		l.Errorf("Failed to get metric for Event: %q. Cause: %q", label, err)
 	} else {
 		counter.Inc()
