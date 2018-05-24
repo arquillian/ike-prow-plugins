@@ -24,8 +24,6 @@ import (
 	"github.com/arquillian/ike-prow-plugins/pkg/server"
 	"github.com/sirupsen/logrus"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
-	"fmt"
-	"errors"
 )
 
 // nolint
@@ -100,11 +98,11 @@ func InitPlugin(pluginName string, newEventHandler EventHandlerCreator, newServe
 	pluginServer := newServer(webhookSecret, handler)
 
 	if errs := pluginServer.RegisterMetrics(); len(errs) > 0 {
-		msg := ""
-		for index, e := range errs {
-			msg = msg + fmt.Sprintf("\n%d. [%s]", index+1, e.Error())
+		errLog := logger
+		for _, e := range errs {
+			errLog = errLog.WithError(e)
 		}
-		logger.WithError(errors.New(msg)).Fatal("Prometheus metrics registration failed!!!")
+		errLog.Fatal("Prometheus metrics registration failed!")
 	}
 
 	port := strconv.Itoa(*port)
