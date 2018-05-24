@@ -59,7 +59,7 @@ func getMsgFromConfigHint(configuration PluginConfiguration, change scm.Reposito
 }
 
 func defaultFileContent(configuration PluginConfiguration, change scm.RepositoryChange) string {
-	pluginHintPath := fmt.Sprintf(ghservice.ConfigHome+"%s_hint.md", configuration.PluginName)
+	pluginHintPath := fmt.Sprintf("%s%s_hint.md", ghservice.ConfigHome, configuration.PluginName)
 	ghFileService := ghservice.RawFileService{Change: change}
 	hintURL := ghFileService.GetRawFileURL(pluginHintPath)
 
