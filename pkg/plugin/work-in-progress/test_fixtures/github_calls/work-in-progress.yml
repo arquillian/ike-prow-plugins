@@ -1,3 +1,4 @@
 title_prefixes:          # <!--1-->  
   - 'work in progress'
 combine_defaults: true   # <!--2-->
+gh_label: wip            # <!--3-->    
