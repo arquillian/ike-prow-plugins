@@ -14,7 +14,7 @@ type rateLimitWatcher struct {
 
 // NewRateLimitWatcherClient wraps github client with calls watching GH API rate limits
 func NewRateLimitWatcherClient(c Client, log log.Logger, threshold int) Client {
-	return rateLimitWatcher{Client: c, log: log, threshold: threshold}
+	return &rateLimitWatcher{Client: c, log: log, threshold: threshold}
 }
 
 func (r rateLimitWatcher) logRateLimitsAfter(f func()) {
