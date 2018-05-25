@@ -14,7 +14,7 @@ const RunCommentPrefix = "/run"
 // RunCmd represents a command that is triggered by "/run plugin-name" or "/run all"
 type RunCmd struct {
 	UserPermissionService *PermissionService
-	WhenAddedOrCreated    DoFunction
+	WhenAddedOrEdited     DoFunction
 }
 
 // Perform executes the set DoFunctions for the given IssueCommentEvent (when all conditions are fulfilled)
@@ -25,7 +25,7 @@ func (c *RunCmd) Perform(client ghclient.Client, log log.Logger, comment *gogh.I
 	RunCommand.
 		When(Triggered).
 		By(AnyOf(user.Admin, user.PRReviewer, user.PRApprover, user.PRCreator)).
-		Then(c.WhenAddedOrCreated)
+		Then(c.WhenAddedOrEdited)
 
 	return RunCommand.Execute(client, log, comment)
 }

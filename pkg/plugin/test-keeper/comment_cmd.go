@@ -16,7 +16,7 @@ const BypassCheckComment = "/ok-without-tests"
 type BypassCmd struct {
 	userPermissionService *is.PermissionService
 	whenDeleted           is.DoFunction
-	whenAddedOrCreated    is.DoFunction
+	WhenAddedOrEdited     is.DoFunction
 }
 
 // Perform executes the set DoFunctions for the given IssueCommentEvent (when all conditions are fulfilled)
@@ -29,7 +29,7 @@ func (c *BypassCmd) Perform(client ghclient.Client, log log.Logger, comment *gog
 	BypassCommand.
 		When(is.Triggered).
 		By(is.AnyOf(user.Admin, user.PRReviewer, user.PRApprover), is.Not(user.PRCreator)).
-		Then(c.whenAddedOrCreated)
+		Then(c.WhenAddedOrEdited)
 
 	return BypassCommand.Execute(client, log, comment)
 }

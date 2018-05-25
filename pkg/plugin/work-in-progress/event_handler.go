@@ -106,7 +106,7 @@ func (gh *GitHubWIPPRHandler) handlePrComment(log log.Logger, comment *gogh.Issu
 	cmdHandler := command.CommentCmdHandler{Client: gh.Client}
 	runCmd := &command.RunCmd{
 		UserPermissionService: userPerm,
-		WhenAddedOrCreated: func() error {
+		WhenAddedOrEdited: func() error {
 			pullRequest, err := prLoader.Load()
 			if err != nil {
 				return err

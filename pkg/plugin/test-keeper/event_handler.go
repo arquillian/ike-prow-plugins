@@ -83,7 +83,7 @@ func (gh *GitHubTestEventsHandler) handlePrComment(log log.Logger, comment *gogh
 
 	runCmd := &command.RunCmd{
 		UserPermissionService: userPerm,
-		WhenAddedOrCreated: func() error {
+		WhenAddedOrEdited: func() error {
 			pullRequest, err := prLoader.Load()
 			if err != nil {
 				return err
@@ -104,7 +104,7 @@ func (gh *GitHubTestEventsHandler) handlePrComment(log log.Logger, comment *gogh
 			}
 			return gh.checkTestsAndSetStatus(log, pullRequest)
 		},
-		whenAddedOrCreated: func() error {
+		WhenAddedOrEdited: func() error {
 			pullRequest, err := prLoader.Load()
 			if err != nil {
 				return err
