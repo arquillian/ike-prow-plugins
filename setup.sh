@@ -22,7 +22,7 @@ function install_packages() {
 }
 
 function install_go_bins() {
-  GO_VERSION=go1.9.4
+  GO_VERSION=go1.10.2
   GO_LOCATION=/usr/local
 
   if [ -z $(which go 2>/dev/null) ]; then
