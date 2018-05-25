@@ -16,10 +16,13 @@ type PluginConfiguration struct {
 	Combine                    bool     `yaml:"combine_defaults,omitempty"`
 }
 
+// DefaultLabel is the GitHub label name set in absense of any configured label name
+const DefaultLabel = "work-in-progress"
+
 // LoadConfiguration loads a PluginConfiguration for the given change
 func LoadConfiguration(log log.Logger, change scm.RepositoryChange) PluginConfiguration {
 
-	configuration := PluginConfiguration{Combine: true, Label: "work-in-progress"}
+	configuration := PluginConfiguration{Combine: true, Label: DefaultLabel}
 	loadableConfig := &ghservice.LoadableConfig{PluginName: ProwPluginName, Change: change, BaseConfig: &configuration.PluginConfiguration}
 
 	err := config.Load(&configuration, loadableConfig)
