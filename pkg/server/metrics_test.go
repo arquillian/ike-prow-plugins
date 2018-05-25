@@ -104,8 +104,14 @@ var _ = Describe("Service Metrics", func() {
 
 		// then
 		Ω(err).ShouldNot(HaveOccurred())
-		Expect(gaugeValue(serverMetrics.RateLimit.WithLabelValues("core"))).To(Equal(8))
-		Expect(gaugeValue(serverMetrics.RateLimit.WithLabelValues("search"))).To(Equal(10))
+		
+		gauge, err := serverMetrics.RateLimit.GetMetricWithLabelValues("core")
+		Ω(err).ShouldNot(HaveOccurred())
+		Expect(gaugeValue(gauge)).To(Equal(8))
+
+		gauge, err = serverMetrics.RateLimit.GetMetricWithLabelValues("search")
+		Ω(err).ShouldNot(HaveOccurred())
+		Expect(gaugeValue(gauge)).To(Equal(10))
 	})
 })
 
