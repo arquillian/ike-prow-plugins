@@ -2,12 +2,12 @@ hash: 89baf0cd29908af47405714762c68467df13cc85df8f24a51b297c51fc6a051c
 updated: 2018-05-22T19:17:43.469703758+05:30
 imports:
 - name: github.com/bazelbuild/buildtools
-  version: a6baf7df1e358187d43bb6b9f3debc6da8454922
+  version: 7a46d39511ae917d3af53e0627f4b57489dd1bff
   subpackages:
   - build
   - tables
 - name: github.com/beorn7/perks
-  version: 3a771d992973f24aa725d07868b467d1ddfceafb
+  version: 3ac7bf7a47d159a033b107610db8a1b6575507a4
   subpackages:
   - quantile
 - name: github.com/certifi/gocertifi
@@ -48,7 +48,7 @@ imports:
 - name: github.com/gorilla/sessions
   version: a2f2a3de9a4a575047f73e3e36bc85ecc3546391
 - name: github.com/matttproud/golang_protobuf_extensions
-  version: c12348ce28de40eed0136aa2b644d0ee0650e56c
+  version: fc2b8d3a73c4867e51861bbdd5ae3c1f0869dd6a
   subpackages:
   - pbutil
 - name: github.com/onsi/ginkgo
@@ -94,7 +94,7 @@ imports:
   - prometheus
   - prometheus/promhttp
 - name: github.com/prometheus/client_model
-  version: 99fa1f4be8e564e8a6b613da7fa6f46c9edafc6c
+  version: fa8ad6fec33561be4280a8f0514318c79d7f6cb6
   subpackages:
   - go
 - name: github.com/prometheus/common
@@ -129,7 +129,7 @@ imports:
 - name: github.com/spf13/pflag
   version: 4c012f6dcd9546820e378d0bdda4d8fc772cdfea
 - name: golang.org/x/crypto
-  version: e0d166c33c321d0ff863f459a5882096e334f508
+  version: d172538b2cfce0c13cee31e647d0367aa8cd2486
   subpackages:
   - ssh/terminal
 - name: golang.org/x/net
@@ -145,11 +145,11 @@ imports:
   - idna
   - lex/httplex
 - name: golang.org/x/oauth2
-  version: fdc9e635145ae97e6c2cb777c48305600cf515cb
+  version: 6881fee410a5daf86371371f9ad451b95e168b71
   subpackages:
   - internal
 - name: golang.org/x/sys
-  version: a646d33e2ee3172a661fc09bca23bb4889a41bc8
+  version: 478fcf54317e52ab69f40bb4c7a1520288d7f7ea
   subpackages:
   - unix
 - name: golang.org/x/text
