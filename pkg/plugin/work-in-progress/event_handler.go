@@ -58,18 +58,7 @@ func (gh *GitHubWIPPRHandler) HandleEvent(log log.Logger, eventType github.Event
 		if !utils.Contains(handledPrActions, *event.Action) {
 			return nil
 		}
-
-		change := scm.RepositoryChange{
-			Owner:    *event.Repo.Owner.Login,
-			RepoName: *event.Repo.Name,
-			Hash:     *event.PullRequest.Head.SHA,
-		}
-		statusContext := github.StatusContext{BotName: gh.BotName, PluginName: ProwPluginName}
-		statusService := ghservice.NewStatusService(gh.Client, log, change, statusContext)
-		if gh.IsWorkInProgress(event.PullRequest.Title) {
-			return statusService.Failure(InProgressMessage, InProgressDetailsLink)
-		}
-		return statusService.Success(ReadyForReviewMessage, ReadyForReviewDetailsLink)
+		return gh.setStatus(log, event.PullRequest)
 
 	case github.IssueComment:
 		var event gogh.IssueCommentEvent
@@ -113,18 +102,8 @@ func (gh *GitHubWIPPRHandler) handlePrComment(log log.Logger, comment *gogh.Issu
 				return err
 			}
 
-			change := scm.RepositoryChange{
-				Owner:    *comment.Repo.Owner.Login,
-				RepoName: *comment.Repo.Name,
-				Hash:     *pullRequest.Head.SHA,
-			}
+			return gh.setStatus(log, pullRequest)
 
-			statusContext := github.StatusContext{BotName: gh.BotName, PluginName: ProwPluginName}
-			statusService := ghservice.NewStatusService(gh.Client, log, change, statusContext)
-			if gh.IsWorkInProgress(pullRequest.Title) {
-				return statusService.Failure(InProgressMessage, InProgressDetailsLink)
-			}
-			return statusService.Success(ReadyForReviewMessage, ReadyForReviewDetailsLink)
 		}})
 
 	err := cmdHandler.Handle(log, comment)
@@ -132,4 +111,19 @@ func (gh *GitHubWIPPRHandler) handlePrComment(log log.Logger, comment *gogh.Issu
 		log.Error(err)
 	}
 	return err
+}
+
+func (gh *GitHubWIPPRHandler) setStatus(log log.Logger, pullRequest *gogh.PullRequest) error {
+	change := scm.RepositoryChange{
+		Owner:    *pullRequest.Base.Repo.Owner.Login,
+		RepoName: *pullRequest.Base.Repo.Name,
+		Hash:     *pullRequest.Head.SHA,
+	}
+
+	statusContext := github.StatusContext{BotName: gh.BotName, PluginName: ProwPluginName}
+	statusService := ghservice.NewStatusService(gh.Client, log, change, statusContext)
+	if gh.IsWorkInProgress(pullRequest.Title) {
+		return statusService.Failure(InProgressMessage, InProgressDetailsLink)
+	}
+	return statusService.Success(ReadyForReviewMessage, ReadyForReviewDetailsLink)
 }
