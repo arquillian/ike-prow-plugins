@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/arquillian/ike-prow-plugins/pkg/command"
 	"github.com/arquillian/ike-prow-plugins/pkg/github"
 	"github.com/arquillian/ike-prow-plugins/pkg/github/service"
 	. "github.com/arquillian/ike-prow-plugins/pkg/internal/test"
@@ -13,6 +12,7 @@ import (
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	"gopkg.in/h2non/gock.v1"
+	"github.com/arquillian/ike-prow-plugins/pkg/command"
 )
 
 const (
@@ -450,7 +450,15 @@ var _ = Describe("Test Keeper Plugin features", func() {
 			// then - implicit verification of /statuses call occurrence with proper payload
 			Ω(err).ShouldNot(HaveOccurred())
 		})
+	})
 
+	Context("Trigger work-in-progress plugin after adding comment '\run plugin-name' on pull request", func() {
+		BeforeEach(func() {
+			defer gock.OffAll()
+			handler = &testkeeper.GitHubTestEventsHandler{Client: NewDefaultGitHubClient(), BotName: botName}
+		})
+
+		AfterEach(EnsureGockRequestsHaveBeenMatched)
 		It("should block newly created pull request without tests when "+command.RunCommentPrefix+" all command is used by admin user", func() {
 			NonExistingRawGitHubFiles("test-keeper.yml", "test-keeper.yaml", "test-keeper_hint.md")
 

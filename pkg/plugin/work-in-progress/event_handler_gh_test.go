@@ -24,26 +24,26 @@ var expectedContext = strings.Join([]string{botName, wip.ProwPluginName}, "/")
 
 var _ = Describe("Test Keeper Plugin features", func() {
 
+	var handler *wip.GitHubWIPPRHandler
+
+	log := log.NewTestLogger()
+	configFilePath := ghservice.ConfigHome + wip.ProwPluginName
+
+	toHaveSuccessState := SoftlySatisfyAll(
+		HaveState(github.StatusSuccess),
+		HaveDescription(wip.ReadyForReviewMessage),
+		HaveContext(expectedContext),
+		HaveTargetURL(wip.ReadyForReviewDetailsLink),
+	)
+
+	toHaveFailureState := SoftlySatisfyAll(
+		HaveState(github.StatusFailure),
+		HaveDescription(wip.InProgressMessage),
+		HaveContext(expectedContext),
+		HaveTargetURL(wip.InProgressDetailsLink),
+	)
+
 	Context("Pull Request title change trigger", func() {
-
-		var handler *wip.GitHubWIPPRHandler
-
-		log := log.NewTestLogger()
-		configFilePath := ghservice.ConfigHome + wip.ProwPluginName
-
-		toHaveSuccessState := SoftlySatisfyAll(
-			HaveState(github.StatusSuccess),
-			HaveDescription(wip.ReadyForReviewMessage),
-			HaveContext(expectedContext),
-			HaveTargetURL(wip.ReadyForReviewDetailsLink),
-		)
-
-		toHaveFailureState := SoftlySatisfyAll(
-			HaveState(github.StatusFailure),
-			HaveDescription(wip.InProgressMessage),
-			HaveContext(expectedContext),
-			HaveTargetURL(wip.InProgressDetailsLink),
-		)
 
 		BeforeEach(func() {
 			defer gock.OffAll()
@@ -145,6 +145,16 @@ var _ = Describe("Test Keeper Plugin features", func() {
 			// then - implicit verification of /statuses call occurrence with proper payload
 			Ω(err).ShouldNot(HaveOccurred())
 		})
+
+	})
+
+	Context("Trigger work-in-progress plugin after adding comment '\run plugin-name' on pull request", func() {
+		BeforeEach(func() {
+			defer gock.OffAll()
+			handler = &wip.GitHubWIPPRHandler{Client: NewDefaultGitHubClient(), BotName: botName}
+		})
+
+		AfterEach(EnsureGockRequestsHaveBeenMatched)
 
 		It("should mark opened PR as ready for review if not prefixed with WIP when "+command.RunCommentPrefix+" "+wip.ProwPluginName+" command is triggered by pr creator", func() {
 			// given
