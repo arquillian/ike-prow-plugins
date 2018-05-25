@@ -36,7 +36,7 @@ func registerOrGet(c prometheus.Collector) (prometheus.Collector, error) {
 		if are, ok := err.(prometheus.AlreadyRegisteredError); ok {
 			return are.ExistingCollector, nil
 		}
-		return nil, err;
+		return nil, err
 	}
 	return c, nil
 }

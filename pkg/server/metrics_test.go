@@ -32,7 +32,7 @@ var _ = Describe("Service Metrics", func() {
 			PluginName:         pluginName,
 			HmacSecret:         secret,
 		}
-		m, errs := server.RegisterMetrics(client);
+		m, errs := server.RegisterMetrics(client)
 		if  len(errs) > 0 {
 			logger.Errorf("Prometheus metrics registration failed!")
 		} else {
