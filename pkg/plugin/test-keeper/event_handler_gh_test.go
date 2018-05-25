@@ -394,13 +394,6 @@ var _ = Describe("Test Keeper Plugin features", func() {
 				Reply(200).
 				BodyString(`[]`)
 
-			toHaveEnforcedFailureState := SoftlySatisfyAll(
-				HaveState(github.StatusFailure),
-				HaveContext(expectedContext),
-				HaveDescription(testkeeper.NoTestsMessage),
-				HaveTargetURL(testkeeper.NoTestsDetailsLink),
-			)
-
 			// This way we implicitly verify that call happened after `HandleEvent` call
 			gock.New("https://api.github.com").
 				Post("/repos/" + repositoryName + "/issues/1/comments").
@@ -408,7 +401,7 @@ var _ = Describe("Test Keeper Plugin features", func() {
 				Reply(201)
 			gock.New("https://api.github.com").
 				Post("/repos/" + repositoryName + "/statuses").
-				SetMatcher(ExpectPayload(toHaveEnforcedFailureState)).
+				SetMatcher(ExpectPayload(toBe(github.StatusFailure, testkeeper.NoTestsMessage, expectedContext, testkeeper.NoTestsDetailsLink))).
 				Reply(201)
 
 			statusPayload := LoadFromFile("test_fixtures/github_calls/prs/without_tests/trigger_run_all_comment_by_admin.json")
