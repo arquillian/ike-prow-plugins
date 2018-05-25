@@ -16,7 +16,7 @@ type PluginConfiguration struct {
 	Combine                    bool     `yaml:"combine_defaults,omitempty"`
 }
 
-// DefaultLabel is the GitHub label name set in absense of any configured label name
+// DefaultLabel is the GitHub label name set in absence of any configured label name
 const DefaultLabel = "work-in-progress"
 
 // LoadConfiguration loads a PluginConfiguration for the given change
