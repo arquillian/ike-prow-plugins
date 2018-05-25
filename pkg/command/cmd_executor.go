@@ -97,7 +97,7 @@ func (p *DoFunctionProvider) getMatchingAction(comment *gogh.IssueCommentEvent) 
 // Execute triggers the given DoFunctions (when all checks are fulfilled) for the given pr comment
 func (e *CmdExecutor) Execute(client ghclient.Client, log log.Logger, comment *gogh.IssueCommentEvent) error {
 	body := strings.TrimSpace(*comment.Comment.Body)
-	if e.Command != body && !strings.HasPrefix(body, e.Command){
+	if prefix := strings.Split(body, " ")[0]; e.Command != body && prefix != e.Command {
 		return nil
 	}
 	for _, doExecutor := range e.executors {
