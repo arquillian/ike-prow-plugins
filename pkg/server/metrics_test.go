@@ -37,7 +37,11 @@ var _ = Describe("Service Metrics", func() {
 		}
 		metrics, errs := server.RegisterMetrics(client)
 		if len(errs) > 0 {
-			Fail("Prometheus serverMetrics registration failed!")
+			var msg string
+			for _, er := range errs {
+				msg += er.Error() + "\n"
+			}
+			Fail("Prometheus serverMetrics registration failed with errors:\n" + msg)
 		}
 		prowServer.Metrics = metrics
 		serverMetrics = metrics
@@ -46,6 +50,9 @@ var _ = Describe("Service Metrics", func() {
 
 	AfterEach(func() {
 		testServer.Close()
+		prometheus.Unregister(serverMetrics.WebHookCounter)
+		prometheus.Unregister(serverMetrics.RateLimit)
+		prometheus.Unregister(serverMetrics.HandledEventsCounter)
 	})
 
 	It("should count incoming webhook", func() {
