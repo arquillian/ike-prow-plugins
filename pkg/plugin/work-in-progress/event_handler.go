@@ -104,7 +104,8 @@ func (gh *GitHubWIPPRHandler) handlePrComment(log log.Logger, comment *gogh.Issu
 	userPerm := command.NewPermissionService(gh.Client, *comment.Sender.Login, prLoader)
 
 	cmdHandler := command.CommentCmdHandler{Client: gh.Client}
-	runCmd := &command.RunCmd{
+	cmdHandler.Register(&command.RunCmd{
+		PluginName:            ProwPluginName,
 		UserPermissionService: userPerm,
 		WhenAddedOrEdited: func() error {
 			pullRequest, err := prLoader.Load()
@@ -124,11 +125,7 @@ func (gh *GitHubWIPPRHandler) handlePrComment(log log.Logger, comment *gogh.Issu
 				return statusService.Failure(InProgressMessage, InProgressDetailsLink)
 			}
 			return statusService.Success(ReadyForReviewMessage, ReadyForReviewDetailsLink)
-		}}
-
-	if runCmd.ContainsRunCmdWithPluginNameOrAll(ProwPluginName, comment) {
-		cmdHandler.Register(runCmd)
-	}
+		}})
 
 	err := cmdHandler.Handle(log, comment)
 	if err != nil {

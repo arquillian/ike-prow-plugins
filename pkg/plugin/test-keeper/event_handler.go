@@ -81,7 +81,8 @@ func (gh *GitHubTestEventsHandler) handlePrComment(log log.Logger, comment *gogh
 
 	cmdHandler := command.CommentCmdHandler{Client: gh.Client}
 
-	runCmd := &command.RunCmd{
+	cmdHandler.Register(&command.RunCmd{
+		PluginName:            ProwPluginName,
 		UserPermissionService: userPerm,
 		WhenAddedOrEdited: func() error {
 			pullRequest, err := prLoader.Load()
@@ -89,13 +90,7 @@ func (gh *GitHubTestEventsHandler) handlePrComment(log log.Logger, comment *gogh
 				return err
 			}
 			return gh.checkTestsAndSetStatus(log, pullRequest)
-		}}
-
-	if runCmd.ContainsRunCmdWithPluginNameOrAll(ProwPluginName, comment) {
-		cmdHandler.Register(runCmd)
-	}
-
-	bypassCmd := &BypassCmd{
+		}}, &BypassCmd{
 		userPermissionService: userPerm,
 		whenDeleted: func() error {
 			pullRequest, err := prLoader.Load()
@@ -111,11 +106,7 @@ func (gh *GitHubTestEventsHandler) handlePrComment(log log.Logger, comment *gogh
 			}
 			statusService := gh.newTestStatusService(log, ghservice.NewRepositoryChangeForPR(pullRequest))
 			return statusService.okWithoutTests(*comment.Sender.Login)
-		}}
-
-	if bypassCmd.Matches(comment) {
-		cmdHandler.Register(bypassCmd)
-	}
+		}})
 
 	err := cmdHandler.Handle(log, comment)
 	if err != nil {

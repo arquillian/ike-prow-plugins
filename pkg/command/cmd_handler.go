@@ -13,8 +13,10 @@ type CommentCmdHandler struct {
 }
 
 // Register adds the given CommentCmd implementation to the list of commands to be handled when an IssueCommentEvent occurs
-func (s *CommentCmdHandler) Register(command CommentCmd) {
-	s.commands = append(s.commands, command)
+func (s *CommentCmdHandler) Register(commands ...CommentCmd) {
+	for _, command := range commands {
+		s.commands = append(s.commands, command)
+	}
 }
 
 // Handle triggers the process of evaluating and performing of all stored CommentCmd implementations for the given comment
