@@ -1,14 +1,19 @@
+DEPLOY_DOCKERFILE?=Dockerfile.deploy
+
 .PHONY: oc-generate-deployments
 oc-generate-deployments: $(OC_DEPLOYMENTS) ## Creates openshift deployments for ike-prow plugins
 
 .PHONY: oc-deploy-hook
-oc-deploy-hook: build-hook build-hook-image push-hook-image ## Deploys hook service only
-	@echo "Deploys hook service ${PROW_VERSION}"
+oc-deploy-hook: build-hook deploy-hook ## Deploys hook service only
+	@echo "Deploys hook service ${TAG}"
 	@oc process -f $(CLUSTER_DIR)/hook-template.yaml \
 		-p REGISTRY=$(REGISTRY) \
 		-p DOCKER_REPO=$(DOCKER_REPO) \
-		-p VERSION=$(PROW_VERSION) \
+		-p IMAGE_TAG=$(TAG) \
 		-o yaml | oc apply -f -
+
+.PHONY: deploy-hook
+deploy-hook: build-hook-image push-hook-image
 
 .PHONY: build-hook
 build-hook: up-skip-test-quick
@@ -16,18 +21,19 @@ build-hook: up-skip-test-quick
 
 .PHONY: build-hook-image
 build-hook-image:
-	$(DOCKER) build --build-arg BINARY=hook -t $(REGISTRY)/$(DOCKER_REPO)/hook:$(PROW_VERSION) -f Dockerfile.prow .
+	$(DOCKER) build --build-arg BINARY=hook -t $(REGISTRY)/$(DOCKER_REPO)/hook -f $(DEPLOY_DOCKERFILE) .
+	$(DOCKER) tag $(REGISTRY)/$(DOCKER_REPO)/hook $(REGISTRY)/$(DOCKER_REPO)/hook:$(TAG)
 
 .PHONY: push-hook-image
 push-hook-image: build-hook-image
-	$(DOCKER) push $(REGISTRY)/$(DOCKER_REPO)/hook:$(PROW_VERSION)
+	$(DOCKER) push $(REGISTRY)/$(DOCKER_REPO)/hook
 
 .PHONY: clean-hook-image
 clean-hook-image:
-	$(DOCKER) rmi -f $(REGISTRY)/$(DOCKER_REPO)/hook:$(PROW_VERSION)
+	$(DOCKER) rmi -f $(REGISTRY)/$(DOCKER_REPO)/hook
 
 .PHONY: oc-deploy-plugins ## Builds plugin images, updates configuration and deploys new version of ike-plugins
-oc-deploy-plugins: oc-init-project build-plugin-images push-plugin-images oc-generate-deployments
+oc-deploy-plugins: oc-init-project compile deploy-plugins oc-generate-deployments
 	@echo "Updating cluster configuration for '$(OC_PROJECT_NAME)'..."
 
 $(OC_DEPLOYMENTS): oc-%: %
@@ -37,22 +43,27 @@ $(OC_DEPLOYMENTS): oc-%: %
 		-p REGISTRY=$(REGISTRY) \
 		-p DOCKER_REPO=$(DOCKER_REPO) \
 		-p PLUGIN_NAME=$< \
-		-p VERSION=$(TAG) \
+		-p IMAGE_TAG=$(TAG) \
 		-o yaml > $(PLUGIN_DEPLOYMENTS_DIR)/$<.yaml
 
 	@oc apply -f $(PLUGIN_DEPLOYMENTS_DIR)/$<.yaml
 
+.PHONY: deploy-plugins
+deploy-plugins: build-plugin-images push-plugin-images
+
 .PHONY: build-plugin-images $(PLUGINS)
-build-plugin-images: compile $(BUILD_IMAGES)
+build-plugin-images: $(BUILD_IMAGES)
 $(BUILD_IMAGES): build-%: %
-	$(DOCKER) build --build-arg BINARY=$< -t $(REGISTRY)/$(DOCKER_REPO)/$<:$(TAG) -f Dockerfile.prow .
+	$(DOCKER) build --build-arg BINARY=$< -t $(REGISTRY)/$(DOCKER_REPO)/$< -f $(DEPLOY_DOCKERFILE) .
+	$(DOCKER) tag $(REGISTRY)/$(DOCKER_REPO)/$< $(REGISTRY)/$(DOCKER_REPO)/$<:$(TAG)
+
 
 .PHONY: clean-plugin-images
 clean-plugin-images: $(CLEAN_IMAGES)
 $(CLEAN_IMAGES): clean-%: %
-	$(DOCKER) rmi -f $(REGISTRY)/$(DOCKER_REPO)/$<:$(TAG)
+	$(DOCKER) rmi -f $(REGISTRY)/$(DOCKER_REPO)/$<
 
 .PHONY: push-plugin-images
 push-plugin-images: build-plugin-images $(PUSH_IMAGES)
 $(PUSH_IMAGES): push-%: %
-	$(DOCKER) push $(REGISTRY)/$(DOCKER_REPO)/$<:$(TAG)
+	$(DOCKER) push $(REGISTRY)/$(DOCKER_REPO)/$<

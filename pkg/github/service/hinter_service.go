@@ -6,7 +6,6 @@ import (
 
 	"github.com/arquillian/ike-prow-plugins/pkg/github/client"
 	"github.com/arquillian/ike-prow-plugins/pkg/log"
-	"github.com/arquillian/ike-prow-plugins/pkg/scm"
 	"github.com/arquillian/ike-prow-plugins/pkg/utils"
 )
 
@@ -21,6 +20,7 @@ type Hinter struct {
 	*CommentService
 	log            log.Logger
 	commentContext HintContext
+	commentsLoader *IssueCommentsLazyLoader
 }
 
 // HintContext holds a plugin name and a assignee to be mentioned in the comment
@@ -30,18 +30,15 @@ type HintContext struct {
 }
 
 // NewHinter creates an instance of GitHub Hinter for the given HintContext
-func NewHinter(client ghclient.Client, log log.Logger, change scm.RepositoryChange, issueOrPrNumber int, commentContext HintContext) *Hinter {
+func NewHinter(client ghclient.Client, log log.Logger, commentsLoader *IssueCommentsLazyLoader, commentContext HintContext) *Hinter {
 	return &Hinter{
 		CommentService: &CommentService{
 			client: client,
-			issue: scm.RepositoryIssue{
-				Owner:    change.Owner,
-				RepoName: change.RepoName,
-				Number:   issueOrPrNumber,
-			},
+			issue: commentsLoader.Issue,
 		},
 		log:            log,
 		commentContext: commentContext,
+		commentsLoader: commentsLoader,
 	}
 }
 
@@ -49,8 +46,7 @@ func NewHinter(client ghclient.Client, log log.Logger, change scm.RepositoryChan
 // (with the related plugin) is found, then it adds a new comment with the plugin title, assignee mention
 // and the given commentMsg. If such a comment is present already, then it does nothing.
 func (s *Hinter) PluginComment(commentMsg string) error {
-
-	comments, err := s.client.ListIssueComments(s.issue)
+	comments, err := s.commentsLoader.Load()
 	if err != nil {
 		s.log.Errorf("Getting all comments failed with an error: %s", err)
 	}
