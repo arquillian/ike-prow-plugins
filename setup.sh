@@ -28,7 +28,7 @@ function install_go_bins() {
   if [ -z $(which go 2>/dev/null) ]; then
     echo -e "${CLEAR}${LIGHT_GREEN}Installing target Go version ${GO_VERSION}${CLEAR} to ${GO_LOCATION}"
     ${SUDO} wget -P /tmp --no-verbose https://dl.google.com/go/${GO_VERSION}.linux-amd64.tar.gz \
-      && echo "15b0937615809f87321a457bb1265f946f9f6e736c563d6c5e0bd2c22e44f779  /tmp/${GO_VERSION}.linux-amd64.tar.gz" > /tmp/go-bin-checksum \
+      && echo "4b677d698c65370afa33757b6954ade60347aaca310ea92a63ed717d7cb0c2ff  /tmp/${GO_VERSION}.linux-amd64.tar.gz" > /tmp/go-bin-checksum \
       && sha256sum -c /tmp/go-bin-checksum \
       && tar -C ${GO_LOCATION} -xzf /tmp/${GO_VERSION}.linux-amd64.tar.gz \
       && rm -f /tmp/${GO_VERSION}.linux-amd64.tar.gz
