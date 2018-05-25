@@ -148,6 +148,8 @@ var _ = Describe("Test Keeper Plugin features", func() {
 
 		It("should mark opened PR as ready for review if not prefixed with WIP when "+command.RunCommentPrefix+" "+wip.ProwPluginName+" command is triggered by pr creator", func() {
 			// given
+			NonExistingRawGitHubFiles("work-in-progress.yml", "work-in-progress.yaml")
+
 			gock.New("https://api.github.com").
 				Get("/repos/" + repositoryName + "/pulls/11").
 				Reply(200).
@@ -179,6 +181,8 @@ var _ = Describe("Test Keeper Plugin features", func() {
 
 		It("should mark opened PR as work-in-progress if prefixed with WIP when "+command.RunCommentPrefix+" all command is used by admin", func() {
 			// given
+			NonExistingRawGitHubFiles("work-in-progress.yml", "work-in-progress.yaml")
+
 			gock.New("https://api.github.com").
 				Get("/repos/" + repositoryName + "/pulls/11").
 				Reply(200).

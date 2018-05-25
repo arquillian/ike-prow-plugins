@@ -452,7 +452,7 @@ var _ = Describe("Test Keeper Plugin features", func() {
 		})
 
 		It("should block newly created pull request without tests when "+command.RunCommentPrefix+" all command is used by admin user", func() {
-			NonExistingRawGitHubFiles("test-keeper.yml", "test-keeper.yaml")
+			NonExistingRawGitHubFiles("test-keeper.yml", "test-keeper.yaml", "test-keeper_hint.md")
 
 			gock.New("https://api.github.com").
 				Get("/repos/" + repositoryName + "/pulls/1").
