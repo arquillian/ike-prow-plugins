@@ -36,10 +36,12 @@ const (
 // CreateCommentMessage creates a comment message for the test-keeper plugin. If the comment message is set in config then it takes that one, the default otherwise.
 func CreateCommentMessage(configuration PluginConfiguration, change scm.RepositoryChange) string {
 	var msg string
-	if configuration.LocationURL == "" {
-		msg = sadIke + paragraph + beginning + paragraph + noConfig
-	} else if configuration.PluginHint != "" {
+	if configuration.PluginHint != "" {
 		msg = getMsgFromConfigHint(configuration, change)
+	} else if content := defaultFileContent(configuration, change); content != "" {
+		msg = content
+	} else if configuration.LocationURL == "" {
+		msg = sadIke + paragraph + beginning + paragraph + noConfig
 	} else {
 		msg = sadIke + paragraph + getMsgWithConfigRef(configuration.LocationURL)
 	}
@@ -54,6 +56,18 @@ func getMsgFromConfigHint(configuration PluginConfiguration, change scm.Reposito
 		return getMsgFromFile(configuration, change)
 	}
 	return configuration.PluginHint
+}
+
+func defaultFileContent(configuration PluginConfiguration, change scm.RepositoryChange) string {
+	pluginHintPath := fmt.Sprintf("%s%s_hint.md", ghservice.ConfigHome, configuration.PluginName)
+	ghFileService := ghservice.RawFileService{Change: change}
+	hintURL := ghFileService.GetRawFileURL(pluginHintPath)
+
+	content, e := utils.GetFileFromURL(hintURL)
+	if e != nil {
+		return ""
+	}
+	return string(content)
 }
 
 func getMsgFromFile(configuration PluginConfiguration, change scm.RepositoryChange) string {

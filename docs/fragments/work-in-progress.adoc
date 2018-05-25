@@ -8,7 +8,7 @@ In addition to managing the status for the PR in progress, it also manages addin
 
 === Plugin Configuration [[work-in-progress-config]]
 
-To configure Work In Progress plugin place `work-in-progress.yml` (or `work-in-progress.yaml`) file in the root of your project and use properties described below.
+To configure Work In Progress plugin place `work-in-progress.yml` (or `work-in-progress.yaml`) file inside of the directory `.ike-prow/` in your project and use properties described below.
 
 .work-in-progress.yaml
 [source, yml, indent=0]
