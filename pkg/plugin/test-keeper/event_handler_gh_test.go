@@ -58,7 +58,7 @@ var _ = Describe("Test Keeper Plugin features", func() {
 
 		It("should approve opened pull request when tests included", func() {
 			// given
-			NonExistingRawGitHubFiles("test-keeper.yml", "test-keeper.yaml", "_hint.md")
+			NonExistingRawGitHubFiles("test-keeper.yml", "test-keeper.yaml", "test-keeper_hint.md")
 			gockEmptyComments(2)
 
 			gock.New("https://api.github.com").
@@ -140,7 +140,7 @@ var _ = Describe("Test Keeper Plugin features", func() {
 		It("should reject opened pull request when no tests are matching defined pattern with no defaults implicitly combined", func() {
 			// given
 
-			NonExistingRawGitHubFiles(configFilePath + "_hint.md")
+			NonExistingRawGitHubFiles("test-keeper_hint.md")
 			gockEmptyComments(2)
 
 			gock.New("https://raw.githubusercontent.com").
@@ -174,7 +174,7 @@ var _ = Describe("Test Keeper Plugin features", func() {
 
 		It("should block newly created pull request when no tests are included", func() {
 			// given
-			NonExistingRawGitHubFiles("test-keeper.yml", "test-keeper.yaml","_hint.md")
+			NonExistingRawGitHubFiles("test-keeper.yml", "test-keeper.yaml","test-keeper_hint.md")
 			gockEmptyComments(1)
 
 			gock.New("https://api.github.com").
@@ -227,7 +227,7 @@ var _ = Describe("Test Keeper Plugin features", func() {
 
 		It("should block newly created pull request when deletions in the tests are the only changes", func() {
 			// given
-			NonExistingRawGitHubFiles("test-keeper.yml", "test-keeper.yaml", "_hint.md")
+			NonExistingRawGitHubFiles("test-keeper.yml", "test-keeper.yaml", "test-keeper_hint.md")
 			gockEmptyComments(1)
 
 			gock.New("https://api.github.com").
@@ -256,7 +256,7 @@ var _ = Describe("Test Keeper Plugin features", func() {
 
 		It("should block newly created pull request when there are changes in the business logic but only deletions in the tests", func() {
 			// given
-			NonExistingRawGitHubFiles("test-keeper.yml", "test-keeper.yaml", "_hint.md")
+			NonExistingRawGitHubFiles("test-keeper.yml", "test-keeper.yaml", "test-keeper_hint.md")
 			gockEmptyComments(1)
 
 			gock.New("https://api.github.com").
@@ -327,7 +327,7 @@ var _ = Describe("Test Keeper Plugin features", func() {
 
 		It("should block pull request without tests and with comments containing bypass message added by user with insufficient permissions", func() {
 			// given
-			NonExistingRawGitHubFiles("test-keeper.yml", "test-keeper.yaml", "_hint.md")
+			NonExistingRawGitHubFiles("test-keeper.yml", "test-keeper.yaml", "test-keeper_hint.md")
 
 			gock.New("https://api.github.com").
 				Get("/repos/" + repositoryName + "/issues/1/comments").
