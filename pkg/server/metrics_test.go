@@ -62,6 +62,13 @@ var _ = Describe("Service Metrics", func() {
 
 	It("should count incoming webhook", func() {
 		// given
+		defer gock.DisableNetworking()
+		gock.New(testServer.URL).EnableNetworking()
+
+		gock.New("https://api.github.com").
+			Get("/rate_limit").
+			Reply(200).
+			Body(FromFile("../github/client/test_fixtures/gh/low_rate_limit.json"))
 		fullName := "bartoszmajsak/wfswarm-booster-pipeline-test"
 		payload := LoadFromFile("../plugin/work-in-progress/test_fixtures/github_calls/ready_pr_opened.json")
 
@@ -77,6 +84,13 @@ var _ = Describe("Service Metrics", func() {
 
 	It("should count handled events", func() {
 		// given
+		defer gock.DisableNetworking()
+		gock.New(testServer.URL).EnableNetworking()
+
+		gock.New("https://api.github.com").
+			Get("/rate_limit").
+			Reply(200).
+			Body(FromFile("../github/client/test_fixtures/gh/low_rate_limit.json"))
 		eventType := "issue_comment"
 		payload := LoadFromFile("../plugin/test-keeper/test_fixtures/github_calls/prs/without_tests/skip_comment_by_admin.json")
 
@@ -97,7 +111,6 @@ var _ = Describe("Service Metrics", func() {
 
 		gock.New("https://api.github.com").
 			Get("/rate_limit").
-			Persist().
 			Reply(200).
 			Body(FromFile("../github/client/test_fixtures/gh/low_rate_limit.json"))
 
