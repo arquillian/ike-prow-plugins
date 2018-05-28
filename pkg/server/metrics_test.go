@@ -57,11 +57,12 @@ var _ = Describe("Service Metrics", func() {
 		serverMetrics.RateLimit.Reset()
 		prometheus.Unregister(serverMetrics.HandledEventsCounter)
 		serverMetrics.HandledEventsCounter.Reset()
+		EnsureGockRequestsHaveBeenMatched()
 	})
-	AfterEach(EnsureGockRequestsHaveBeenMatched)
 
 	It("should count incoming webhook", func() {
 		// given
+		setGockMocks()
 		fullName := "bartoszmajsak/wfswarm-booster-pipeline-test"
 		payload := LoadFromFile("../plugin/work-in-progress/test_fixtures/github_calls/ready_pr_opened.json")
 
@@ -77,6 +78,7 @@ var _ = Describe("Service Metrics", func() {
 
 	It("should count handled events", func() {
 		// given
+		setGockMocks()
 		eventType := "issue_comment"
 		payload := LoadFromFile("../plugin/test-keeper/test_fixtures/github_calls/prs/without_tests/skip_comment_by_admin.json")
 
@@ -92,15 +94,7 @@ var _ = Describe("Service Metrics", func() {
 
 	It("should get Rate limit for GitHub API calls", func() {
 		// given
-		defer gock.DisableNetworking()
-		gock.New(testServer.URL).EnableNetworking()
-
-		gock.New("https://api.github.com").
-			Get("/rate_limit").
-			Persist().
-			Reply(200).
-			Body(FromFile("../github/client/test_fixtures/gh/low_rate_limit.json"))
-
+		setGockMocks()
 		payload := LoadFromFile("../plugin/test-keeper/test_fixtures/github_calls/prs/without_tests/skip_comment_by_admin.json")
 
 		// when
@@ -118,6 +112,16 @@ var _ = Describe("Service Metrics", func() {
 		Expect(gaugeValue(gauge)).To(Equal(10))
 	})
 })
+
+func setGockMocks() {
+	gock.New("https://api.github.com").
+		Get("/rate_limit").
+		Reply(200).
+		Body(FromFile("../github/client/test_fixtures/gh/low_rate_limit.json"))
+	gock.New("http://127.0.0.1").
+		Post("").
+		EnableNetworking()
+}
 
 func count(counter prometheus.Counter) int {
 	m := &dto.Metric{}
