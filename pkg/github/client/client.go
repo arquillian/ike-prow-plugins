@@ -24,9 +24,7 @@ type Client interface {
 	ListIssueComments(issue scm.RepositoryIssue) ([]*gogh.IssueComment, error)
 	CreateIssueComment(issue scm.RepositoryIssue, commentMsg *string) error
 	CreateStatus(change scm.RepositoryChange, repoStatus *gogh.RepoStatus) error
-	// This method is intended to be used by client decorators which need access to GH API methods not (yet)
-	// exposed by this interface
-	unwrap() *gogh.Client
+	GetRateLimit() (*gogh.RateLimits, error)
 }
 
 // NewOauthClient creates a Client instance with the given oauth secret used as a access token. Underneath
@@ -94,8 +92,10 @@ func (c client) CreateStatus(change scm.RepositoryChange, repoStatus *gogh.RepoS
 	return c.checkHTTPCode(response, err)
 }
 
-func (c client) unwrap() *gogh.Client {
-	return c.gh
+// GetRateLimits retrieves the rate limits for the current GH client
+func (c client) GetRateLimit() (*gogh.RateLimits, error) {
+	limits, response, e := c.gh.RateLimits(context.Background())
+	return limits, c.checkHTTPCode(response, e)
 }
 
 func (c client) checkHTTPCode(response *gogh.Response, e error) error {

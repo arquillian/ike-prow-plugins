@@ -102,3 +102,14 @@ func (r retryClient) CreateStatus(change scm.RepositoryChange, repoStatus *gogh.
 		return r.Client.CreateStatus(change, repoStatus)
 	})
 }
+
+// GetRateLimits retrieves the rate limits for the current GH client
+func (r retryClient) GetRateLimit() (*gogh.RateLimits, error) {
+	var limits *gogh.RateLimits
+	err := r.retry(func() error {
+		var e error
+		limits, e = r.Client.GetRateLimit()
+		return e
+	})
+	return limits, err
+}
