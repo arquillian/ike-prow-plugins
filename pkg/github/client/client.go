@@ -24,6 +24,9 @@ type Client interface {
 	ListIssueComments(issue scm.RepositoryIssue) ([]*gogh.IssueComment, error)
 	CreateIssueComment(issue scm.RepositoryIssue, commentMsg *string) error
 	CreateStatus(change scm.RepositoryChange, repoStatus *gogh.RepoStatus) error
+	ListPullRequestLabels(change scm.RepositoryChange, prNumber int) ([]*gogh.Label, error)
+	AddPullRequestLabel(change scm.RepositoryChange, prNumber int, label []string) ([]*gogh.Label, error)
+	RemovePullRequestLabel(change scm.RepositoryChange, prNumber int, label string) error
 	GetRateLimit() (*gogh.RateLimits, error)
 }
 
@@ -89,6 +92,21 @@ func (c client) CreateIssueComment(issue scm.RepositoryIssue, commentMsg *string
 func (c client) CreateStatus(change scm.RepositoryChange, repoStatus *gogh.RepoStatus) error {
 	_, response, err :=
 		c.gh.Repositories.CreateStatus(context.Background(), change.Owner, change.RepoName, change.Hash, repoStatus)
+	return c.checkHTTPCode(response, err)
+}
+
+func (c client) ListPullRequestLabels(change scm.RepositoryChange, prNumber int) ([]*gogh.Label, error) {
+	labels, response, err := c.gh.Issues.ListLabelsByIssue(context.Background(), change.Owner, change.RepoName, prNumber, nil)
+	return labels, c.checkHTTPCode(response, err)
+}
+
+func (c client) AddPullRequestLabel(change scm.RepositoryChange, prNumber int, label []string) ([]*gogh.Label, error) {
+	labels, response, err := c.gh.Issues.AddLabelsToIssue(context.Background(), change.Owner, change.RepoName, prNumber, label)
+	return labels, c.checkHTTPCode(response, err)
+}
+
+func (c client) RemovePullRequestLabel(change scm.RepositoryChange, prNumber int, label string) error {
+	response, err := c.gh.Issues.RemoveLabelForIssue(context.Background(), change.Owner, change.RepoName, prNumber, label)
 	return c.checkHTTPCode(response, err)
 }
 
