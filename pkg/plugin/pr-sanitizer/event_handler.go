@@ -67,9 +67,9 @@ func (gh *GitHubLabelsEventsHandler) HandleEvent(log log.Logger, eventType githu
 		statusService := ghservice.NewStatusService(gh.Client, log, change, statusContext)
 		configuration := LoadConfiguration(log, change)
 		if gh.HasSemanticMessage(*event.PullRequest.Title, configuration) {
-			return statusService.Failure(FailureMessage, FailureDetailsLink)
+			return statusService.Success(SuccessMessage, SuccessDetailsLink)
 		}
-		return statusService.Success(SuccessMessage, SuccessDetailsLink)
+		return statusService.Failure(FailureMessage, FailureDetailsLink)
 
 	default:
 		log.Warnf("received an event of type %q but didn't ask for it", eventType)
