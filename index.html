@@ -1277,6 +1277,9 @@ If you need to reconfigure the plugin then read the section <a href="#test-keepe
 <div class="paragraph">
 <p>If the PR title starts with any of the default prefixes such as <code>WIP</code>, <code>DO NOT MERGE</code>, <code>DON&#8217;T MERGE</code>, <code>WORK-IN-PROGRESS</code> with combinations of <code>( )</code>, <code>[ ]</code>, <code>:</code> or any of the user configured prefixes as described below (non-case sensitive) then the plugin marks its check as <strong>Failure</strong>, or as <strong>Success</strong> otherwise.</p>
 </div>
+<div class="paragraph">
+<p>In addition to managing the status for the PR in progress, it also manages adding/removing the GitHub label (<code>work-in-progress</code> by default or configured otherwise) for the given PR.</p>
+</div>
 <div class="sect3">
 <h4 id="work-in-progress-config"><a class="anchor" href="#work-in-progress-config"></a>3.3.1. Plugin Configuration</h4>
 <div class="paragraph">
@@ -1287,7 +1290,8 @@ If you need to reconfigure the plugin then read the section <a href="#test-keepe
 <div class="content">
 <pre class="CodeRay highlight"><code data-lang="yml"><span class="key">title_prefixes</span>:          <i class="conum" data-value="1"></i><b>(1)</b>
   - <span class="string"><span class="content">'work in progress'</span></span>
-<span class="key">combine_defaults</span>: <span class="string"><span class="content">true   </span></span> <i class="conum" data-value="2"></i><b>(2)</b></code></pre>
+<span class="key">combine_defaults</span>: <span class="string"><span class="content">true   </span></span><i class="conum" data-value="2"></i><b>(2)</b>
+<span class="key">gh_label</span>: <span class="string"><span class="content">wip           </span></span> <i class="conum" data-value="3"></i><b>(3)</b></code></pre>
 </div>
 </div>
 <div class="colist arabic">
@@ -1300,6 +1304,10 @@ If you need to reconfigure the plugin then read the section <a href="#test-keepe
 <td><i class="conum" data-value="2"></i><b>2</b></td>
 <td>Allows you to decide if you want to combine your patterns with the list (<code>WIP</code>, <code>DO NOT MERGE</code>, <code>DON&#8217;T MERGE</code>, <code>WORK-IN-PROGRESS</code>) of predefined defaults (<code>true</code> by default).</td>
 </tr>
+<tr>
+<td><i class="conum" data-value="3"></i><b>3</b></td>
+<td>Defines the custom name to be used for the GitHub label for the "work in progress pull request" (<code>work-in-progress</code> by default).</td>
+</tr>
 </table>
 </div>
 </div>
@@ -1308,16 +1316,16 @@ If you need to reconfigure the plugin then read the section <a href="#test-keepe
 <div class="sect4">
 <h5 id="wip-success"><a class="anchor" href="#wip-success"></a>Success</h5>
 <div class="paragraph">
-<p>Your Pull Request has been approved as the plugin didn&#8217;t detect any sign of work in progress (the PR title doesn&#8217;t start with any of the "work-in-progress prefixes").</p>
+<p>Your Pull Request has been approved as the plugin didn&#8217;t detect any sign of work in progress (the PR title doesn&#8217;t start with any of the "work in progress prefixes").</p>
 </div>
 </div>
 <div class="sect4">
 <h5 id="wip-failed"><a class="anchor" href="#wip-failed"></a>Failed</h5>
 <div class="paragraph">
-<p>Your Pull Request has been rejected because the plugin detected that the PR title starts with one of the "work-in-progress prefixes", so it seems that there is still an ongoing work.</p>
+<p>Your Pull Request has been rejected because the plugin detected that the PR title starts with one of the "work in progress prefixes", so it seems that there is still an ongoing work.</p>
 </div>
 <div class="paragraph">
-<p>When the PR is done and ready for review and merge, then remove the prefix from the title to make the status green.</p>
+<p>When the PR is done and ready for review and merge, then remove the prefix from the title to make the status green. Removing the prefix also triggers removing the added GitHub "work-in-progress label" from the PR.</p>
 </div>
 </div>
 </div>
@@ -1327,7 +1335,7 @@ If you need to reconfigure the plugin then read the section <a href="#test-keepe
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2018-05-28 16:55:33 UTC
+Last updated 2018-05-29 10:30:55 UTC
 </div>
 </div>
 <script>
