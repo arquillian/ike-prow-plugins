@@ -29,7 +29,8 @@ var _ = Describe("Work In Progress config loader features", func() {
 			gock.New("https://raw.githubusercontent.com").
 				Get("owner/repo/46cb8fac44709e4ccaae97448c65e8f7320cfea7/" + configFilePath + ".yml").
 				Reply(200).
-				BodyString("title_prefixes: ['[work in progress]', 'work in progress']")
+				BodyString("title_prefixes: ['[work in progress]', 'work in progress']\n" +
+								"gh_label: working-in-progress")
 
 			change := scm.RepositoryChange{
 				Owner:    "owner",
@@ -43,7 +44,7 @@ var _ = Describe("Work In Progress config loader features", func() {
 			// then
 			Expect(configuration.Prefix).To(ConsistOf("[work in progress]", "work in progress"))
 			Expect(configuration.Combine).To(Equal(true))
-			Expect(configuration.Label).To(Equal("work-in-progress"))
+			Expect(configuration.Label).To(Equal("working-in-progress"))
 		})
 
 		It("should not load work-in-progress configuration yaml file and return empty url when config is not accessible", func() {
