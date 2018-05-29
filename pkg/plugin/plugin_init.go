@@ -8,7 +8,7 @@ import (
 
 	"strconv"
 
-	probeshandler "github.com/arquillian/ike-prow-plugins/pkg/probes-handler"
+	"github.com/arquillian/ike-prow-plugins/pkg/probes-handler"
 	"github.com/arquillian/ike-prow-plugins/pkg/utils"
 	"k8s.io/test-infra/prow/pluginhelp/externalplugins"
 	"k8s.io/test-infra/prow/plugins"
@@ -94,7 +94,17 @@ func InitPlugin(pluginName string, newEventHandler EventHandlerCreator, newServe
 		100)
 
 	handler := newEventHandler(githubClient, *pluginBotName)
+
 	pluginServer := newServer(webhookSecret, handler)
+	metrics, errs := server.RegisterMetrics(githubClient)
+	if len(errs) > 0 {
+		errLog := logger
+		for _, e := range errs {
+			errLog = errLog.WithError(e)
+		}
+		errLog.Fatal("Prometheus metrics registration failed!")
+	}
+	pluginServer.Metrics = metrics
 
 	port := strconv.Itoa(*port)
 	logger.Infof("Starting server on port %s", port)

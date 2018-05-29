@@ -1,8 +1,6 @@
 package ghclient
 
 import (
-	"context"
-
 	"github.com/arquillian/ike-prow-plugins/pkg/log"
 	"github.com/arquillian/ike-prow-plugins/pkg/scm"
 	gogh "github.com/google/go-github/github"
@@ -24,9 +22,13 @@ func (r rateLimitWatcher) logRateLimitsAfter(f func()) {
 	r.logRateLimits()
 }
 
+// GetRateLimits retrieves the rate limits for the current GH client
+func (r rateLimitWatcher) GetRateLimit() (*gogh.RateLimits, error) {
+	return r.Client.GetRateLimit()
+}
+
 func (r rateLimitWatcher) logRateLimits() {
-	ghclient := r.unwrap()
-	limits, _, e := ghclient.RateLimits(context.Background())
+	limits, e := r.GetRateLimit()
 	if e != nil {
 		r.log.Errorf("failed to load rate limits %s", e)
 		return

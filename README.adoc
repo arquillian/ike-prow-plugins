@@ -40,7 +40,7 @@ You need to have following packages in place:
 
 * `git`
 * `make`
-* `go` (`>= v1.9.4`)
+* `go` (`>= v1.10.2`)
 * link:https://glide.sh/[`glide`] for dependency management
 * link:https://github.com/alecthomas/gometalinter[`gometalinter`]
 
