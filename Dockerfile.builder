@@ -5,7 +5,7 @@ LABEL maintainer="Devtools-test <devtools-test@redhat.com>"
 ARG HOME
 ARG GOPATH
 ARG PROJECT_PATH
-ARG GO_VERSION=go1.9.4
+ARG GO_VERSION=go1.10.2
 
 ENV HOME=${HOME}
 ENV GOPATH=${GOPATH}
