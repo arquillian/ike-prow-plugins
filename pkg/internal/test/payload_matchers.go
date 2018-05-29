@@ -26,7 +26,7 @@ func createPayloadMatcher(matchers []SoftMatcher) gock.Matcher {
 		if err != nil {
 			return false, err
 		}
-		var payload map[string]interface{}
+		var payload interface{}
 		err = json.Unmarshal(body, &payload)
 		payloadExpectations := createPayloadAssert(matchers)(payload)
 		return payloadExpectations, err
@@ -34,8 +34,8 @@ func createPayloadMatcher(matchers []SoftMatcher) gock.Matcher {
 	return matcher
 }
 
-func createPayloadAssert(matchers []SoftMatcher) func(statusPayload map[string]interface{}) bool {
-	return func(statusPayload map[string]interface{}) bool {
+func createPayloadAssert(matchers []SoftMatcher) func(statusPayload interface{}) bool {
+	return func(statusPayload interface{}) bool {
 		return gomega.Expect(statusPayload).To(SoftlySatisfyAll(matchers...))
 	}
 }
@@ -85,11 +85,20 @@ func HaveBody(expectedBody string) SoftMatcher {
 		"body")
 }
 
-// HaveBodyThatContains gets "body" key from map[string]interface{} and checks if its value contains the given string
+// HaveBodyThatContains gets "body" key from map[string]interface{} or first element from []interface{} and checks if its value contains the given string
 // This matcher is used to verify body content sent in request to GitHub API
 func HaveBodyThatContains(content string) SoftMatcher {
 	return TransformWithName(
-		func(s map[string]interface{}) interface{} { return s["body"] },
+		func(s interface{}) interface{} {
+			switch v := s.(type) {
+			case map[string]interface{}:
+				return v["body"]
+			case []interface{}:
+				return v[0]
+			default:
+				return v
+			}
+		},
 		gomega.ContainSubstring(content),
 		"body")
 }

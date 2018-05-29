@@ -4,6 +4,8 @@ This plugin can help reviewers with focusing on work that really matters so they
 
 If the PR title starts with any of the default prefixes such as `WIP`, `DO NOT MERGE`, `DON'T MERGE`, `WORK-IN-PROGRESS` with combinations of `( )`, `[ ]`, `:` or any of the user configured prefixes as described below (non-case sensitive) then the plugin marks its check as **Failure**, or as **Success** otherwise.
 
+In addition to managing the status for the PR in progress, it also manages adding/removing the GitHub label (`const:pkg/plugin/work-in-progress/configuration.go[name="DefaultLabel"]` by default or configured otherwise) for the given PR. 
+
 === Plugin Configuration [[work-in-progress-config]]
 
 To configure Work In Progress plugin place `work-in-progress.yml` (or `work-in-progress.yaml`) file inside of the directory `.ike-prow/` in your project and use properties described below.
@@ -16,6 +18,7 @@ include::../../pkg/plugin/work-in-progress/test_fixtures/github_calls/work-in-pr
 
 <1> Defines set of custom-prefixes which will be used to match titles prefixes in changeset and determine if Pull Requests are still in progress.
 <2> Allows you to decide if you want to combine your patterns with the list (`WIP`, `DO NOT MERGE`, `DON'T MERGE`, `WORK-IN-PROGRESS`) of predefined defaults (`true` by default).
+<3> Defines the custom name to be used for the GitHub label for the "work in progress pull request" (`const:pkg/plugin/work-in-progress/configuration.go[name="DefaultLabel"]` by default).
 
 === Status details
 
