@@ -52,28 +52,61 @@ func (gh *GitHubWIPPRHandler) HandleEvent(log log.Logger, eventType github.Event
 			return err
 		}
 
-		if !utils.Contains(handledPrActions, *event.Action) {
-			return nil
+		if err := gh.handlePrEvent(log, &event); err != nil {
+			log.Errorf("Error handling '%q' event with payload %q. Cause: %q", github.PullRequest, event, err)
+			return err
 		}
-
-		change := scm.RepositoryChange{
-			Owner:    *event.Repo.Owner.Login,
-			RepoName: *event.Repo.Name,
-			Hash:     *event.PullRequest.Head.SHA,
-		}
-		statusContext := github.StatusContext{BotName: gh.BotName, PluginName: ProwPluginName}
-		statusService := ghservice.NewStatusService(gh.Client, log, change, statusContext)
-		configuration := LoadConfiguration(log, change)
-		if gh.IsWorkInProgress(*event.PullRequest.Title, configuration) {
-			return statusService.Failure(InProgressMessage, InProgressDetailsLink)
-		}
-		return statusService.Success(ReadyForReviewMessage, ReadyForReviewDetailsLink)
 
 	default:
 		log.Warnf("received an event of type %q but didn't ask for it", eventType)
 	}
 
 	return nil
+}
+
+func (gh *GitHubWIPPRHandler) handlePrEvent(log log.Logger, event *gogh.PullRequestEvent) error {
+	if !utils.Contains(handledPrActions, *event.Action) {
+		return nil
+	}
+
+	change := scm.RepositoryChange{
+		Owner:    *event.Repo.Owner.Login,
+		RepoName: *event.Repo.Name,
+		Hash:     *event.PullRequest.Head.SHA,
+	}
+	statusContext := github.StatusContext{BotName: gh.BotName, PluginName: ProwPluginName}
+	statusService := ghservice.NewStatusService(gh.Client, log, change, statusContext)
+
+	labels, err := gh.Client.ListPullRequestLabels(change, *event.PullRequest.Number)
+	if err != nil {
+		log.Warnf("failed to list labels on PR [%q]. cause: %s", *event.PullRequest, err)
+	}
+
+	configuration := LoadConfiguration(log, change)
+	labelExists := gh.hasWorkInProgressLabel(labels, configuration.Label)
+	if gh.IsWorkInProgress(*event.PullRequest.Title, configuration) {
+		if !labelExists {
+			if _, err := gh.Client.AddPullRequestLabel(change, *event.PullRequest.Number, strings.Fields(configuration.Label)); err != nil {
+				log.Errorf("failed to add label on PR [%q]. cause: %s", *event.PullRequest, err)
+			}
+		}
+		return statusService.Failure(InProgressMessage, InProgressDetailsLink)
+	}
+	if labelExists {
+		if err := gh.Client.RemovePullRequestLabel(change, *event.PullRequest.Number, configuration.Label); err != nil {
+			log.Errorf("failed to remove label on PR [%q]. cause: %s", *event.PullRequest, err)
+		}
+	}
+	return statusService.Success(ReadyForReviewMessage, ReadyForReviewDetailsLink)
+}
+
+func (gh *GitHubWIPPRHandler) hasWorkInProgressLabel(labels []*gogh.Label, wipLabel string) bool {
+	for _, label := range labels {
+		if label.GetName() == wipLabel {
+			return true
+		}
+	}
+	return false
 }
 
 // IsWorkInProgress checks if title is marked as Work In Progress
