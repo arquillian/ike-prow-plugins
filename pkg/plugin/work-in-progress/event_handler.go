@@ -9,7 +9,6 @@ import (
 	"github.com/arquillian/ike-prow-plugins/pkg/github/client"
 	"github.com/arquillian/ike-prow-plugins/pkg/github/service"
 	"github.com/arquillian/ike-prow-plugins/pkg/log"
-	"github.com/arquillian/ike-prow-plugins/pkg/plugin"
 	"github.com/arquillian/ike-prow-plugins/pkg/scm"
 	"github.com/arquillian/ike-prow-plugins/pkg/utils"
 	gogh "github.com/google/go-github/github"
@@ -21,13 +20,13 @@ const (
 
 	// InProgressMessage is a message used in GH Status as description when the PR is in progress
 	InProgressMessage = "PR is in progress and can't be merged yet. You might want to wait with review as well"
-	// InProgressDetailsLink is a link to an anchor in arq documentation that contains additional status details for InProgressMessage
-	InProgressDetailsLink = plugin.DocumentationURL + "#wip-failed"
+	// InProgressDetailsPageName is a name of a documentation page that contains additional status details for InProgressMessage
+	InProgressDetailsPageName = "wip-failed"
 
 	// ReadyForReviewMessage is a message used in GH Status as description when the PR is ready for review and merge
 	ReadyForReviewMessage = "PR is ready for review and merge"
-	// ReadyForReviewDetailsLink is a link to an anchor in arq documentation that contains additional status details for ReadyForReviewMessage
-	ReadyForReviewDetailsLink = plugin.DocumentationURL + "#wip-success"
+	// ReadyForReviewDetailsPageName is a name of a documentation page that contains additional status details for ReadyForReviewMessage
+	ReadyForReviewDetailsPageName = "wip-success"
 )
 
 // GitHubWIPPRHandler handles PR events and updates status of the PR based on work-in-progress indicator
@@ -90,14 +89,14 @@ func (gh *GitHubWIPPRHandler) handlePrEvent(log log.Logger, event *gogh.PullRequ
 				log.Errorf("failed to add label on PR [%q]. cause: %s", *event.PullRequest, err)
 			}
 		}
-		return statusService.Failure(InProgressMessage, InProgressDetailsLink)
+		return statusService.Failure(InProgressMessage, InProgressDetailsPageName)
 	}
 	if labelExists {
 		if err := gh.Client.RemovePullRequestLabel(change, *event.PullRequest.Number, configuration.Label); err != nil {
 			log.Errorf("failed to remove label on PR [%q]. cause: %s", *event.PullRequest, err)
 		}
 	}
-	return statusService.Success(ReadyForReviewMessage, ReadyForReviewDetailsLink)
+	return statusService.Success(ReadyForReviewMessage, ReadyForReviewDetailsPageName)
 }
 
 func (gh *GitHubWIPPRHandler) hasWorkInProgressLabel(labels []*gogh.Label, wipLabel string) bool {

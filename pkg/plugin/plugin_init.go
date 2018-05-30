@@ -43,7 +43,7 @@ var (
 )
 
 // DocumentationURL is a link to arquillian ike-prow-plugins documentation
-const DocumentationURL = "http://arquillian.org/ike-prow-plugins/"
+const DocumentationURL = "http://arquillian.org/ike-prow-plugins"
 
 // EventHandlerCreator is a func type that creates server.GitHubEventHandler instance which is the central point for
 // the plugin logic
