@@ -1227,7 +1227,7 @@ Don&#8217;t use a regular expression inside of the wildcard format. We don&#8217
 <p>It means that changeset in this PR has files matching any of the default test patterns, those you configured  or by a combination of both.</p>
 </div>
 <div class="paragraph">
-<p>For more information about the behavior and what the default file patterns are, see <a href="#test-keeper-how">How does it work?</a> section. If you need to reconfigure the plugin then read the section <a href="#test-keeper-config">Plugin Configuration</a>.</p>
+<p>For more information about the behavior and what the default file patterns are, see <a href="index.html#test-keeper-how">How does it work?</a> section. If you need to reconfigure the plugin then read the section <a href="index.html#test-keeper-config">Plugin Configuration</a>.</p>
 </div>
 </div>
 <div class="sect4">
@@ -1236,7 +1236,7 @@ Don&#8217;t use a regular expression inside of the wildcard format. We don&#8217
 <p>Your Pull Request has been approved because it seems that it doesn&#8217;t need to have additional tests. All changed files in the changeset match patterns for which the validation should be skipped.</p>
 </div>
 <div class="paragraph">
-<p>For more information about the behavior and what the default file patterns are, see <a href="#test-keeper-how">How does it work?</a> section. If you need to reconfigure the plugin then read the section <a href="#test-keeper-config">Plugin Configuration</a>.</p>
+<p>For more information about the behavior and what the default file patterns are, see <a href="index.html#test-keeper-how">How does it work?</a> section. If you need to reconfigure the plugin then read the section <a href="index.html#test-keeper-config">Plugin Configuration</a>.</p>
 </div>
 </div>
 <div class="sect4">
@@ -1248,11 +1248,11 @@ Don&#8217;t use a regular expression inside of the wildcard format. We don&#8217
 <p>If the PR contains only "non-production" changeset and some of them haven&#8217;t been detected by any file patterns the validation should be skipped for, you can add them in your configuration file.</p>
 </div>
 <div class="paragraph">
-<p>For more information see <a href="#test-keeper-how">How does it work?</a> and <a href="#test-keeper-config">Plugin Configuration</a> sections.</p>
+<p>For more information see <a href="index.html#test-keeper-how">How does it work?</a> and <a href="index.html#test-keeper-config">Plugin Configuration</a> sections.</p>
 </div>
 </div>
 <div class="sect4">
-<h5 id="no-tests"><a class="anchor" href="#no-tests"></a>Failed</h5>
+<h5 id="no-tests"><a class="anchor" href="#no-tests"></a>Failure</h5>
 <div class="paragraph">
 <p>Your Pull Request has been rejected because the plugin wasn&#8217;t able to find any added or changed test file in the change-set.</p>
 </div>
@@ -1263,8 +1263,8 @@ Don&#8217;t use a regular expression inside of the wildcard format. We don&#8217
 <p>If you are an admin and you are sure that no test is needed then you can use a command <code>/ok-without-tests</code> as a comment to make the status green.</p>
 </div>
 <div class="paragraph">
-<p>For more information about the behavior, how the test files are detected and what the default file patterns are, see <a href="#test-keeper-how">How does it work?</a> section.
-If you need to reconfigure the plugin then read the section <a href="#test-keeper-config">Plugin Configuration</a>.</p>
+<p>For more information about the behavior, how the test files are detected and what the default file patterns are, see <a href="index.html#test-keeper-how">How does it work?</a> section.
+If you need to reconfigure the plugin then read the section <a href="index.html#test-keeper-config">Plugin Configuration</a>.</p>
 </div>
 </div>
 </div>
@@ -1316,13 +1316,13 @@ If you need to reconfigure the plugin then read the section <a href="#test-keepe
 <div class="sect4">
 <h5 id="wip-success"><a class="anchor" href="#wip-success"></a>Success</h5>
 <div class="paragraph">
-<p>Your Pull Request has been approved as the plugin didn&#8217;t detect any sign of work in progress (the PR title doesn&#8217;t start with any of the "work in progress prefixes").</p>
+<p>Your Pull Request has been approved as the plugin didn&#8217;t detect any sign of work in progress (the PR title doesn&#8217;t start with any of the <a href="index.html#work-in-progress-config">work in progress prefixes</a>).</p>
 </div>
 </div>
 <div class="sect4">
 <h5 id="wip-failed"><a class="anchor" href="#wip-failed"></a>Failed</h5>
 <div class="paragraph">
-<p>Your Pull Request has been rejected because the plugin detected that the PR title starts with one of the "work in progress prefixes", so it seems that there is still an ongoing work.</p>
+<p>Your Pull Request has been rejected because the plugin detected that the PR title starts with one of the <a href="index.html#work-in-progress-config">work in progress prefixes</a>, so it seems that there is still an ongoing work.</p>
 </div>
 <div class="paragraph">
 <p>When the PR is done and ready for review and merge, then remove the prefix from the title to make the status green. Removing the prefix also triggers removing the added GitHub "work-in-progress label" from the PR.</p>
@@ -1335,7 +1335,7 @@ If you need to reconfigure the plugin then read the section <a href="#test-keepe
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2018-05-29 10:30:55 UTC
+Last updated 2018-05-30 11:12:31 UTC
 </div>
 </div>
 <script>
