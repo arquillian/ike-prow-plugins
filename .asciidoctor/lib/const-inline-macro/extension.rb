@@ -18,10 +18,12 @@ class ConstBlockMacro < Extensions::InlineMacroProcessor
   named :const
 
   def process parent, target, attrs
-
-    data_path = parent.normalize_asset_path(target, 'target')
+    if ENV['PROJECT_ROOT'].inspect.nil?
+       data_path = parent.normalize_asset_path(target, 'target')
+    else
+      data_path = ENV['PROJECT_ROOT'] + target
+    end
     const_value = []
-
     if attrs.has_key? 'name'
       const_name = attrs['name']
 

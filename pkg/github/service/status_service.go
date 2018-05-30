@@ -9,6 +9,8 @@ import (
 	"github.com/arquillian/ike-prow-plugins/pkg/scm"
 	"github.com/arquillian/ike-prow-plugins/pkg/utils"
 	"github.com/google/go-github/github"
+	"github.com/arquillian/ike-prow-plugins/pkg/plugin"
+	"strings"
 )
 
 // StatusService is a struct
@@ -30,13 +32,13 @@ func NewStatusService(client ghclient.Client, log log.Logger, change scm.Reposit
 }
 
 // Success marks given change as a success.
-func (s *StatusService) Success(reason, detailsLink string) error {
-	return s.setStatus(github_type.StatusSuccess, reason, detailsLink)
+func (s *StatusService) Success(reason, detailsPageName string) error {
+	return s.setStatus(github_type.StatusSuccess, reason, s.generateDetailsLink(detailsPageName, github_type.StatusSuccess))
 }
 
 // Failure marks given change as a failure.
-func (s *StatusService) Failure(reason, detailsLink string) error {
-	return s.setStatus(github_type.StatusFailure, reason, detailsLink)
+func (s *StatusService) Failure(reason, detailsPageName string) error {
+	return s.setStatus(github_type.StatusFailure, reason, s.generateDetailsLink(detailsPageName, github_type.StatusFailure))
 }
 
 // Pending marks given change as a pending.
@@ -66,4 +68,8 @@ func (s *StatusService) setStatus(status, reason, detailsLink string) error {
 	}
 
 	return err
+}
+
+func (s StatusService) generateDetailsLink(filename, status string) string {
+	return fmt.Sprintf("%s/status/%s/%s/%s.html", plugin.DocumentationURL, s.statusContext.PluginName, strings.ToLower(status), filename)
 }

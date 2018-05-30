@@ -83,35 +83,7 @@ test_patterns:
 
 === Status details
 
-==== Success - test is present [[tests-exist]]
-
-Your Pull Request has been approved because the plugin detected a test file that has been added or changed in the PR.
-
-It means that changeset in this PR has files matching any of the default test patterns, those you configured  or by a combination of both.
-
-For more information about the behavior and what the default file patterns are, see <<test-keeper-how>> section. If you need to reconfigure the plugin then read the section <<test-keeper-config>>.
-
-==== Success - no test needed [[only-skipped]]
-
-Your Pull Request has been approved because it seems that it doesn't need to have additional tests. All changed files in the changeset match patterns for which the validation should be skipped.
-
-For more information about the behavior and what the default file patterns are, see <<test-keeper-how>> section. If you need to reconfigure the plugin then read the section <<test-keeper-config>>.
-
-==== Success - approved by [[keeper-approved-by]]
-
-Your Pull Request has been approved by any of the administrators or reviewers despite the fact that it has no test.
-
-If the PR contains only "non-production" changeset and some of them haven't been detected by any file patterns the validation should be skipped for, you can add them in your configuration file.
-
-For more information see <<test-keeper-how>> and <<test-keeper-config>> sections.
-
-==== Failed [[no-tests]]
-
-Your Pull Request has been rejected because the plugin wasn't able to find any added or changed test file in the change-set.
-
-Automated tests give us confidence in shipping reliable software. Please add some as part of this change.
-
-If you are an admin and you are sure that no test is needed then you can use a command `const:pkg/plugin/test-keeper/comment_cmd.go[name="BypassCheckComment"]` as a comment to make the status green.
-
-For more information about the behavior, how the test files are detected and what the default file patterns are, see <<test-keeper-how>> section.
-If you need to reconfigure the plugin then read the section <<test-keeper-config>>.
+include::{asciidoctor-source}/fragments/status/test-keeper/success/tests-exist.adoc[leveloffset=1]
+include::{asciidoctor-source}/fragments/status/test-keeper/success/only-skipped.adoc[leveloffset=1]
+include::{asciidoctor-source}/fragments/status/test-keeper/success/keeper-approved-by.adoc[leveloffset=1]
+include::{asciidoctor-source}/fragments/status/test-keeper/failure/no-tests.adoc[leveloffset=1]
