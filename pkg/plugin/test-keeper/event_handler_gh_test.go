@@ -150,6 +150,8 @@ var _ = Describe("Test Keeper Plugin features", func() {
 
 			gock.New("https://api.github.com").
 				Get("/repos/" + repositoryName + "/pulls/2/files").
+				MatchParam("per_page","100").
+				MatchParam("page", "1").
 				Reply(200).
 				Body(FromFile("test_fixtures/github_calls/prs/with_tests/changes_go_files.json"))
 
@@ -459,6 +461,8 @@ var _ = Describe("Test Keeper Plugin features", func() {
 func gockEmptyComments(prNumber int) {
 	gock.New("https://api.github.com").
 		Get(fmt.Sprintf("/repos/%s/issues/%d/comments", repositoryName, prNumber)).
+		MatchParam("per_page","100").
+		MatchParam("page", "1").
 		Reply(200).
 		BodyString("[]")
 }

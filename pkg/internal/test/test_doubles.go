@@ -34,5 +34,7 @@ func FromFile(filePath string) io.Reader {
 
 // NewDefaultGitHubClient creates a GH client with default go-github client (without any authentication token)
 func NewDefaultGitHubClient() ghclient.Client {
-	return ghclient.NewClient(gogh.NewClient(nil), log.NewTestLogger())
+	client := ghclient.NewClient(gogh.NewClient(nil), log.NewTestLogger())
+	client.RegisterAroundFunctions(ghclient.NewPaginationChecker())
+	return client
 }
