@@ -3,16 +3,17 @@ package ghclient_test
 import (
 	"net/http"
 
-	"github.com/arquillian/ike-prow-plugins/pkg/github/client"
 	. "github.com/arquillian/ike-prow-plugins/pkg/internal/test"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	"gopkg.in/h2non/gock.v1"
+	"github.com/arquillian/ike-prow-plugins/pkg/github/client"
 )
 
 var _ = Describe("Retry client features", func() {
 
-	client := ghclient.NewRetryClient(NewDefaultGitHubClient(), 3, 0)
+	client := NewDefaultGitHubClient()
+	client.RegisterAroundFunctions(ghclient.NewRetryWrapper( 3, 0))
 
 	Context("Client should try 3 times to get the correct response", func() {
 

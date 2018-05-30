@@ -1,0 +1,14 @@
+[
+  {
+    "sha": "f6568e22176678175e5db4a375db26c60f9c2041",
+    "filename": "README.adoc",
+    "status": "modified",
+    "additions": 2,
+    "deletions": 2,
+    "changes": 4,
+    "blob_url": "https://github.com/bartoszmajsak/wfswarm-booster-pipeline-test/blob/6c27474573dac946aab9e9c40255be93fbf23c7e/README.adoc",
+    "raw_url": "https://github.com/bartoszmajsak/wfswarm-booster-pipeline-test/raw/6c27474573dac946aab9e9c40255be93fbf23c7e/README.adoc",
+    "contents_url": "https://api.github.com/repos/bartoszmajsak/wfswarm-booster-pipeline-test/contents/README.adoc?ref=6c27474573dac946aab9e9c40255be93fbf23c7e",
+    "patch": "@@ -1,6 +1,6 @@\n = REST API Level 0 - WildFly Swarm Booster\n \n-IMPORTANT: This booster requires Java 8 JDK or greater and Maven 3.3.x.\n+IMPORTANT: This booster requires Java 8 JDK or greater and Maven `3.3.x`.\n \n IMPORTANT: As part of the process of creating this booster, launch.openshift.io set up a project with a CI/CD deployment of this booster. You can see the status of this deployment in your Single-node OpenShift Cluster or OpenShift Online Web Console. \n \n@@ -57,4 +57,4 @@ $ mvn clean fabric8:deploy -Popenshift\n ----\n \n == More Information\n-You can learn more about this booster and rest of the WildFly Swarm runtime in the link:http://appdev.openshift.io/docs/wf-swarm-runtime.html[WildFly Swarm Runtime Guide].\n\\ No newline at end of file\n+You can learn more about this booster and rest of the WildFly Swarm runtime in the link:http://appdev.openshift.io/docs/wf-swarm-runtime.html[WildFly Swarm Runtime Guide]."
+  }
+]

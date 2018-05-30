@@ -9,11 +9,11 @@ import (
 	"gopkg.in/h2non/gock.v1"
 )
 
-var _ = Describe("GitHub rate limit watcher client", func() {
+var _ = Describe("Rate limit watcher", func() {
 
 	logger, hook := test.NewNullLogger()
-
-	client := ghclient.NewRateLimitWatcherClient(NewDefaultGitHubClient(), logger, 10)
+	client := NewDefaultGitHubClient()
+	client.RegisterAroundFunctions(ghclient.NewRateLimitWatcher(client, logger, 10))
 
 	BeforeEach(func() {
 		defer gock.OffAll()
