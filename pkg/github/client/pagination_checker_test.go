@@ -13,7 +13,7 @@ var _ = Describe("Pagination checker", func() {
 	const repositoryName = "bartoszmajsak/wfswarm-booster-pipeline-test"
 	client := NewDefaultGitHubClient()
 
-	Context("Client should try 3 times to get the correct response", func() {
+	Context("Pagination checker should correctly detect when there are some more pages available", func() {
 
 		BeforeEach(func() {
 			defer gock.OffAll()
@@ -21,7 +21,7 @@ var _ = Describe("Pagination checker", func() {
 
 		AfterEach(EnsureGockRequestsHaveBeenMatched)
 
-		It("should try to get the response 3 times and then fail when client gets only 404", func() {
+		It("should get all 3 pages and group the entries together", func() {
 			// given
 			gock.New("https://api.github.com").
 				Get("/repos/" + repositoryName + "/pulls/2/files").
