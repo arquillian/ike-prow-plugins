@@ -43,7 +43,7 @@ var (
 )
 
 // DocumentationURL is a link to arquillian ike-prow-plugins documentation
-const DocumentationURL = "http://arquillian.org/ike-prow-plugins/"
+const DocumentationURL = "http://arquillian.org/ike-prow-plugins"
 
 // EventHandlerCreator is a func type that creates server.GitHubEventHandler instance which is the central point for
 // the plugin logic
@@ -85,13 +85,11 @@ func InitPlugin(pluginName string, newEventHandler EventHandlerCreator, newServe
 		logger.WithError(err).Fatalf("Error loading ike-plugins config from %q.", *pluginConfig)
 	}
 
-	githubClient := ghclient.NewRateLimitWatcherClient(
-		ghclient.NewRetryClient(
-			ghclient.NewOauthClient(oauthSecret, logger),
-			4,
-			30*time.Second),
-		logger,
-		100)
+	githubClient := ghclient.NewOauthClient(oauthSecret, logger)
+	githubClient.RegisterAroundFunctions(
+		ghclient.NewRateLimitWatcher(githubClient, logger, 100),
+		ghclient.NewRetryWrapper(4, 30*time.Second),
+		ghclient.NewPaginationChecker())
 
 	handler := newEventHandler(githubClient, *pluginBotName)
 

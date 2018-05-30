@@ -1,10 +1,10 @@
 package log
 
 import (
-	"io/ioutil"
 	"os"
 
 	"github.com/sirupsen/logrus"
+	"io/ioutil"
 )
 
 // Logger is a facade interface compatible with logrus.Logger but with limited scope of logging.

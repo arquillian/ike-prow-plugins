@@ -12,6 +12,8 @@ import (
 
 	"github.com/arquillian/ike-prow-plugins/pkg/command"
 	"github.com/arquillian/ike-prow-plugins/pkg/github"
+	"fmt"
+	"github.com/arquillian/ike-prow-plugins/pkg/plugin"
 	"github.com/arquillian/ike-prow-plugins/pkg/github/service"
 	"github.com/arquillian/ike-prow-plugins/pkg/plugin/test-keeper"
 )
@@ -21,7 +23,10 @@ const (
 	repositoryName = "bartoszmajsak/wfswarm-booster-pipeline-test"
 )
 
-var expectedContext = strings.Join([]string{botName, wip.ProwPluginName}, "/")
+var (
+	expectedContext = strings.Join([]string{botName, wip.ProwPluginName}, "/")
+	docStatusRoot = fmt.Sprintf("%s/status/%s", plugin.DocumentationURL, wip.ProwPluginName)
+)
 
 var _ = Describe("Test Keeper Plugin features", func() {
 
@@ -34,18 +39,17 @@ var _ = Describe("Test Keeper Plugin features", func() {
 		HaveState(github.StatusSuccess),
 		HaveDescription(wip.ReadyForReviewMessage),
 		HaveContext(expectedContext),
-		HaveTargetURL(wip.ReadyForReviewDetailsLink),
+		HaveTargetURL(fmt.Sprintf("%s/%s/%s.html", docStatusRoot, "success", wip.ReadyForReviewDetailsPageName)),
 	)
 
 	toHaveFailureState := SoftlySatisfyAll(
 		HaveState(github.StatusFailure),
 		HaveDescription(wip.InProgressMessage),
 		HaveContext(expectedContext),
-		HaveTargetURL(wip.InProgressDetailsLink),
+		HaveTargetURL(fmt.Sprintf("%s/%s/%s.html", docStatusRoot, "failure", wip.InProgressDetailsPageName)),
 	)
 
 	Context("Pull Request title change trigger", func() {
-
 		BeforeEach(func() {
 			defer gock.OffAll()
 			handler = &wip.GitHubWIPPRHandler{Client: NewDefaultGitHubClient(), BotName: botName}

@@ -132,9 +132,9 @@ func (gh *GitHubTestEventsHandler) handlePrComment(log log.Logger, comment *gogh
 
 func (gh *GitHubTestEventsHandler) checkTestsAndSetStatus(log log.Logger, pr *gogh.PullRequest) error {
 	change := ghservice.NewRepositoryChangeForPR(pr)
-	statusService := gh.newTestStatusService(log, change)
 	configuration := LoadConfiguration(log, change)
 	fileCategories, err := gh.checkTests(log, change, configuration, *pr.Number)
+	statusService := gh.newTestStatusService(log, change)
 	if err != nil {
 		if statusErr := statusService.reportError(); statusErr != nil {
 			log.Errorf("failed to report error status on PR [%q]. cause: %s", *pr, statusErr)
