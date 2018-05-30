@@ -13,6 +13,7 @@ import (
 	"github.com/arquillian/ike-prow-plugins/pkg/command"
 	"github.com/arquillian/ike-prow-plugins/pkg/github"
 	"github.com/arquillian/ike-prow-plugins/pkg/github/service"
+	"github.com/arquillian/ike-prow-plugins/pkg/plugin/test-keeper"
 )
 
 const (
@@ -148,7 +149,7 @@ var _ = Describe("Test Keeper Plugin features", func() {
 
 	})
 
-	Context("Trigger work-in-progress plugin after adding comment '\run plugin-name' on pull request", func() {
+	Context("Trigger work-in-progress plugin by triggering comment on pull request", func() {
 		BeforeEach(func() {
 			defer gock.OffAll()
 			handler = &wip.GitHubWIPPRHandler{Client: NewDefaultGitHubClient(), BotName: botName}
@@ -222,6 +223,37 @@ var _ = Describe("Test Keeper Plugin features", func() {
 			Ω(err).ShouldNot(HaveOccurred())
 		})
 
+		It("should approve newly created pull request with tests when "+command.RunCommentPrefix+" "+testkeeper.ProwPluginName+" command is triggered by pr creator", func() {
+			// given
+			NonExistingRawGitHubFiles("work-in-progress.yml", "work-in-progress.yaml")
+
+			gock.New("https://api.github.com").
+				Get("/repos/" + repositoryName + "/pulls/11").
+				Reply(200).
+				Body(FromFile("test_fixtures/github_calls/pr_details.json"))
+
+			gock.New("https://api.github.com").
+				Get("/repos/" + repositoryName + "/pulls/11/reviews").
+				Reply(200).
+				BodyString(`[]`)
+
+			gock.New("https://api.github.com").
+				Get("/repos/" + repositoryName + "/collaborators/bartoszmajsak-test/permission").
+				Reply(200).
+				Body(FromFile("test_fixtures/github_calls/collaborators_external-user_permission.json"))
+
+			gock.New("https://api.github.com").
+				Post("/repos/bartoszmajsak/wfswarm-booster-pipeline-test/statuses").
+				Times(0)  // This way we implicitly verify that call not happened after `HandleEvent` call
+
+			statusPayload := LoadFromFile("test_fixtures/github_calls/trigger_run_test-keeper_on_pr_by_pr_creator.json")
+
+			// when
+			err := handler.HandleEvent(log, github.IssueComment, statusPayload)
+
+			// then
+			Ω(err).ShouldNot(HaveOccurred())
+		})
 	})
 
 })

@@ -171,7 +171,7 @@ var _ = Describe("Test Keeper Plugin features", func() {
 
 		It("should block newly created pull request when no tests are included", func() {
 			// given
-			NonExistingRawGitHubFiles("test-keeper.yml", "test-keeper.yaml","_hint.md")
+			NonExistingRawGitHubFiles("test-keeper.yml", "test-keeper.yaml", "_hint.md")
 			gockEmptyComments(1)
 
 			gock.New("https://api.github.com").
@@ -452,7 +452,7 @@ var _ = Describe("Test Keeper Plugin features", func() {
 		})
 	})
 
-	Context("Trigger work-in-progress plugin after adding comment '\run plugin-name' on pull request", func() {
+	Context("Trigger test-keeper plugin by triggering comment on pull request", func() {
 		BeforeEach(func() {
 			defer gock.OffAll()
 			handler = &testkeeper.GitHubTestEventsHandler{Client: NewDefaultGitHubClient(), BotName: botName}
@@ -551,6 +551,53 @@ var _ = Describe("Test Keeper Plugin features", func() {
 			err := handler.HandleEvent(log, github.IssueComment, statusPayload)
 
 			// then - implicit verification of /statuses call occurrence with proper payload
+			Ω(err).ShouldNot(HaveOccurred())
+		})
+
+		It("should do nothing for newly created pull request with tests when "+command.RunCommentPrefix+" work-in-progress command is triggered by pr creator", func() {
+			// given
+			NonExistingRawGitHubFiles("test-keeper.yml", "test-keeper.yaml")
+
+			gock.New("https://api.github.com").
+				Get("/repos/" + repositoryName + "/pulls/2").
+				Reply(200).
+				Body(FromFile("test_fixtures/github_calls/prs/with_tests/pr_details.json"))
+
+			gock.New("https://api.github.com").
+				Get("/repos/" + repositoryName + "/pulls/2/files").
+				Reply(200).
+				Body(FromFile("test_fixtures/github_calls/prs/with_tests/changes.json"))
+
+			gock.New("https://api.github.com").
+				Get("/repos/" + repositoryName + "/issues/2/comments").
+				Reply(200).
+				BodyString("[]")
+
+			gock.New("https://api.github.com").
+				Get("/repos/" + repositoryName + "/collaborators/bartoszmajsak-test/permission").
+				Reply(200).
+				Body(FromFile("test_fixtures/github_calls/collaborators_external-user_permission.json"))
+
+			gock.New("https://api.github.com").
+				Get("/repos/" + repositoryName + "/pulls/2/reviews").
+				Reply(200).
+				BodyString(`[]`)
+
+			// This way we implicitly verify that call not happened after `HandleEvent` call
+			gock.New("https://api.github.com").
+				Post("/repos/" + repositoryName + "/issues/2/comments").
+				Times(0)
+
+			gock.New("https://api.github.com").
+				Post("/repos/" + repositoryName + "/statuses").
+				Times(0)
+
+			statusPayload := LoadFromFile("test_fixtures/github_calls/prs/with_tests/trigger_run_work-in-progress_comment_by_pr_reviewer.json")
+
+			// when
+			err := handler.HandleEvent(log, github.IssueComment, statusPayload)
+
+			// then
 			Ω(err).ShouldNot(HaveOccurred())
 		})
 	})
