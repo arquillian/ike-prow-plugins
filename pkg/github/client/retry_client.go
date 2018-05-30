@@ -102,3 +102,40 @@ func (r retryClient) CreateStatus(change scm.RepositoryChange, repoStatus *gogh.
 		return r.Client.CreateStatus(change, repoStatus)
 	})
 }
+
+func (r retryClient) ListPullRequestLabels(change scm.RepositoryChange, prNumber int) ([]*gogh.Label, error) {
+	var labels []*gogh.Label
+	err := r.retry(func() error {
+		var e error
+		labels, e = r.Client.ListPullRequestLabels(change, prNumber)
+		return e
+	})
+	return labels, err
+}
+
+func (r retryClient) AddPullRequestLabel(change scm.RepositoryChange, prNumber int, label []string) ([]*gogh.Label, error) {
+	var labels []*gogh.Label
+	err := r.retry(func() error {
+		var e error
+		labels, e = r.Client.AddPullRequestLabel(change, prNumber, label)
+		return e
+	})
+	return labels, err
+}
+
+func (r retryClient) RemovePullRequestLabel(change scm.RepositoryChange, prNumber int, label string) error {
+	return r.retry(func() error {
+		return r.Client.RemovePullRequestLabel(change, prNumber, label)
+	})
+}
+
+// GetRateLimits retrieves the rate limits for the current GH client
+func (r retryClient) GetRateLimit() (*gogh.RateLimits, error) {
+	var limits *gogh.RateLimits
+	err := r.retry(func() error {
+		var e error
+		limits, e = r.Client.GetRateLimit()
+		return e
+	})
+	return limits, err
+}

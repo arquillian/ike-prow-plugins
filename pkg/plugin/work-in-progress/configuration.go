@@ -12,13 +12,17 @@ import (
 type PluginConfiguration struct {
 	config.PluginConfiguration `yaml:",inline,omitempty"`
 	Prefix                     []string `yaml:"title_prefixes,omitempty"`
+	Label                      string   `yaml:"gh_label,omitempty"`
 	Combine                    bool     `yaml:"combine_defaults,omitempty"`
 }
+
+// DefaultLabel is the GitHub label name set in absence of any configured label name
+const DefaultLabel = "work-in-progress"
 
 // LoadConfiguration loads a PluginConfiguration for the given change
 func LoadConfiguration(log log.Logger, change scm.RepositoryChange) PluginConfiguration {
 
-	configuration := PluginConfiguration{Combine: true}
+	configuration := PluginConfiguration{Combine: true, Label: DefaultLabel}
 	loadableConfig := &ghservice.LoadableConfig{PluginName: ProwPluginName, Change: change, BaseConfig: &configuration.PluginConfiguration}
 
 	err := config.Load(&configuration, loadableConfig)

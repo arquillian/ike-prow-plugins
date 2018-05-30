@@ -39,8 +39,8 @@ type GitHubWIPPRHandler struct {
 
 var (
 	handledCommentActions = []string{"created"}
-	handledPrActions = []string{"opened", "reopened", "edited", "synchronize"}
-	defaultPrefixes  = []string{"WIP", "DO NOT MERGE", "DON'T MERGE", "WORK-IN-PROGRESS"}
+	handledPrActions      = []string{"opened", "reopened", "edited", "synchronize"}
+	defaultPrefixes       = []string{"WIP", "DO NOT MERGE", "DON'T MERGE", "WORK-IN-PROGRESS"}
 )
 
 // HandleEvent is an entry point for the plugin logic. This method is invoked by the Server when
@@ -54,10 +54,10 @@ func (gh *GitHubWIPPRHandler) HandleEvent(log log.Logger, eventType github.Event
 			return err
 		}
 
-		if !utils.Contains(handledPrActions, *event.Action) {
-			return nil
+		if err := gh.handlePrEvent(log, &event); err != nil {
+			log.Errorf("Error handling '%q' event with payload %q. Cause: %q", github.PullRequest, event, err)
+			return err
 		}
-		return gh.setStatus(log, event.PullRequest)
 
 	case github.IssueComment:
 		var event gogh.IssueCommentEvent
@@ -76,6 +76,23 @@ func (gh *GitHubWIPPRHandler) HandleEvent(log log.Logger, eventType github.Event
 	}
 
 	return nil
+}
+
+func (gh *GitHubWIPPRHandler) handlePrEvent(log log.Logger, event *gogh.PullRequestEvent) error {
+	if !utils.Contains(handledPrActions, *event.Action) {
+		return nil
+	}
+
+	return gh.setStatus(log, event.PullRequest)
+}
+
+func (gh *GitHubWIPPRHandler) hasWorkInProgressLabel(labels []*gogh.Label, wipLabel string) bool {
+	for _, label := range labels {
+		if label.GetName() == wipLabel {
+			return true
+		}
+	}
+	return false
 }
 
 // IsWorkInProgress checks if title is marked as Work In Progress
@@ -139,9 +156,26 @@ func (gh *GitHubWIPPRHandler) setStatus(log log.Logger, pullRequest *gogh.PullRe
 
 	statusContext := github.StatusContext{BotName: gh.BotName, PluginName: ProwPluginName}
 	statusService := ghservice.NewStatusService(gh.Client, log, change, statusContext)
+
+	labels, err := gh.Client.ListPullRequestLabels(change, *pullRequest.Number)
+	if err != nil {
+		log.Warnf("failed to list labels on PR [%q]. cause: %s", *pullRequest, err)
+	}
+
 	configuration := LoadConfiguration(log, change)
+	labelExists := gh.hasWorkInProgressLabel(labels, configuration.Label)
 	if gh.IsWorkInProgress(*pullRequest.Title, configuration) {
+		if !labelExists {
+			if _, err := gh.Client.AddPullRequestLabel(change, *pullRequest.Number, strings.Fields(configuration.Label)); err != nil {
+				log.Errorf("failed to add label on PR [%q]. cause: %s", pullRequest, err)
+			}
+		}
 		return statusService.Failure(InProgressMessage, InProgressDetailsLink)
+	}
+	if labelExists {
+		if err := gh.Client.RemovePullRequestLabel(change, *pullRequest.Number, configuration.Label); err != nil {
+			log.Errorf("failed to remove label on PR [%q]. cause: %s", *pullRequest, err)
+		}
 	}
 	return statusService.Success(ReadyForReviewMessage, ReadyForReviewDetailsLink)
 }

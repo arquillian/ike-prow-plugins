@@ -10,7 +10,7 @@ addons:
        - git
 
 go:
-  - "1.9.4"
+  - "1.10.2"
 
 before_install:
   - BRANCH=${TRAVIS_PULL_REQUEST_BRANCH:-$TRAVIS_BRANCH}

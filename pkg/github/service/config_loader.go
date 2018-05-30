@@ -40,13 +40,12 @@ func (l *LoadableConfig) loadFromRawFile(pathTemplate string) config.Source {
 	return func() ([]byte, error) {
 		configURL := rawFileService.GetRawFileURL(filePath)
 		downloadedConfig, err := utils.GetFileFromURL(configURL)
+		l.BaseConfig.PluginName = l.PluginName
 
 		if err != nil {
 			return nil, err
 		}
-
 		l.BaseConfig.LocationURL = githubBaseURL + rawFileService.GetRelativePath(filePath)
-		l.BaseConfig.PluginName = l.PluginName
 
 		return downloadedConfig, nil
 	}

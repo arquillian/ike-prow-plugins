@@ -1,8 +1,6 @@
 package ghclient
 
 import (
-	"context"
-
 	"github.com/arquillian/ike-prow-plugins/pkg/log"
 	"github.com/arquillian/ike-prow-plugins/pkg/scm"
 	gogh "github.com/google/go-github/github"
@@ -24,9 +22,13 @@ func (r rateLimitWatcher) logRateLimitsAfter(f func()) {
 	r.logRateLimits()
 }
 
+// GetRateLimits retrieves the rate limits for the current GH client
+func (r rateLimitWatcher) GetRateLimit() (*gogh.RateLimits, error) {
+	return r.Client.GetRateLimit()
+}
+
 func (r rateLimitWatcher) logRateLimits() {
-	ghclient := r.unwrap()
-	limits, _, e := ghclient.RateLimits(context.Background())
+	limits, e := r.GetRateLimit()
 	if e != nil {
 		r.log.Errorf("failed to load rate limits %s", e)
 		return
@@ -94,6 +96,32 @@ func (r rateLimitWatcher) CreateStatus(change scm.RepositoryChange, repoStatus *
 	var err error
 	r.logRateLimitsAfter(func() {
 		err = r.Client.CreateStatus(change, repoStatus)
+	})
+	return err
+}
+
+func (r rateLimitWatcher) ListPullRequestLabels(change scm.RepositoryChange, prNumber int) ([]*gogh.Label, error) {
+	var labels []*gogh.Label
+	var err error
+	r.logRateLimitsAfter(func() {
+		labels, err = r.Client.ListPullRequestLabels(change, prNumber)
+	})
+	return labels, err
+}
+
+func (r rateLimitWatcher) AddPullRequestLabel(change scm.RepositoryChange, prNumber int, label []string) ([]*gogh.Label, error) {
+	var labels []*gogh.Label
+	var err error
+	r.logRateLimitsAfter(func() {
+		labels, err = r.Client.AddPullRequestLabel(change, prNumber, label)
+	})
+	return labels, err
+}
+
+func (r rateLimitWatcher) RemovePullRequestLabel(change scm.RepositoryChange, prNumber int, label string) error {
+	var err error
+	r.logRateLimitsAfter(func() {
+		err = r.Client.RemovePullRequestLabel(change, prNumber, label)
 	})
 	return err
 }

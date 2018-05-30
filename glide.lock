@@ -1,5 +1,5 @@
 hash: 89baf0cd29908af47405714762c68467df13cc85df8f24a51b297c51fc6a051c
-updated: 2018-05-25T06:56:23.496463293+05:30
+updated: 2018-05-24T17:10:34.594939785+05:30
 imports:
 - name: github.com/bazelbuild/buildtools
   version: 7a46d39511ae917d3af53e0627f4b57489dd1bff
@@ -123,7 +123,7 @@ imports:
   subpackages:
   - hooks/test
 - name: github.com/spf13/pflag
-  version: 4c012f6dcd9546820e378d0bdda4d8fc772cdfea
+  version: 583c0c0531f06d5278b7d917446061adc344b5cd
 - name: golang.org/x/crypto
   version: d172538b2cfce0c13cee31e647d0367aa8cd2486
   subpackages:
@@ -229,6 +229,7 @@ imports:
   - prow/github
   - prow/hook
   - prow/kube
+  - prow/phony
   - prow/pjutil
   - prow/pluginhelp
   - prow/pluginhelp/externalplugins

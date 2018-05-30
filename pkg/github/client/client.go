@@ -24,9 +24,10 @@ type Client interface {
 	ListIssueComments(issue scm.RepositoryIssue) ([]*gogh.IssueComment, error)
 	CreateIssueComment(issue scm.RepositoryIssue, commentMsg *string) error
 	CreateStatus(change scm.RepositoryChange, repoStatus *gogh.RepoStatus) error
-	// This method is intended to be used by client decorators which need access to GH API methods not (yet)
-	// exposed by this interface
-	unwrap() *gogh.Client
+	ListPullRequestLabels(change scm.RepositoryChange, prNumber int) ([]*gogh.Label, error)
+	AddPullRequestLabel(change scm.RepositoryChange, prNumber int, label []string) ([]*gogh.Label, error)
+	RemovePullRequestLabel(change scm.RepositoryChange, prNumber int, label string) error
+	GetRateLimit() (*gogh.RateLimits, error)
 }
 
 // NewOauthClient creates a Client instance with the given oauth secret used as a access token. Underneath
@@ -94,8 +95,25 @@ func (c client) CreateStatus(change scm.RepositoryChange, repoStatus *gogh.RepoS
 	return c.checkHTTPCode(response, err)
 }
 
-func (c client) unwrap() *gogh.Client {
-	return c.gh
+func (c client) ListPullRequestLabels(change scm.RepositoryChange, prNumber int) ([]*gogh.Label, error) {
+	labels, response, err := c.gh.Issues.ListLabelsByIssue(context.Background(), change.Owner, change.RepoName, prNumber, nil)
+	return labels, c.checkHTTPCode(response, err)
+}
+
+func (c client) AddPullRequestLabel(change scm.RepositoryChange, prNumber int, label []string) ([]*gogh.Label, error) {
+	labels, response, err := c.gh.Issues.AddLabelsToIssue(context.Background(), change.Owner, change.RepoName, prNumber, label)
+	return labels, c.checkHTTPCode(response, err)
+}
+
+func (c client) RemovePullRequestLabel(change scm.RepositoryChange, prNumber int, label string) error {
+	response, err := c.gh.Issues.RemoveLabelForIssue(context.Background(), change.Owner, change.RepoName, prNumber, label)
+	return c.checkHTTPCode(response, err)
+}
+
+// GetRateLimits retrieves the rate limits for the current GH client
+func (c client) GetRateLimit() (*gogh.RateLimits, error) {
+	limits, response, e := c.gh.RateLimits(context.Background())
+	return limits, c.checkHTTPCode(response, e)
 }
 
 func (c client) checkHTTPCode(response *gogh.Response, e error) error {

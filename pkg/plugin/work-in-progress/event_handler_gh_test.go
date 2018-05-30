@@ -58,6 +58,11 @@ var _ = Describe("Test Keeper Plugin features", func() {
 			NonExistingRawGitHubFiles("work-in-progress.yml", "work-in-progress.yaml")
 
 			gock.New("https://api.github.com").
+				Get("/repos/bartoszmajsak/wfswarm-booster-pipeline-test/issues/4/labels").
+				Reply(200).
+				BodyString("[]")
+
+			gock.New("https://api.github.com").
 				Post("/repos/bartoszmajsak/wfswarm-booster-pipeline-test/statuses").
 				SetMatcher(ExpectPayload(toHaveSuccessState)).
 				Reply(201) // This way we implicitly verify that call happened after `HandleEvent` call
@@ -74,6 +79,17 @@ var _ = Describe("Test Keeper Plugin features", func() {
 		It("should mark opened PR as work-in-progress when prefixed with WIP", func() {
 			// given
 			NonExistingRawGitHubFiles("work-in-progress.yml", "work-in-progress.yaml")
+
+			gock.New("https://api.github.com").
+				Get("/repos/bartoszmajsak/wfswarm-booster-pipeline-test/issues/4/labels").
+				Reply(200).
+				BodyString("[]")
+
+			gock.New("https://api.github.com").
+				Post("/repos/bartoszmajsak/wfswarm-booster-pipeline-test/issues/4/labels").
+				SetMatcher(ExpectPayload(To(HaveBodyThatContains("work-in-progress")))).
+				Reply(200).
+				Body(FromFile("test_fixtures/github_calls/wip_pr_created_with_label.json"))
 
 			gock.New("https://api.github.com").
 				Post("/repos/bartoszmajsak/wfswarm-booster-pipeline-test/statuses").
@@ -97,6 +113,17 @@ var _ = Describe("Test Keeper Plugin features", func() {
 				Body(FromFile("test_fixtures/github_calls/work-in-progress.yml"))
 
 			gock.New("https://api.github.com").
+				Get("/repos/bartoszmajsak/wfswarm-booster-pipeline-test/issues/4/labels").
+				Reply(200).
+				BodyString("[]")
+
+			gock.New("https://api.github.com").
+				Post("/repos/bartoszmajsak/wfswarm-booster-pipeline-test/issues/4/labels").
+				SetMatcher(ExpectPayload(To(HaveBodyThatContains("wip")))).
+				Reply(200).
+				Body(FromFile("test_fixtures/github_calls/wip_pr_created_with_label.json"))
+
+			gock.New("https://api.github.com").
 				Post("/repos/bartoszmajsak/wfswarm-booster-pipeline-test/statuses").
 				SetMatcher(ExpectPayload(toHaveFailureState)).
 				Reply(201) // This way we implicitly verify that call happened after `HandleEvent` call
@@ -113,6 +140,17 @@ var _ = Describe("Test Keeper Plugin features", func() {
 		It("should mark status as failed (thus block PR merge) when title updated to contain WIP", func() {
 			// given
 			NonExistingRawGitHubFiles("work-in-progress.yml", "work-in-progress.yaml")
+
+			gock.New("https://api.github.com").
+				Get("/repos/bartoszmajsak/wfswarm-booster-pipeline-test/issues/4/labels").
+				Reply(200).
+				BodyString("[]")
+
+			gock.New("https://api.github.com").
+				Post("/repos/bartoszmajsak/wfswarm-booster-pipeline-test/issues/4/labels").
+				SetMatcher(ExpectPayload(To(HaveBodyThatContains("work-in-progress")))).
+				Reply(200).
+				Body(FromFile("test_fixtures/github_calls/pr_edited_with_label.json"))
 
 			gock.New("https://api.github.com").
 				Post("/repos/bartoszmajsak/wfswarm-booster-pipeline-test/statuses").
@@ -132,6 +170,18 @@ var _ = Describe("Test Keeper Plugin features", func() {
 		It("should mark status as success (thus unblock PR merge) when title has WIP removed", func() {
 			// given
 			NonExistingRawGitHubFiles("work-in-progress.yml", "work-in-progress.yaml")
+
+			gock.New("https://api.github.com").
+				Get("/repos/bartoszmajsak/wfswarm-booster-pipeline-test/issues/4/labels").
+				Reply(200).
+				BodyString(`[{"id": 934813958,` +
+					`"url": "https://api.github.com/repos/bartoszmajsak/wfswarm-booster-pipeline-test/labels/work-in-progress",` +
+					`"name": "work-in-progress", "color": "ededed", "default": false}]`)
+
+			gock.New("https://api.github.com").
+				Delete("/repos/bartoszmajsak/wfswarm-booster-pipeline-test/issues/4/labels/work-in-progress").
+				Reply(200).
+				Body(FromFile("test_fixtures/github_calls/pr_edited_with_unlabel.json"))
 
 			gock.New("https://api.github.com").
 				Post("/repos/bartoszmajsak/wfswarm-booster-pipeline-test/statuses").
@@ -172,6 +222,11 @@ var _ = Describe("Test Keeper Plugin features", func() {
 				BodyString(`[]`)
 
 			gock.New("https://api.github.com").
+				Get("/repos/bartoszmajsak/wfswarm-booster-pipeline-test/issues/11/labels").
+				Reply(200).
+				BodyString("[]")
+
+			gock.New("https://api.github.com").
 				Get("/repos/" + repositoryName + "/collaborators/bartoszmajsak-test/permission").
 				Reply(200).
 				Body(FromFile("test_fixtures/github_calls/collaborators_external-user_permission.json"))
@@ -208,6 +263,18 @@ var _ = Describe("Test Keeper Plugin features", func() {
 				Get("/repos/" + repositoryName + "/collaborators/bartoszmajsak/permission").
 				Reply(200).
 				Body(FromFile("test_fixtures/github_calls/collaborators_repo-admin_permission.json"))
+
+			gock.New("https://api.github.com").
+				Get("/repos/bartoszmajsak/wfswarm-booster-pipeline-test/issues/11/labels").
+				Reply(200).
+				BodyString("[]")
+
+			gock.New("https://api.github.com").
+				Post("/repos/bartoszmajsak/wfswarm-booster-pipeline-test/issues/11/labels").
+				SetMatcher(ExpectPayload(To(HaveBodyThatContains("work-in-progress")))).
+				Reply(200).
+				BodyString("work-in-progress")
+
 
 			gock.New("https://api.github.com").
 				Post("/repos/bartoszmajsak/wfswarm-booster-pipeline-test/statuses").
