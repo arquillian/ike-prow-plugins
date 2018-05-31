@@ -1,0 +1,5 @@
+{{.Thumbnail}}
+
+{{.Description}}
+
+Your plugin configuration is stored in the [file]({{.ConfigFile}}).
