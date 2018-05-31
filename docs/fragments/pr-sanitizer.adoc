@@ -1,0 +1,51 @@
+== PR Sanitizer Plugin
+
+This plugin enforces that the PR title comforms with the semantic commit message style. Conformance with the semantic commit message style not only makes your changelog and git history clean and easy to navigate but also encourages making atomic commits that are more clearly understood.
+
+A rigid semantic commit message style obeys the below format.
+
+[source, shell, indent=0]
+----
+<type>(<scope>): <subject>
+----
+* where `<scope>` is optional.
+
+*Example* 
+
+[source, shell, indent=0]
+----
+feat: add beta sequence
+^--^  ^---------------^
+|     |
+|     +-> Summary in present tense.
+|
++-------> Type: chore, docs, feat, fix, refactor, style, or test.
+----
+* where each of `<type>` categorizes the PR according to the change introduced.
+  - `feat`: introducing new feature in codebase
+  - `fix`: patching bug in codebase
+  - `docs`: changes to the documentation
+  - `style`: formatting, missing semi colons, etc; no production code change
+  - `refactor`: refactoring production code, eg. renaming a variable
+  - `test`: adding missing tests, refactoring tests; no production code change
+  - `chore`: updating build scripts, grunt tasks etc; no production code change
+
+If the PR title is prefixed with any of the default types listed above or any of the user configured types as described below (non-case sensitive) then the plugin marks its check as **Success**, or as **Failure** otherwise.
+
+=== Plugin Configuration [[pr-sanitizer-config]]
+
+To configure PR Sanitizer plugin place `pr-sanitizer.yml` (or `pr-sanitizer.yaml`) file inside of the directory `.ike-prow/` in your project and use properties described below.
+
+.pr-sanitizer.yaml
+[source, yml, indent=0]
+----
+include::../../pkg/plugin/pr-sanitizer/test_fixtures/github_calls/pr-sanitizer.yml[]
+----
+
+<1> Defines set of custom types which will be used to match titles prefixes in changeset and determine if Pull Requests Title conforms with the semantic message style. (Eg. above code snippet configures emoji style semantic commit message.)
+<2> Allows you to decide if you want to combine your patterns with the list (`feat`, `fix`, `refactor`, `docs`, `test`, `chore`, `style`) of predefined default types (`true` by default).
+
+=== Status details
+
+include::{asciidoctor-source}/fragments/status/pr-sanitizer/success/pr-sanitizer-success.adoc[leveloffset=1]
+include::{asciidoctor-source}/fragments/status/pr-sanitizer/failure/pr-sanitizer-failed.adoc[leveloffset=1]

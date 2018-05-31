@@ -57,3 +57,4 @@ NOTE: More details about GitHub hooks can be found in the link:https://developer
 
 include::{asciidoctor-source}/fragments/test-keeper.adoc[leveloffset=1]
 include::{asciidoctor-source}/fragments/work-in-progress.adoc[leveloffset=1]
+include::{asciidoctor-source}/fragments/pr-sanitizer.adoc[leveloffset=1]
