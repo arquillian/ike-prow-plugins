@@ -102,11 +102,7 @@ var _ = Describe("Test keeper config loader features", func() {
 
 		It("should not load test-keeper configuration yaml file and return empty url when config is not accessible", func() {
 			// given
-			NonExistingRawGitHubFiles(".ike-prow/test-keeper.yml")
-
-			gock.New("https://raw.githubusercontent.com").
-				Get("owner/repo/46cb8fac44709e4ccaae97448c65e8f7320cfea7/" + configFilePath  + ".yaml").
-				Reply(404)
+			NonExistingRawGitHubFiles(".ike-prow/test-keeper.yml", ".ike-prow/test-keeper.yaml")
 
 			change := scm.RepositoryChange{
 				Owner:    "owner",

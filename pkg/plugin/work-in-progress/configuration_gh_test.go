@@ -49,11 +49,7 @@ var _ = Describe("Work In Progress config loader features", func() {
 
 		It("should not load work-in-progress configuration yaml file and return empty url when config is not accessible", func() {
 			// given
-			NonExistingRawGitHubFiles("work-in-progress.yml")
-
-			gock.New("https://raw.githubusercontent.com").
-				Get("owner/repo/46cb8fac44709e4ccaae97448c65e8f7320cfea7/" + configFilePath + ".yaml").
-				Reply(404)
+			NonExistingRawGitHubFiles("work-in-progress.yml", "work-in-progress.yaml")
 
 			change := scm.RepositoryChange{
 				Owner:    "owner",
