@@ -1,10 +1,12 @@
 package prsanitizer_test
 
 import (
+	"fmt"
 	"strings"
 
 	. "github.com/arquillian/ike-prow-plugins/pkg/internal/test"
 	"github.com/arquillian/ike-prow-plugins/pkg/log"
+	"github.com/arquillian/ike-prow-plugins/pkg/plugin"
 	"github.com/arquillian/ike-prow-plugins/pkg/plugin/pr-sanitizer"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -18,7 +20,10 @@ const (
 	botName = "alien-ike"
 )
 
-var expectedContext = strings.Join([]string{botName, prsanitizer.ProwPluginName}, "/")
+var (
+	expectedContext = strings.Join([]string{botName, prsanitizer.ProwPluginName}, "/")
+	docStatusRoot   = fmt.Sprintf("%s/status/%s", plugin.DocumentationURL, prsanitizer.ProwPluginName)
+)
 
 var _ = Describe("PR Sanitizer Plugin features", func() {
 
@@ -33,14 +38,14 @@ var _ = Describe("PR Sanitizer Plugin features", func() {
 			HaveState(github.StatusSuccess),
 			HaveDescription(prsanitizer.SuccessMessage),
 			HaveContext(expectedContext),
-			HaveTargetURL(prsanitizer.SuccessDetailsLink),
+			HaveTargetURL(fmt.Sprintf("%s/%s/%s.html", docStatusRoot, "success", prsanitizer.SuccessDetailsLink)),
 		)
 
 		toHaveFailureState := SoftlySatisfyAll(
 			HaveState(github.StatusFailure),
 			HaveDescription(prsanitizer.FailureMessage),
 			HaveContext(expectedContext),
-			HaveTargetURL(prsanitizer.FailureDetailsLink),
+			HaveTargetURL(fmt.Sprintf("%s/%s/%s.html", docStatusRoot, "failure", prsanitizer.FailureDetailsLink)),
 		)
 
 		BeforeEach(func() {

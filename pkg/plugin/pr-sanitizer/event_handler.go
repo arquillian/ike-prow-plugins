@@ -19,14 +19,13 @@ const (
 	ProwPluginName = "pr-sanitizer"
 
 	// FailureMessage is a message used in GH Status as description when the PR title does not follow semantic message style
-	FailureMessage = "It appears that the PR title does not conform with semantic commit message style." +
-		"\n\n" +
-		"A minor change to your commit message style can make your changelog and git history clean and easy to navigate."
+	FailureMessage = "PR title does not conform with semantic commit message style."
+
 	// FailureDetailsLink is a link to an anchor in arq documentation that contains additional status details for InProgressMessage
 	FailureDetailsLink = plugin.DocumentationURL + "#prsanitizer-failed"
 
 	// SuccessMessage is a message used in GH Status as description when the PR title conforms to the semantic commit message style
-	SuccessMessage = "Thank you for conforming with the semantic commit message style."
+	SuccessMessage = "PR title conforms with semantic commit message style."
 	// SuccessDetailsLink is a link to an anchor in arq documentation that contains additional status details for ReadyForReviewMessage
 	SuccessDetailsLink = plugin.DocumentationURL + "#prsanitizer-success"
 )
