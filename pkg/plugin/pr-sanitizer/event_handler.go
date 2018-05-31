@@ -8,7 +8,6 @@ import (
 	"github.com/arquillian/ike-prow-plugins/pkg/github/client"
 	"github.com/arquillian/ike-prow-plugins/pkg/github/service"
 	"github.com/arquillian/ike-prow-plugins/pkg/log"
-	"github.com/arquillian/ike-prow-plugins/pkg/plugin"
 	"github.com/arquillian/ike-prow-plugins/pkg/scm"
 	"github.com/arquillian/ike-prow-plugins/pkg/utils"
 	gogh "github.com/google/go-github/github"
@@ -21,13 +20,13 @@ const (
 	// FailureMessage is a message used in GH Status as description when the PR title does not follow semantic message style
 	FailureMessage = "PR title does not conform with semantic commit message style."
 
-	// FailureDetailsLink is a link to an anchor in arq documentation that contains additional status details for InProgressMessage
-	FailureDetailsLink = plugin.DocumentationURL + "#prsanitizer-failed"
+	// FailureDetailsLink is a link to an anchor in arq documentation that contains additional status details for failure state
+	FailureDetailsLink = "prsanitizer-failed"
 
 	// SuccessMessage is a message used in GH Status as description when the PR title conforms to the semantic commit message style
 	SuccessMessage = "PR title conforms with semantic commit message style."
-	// SuccessDetailsLink is a link to an anchor in arq documentation that contains additional status details for ReadyForReviewMessage
-	SuccessDetailsLink = plugin.DocumentationURL + "#prsanitizer-success"
+	// SuccessDetailsLink is a link to an anchor in arq documentation that contains additional status details for success state
+	SuccessDetailsLink = "prsanitizer-success"
 )
 
 // GitHubLabelsEventsHandler is the event handler for the plugin.
@@ -65,7 +64,7 @@ func (gh *GitHubLabelsEventsHandler) HandleEvent(log log.Logger, eventType githu
 		statusContext := github.StatusContext{BotName: gh.BotName, PluginName: ProwPluginName}
 		statusService := ghservice.NewStatusService(gh.Client, log, change, statusContext)
 		configuration := LoadConfiguration(log, change)
-		if gh.HasSemanticMessage(*event.PullRequest.Title, configuration) {
+		if gh.HasTitleWithValidType(*event.PullRequest.Title, configuration) {
 			return statusService.Success(SuccessMessage, SuccessDetailsLink)
 		}
 		return statusService.Failure(FailureMessage, FailureDetailsLink)
@@ -76,8 +75,8 @@ func (gh *GitHubLabelsEventsHandler) HandleEvent(log log.Logger, eventType githu
 	return nil
 }
 
-// HasSemanticMessage checks if title is marked as Work In Progress
-func (gh *GitHubLabelsEventsHandler) HasSemanticMessage(title string, config PluginConfiguration) bool {
+// HasTitleWithValidType checks if title prefix conforms with semantic message style
+func (gh *GitHubLabelsEventsHandler) HasTitleWithValidType(title string, config PluginConfiguration) bool {
 	prefixes := defaultTypes
 	if len(config.TypePrefix) != 0 {
 		if config.Combine {
@@ -88,7 +87,7 @@ func (gh *GitHubLabelsEventsHandler) HasSemanticMessage(title string, config Plu
 	}
 
 	for _, prefix := range prefixes {
-		if strings.HasPrefix(strings.ToLower(title), prefix) {
+		if strings.HasPrefix(strings.ToLower(title), strings.ToLower(prefix)) {
 			return true
 		}
 	}

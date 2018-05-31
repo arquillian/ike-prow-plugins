@@ -19,7 +19,7 @@ var _ = Describe("PR Sanitizer config loader features", func() {
 
 	AfterEach(EnsureGockRequestsHaveBeenMatched)
 
-	Context("Loading test-keeper configuration file from GitHub repository", func() {
+	Context("Loading pr-sanitizer configuration file from GitHub repository", func() {
 
 		logger := log.NewTestLogger()
 		configFilePath := ghservice.ConfigHome + prsanitizer.ProwPluginName
@@ -47,11 +47,7 @@ var _ = Describe("PR Sanitizer config loader features", func() {
 
 		It("should not load pr-sanitizer configuration yaml file and return empty url when config is not accessible", func() {
 			// given
-			NonExistingRawGitHubFiles("pr-sanitizer.yml")
-
-			gock.New("https://raw.githubusercontent.com").
-				Get("owner/repo/46cb8fac44709e4ccaae97448c65e8f7320cfea7/" + configFilePath + ".yaml").
-				Reply(404)
+			NonExistingRawGitHubFiles(".ike-prow/pr-sanitizer.yml", ".ike-prow/pr-sanitizer.yaml")
 
 			change := scm.RepositoryChange{
 				Owner:    "owner",

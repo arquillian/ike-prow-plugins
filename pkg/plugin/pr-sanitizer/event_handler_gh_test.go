@@ -103,7 +103,7 @@ var _ = Describe("PR Sanitizer Plugin features", func() {
 				SetMatcher(ExpectPayload(toHaveSuccessState)).
 				Reply(201) // This way we implicitly verify that call happened after `HandleEvent` call
 
-			statusPayload := LoadFromFile("test_fixtures/github_calls/custom_prefix_pr_opened.json")
+			statusPayload := LoadFromFile("test_fixtures/github_calls/custom_prefix_pr_edited.json")
 
 			// when
 			err := handler.HandleEvent(log, github.PullRequest, statusPayload)

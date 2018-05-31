@@ -20,7 +20,7 @@ var _ = Describe("PR-Sanitizer Plugin features", func() {
 
 		DescribeTable("should recognize PR as compliant with semantic commit message if title starts with any default prefix",
 			func(title string) {
-				Expect(handler.HasSemanticMessage(title, prsanitizer.PluginConfiguration{})).To(BeTrue())
+				Expect(handler.HasTitleWithValidType(title, prsanitizer.PluginConfiguration{})).To(BeTrue())
 			},
 			Entry("chore prefix", "chore(#1): add Oyster build script"),
 			Entry("docs prefix", "docs(#1): explain hat wobble"),
@@ -33,7 +33,7 @@ var _ = Describe("PR-Sanitizer Plugin features", func() {
 
 		DescribeTable("should not recognize PR as compliant with semantic commit message if title doesn't start with any default prefix",
 			func(title string) {
-				Expect(handler.HasSemanticMessage(title, prsanitizer.PluginConfiguration{})).To(BeFalse())
+				Expect(handler.HasTitleWithValidType(title, prsanitizer.PluginConfiguration{})).To(BeFalse())
 			},
 			Entry("not a supported semantic commit prefix", "wip-fix off-by one bug"),
 			Entry("empty title", ""),

@@ -7,11 +7,11 @@ import (
 	"github.com/arquillian/ike-prow-plugins/pkg/scm"
 )
 
-// PluginConfiguration defines prefix patterns set of PR titles will be matched against
-// It's unmarshaled from work-in-progress.yml configuration file
+// PluginConfiguration defines prefix patterns set against which PR titles will be matched 
+// It's unmarshaled from pr-sanitizer.yml configuration file
 type PluginConfiguration struct {
 	config.PluginConfiguration `yaml:",inline,omitempty"`
-	TypePrefix                     []string `yaml:"type_prefixes,omitempty"`
+	TypePrefix                 []string `yaml:"type_prefixes,omitempty"`
 	Combine                    bool     `yaml:"combine_defaults,omitempty"`
 }
 
