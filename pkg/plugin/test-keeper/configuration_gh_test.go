@@ -43,7 +43,7 @@ var _ = Describe("Test keeper config loader features", func() {
 			configuration := testkeeper.LoadConfiguration(logger, change)
 
 			// then
-			Expect(configuration.LocationURL).To(Equal("https://github.com/owner/repo/46cb8fac44709e4ccaae97448c65e8f7320cfea7/.ike-prow/test-keeper.yml"))
+			Expect(configuration.LocationURL).To(Equal("https://github.com/owner/repo/blob/46cb8fac44709e4ccaae97448c65e8f7320cfea7/.ike-prow/test-keeper.yml"))
 			Expect(configuration.PluginName).To(Equal(testkeeper.ProwPluginName))
 			Expect(configuration.PluginHint).To(Equal("http://my.server.com/message.md"))
 		})

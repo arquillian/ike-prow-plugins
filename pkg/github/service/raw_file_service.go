@@ -15,10 +15,14 @@ type RawFileService struct {
 
 // GetRawFileURL creates a url to the given path related to the GitHub repository change
 func (s *RawFileService) GetRawFileURL(path string) string {
-	return fmt.Sprintf(rawURL, s.GetRelativePath(path))
+	return fmt.Sprintf(rawURL, s.GetRelativePath(path, false))
 }
 
 // GetRelativePath creates repository specific relative path
-func (s *RawFileService) GetRelativePath(path string) string {
-	return fmt.Sprintf("%s/%s/%s/%s", s.Change.Owner, s.Change.RepoName, s.Change.Hash, path)
+func (s *RawFileService) GetRelativePath(path string, useBlob bool) string {
+	repoPath := s.Change.Owner +"/"+ s.Change.RepoName
+	if useBlob {
+		repoPath += "/blob"
+	}
+	return fmt.Sprintf("%s/%s/%s", repoPath, s.Change.Hash, path)
 }
