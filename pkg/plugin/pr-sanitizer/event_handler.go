@@ -21,12 +21,12 @@ const (
 	FailureMessage = "PR title does not conform with semantic commit message style."
 
 	// FailureDetailsLink is a link to an anchor in arq documentation that contains additional status details for failure state
-	FailureDetailsLink = "prsanitizer-failed"
+	FailureDetailsLink = "pr-sanitizer-failed"
 
 	// SuccessMessage is a message used in GH Status as description when the PR title conforms to the semantic commit message style
 	SuccessMessage = "PR title conforms with semantic commit message style."
 	// SuccessDetailsLink is a link to an anchor in arq documentation that contains additional status details for success state
-	SuccessDetailsLink = "prsanitizer-success"
+	SuccessDetailsLink = "pr-sanitizer-success"
 )
 
 // GitHubLabelsEventsHandler is the event handler for the plugin.

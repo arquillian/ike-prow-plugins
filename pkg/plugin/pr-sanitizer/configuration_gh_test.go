@@ -47,7 +47,7 @@ var _ = Describe("PR Sanitizer config loader features", func() {
 
 		It("should not load pr-sanitizer configuration yaml file and return empty url when config is not accessible", func() {
 			// given
-			NonExistingRawGitHubFiles(".ike-prow/pr-sanitizer.yml", ".ike-prow/pr-sanitizer.yaml")
+			NonExistingRawGitHubFiles("pr-sanitizer.yml", "pr-sanitizer.yaml")
 
 			change := scm.RepositoryChange{
 				Owner:    "owner",
