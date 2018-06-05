@@ -101,7 +101,9 @@ func (gh *GitHubTestEventsHandler) handlePrComment(log log.Logger, comment *gogh
 		UserPermissionService: userPerm,
 		WhenAddedOrEdited: func() error {
 			return gh.loadPRCheckTestsAndSetStatus(prLoader, log)
-		}}, &BypassCmd{
+		}})
+
+	cmdHandler.Register(&BypassCmd{
 		userPermissionService: userPerm,
 		whenDeleted: func() error {
 			return gh.loadPRCheckTestsAndSetStatus(prLoader, log)
