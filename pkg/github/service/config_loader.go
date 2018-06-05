@@ -45,7 +45,7 @@ func (l *LoadableConfig) loadFromRawFile(pathTemplate string) config.Source {
 		if err != nil {
 			return nil, err
 		}
-		l.BaseConfig.LocationURL = githubBaseURL + rawFileService.GetRelativePath(filePath)
+		l.BaseConfig.LocationURL = githubBaseURL + rawFileService.GetRelativePath(filePath, true)
 
 		return downloadedConfig, nil
 	}
