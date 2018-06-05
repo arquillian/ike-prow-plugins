@@ -19,10 +19,12 @@ var _ = Describe("Comment message creation", func() {
 		It("should create default message referencing to documentation when url to config is empty", func() {
 			// given
 			conf := config.PluginConfiguration{PluginName: ProwPluginName}
-			message := &comment.Message{ConfigFile: conf.LocationURL, Documentation: "#_my_test_plugin"}
+			comment := &comment.Comment{
+				Message: &comment.Message{ConfigFile: conf.LocationURL, Documentation: "#_my_test_plugin"},
+			}
 
 			// when
-			msg := message.LoadMessage(conf, scm.RepositoryChange{})
+			msg := comment.LoadMessage(conf, scm.RepositoryChange{})
 
 			// then
 			Expect(msg).To(ContainSubstring("http://arquillian.org/ike-prow-plugins/#_my_test_plugin"))
@@ -32,10 +34,12 @@ var _ = Describe("Comment message creation", func() {
 			// given
 			url := "http://github.com/my/repo/my-test-plugin.yaml"
 			conf := config.PluginConfiguration{LocationURL: url}
-			message := &comment.Message{ConfigFile: conf.LocationURL, Documentation: "#_my_test_plugin"}
+			comment := &comment.Comment{
+				Message: &comment.Message{ConfigFile: conf.LocationURL, Documentation: "#_my_test_plugin"},
+			}
 
 			// when
-			msg := message.LoadMessage(conf, scm.RepositoryChange{})
+			msg := comment.LoadMessage(conf, scm.RepositoryChange{})
 
 			// then
 			Expect(msg).NotTo(ContainSubstring("http://arquillian.org/ike-prow-plugins/#_my_test_plugin"))
@@ -70,10 +74,12 @@ var _ = Describe("Comment message creation", func() {
 				Hash:     "46cb8fac44709e4ccaae97448c65e8f7320cfea7",
 			}
 
-			message := &comment.Message{ConfigFile: conf.LocationURL, Documentation: "#_my_test_plugin"}
+			comment := &comment.Comment{
+				Message: &comment.Message{ConfigFile: conf.LocationURL, Documentation: "#_my_test_plugin"},
+			}
 
 			// when
-			msg := message.LoadMessage(conf, change)
+			msg := comment.LoadMessage(conf, change)
 
 			// then
 			Expect(msg).To(Equal("Custom message"))
@@ -96,10 +102,12 @@ var _ = Describe("Comment message creation", func() {
 				Hash:     "46cb8fac44709e4ccaae97448c65e8f7320cfea7",
 			}
 
-			message := &comment.Message{ConfigFile: conf.LocationURL, Documentation: "#_my_test_plugin"}
+			comment := &comment.Comment{
+				Message: &comment.Message{ConfigFile: conf.LocationURL, Documentation: "#_my_test_plugin"},
+			}
 
 			// when
-			msg := message.LoadMessage(conf, change)
+			msg := comment.LoadMessage(conf, change)
 
 			// then
 			Expect(msg).To(Equal("Custom message"))
@@ -137,10 +145,12 @@ var _ = Describe("Comment message creation", func() {
 				Hash:     "46cb8fac44709e4ccaae97448c65e8f7320cfea7",
 			}
 
-			message := &comment.Message{ConfigFile: conf.LocationURL, Documentation: "#_my_test_plugin"}
+			comment := &comment.Comment{
+				Message: &comment.Message{ConfigFile: conf.LocationURL, Documentation: "#_my_test_plugin"},
+			}
 
 			// when
-			msg := message.LoadMessage(conf, change)
+			msg := comment.LoadMessage(conf, change)
 
 			// then
 			Expect(msg).To(Equal("Custom message"))
@@ -163,10 +173,12 @@ var _ = Describe("Comment message creation", func() {
 				Hash:     "46cb8fac44709e4ccaae97448c65e8f7320cfea7",
 			}
 
-			message := &comment.Message{ConfigFile: conf.LocationURL, Documentation: "#_my_test_plugin"}
+			comment := &comment.Comment{
+				Message: &comment.Message{ConfigFile: conf.LocationURL, Documentation: "#_my_test_plugin"},
+			}
 
 			// when
-			msg := message.LoadMessage(conf, change)
+			msg := comment.LoadMessage(conf, change)
 
 			// then
 			Expect(msg).NotTo(ContainSubstring("http://arquillian.org/ike-prow-plugins/#_my_test_plugin"))
@@ -189,10 +201,12 @@ var _ = Describe("Comment message creation", func() {
 				PluginHint:  "http://my.server.com/path/to/my-test-plugin_hint.md",
 			}
 
-			message := &comment.Message{ConfigFile: conf.LocationURL, Documentation: "#_my_test_plugin"}
+			comment := &comment.Comment{
+				Message: &comment.Message{ConfigFile: conf.LocationURL, Documentation: "#_my_test_plugin"},
+			}
 
 			// when
-			msg := message.LoadMessage(conf, scm.RepositoryChange{})
+			msg := comment.LoadMessage(conf, scm.RepositoryChange{})
 
 			// then
 			Expect(msg).To(Equal("Custom message"))
@@ -212,10 +226,12 @@ var _ = Describe("Comment message creation", func() {
 				PluginHint:  "http://my.server.com/path/to/MY-TEST-PLUGIN_HINT.MD",
 			}
 
-			message := &comment.Message{ConfigFile: conf.LocationURL, Documentation: "#_my_test_plugin"}
+			comment := &comment.Comment{
+				Message: &comment.Message{ConfigFile: conf.LocationURL, Documentation: "#_my_test_plugin"},
+			}
 
 			// when
-			msg := message.LoadMessage(conf, scm.RepositoryChange{})
+			msg := comment.LoadMessage(conf, scm.RepositoryChange{})
 
 			// then
 			Expect(msg).To(Equal("Custom message"))
@@ -234,10 +250,12 @@ var _ = Describe("Comment message creation", func() {
 				PluginHint:  "http://my.server.com/path/to/my-test-plugin_hint.md",
 			}
 
-			message := &comment.Message{ConfigFile: conf.LocationURL, Documentation: "#_my_test_plugin"}
+			comment := &comment.Comment{
+				Message: &comment.Message{ConfigFile: conf.LocationURL, Documentation: "#_my_test_plugin"},
+			}
 
 			// when
-			msg := message.LoadMessage(conf, scm.RepositoryChange{})
+			msg := comment.LoadMessage(conf, scm.RepositoryChange{})
 
 			// then
 			Expect(msg).NotTo(ContainSubstring("http://arquillian.org/ike-prow-plugins/#_my_test_plugin"))
@@ -267,10 +285,12 @@ var _ = Describe("Comment message creation", func() {
 				Hash:     "46cb8fac44709e4ccaae97448c65e8f7320cfea7",
 			}
 
-			message := &comment.Message{ConfigFile: conf.LocationURL, Documentation: "#_my_test_plugin"}
+			comment := &comment.Comment{
+				Message: &comment.Message{ConfigFile: conf.LocationURL, Documentation: "#_my_test_plugin"},
+			}
 
 			// when
-			msg := message.LoadMessage(conf, change)
+			msg := comment.LoadMessage(conf, change)
 
 			// then
 			Expect(msg).NotTo(ContainSubstring("http://arquillian.org/ike-prow-plugins/#_my_test_plugin"))
@@ -289,10 +309,12 @@ var _ = Describe("Comment message creation", func() {
 				PluginHint:  "Custom message",
 			}
 
-			message := &comment.Message{ConfigFile: conf.LocationURL, Documentation: "#_my_test_plugin"}
+			comment := &comment.Comment{
+				Message: &comment.Message{ConfigFile: conf.LocationURL, Documentation: "#_my_test_plugin"},
+			}
 
 			// when
-			msg := message.LoadMessage(conf, scm.RepositoryChange{})
+			msg := comment.LoadMessage(conf, scm.RepositoryChange{})
 
 			// then
 			Expect(msg).To(Equal("Custom message"))
@@ -311,10 +333,12 @@ var _ = Describe("Comment message creation", func() {
 				PluginHint:  "http://my.server.com/path/to/custom_message_file.md",
 			}
 
-			message := &comment.Message{ConfigFile: conf.LocationURL, Documentation: "#_my_test_plugin"}
+			comment := &comment.Comment{
+				Message: &comment.Message{ConfigFile: conf.LocationURL, Documentation: "#_my_test_plugin"},
+			}
 
 			// when
-			msg := message.LoadMessage(conf, scm.RepositoryChange{})
+			msg := comment.LoadMessage(conf, scm.RepositoryChange{})
 
 			// then
 			Expect(msg).NotTo(ContainSubstring("http://arquillian.org/ike-prow-plugins/#_my_test_plugin"))

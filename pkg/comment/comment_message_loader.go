@@ -10,11 +10,18 @@ import (
 	assets "github.com/arquillian/ike-prow-plugins/pkg/assets/generated"
 	"github.com/arquillian/ike-prow-plugins/pkg/config"
 	"github.com/arquillian/ike-prow-plugins/pkg/github/service"
+	"github.com/arquillian/ike-prow-plugins/pkg/log"
 	"github.com/arquillian/ike-prow-plugins/pkg/scm"
 	"github.com/arquillian/ike-prow-plugins/pkg/utils"
 )
 
-// Message struct for the plugin comment service
+// Comment struct for the plugin comment service
+type Comment struct {
+	Message *Message
+	Log     log.Logger
+}
+
+// Message struct for message template data for the plugin comment service
 type Message struct {
 	Thumbnail      string
 	Description    string
@@ -24,41 +31,44 @@ type Message struct {
 }
 
 // LoadMessage loads a comment message for the plugins from the template files. If the comment message is set in config then it takes that one, the default otherwise.
-func (commentMessage *Message) LoadMessage(configuration config.PluginConfiguration, change scm.RepositoryChange) string {
+func (comment *Comment) LoadMessage(configuration config.PluginConfiguration, change scm.RepositoryChange) string {
 	var msg string
 	if configuration.PluginHint != "" {
-		msg = commentMessage.getMsgFromConfigHint(configuration, change)
-	} else if content := defaultFileContent(configuration, change); content != "" {
+		msg = comment.getMsgFromConfigHint(configuration, change)
+	} else if content := comment.defaultFileContent(configuration, change); content != "" {
 		msg = content
 	} else if configuration.LocationURL == "" {
-		msg = loadMessageTemplate("message-with-no-config.txt")
+		msg = comment.loadMessageTemplate("message-with-no-config.txt")
 	} else {
-		msg = loadMessageTemplate("message-with-config.txt")
+		msg = comment.loadMessageTemplate("message-with-config.txt")
 	}
-	return commentMessage.getMsgFromTemplate(msg)
+	return comment.getMsgFromTemplate(msg)
 }
 
-func (commentMessage *Message) getMsgFromTemplate(msg string) string {
+func (comment *Comment) getMsgFromTemplate(msg string) string {
 	var tpl bytes.Buffer
 	msgTemplate, err := template.New("message").Parse(msg)
-	err = msgTemplate.Execute(&tpl, commentMessage)
 	if err != nil {
-		return ""
+		comment.Log.Errorf("falied to parse template file %s", err)
+	}
+	err = msgTemplate.Execute(&tpl, comment.Message)
+	if err != nil {
+		comment.Log.Errorf("failed to write template output %s", err)
 	}
 	return tpl.String()
 }
 
-func (commentMessage *Message) getMsgFromConfigHint(configuration config.PluginConfiguration, change scm.RepositoryChange) string {
+func (comment *Comment) getMsgFromConfigHint(configuration config.PluginConfiguration, change scm.RepositoryChange) string {
 	fileRegex := "(?mi)" + configuration.PluginName + "_hint.md$"
 
 	isFilePath, err := regexp.MatchString(fileRegex, configuration.PluginHint)
 	if isFilePath && err == nil {
-		return commentMessage.getMsgFromFile(configuration, change)
+		return comment.getMsgFromFile(configuration, change)
 	}
 	return configuration.PluginHint
 }
 
-func (commentMessage *Message) getMsgFromFile(configuration config.PluginConfiguration, change scm.RepositoryChange) string {
+func (comment *Comment) getMsgFromFile(configuration config.PluginConfiguration, change scm.RepositoryChange) string {
 	_, err := url.ParseRequestURI(configuration.PluginHint)
 
 	var content []byte
@@ -73,14 +83,14 @@ func (commentMessage *Message) getMsgFromFile(configuration config.PluginConfigu
 	content, err = utils.GetFileFromURL(msgFileURL)
 
 	if err != nil {
-		commentMessage.MessageFileURL = msgFileURL
-		return loadMessageTemplate("message-with-hint-file-not-found.txt")
+		comment.Message.MessageFileURL = msgFileURL
+		return comment.loadMessageTemplate("message-with-hint-file-not-found.txt")
 	}
 
 	return string(content)
 }
 
-func defaultFileContent(configuration config.PluginConfiguration, change scm.RepositoryChange) string {
+func (comment *Comment) defaultFileContent(configuration config.PluginConfiguration, change scm.RepositoryChange) string {
 	pluginHintPath := fmt.Sprintf("%s%s_hint.md", ghservice.ConfigHome, configuration.PluginName)
 	ghFileService := ghservice.RawFileService{Change: change}
 	hintURL := ghFileService.GetRawFileURL(pluginHintPath)
@@ -92,10 +102,10 @@ func defaultFileContent(configuration config.PluginConfiguration, change scm.Rep
 	return string(content)
 }
 
-func loadMessageTemplate(file string) string {
+func (comment *Comment) loadMessageTemplate(file string) string {
 	asset, err := assets.Asset(file)
 	if err != nil {
-		return ""
+		comment.Log.Errorf("failed to load template asset file %s", err)
 	}
 	return string(asset)
 }

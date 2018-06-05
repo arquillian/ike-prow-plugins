@@ -2,6 +2,7 @@ package testkeeper
 
 import (
 	"github.com/arquillian/ike-prow-plugins/pkg/comment"
+	"github.com/arquillian/ike-prow-plugins/pkg/log"
 	"github.com/arquillian/ike-prow-plugins/pkg/scm"
 )
 
@@ -21,12 +22,15 @@ const (
 )
 
 // CreateCommentMessage creates a comment message for the test-keeper plugin. If the comment message is set in config then it takes that one, the default otherwise.
-func CreateCommentMessage(configuration PluginConfiguration, change scm.RepositoryChange) string {
-	message := &comment.Message{
-		Thumbnail:     sadIke,
-		Description:   beginning,
-		ConfigFile:    configuration.LocationURL,
-		Documentation: documentationSection,
+func CreateCommentMessage(configuration PluginConfiguration, change scm.RepositoryChange, log log.Logger) string {
+	comment := &comment.Comment{
+		Log: log,
+		Message: &comment.Message{
+			Thumbnail:     sadIke,
+			Description:   beginning,
+			ConfigFile:    configuration.LocationURL,
+			Documentation: documentationSection,
+		},
 	}
-	return message.LoadMessage(configuration.PluginConfiguration, change)
+	return comment.LoadMessage(configuration.PluginConfiguration, change)
 }
