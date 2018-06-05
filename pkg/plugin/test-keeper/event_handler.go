@@ -100,19 +100,11 @@ func (gh *GitHubTestEventsHandler) handlePrComment(log log.Logger, comment *gogh
 		PluginName:            ProwPluginName,
 		UserPermissionService: userPerm,
 		WhenAddedOrEdited: func() error {
-			pullRequest, err := prLoader.Load()
-			if err != nil {
-				return err
-			}
-			return gh.checkTestsAndSetStatus(log, pullRequest)
+			return gh.loadPRCheckTestsAndSetStatus(prLoader, log)
 		}}, &BypassCmd{
 		userPermissionService: userPerm,
 		whenDeleted: func() error {
-			pullRequest, err := prLoader.Load()
-			if err != nil {
-				return err
-			}
-			return gh.checkTestsAndSetStatus(log, pullRequest)
+			return gh.loadPRCheckTestsAndSetStatus(prLoader, log)
 		},
 		whenAddedOrEdited: func() error {
 			pullRequest, err := prLoader.Load()
@@ -194,4 +186,12 @@ func (gh *GitHubTestEventsHandler) checkTests(log log.Logger, change scm.Reposit
 	}
 
 	return fileCategories, err
+}
+
+func (gh *GitHubTestEventsHandler) loadPRCheckTestsAndSetStatus(prLoader *ghservice.PullRequestLazyLoader, log log.Logger) error {
+	pullRequest, err := prLoader.Load()
+	if err != nil {
+		return err
+	}
+	return gh.checkTestsAndSetStatus(log, pullRequest)
 }
