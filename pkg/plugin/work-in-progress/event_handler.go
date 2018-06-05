@@ -82,7 +82,7 @@ func (gh *GitHubWIPPRHandler) handlePrEvent(log log.Logger, event *gogh.PullRequ
 		return nil
 	}
 
-	return gh.setStatus(log, event.PullRequest)
+	return gh.checkTitleAndSetStatus(log, event.PullRequest)
 }
 
 func (gh *GitHubWIPPRHandler) hasWorkInProgressLabel(labels []*gogh.Label, wipLabel string) bool {
@@ -135,7 +135,7 @@ func (gh *GitHubWIPPRHandler) handlePrComment(log log.Logger, comment *gogh.Issu
 				return err
 			}
 
-			return gh.setStatus(log, pullRequest)
+			return gh.checkTitleAndSetStatus(log, pullRequest)
 
 		}})
 
@@ -146,7 +146,7 @@ func (gh *GitHubWIPPRHandler) handlePrComment(log log.Logger, comment *gogh.Issu
 	return err
 }
 
-func (gh *GitHubWIPPRHandler) setStatus(log log.Logger, pullRequest *gogh.PullRequest) error {
+func (gh *GitHubWIPPRHandler) checkTitleAndSetStatus(log log.Logger, pullRequest *gogh.PullRequest) error {
 	change := scm.RepositoryChange{
 		Owner:    *pullRequest.Base.Repo.Owner.Login,
 		RepoName: *pullRequest.Base.Repo.Name,
