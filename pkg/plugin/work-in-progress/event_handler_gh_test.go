@@ -28,7 +28,7 @@ var (
 	docStatusRoot = fmt.Sprintf("%s/status/%s", plugin.DocumentationURL, wip.ProwPluginName)
 )
 
-var _ = Describe("Test Keeper Plugin features", func() {
+var _ = Describe("Work In Progress Plugin features", func() {
 
 	var handler *wip.GitHubWIPPRHandler
 
