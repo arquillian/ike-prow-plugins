@@ -22,11 +22,11 @@ const (
 
 // CreateCommentMessage creates a comment message for the test-keeper plugin. If the comment message is set in config then it takes that one, the default otherwise.
 func CreateCommentMessage(configuration PluginConfiguration, change scm.RepositoryChange) string {
-	message := comment.Message{
+	message := &comment.Message{
 		Thumbnail:     sadIke,
 		Description:   beginning,
 		ConfigFile:    configuration.LocationURL,
 		Documentation: documentationSection,
 	}
-	return comment.LoadMessageTemplate(message, configuration.PluginConfiguration, change)
+	return message.LoadMessage(configuration.PluginConfiguration, change)
 }
