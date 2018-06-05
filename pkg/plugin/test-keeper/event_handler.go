@@ -114,7 +114,7 @@ func (gh *GitHubTestEventsHandler) handlePrComment(log log.Logger, comment *gogh
 			}
 			return gh.checkTestsAndSetStatus(log, pullRequest)
 		},
-		WhenAddedOrEdited: func() error {
+		whenAddedOrEdited: func() error {
 			pullRequest, err := prLoader.Load()
 			if err != nil {
 				return err
