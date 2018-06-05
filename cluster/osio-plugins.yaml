@@ -90,7 +90,3 @@ external_plugins:
       events:
         - pull_request
         - issue_comment
-    - name: work-in-progress
-      events:
-        - pull_request
-        - issue_comment
