@@ -512,7 +512,7 @@ var _ = Describe("Test Keeper Plugin features", func() {
 			Ω(err).ShouldNot(HaveOccurred())
 		})
 
-		It("should approve newly created pull request with tests when "+command.RunCommentPrefix+" "+testkeeper.ProwPluginName+" command is triggered by pr creator", func() {
+		It("should approve newly created pull request with tests when "+command.RunCommentPrefix+" "+testkeeper.ProwPluginName+" command is triggered by pr reviewer", func() {
 			NonExistingRawGitHubFiles("test-keeper.yml", "test-keeper.yaml")
 
 			gock.New("https://api.github.com").
@@ -560,7 +560,7 @@ var _ = Describe("Test Keeper Plugin features", func() {
 			Ω(err).ShouldNot(HaveOccurred())
 		})
 
-		It("should do nothing for newly created pull request with tests when "+command.RunCommentPrefix+" work-in-progress command is triggered by pr creator", func() {
+		It("should do nothing for newly created pull request with tests when "+command.RunCommentPrefix+" work-in-progress command is triggered by pr reviewer", func() {
 			// given
 			NonExistingRawGitHubFiles("test-keeper.yml", "test-keeper.yaml")
 
