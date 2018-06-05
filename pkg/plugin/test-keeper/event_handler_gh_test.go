@@ -503,7 +503,7 @@ var _ = Describe("Test Keeper Plugin features", func() {
 				SetMatcher(ExpectPayload(toBe(github.StatusFailure, testkeeper.NoTestsMessage, expectedContext, testkeeper.NoTestsDetailsPageName))).
 				Reply(201)
 
-			statusPayload := LoadFromFile("test_fixtures/github_calls/prs/without_tests/trigger_run_all_comment_by_admin.json")
+			statusPayload := LoadFromFile("test_fixtures/github_calls/prs/run_cmd/trigger_run_all_comment_by_admin.json")
 
 			// when
 			err := handler.HandleEvent(log, github.IssueComment, statusPayload)
@@ -518,7 +518,7 @@ var _ = Describe("Test Keeper Plugin features", func() {
 			gock.New("https://api.github.com").
 				Get("/repos/" + repositoryName + "/pulls/2").
 				Reply(200).
-				Body(FromFile("test_fixtures/github_calls/prs/with_tests/pr_details.json"))
+				Body(FromFile("test_fixtures/github_calls/prs/run_cmd/pr_details.json"))
 
 			gock.New("https://api.github.com").
 				Get("/repos/" + repositoryName + "/pulls/2/files").
@@ -551,7 +551,7 @@ var _ = Describe("Test Keeper Plugin features", func() {
 				SetMatcher(ExpectPayload(toBe(github.StatusSuccess, testkeeper.TestsExistMessage, expectedContext, testkeeper.TestsExistDetailsPageName))).
 				Reply(201) // This way we implicitly verify that call happened after `HandleEvent` call
 
-			statusPayload := LoadFromFile("test_fixtures/github_calls/prs/with_tests/trigger_run_test-keeper_comment_by_pr_reviewer.json")
+			statusPayload := LoadFromFile("test_fixtures/github_calls/prs/run_cmd/trigger_run_test-keeper_comment_by_pr_reviewer.json")
 
 			// when
 			err := handler.HandleEvent(log, github.IssueComment, statusPayload)
@@ -567,7 +567,7 @@ var _ = Describe("Test Keeper Plugin features", func() {
 			gock.New("https://api.github.com").
 				Get("/repos/" + repositoryName + "/pulls/2").
 				Reply(200).
-				Body(FromFile("test_fixtures/github_calls/prs/with_tests/pr_details.json"))
+				Body(FromFile("test_fixtures/github_calls/prs/run_cmd/pr_details.json"))
 
 			gock.New("https://api.github.com").
 				Get("/repos/" + repositoryName + "/pulls/2/files").
@@ -598,7 +598,7 @@ var _ = Describe("Test Keeper Plugin features", func() {
 				Post("/repos/" + repositoryName + "/statuses").
 				Times(0)
 
-			statusPayload := LoadFromFile("test_fixtures/github_calls/prs/with_tests/trigger_run_work-in-progress_comment_by_pr_reviewer.json")
+			statusPayload := LoadFromFile("test_fixtures/github_calls/prs/run_cmd/trigger_run_work-in-progress_comment_by_pr_reviewer.json")
 
 			// when
 			err := handler.HandleEvent(log, github.IssueComment, statusPayload)
