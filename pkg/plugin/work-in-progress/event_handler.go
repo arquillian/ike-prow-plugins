@@ -12,6 +12,7 @@ import (
 	"github.com/arquillian/ike-prow-plugins/pkg/scm"
 	"github.com/arquillian/ike-prow-plugins/pkg/utils"
 	gogh "github.com/google/go-github/github"
+	"github.com/arquillian/ike-prow-plugins/pkg/command"
 )
 
 const (
@@ -36,8 +37,9 @@ type GitHubWIPPRHandler struct {
 }
 
 var (
-	handledPrActions = []string{"opened", "reopened", "edited", "synchronize"}
-	defaultPrefixes  = []string{"WIP", "DO NOT MERGE", "DON'T MERGE", "WORK-IN-PROGRESS"}
+	handledCommentActions = []string{"created"}
+	handledPrActions      = []string{"opened", "reopened", "edited", "synchronize"}
+	defaultPrefixes       = []string{"WIP", "DO NOT MERGE", "DON'T MERGE", "WORK-IN-PROGRESS"}
 )
 
 // HandleEvent is an entry point for the plugin logic. This method is invoked by the Server when
@@ -56,6 +58,18 @@ func (gh *GitHubWIPPRHandler) HandleEvent(log log.Logger, eventType github.Event
 			return err
 		}
 
+	case github.IssueComment:
+		var event gogh.IssueCommentEvent
+		if err := json.Unmarshal(payload, &event); err != nil {
+			log.Errorf("Failed while parsing '%q' event with payload: %q. Cause: %q", github.IssueComment, event, err)
+			return err
+		}
+
+		if err := gh.handlePrComment(log, &event); err != nil {
+			log.Errorf("Error handling '%q' event with payload %q. Cause: %q", github.IssueComment, event, err)
+			return err
+		}
+
 	default:
 		log.Warnf("received an event of type %q but didn't ask for it", eventType)
 	}
@@ -68,35 +82,7 @@ func (gh *GitHubWIPPRHandler) handlePrEvent(log log.Logger, event *gogh.PullRequ
 		return nil
 	}
 
-	change := scm.RepositoryChange{
-		Owner:    *event.Repo.Owner.Login,
-		RepoName: *event.Repo.Name,
-		Hash:     *event.PullRequest.Head.SHA,
-	}
-	statusContext := github.StatusContext{BotName: gh.BotName, PluginName: ProwPluginName}
-	statusService := ghservice.NewStatusService(gh.Client, log, change, statusContext)
-
-	labels, err := gh.Client.ListPullRequestLabels(change, *event.PullRequest.Number)
-	if err != nil {
-		log.Warnf("failed to list labels on PR [%q]. cause: %s", *event.PullRequest, err)
-	}
-
-	configuration := LoadConfiguration(log, change)
-	labelExists := gh.hasWorkInProgressLabel(labels, configuration.Label)
-	if gh.IsWorkInProgress(*event.PullRequest.Title, configuration) {
-		if !labelExists {
-			if err := gh.Client.AddPullRequestLabel(change, *event.PullRequest.Number, strings.Fields(configuration.Label)); err != nil {
-				log.Errorf("failed to add label on PR [%q]. cause: %s", *event.PullRequest, err)
-			}
-		}
-		return statusService.Failure(InProgressMessage, InProgressDetailsPageName)
-	}
-	if labelExists {
-		if err := gh.Client.RemovePullRequestLabel(change, *event.PullRequest.Number, configuration.Label); err != nil {
-			log.Errorf("failed to remove label on PR [%q]. cause: %s", *event.PullRequest, err)
-		}
-	}
-	return statusService.Success(ReadyForReviewMessage, ReadyForReviewDetailsPageName)
+	return gh.checkTitleAndSetStatus(log, event.PullRequest)
 }
 
 func (gh *GitHubWIPPRHandler) hasWorkInProgressLabel(labels []*gogh.Label, wipLabel string) bool {
@@ -129,4 +115,66 @@ func (gh *GitHubWIPPRHandler) hasPrefix(title string, prefixes []string) bool {
 		}
 	}
 	return false
+}
+
+func (gh *GitHubWIPPRHandler) handlePrComment(log log.Logger, comment *gogh.IssueCommentEvent) error {
+	if !utils.Contains(handledCommentActions, *comment.Action) {
+		return nil
+	}
+
+	prLoader := ghservice.NewPullRequestLazyLoaderFromComment(gh.Client, comment)
+	userPerm := command.NewPermissionService(gh.Client, *comment.Sender.Login, prLoader)
+
+	cmdHandler := command.CommentCmdHandler{Client: gh.Client}
+	cmdHandler.Register(&command.RunCmd{
+		PluginName:            ProwPluginName,
+		UserPermissionService: userPerm,
+		WhenAddedOrEdited: func() error {
+			pullRequest, err := prLoader.Load()
+			if err != nil {
+				return err
+			}
+
+			return gh.checkTitleAndSetStatus(log, pullRequest)
+
+		}})
+
+	err := cmdHandler.Handle(log, comment)
+	if err != nil {
+		log.Error(err)
+	}
+	return err
+}
+
+func (gh *GitHubWIPPRHandler) checkTitleAndSetStatus(log log.Logger, pullRequest *gogh.PullRequest) error {
+	change := scm.RepositoryChange{
+		Owner:    *pullRequest.Base.Repo.Owner.Login,
+		RepoName: *pullRequest.Base.Repo.Name,
+		Hash:     *pullRequest.Head.SHA,
+	}
+	statusContext := github.StatusContext{BotName: gh.BotName, PluginName: ProwPluginName}
+	statusService := ghservice.NewStatusService(gh.Client, log, change, statusContext)
+
+	labels, err := gh.Client.ListPullRequestLabels(change, *pullRequest.Number)
+	if err != nil {
+		log.Warnf("failed to list labels on PR [%q]. cause: %s", *pullRequest, err)
+	}
+
+	configuration := LoadConfiguration(log, change)
+	labelExists := gh.hasWorkInProgressLabel(labels, configuration.Label)
+	if gh.IsWorkInProgress(*pullRequest.Title, configuration) {
+		if !labelExists {
+			if err := gh.Client.AddPullRequestLabel(change, *pullRequest.Number, strings.Fields(configuration.Label)); err != nil {
+				log.Errorf("failed to add label on PR [%q]. cause: %s", *pullRequest, err)
+			}
+		}
+		return statusService.Failure(InProgressMessage, InProgressDetailsPageName)
+	}
+	if labelExists {
+		if err := gh.Client.RemovePullRequestLabel(change, *pullRequest.Number, configuration.Label); err != nil {
+			log.Errorf("failed to remove label on PR [%q]. cause: %s", *pullRequest, err)
+		}
+	}
+	return statusService.Success(ReadyForReviewMessage, ReadyForReviewDetailsPageName)
+
 }

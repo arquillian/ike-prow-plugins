@@ -1,13 +1,12 @@
 package command
 
 import (
-	"strings"
-
 	"github.com/arquillian/ike-prow-plugins/pkg/github/client"
 	"github.com/arquillian/ike-prow-plugins/pkg/github/service"
 	"github.com/arquillian/ike-prow-plugins/pkg/log"
 	"github.com/arquillian/ike-prow-plugins/pkg/utils"
 	gogh "github.com/google/go-github/github"
+	"strings"
 )
 
 // DoFunction is used for performing operations related to command actions
@@ -97,7 +96,8 @@ func (p *DoFunctionProvider) getMatchingAction(comment *gogh.IssueCommentEvent) 
 
 // Execute triggers the given DoFunctions (when all checks are fulfilled) for the given pr comment
 func (e *CmdExecutor) Execute(client ghclient.Client, log log.Logger, comment *gogh.IssueCommentEvent) error {
-	if e.Command != strings.TrimSpace(*comment.Comment.Body) {
+	body := strings.TrimSpace(*comment.Comment.Body)
+	if prefix := strings.Split(body, " ")[0]; e.Command != body && prefix != e.Command {
 		return nil
 	}
 	for _, doExecutor := range e.executors {
