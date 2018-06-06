@@ -1,7 +1,7 @@
 package testkeeper
 
 import (
-	"github.com/arquillian/ike-prow-plugins/pkg/comment"
+	"github.com/arquillian/ike-prow-plugins/pkg/hint"
 	"github.com/arquillian/ike-prow-plugins/pkg/log"
 	"github.com/arquillian/ike-prow-plugins/pkg/scm"
 )
@@ -21,16 +21,16 @@ const (
 	sadIke = `<img align="left" src="https://cdn.rawgit.com/bartoszmajsak/ike-prow-plugins/2025328b70bd1879520411b3cacadee61a49641a/docs/images/arquillian_ui_failure_128px.png">`
 )
 
-// CreateCommentMessage creates a comment message for the test-keeper plugin. If the comment message is set in config then it takes that one, the default otherwise.
-func CreateCommentMessage(configuration PluginConfiguration, change scm.RepositoryChange, log log.Logger) string {
-	comment := &comment.Comment{
+// CreateHintMessage creates a hint message for the test-keeper plugin. If the hint message is set in config then it takes that one, the default otherwise.
+func CreateHintMessage(configuration PluginConfiguration, change scm.RepositoryChange, log log.Logger) string {
+	hint := &hint.Hint{
 		Log: log,
-		Message: &comment.Message{
+		Message: &hint.Message{
 			Thumbnail:     sadIke,
 			Description:   beginning,
 			ConfigFile:    configuration.LocationURL,
 			Documentation: documentationSection,
 		},
 	}
-	return comment.LoadMessage(configuration.PluginConfiguration, change)
+	return hint.LoadMessage(configuration.PluginConfiguration, change)
 }
