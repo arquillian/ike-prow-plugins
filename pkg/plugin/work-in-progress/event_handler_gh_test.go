@@ -10,14 +10,17 @@ import (
 	. "github.com/onsi/gomega"
 	"gopkg.in/h2non/gock.v1"
 
+	"github.com/arquillian/ike-prow-plugins/pkg/command"
 	"github.com/arquillian/ike-prow-plugins/pkg/github"
 	"fmt"
 	"github.com/arquillian/ike-prow-plugins/pkg/plugin"
 	"github.com/arquillian/ike-prow-plugins/pkg/github/service"
+	"github.com/arquillian/ike-prow-plugins/pkg/plugin/test-keeper"
 )
 
 const (
-	botName = "alien-ike"
+	botName        = "alien-ike"
+	repositoryName = "bartoszmajsak/wfswarm-booster-pipeline-test"
 )
 
 var (
@@ -25,29 +28,28 @@ var (
 	docStatusRoot = fmt.Sprintf("%s/status/%s", plugin.DocumentationURL, wip.ProwPluginName)
 )
 
-var _ = Describe("Test Keeper Plugin features", func() {
+var _ = Describe("Work In Progress Plugin features", func() {
+
+	var handler *wip.GitHubWIPPRHandler
+
+	log := log.NewTestLogger()
+	configFilePath := ghservice.ConfigHome + wip.ProwPluginName
+
+	toHaveSuccessState := SoftlySatisfyAll(
+		HaveState(github.StatusSuccess),
+		HaveDescription(wip.ReadyForReviewMessage),
+		HaveContext(expectedContext),
+		HaveTargetURL(fmt.Sprintf("%s/%s/%s.html", docStatusRoot, "success", wip.ReadyForReviewDetailsPageName)),
+	)
+
+	toHaveFailureState := SoftlySatisfyAll(
+		HaveState(github.StatusFailure),
+		HaveDescription(wip.InProgressMessage),
+		HaveContext(expectedContext),
+		HaveTargetURL(fmt.Sprintf("%s/%s/%s.html", docStatusRoot, "failure", wip.InProgressDetailsPageName)),
+	)
 
 	Context("Pull Request title change trigger", func() {
-
-		var handler *wip.GitHubWIPPRHandler
-
-		log := log.NewTestLogger()
-		configFilePath := ghservice.ConfigHome + wip.ProwPluginName
-
-		toHaveSuccessState := SoftlySatisfyAll(
-			HaveState(github.StatusSuccess),
-			HaveDescription(wip.ReadyForReviewMessage),
-			HaveContext(expectedContext),
-			HaveTargetURL(fmt.Sprintf("%s/%s/%s.html", docStatusRoot, "success", wip.ReadyForReviewDetailsPageName)),
-		)
-
-		toHaveFailureState := SoftlySatisfyAll(
-			HaveState(github.StatusFailure),
-			HaveDescription(wip.InProgressMessage),
-			HaveContext(expectedContext),
-			HaveTargetURL(fmt.Sprintf("%s/%s/%s.html", docStatusRoot, "failure", wip.InProgressDetailsPageName)),
-		)
-
 		BeforeEach(func() {
 			defer gock.OffAll()
 			handler = &wip.GitHubWIPPRHandler{Client: NewDefaultGitHubClient(), BotName: botName}
@@ -199,6 +201,130 @@ var _ = Describe("Test Keeper Plugin features", func() {
 			Ω(err).ShouldNot(HaveOccurred())
 		})
 
+	})
+
+	Context("Trigger work-in-progress plugin by triggering comment on pull request", func() {
+		BeforeEach(func() {
+			defer gock.OffAll()
+			handler = &wip.GitHubWIPPRHandler{Client: NewDefaultGitHubClient(), BotName: botName}
+		})
+
+		AfterEach(EnsureGockRequestsHaveBeenMatched)
+
+		It("should mark opened PR as ready for review if not prefixed with WIP when "+command.RunCommentPrefix+" "+wip.ProwPluginName+" command is triggered by pr creator", func() {
+			// given
+			NonExistingRawGitHubFiles("work-in-progress.yml", "work-in-progress.yaml")
+
+			gock.New("https://api.github.com").
+				Get("/repos/" + repositoryName + "/pulls/11").
+				Reply(200).
+				Body(FromFile("test_fixtures/github_calls/pr_details.json"))
+
+			gock.New("https://api.github.com").
+				Get("/repos/" + repositoryName + "/pulls/11/reviews").
+				Reply(200).
+				BodyString(`[]`)
+
+			gock.New("https://api.github.com").
+				Get("/repos/bartoszmajsak/wfswarm-booster-pipeline-test/issues/11/labels").
+				Reply(200).
+				BodyString("[]")
+
+			gock.New("https://api.github.com").
+				Get("/repos/" + repositoryName + "/collaborators/bartoszmajsak-test/permission").
+				Reply(200).
+				Body(FromFile("test_fixtures/github_calls/collaborators_external-user_permission.json"))
+
+			gock.New("https://api.github.com").
+				Post("/repos/bartoszmajsak/wfswarm-booster-pipeline-test/statuses").
+				SetMatcher(ExpectPayload(toHaveSuccessState)).
+				Reply(201) // This way we implicitly verify that call happened after `HandleEvent` call
+
+			statusPayload := LoadFromFile("test_fixtures/github_calls/trigger_run_work-in-progress_on_pr_by_pr_creator.json")
+
+			// when
+			err := handler.HandleEvent(log, github.IssueComment, statusPayload)
+
+			// then - implicit verification of /statuses call occurrence with proper payload
+			Ω(err).ShouldNot(HaveOccurred())
+		})
+
+		It("should mark opened PR as work-in-progress if prefixed with WIP when "+command.RunCommentPrefix+" all command is used by admin", func() {
+			// given
+			NonExistingRawGitHubFiles("work-in-progress.yml", "work-in-progress.yaml")
+
+			gock.New("https://api.github.com").
+				Get("/repos/" + repositoryName + "/pulls/11").
+				Reply(200).
+				Body(FromFile("test_fixtures/github_calls//pr_details_wip.json"))
+
+			gock.New("https://api.github.com").
+				Get("/repos/" + repositoryName + "/pulls/11/reviews").
+				Reply(200).
+				BodyString(`[]`)
+
+			gock.New("https://api.github.com").
+				Get("/repos/" + repositoryName + "/collaborators/bartoszmajsak/permission").
+				Reply(200).
+				Body(FromFile("test_fixtures/github_calls/collaborators_repo-admin_permission.json"))
+
+			gock.New("https://api.github.com").
+				Get("/repos/bartoszmajsak/wfswarm-booster-pipeline-test/issues/11/labels").
+				Reply(200).
+				BodyString("[]")
+
+			gock.New("https://api.github.com").
+				Post("/repos/bartoszmajsak/wfswarm-booster-pipeline-test/issues/11/labels").
+				SetMatcher(ExpectPayload(To(HaveBodyThatContains("work-in-progress")))).
+				Reply(200).
+				BodyString("work-in-progress")
+
+
+			gock.New("https://api.github.com").
+				Post("/repos/bartoszmajsak/wfswarm-booster-pipeline-test/statuses").
+				SetMatcher(ExpectPayload(toHaveFailureState)).
+				Reply(201) // This way we implicitly verify that call happened after `HandleEvent` call
+
+			statusPayload := LoadFromFile("test_fixtures/github_calls/trigger_run_all_on_wip_pr_by_admin.json")
+
+			// when
+			err := handler.HandleEvent(log, github.IssueComment, statusPayload)
+
+			// then - implicit verification of /statuses call occurrence with proper payload
+			Ω(err).ShouldNot(HaveOccurred())
+		})
+
+		It("should approve newly created pull request with tests when "+command.RunCommentPrefix+" "+testkeeper.ProwPluginName+" command is triggered by pr creator", func() {
+			// given
+			NonExistingRawGitHubFiles("work-in-progress.yml", "work-in-progress.yaml")
+
+			gock.New("https://api.github.com").
+				Get("/repos/" + repositoryName + "/pulls/11").
+				Reply(200).
+				Body(FromFile("test_fixtures/github_calls/pr_details.json"))
+
+			gock.New("https://api.github.com").
+				Get("/repos/" + repositoryName + "/pulls/11/reviews").
+				Reply(200).
+				BodyString(`[]`)
+
+			gock.New("https://api.github.com").
+				Get("/repos/" + repositoryName + "/collaborators/bartoszmajsak-test/permission").
+				Reply(200).
+				Body(FromFile("test_fixtures/github_calls/collaborators_external-user_permission.json"))
+
+			gock.New("https://api.github.com").
+				Post("/repos/bartoszmajsak/wfswarm-booster-pipeline-test/statuses").
+				Times(0)  // This way we implicitly verify that call not happened after `HandleEvent` call
+
+			statusPayload := LoadFromFile("test_fixtures/github_calls/trigger_run_test-keeper_on_pr_by_pr_creator.json")
+
+			// when
+			err := handler.HandleEvent(log, github.IssueComment, statusPayload)
+
+			// then
+			Ω(err).ShouldNot(HaveOccurred())
+		})
 	})
 
 })

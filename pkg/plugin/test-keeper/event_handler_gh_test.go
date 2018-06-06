@@ -13,6 +13,7 @@ import (
 	. "github.com/onsi/gomega"
 	"gopkg.in/h2non/gock.v1"
 	"github.com/arquillian/ike-prow-plugins/pkg/plugin"
+	"github.com/arquillian/ike-prow-plugins/pkg/command"
 )
 
 const (
@@ -453,6 +454,156 @@ var _ = Describe("Test Keeper Plugin features", func() {
 			err := handler.HandleEvent(log, github.IssueComment, statusPayload)
 
 			// then - implicit verification of /statuses call occurrence with proper payload
+			Ω(err).ShouldNot(HaveOccurred())
+		})
+	})
+
+	Context("Trigger test-keeper plugin by triggering comment on pull request", func() {
+		BeforeEach(func() {
+			defer gock.OffAll()
+			handler = &testkeeper.GitHubTestEventsHandler{Client: NewDefaultGitHubClient(), BotName: botName}
+		})
+
+		AfterEach(EnsureGockRequestsHaveBeenMatched)
+		It("should block newly created pull request without tests when "+command.RunCommentPrefix+" all command is used by admin user", func() {
+			NonExistingRawGitHubFiles("test-keeper.yml", "test-keeper.yaml", "test-keeper_hint.md")
+
+			gock.New("https://api.github.com").
+				Get("/repos/" + repositoryName + "/pulls/1").
+				Reply(200).
+				Body(FromFile("test_fixtures/github_calls/prs/without_tests/pr_details.json"))
+
+			gock.New("https://api.github.com").
+				Get("/repos/" + repositoryName + "/pulls/1/files").
+				Reply(200).
+				Body(FromFile("test_fixtures/github_calls/prs/without_tests/changes.json"))
+
+			gock.New("https://api.github.com").
+				Get("/repos/" + repositoryName + "/issues/1/comments").
+				Reply(200).
+				BodyString("[]")
+
+			gock.New("https://api.github.com").
+				Get("/repos/" + repositoryName + "/collaborators/bartoszmajsak/permission").
+				Reply(200).
+				Body(FromFile("test_fixtures/github_calls/collaborators_repo-admin_permission.json"))
+
+			gock.New("https://api.github.com").
+				Get("/repos/" + repositoryName + "/pulls/1/reviews").
+				Reply(200).
+				BodyString(`[]`)
+
+			// This way we implicitly verify that call happened after `HandleEvent` call
+			gock.New("https://api.github.com").
+				Post("/repos/" + repositoryName + "/issues/1/comments").
+				SetMatcher(ExpectPayload(toHaveBodyWithWholePluginsComment)).
+				Reply(201)
+			gock.New("https://api.github.com").
+				Post("/repos/" + repositoryName + "/statuses").
+				SetMatcher(ExpectPayload(toBe(github.StatusFailure, testkeeper.NoTestsMessage, expectedContext, testkeeper.NoTestsDetailsPageName))).
+				Reply(201)
+
+			statusPayload := LoadFromFile("test_fixtures/github_calls/prs/run_cmd/trigger_run_all_comment_by_admin.json")
+
+			// when
+			err := handler.HandleEvent(log, github.IssueComment, statusPayload)
+
+			// then - implicit verification of /statuses call occurrence with proper payload
+			Ω(err).ShouldNot(HaveOccurred())
+		})
+
+		It("should approve newly created pull request with tests when "+command.RunCommentPrefix+" "+testkeeper.ProwPluginName+" command is triggered by pr reviewer", func() {
+			NonExistingRawGitHubFiles("test-keeper.yml", "test-keeper.yaml")
+
+			gock.New("https://api.github.com").
+				Get("/repos/" + repositoryName + "/pulls/2").
+				Reply(200).
+				Body(FromFile("test_fixtures/github_calls/prs/run_cmd/pr_details.json"))
+
+			gock.New("https://api.github.com").
+				Get("/repos/" + repositoryName + "/pulls/2/files").
+				Reply(200).
+				Body(FromFile("test_fixtures/github_calls/prs/with_tests/changes.json"))
+
+			gock.New("https://api.github.com").
+				Get("/repos/" + repositoryName + "/issues/2/comments").
+				Reply(200).
+				BodyString("[]")
+
+			gock.New("https://api.github.com").
+				Get("/repos/" + repositoryName + "/collaborators/bartoszmajsak-test/permission").
+				Reply(200).
+				Body(FromFile("test_fixtures/github_calls/collaborators_external-user_permission.json"))
+
+			gock.New("https://api.github.com").
+				Get("/repos/" + repositoryName + "/pulls/2/reviews").
+				Reply(200).
+				BodyString(`[]`)
+
+			// This way we implicitly verify that call happened after `HandleEvent` call
+			gock.New("https://api.github.com").
+				Post("/repos/" + repositoryName + "/issues/2/comments").
+				SetMatcher(ExpectPayload(toHaveBodyWithWholePluginsComment)).
+				Reply(201)
+
+			gock.New("https://api.github.com").
+				Post("/repos/" + repositoryName + "/statuses").
+				SetMatcher(ExpectPayload(toBe(github.StatusSuccess, testkeeper.TestsExistMessage, expectedContext, testkeeper.TestsExistDetailsPageName))).
+				Reply(201) // This way we implicitly verify that call happened after `HandleEvent` call
+
+			statusPayload := LoadFromFile("test_fixtures/github_calls/prs/run_cmd/trigger_run_test-keeper_comment_by_pr_reviewer.json")
+
+			// when
+			err := handler.HandleEvent(log, github.IssueComment, statusPayload)
+
+			// then - implicit verification of /statuses call occurrence with proper payload
+			Ω(err).ShouldNot(HaveOccurred())
+		})
+
+		It("should do nothing for newly created pull request with tests when "+command.RunCommentPrefix+" work-in-progress command is triggered by pr reviewer", func() {
+			// given
+			NonExistingRawGitHubFiles("test-keeper.yml", "test-keeper.yaml")
+
+			gock.New("https://api.github.com").
+				Get("/repos/" + repositoryName + "/pulls/2").
+				Reply(200).
+				Body(FromFile("test_fixtures/github_calls/prs/run_cmd/pr_details.json"))
+
+			gock.New("https://api.github.com").
+				Get("/repos/" + repositoryName + "/pulls/2/files").
+				Reply(200).
+				Body(FromFile("test_fixtures/github_calls/prs/with_tests/changes.json"))
+
+			gock.New("https://api.github.com").
+				Get("/repos/" + repositoryName + "/issues/2/comments").
+				Reply(200).
+				BodyString("[]")
+
+			gock.New("https://api.github.com").
+				Get("/repos/" + repositoryName + "/collaborators/bartoszmajsak-test/permission").
+				Reply(200).
+				Body(FromFile("test_fixtures/github_calls/collaborators_external-user_permission.json"))
+
+			gock.New("https://api.github.com").
+				Get("/repos/" + repositoryName + "/pulls/2/reviews").
+				Reply(200).
+				BodyString(`[]`)
+
+			// This way we implicitly verify that call not happened after `HandleEvent` call
+			gock.New("https://api.github.com").
+				Post("/repos/" + repositoryName + "/issues/2/comments").
+				Times(0)
+
+			gock.New("https://api.github.com").
+				Post("/repos/" + repositoryName + "/statuses").
+				Times(0)
+
+			statusPayload := LoadFromFile("test_fixtures/github_calls/prs/run_cmd/trigger_run_work-in-progress_comment_by_pr_reviewer.json")
+
+			// when
+			err := handler.HandleEvent(log, github.IssueComment, statusPayload)
+
+			// then
 			Ω(err).ShouldNot(HaveOccurred())
 		})
 	})
