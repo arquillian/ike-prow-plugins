@@ -59,6 +59,8 @@ objects:
             ports:
               - name: http
                 containerPort: 8888
+              - name: pmcd
+                containerPort: 44321
             volumeMounts:
             - name: hmac
               mountPath: /etc/webhook
@@ -103,4 +105,15 @@ objects:
       ports:
       - port: 80
         targetPort: 8888
-      type: NodePort  
+      type: NodePort
+  - kind: Service
+    apiVersion: v1
+    metadata:
+      name: pmcd-${PLUGIN_NAME}
+    spec:
+      selector:
+        app: ${PLUGIN_NAME}
+      ports:
+      - port: 80
+        targetPort: 44321
+      type: NodePort
