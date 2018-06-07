@@ -113,7 +113,7 @@ objects:
       selector:
         app: hook
       ports:
-      - port: 80
+      - port: 44321
         targetPort: 44321
       type: NodePort
   - kind: Route
