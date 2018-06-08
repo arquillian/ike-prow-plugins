@@ -1,0 +1,5 @@
+{{.Thumbnail}}
+
+{{.Description}}
+
+For more information please head over to official [documentation](http://arquillian.org/ike-prow-plugins/{{.Documentation}}). You can find there how to configure the plugin.

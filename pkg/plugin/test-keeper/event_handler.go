@@ -158,7 +158,7 @@ func (gh *GitHubTestEventsHandler) checkTestsAndSetStatus(log log.Logger, pr *go
 	hintContext := ghservice.HintContext{PluginName: ProwPluginName, Assignee: *pr.User.Login}
 	hinter := ghservice.NewHinter(gh.Client, log, commentsLoader, hintContext)
 
-	cerr := hinter.PluginComment(CreateCommentMessage(configuration, change))
+	cerr := hinter.PluginComment(CreateHintMessage(configuration, change, log))
 	if cerr != nil {
 		log.Errorf("failed to comment on PR [%q]. cause: %s", *pr, cerr)
 		return cerr
