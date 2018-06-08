@@ -23,7 +23,7 @@ const (
 
 // CreateHintMessage creates a hint message for the test-keeper plugin. If the hint message is set in config then it takes that one, the default otherwise.
 func CreateHintMessage(configuration PluginConfiguration, change scm.RepositoryChange, log log.Logger) string {
-	hint := &hint.Hint{
+	pluginHint := &hint.Hint{
 		Log: log,
 		Message: &hint.Message{
 			Thumbnail:     sadIke,
@@ -32,5 +32,5 @@ func CreateHintMessage(configuration PluginConfiguration, change scm.RepositoryC
 			Documentation: documentationSection,
 		},
 	}
-	return hint.LoadMessage(configuration.PluginConfiguration, change)
+	return pluginHint.LoadMessage(configuration.PluginConfiguration, change)
 }
