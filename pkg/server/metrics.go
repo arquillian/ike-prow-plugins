@@ -9,15 +9,15 @@ import (
 var (
 	rateLimit = prometheus.NewGaugeVec(prometheus.GaugeOpts{
 		Name: "github_rate_limits",
-		Help: "Rate limit for GitHub API calls",
+		Help: "Rate limit for GitHub API calls.",
 	}, []string{"type"})
 	webHookCounter = prometheus.NewCounterVec(prometheus.CounterOpts{
-		Name: "webhook_counter",
-		Help: "A counter of the webhooks made to service.",
+		Name: "webhook_total",
+		Help: "Total number of the webhooks made to service.",
 	}, []string{"full_name"})
 	handledEventsCounter = prometheus.NewCounterVec(prometheus.CounterOpts{
-		Name: "handled_events_counter",
-		Help: "A counter of handled events.",
+		Name: "handled_events_total",
+		Help: "Total number of handled events.",
 	}, []string{"event_type"})
 )
 

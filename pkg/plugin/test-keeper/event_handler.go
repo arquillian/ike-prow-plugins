@@ -8,9 +8,9 @@ import (
 	"github.com/arquillian/ike-prow-plugins/pkg/github/client"
 	"github.com/arquillian/ike-prow-plugins/pkg/github/service"
 	"github.com/arquillian/ike-prow-plugins/pkg/log"
-	"github.com/arquillian/ike-prow-plugins/pkg/scm"
 	"github.com/arquillian/ike-prow-plugins/pkg/utils"
 	gogh "github.com/google/go-github/github"
+	"github.com/arquillian/ike-prow-plugins/pkg/scm"
 )
 
 // GitHubTestEventsHandler is the event handler for the plugin.
@@ -96,25 +96,26 @@ func (gh *GitHubTestEventsHandler) handlePrComment(log log.Logger, comment *gogh
 
 	cmdHandler := command.CommentCmdHandler{Client: gh.Client}
 
-	cmdHandler.Register(
-		&BypassCmd{
-			userPermissionService: userPerm,
-			whenDeleted: func() error {
-				pullRequest, err := prLoader.Load()
-				if err != nil {
-					return err
-				}
-				return gh.checkTestsAndSetStatus(log, pullRequest)
-			},
-			whenAddedOrCreated: func() error {
-				pullRequest, err := prLoader.Load()
-				if err != nil {
-					return err
-				}
-				statusService := gh.newTestStatusService(log, ghservice.NewRepositoryChangeForPR(pullRequest))
-				return statusService.okWithoutTests(*comment.Sender.Login)
-			},
-		})
+	cmdHandler.Register(&command.RunCmd{
+		PluginName:            ProwPluginName,
+		UserPermissionService: userPerm,
+		WhenAddedOrEdited: func() error {
+			return gh.loadPRCheckTestsAndSetStatus(prLoader, log)
+		}})
+
+	cmdHandler.Register(&BypassCmd{
+		userPermissionService: userPerm,
+		whenDeleted: func() error {
+			return gh.loadPRCheckTestsAndSetStatus(prLoader, log)
+		},
+		whenAddedOrEdited: func() error {
+			pullRequest, err := prLoader.Load()
+			if err != nil {
+				return err
+			}
+			statusService := gh.newTestStatusService(log, ghservice.NewRepositoryChangeForPR(pullRequest))
+			return statusService.okWithoutTests(*comment.Sender.Login)
+		}})
 
 	err := cmdHandler.Handle(log, comment)
 	if err != nil {
@@ -157,7 +158,7 @@ func (gh *GitHubTestEventsHandler) checkTestsAndSetStatus(log log.Logger, pr *go
 	hintContext := ghservice.HintContext{PluginName: ProwPluginName, Assignee: *pr.User.Login}
 	hinter := ghservice.NewHinter(gh.Client, log, commentsLoader, hintContext)
 
-	cerr := hinter.PluginComment(CreateCommentMessage(configuration, change))
+	cerr := hinter.PluginComment(CreateHintMessage(configuration, change, log))
 	if cerr != nil {
 		log.Errorf("failed to comment on PR [%q]. cause: %s", *pr, cerr)
 		return cerr
@@ -187,4 +188,12 @@ func (gh *GitHubTestEventsHandler) checkTests(log log.Logger, change scm.Reposit
 	}
 
 	return fileCategories, err
+}
+
+func (gh *GitHubTestEventsHandler) loadPRCheckTestsAndSetStatus(prLoader *ghservice.PullRequestLazyLoader, log log.Logger) error {
+	pullRequest, err := prLoader.Load()
+	if err != nil {
+		return err
+	}
+	return gh.checkTestsAndSetStatus(log, pullRequest)
 }
