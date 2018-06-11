@@ -21,7 +21,7 @@ type GitHubLabelsEventsHandler struct {
 }
 
 func main() {
-	pluginBootstrap.InitPlugin(ProwPluginName, handlerCreator, serverCreator, helpProvider)
+	pluginBootstrap.InitPlugin(ProwPluginName, handlerCreator, serverCreator, helpProvider, registerMetrics)
 }
 
 func handlerCreator(githubClient ghclient.Client, botName string) server.GitHubEventHandler {
@@ -46,4 +46,8 @@ func helpProvider(enabledRepos []string) (*pluginhelp.PluginHelp, error) {
 	return &pluginhelp.PluginHelp{
 		Description: `PR Sanitizer plugin`,
 	}, nil
+}
+
+func registerMetrics() []error {
+	return make([]error, 0)
 }

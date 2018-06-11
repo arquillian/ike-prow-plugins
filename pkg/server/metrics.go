@@ -28,22 +28,25 @@ func RegisterMetrics(client ghclient.Client) (*Metrics, []error) {
 		ghClient: client,
 	}
 
-	registerOrGet(rateLimit, &errors, func(collector prometheus.Collector) {
+	RegisterOrGet(rateLimit, &errors, func(collector prometheus.Collector) {
 		metrics.RateLimit = collector.(*prometheus.GaugeVec)
 	})
 
-	registerOrGet(webHookCounter, &errors, func(collector prometheus.Collector) {
+	RegisterOrGet(webHookCounter, &errors, func(collector prometheus.Collector) {
 		metrics.WebHookCounter = collector.(*prometheus.CounterVec)
 	})
 
-	registerOrGet(handledEventsCounter, &errors, func(collector prometheus.Collector) {
+	RegisterOrGet(handledEventsCounter, &errors, func(collector prometheus.Collector) {
 		metrics.HandledEventsCounter = collector.(*prometheus.CounterVec)
 	})
 
 	return metrics, errors
 }
 
-func registerOrGet(collector prometheus.Collector, errors *[]error, assign func(regCollector prometheus.Collector)) {
+// RegisterOrGet registers the provided Collector with the DefaultRegisterer and
+// assigns the Collector, unless an equal Collector was registered before, in
+// which case that Collector is assigned.
+func RegisterOrGet(collector prometheus.Collector, errors *[]error, assign func(regCollector prometheus.Collector)) {
 	if err := prometheus.Register(collector); err != nil {
 		if are, ok := err.(prometheus.AlreadyRegisteredError); ok {
 			assign(are.ExistingCollector)

@@ -24,6 +24,7 @@ import (
 	"github.com/arquillian/ike-prow-plugins/pkg/server"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"github.com/sirupsen/logrus"
+	"fmt"
 )
 
 // nolint
@@ -52,10 +53,13 @@ type EventHandlerCreator func(client ghclient.Client, botName string) server.Git
 // ServerCreator is a func type that wires Server and server.GitHubEventHandler together
 type ServerCreator func(hmacSecret []byte, evenHandler server.GitHubEventHandler) *server.Server
 
+// RegisterMetrics registers prometheus collectors to collect plugin specific metrics.
+type RegisterMetrics func() ([]error)
+
 // InitPlugin instantiates logger, loads the secrets from the flags, sets context to background and starts server with
 // the attached event handler.
 func InitPlugin(pluginName string, newEventHandler EventHandlerCreator, newServer ServerCreator,
-	helpProvider externalplugins.ExternalPluginHelpProvider) {
+	helpProvider externalplugins.ExternalPluginHelpProvider, registerMetrics RegisterMetrics) {
 
 	// Ignore SIGTERM so that we don't drop hooks when the pod is removed.
 	// We'll get SIGTERM first and then SIGKILL after our graceful termination deadline.
@@ -95,14 +99,12 @@ func InitPlugin(pluginName string, newEventHandler EventHandlerCreator, newServe
 
 	pluginServer := newServer(webhookSecret, handler)
 	metrics, errs := server.RegisterMetrics(githubClient)
-	if len(errs) > 0 {
-		errLog := logger
-		for _, e := range errs {
-			errLog = errLog.WithError(e)
-		}
-		errLog.Fatal("Prometheus metrics registration failed!")
-	}
+	logErrors(errs, logger, "Prometheus metrics registration failed!")
+
 	pluginServer.Metrics = metrics
+
+	errors := registerMetrics()
+	logErrors(errors, logger, fmt.Sprintf("Prometheus metrics registration failed for plugin %s!", pluginName))
 
 	port := strconv.Itoa(*port)
 	logger.Infof("Starting server on port %s", port)
@@ -149,4 +151,14 @@ func configureLogger(pluginName string) *logrus.Entry {
 	}
 
 	return logger
+}
+
+func logErrors(errors []error, logger *logrus.Entry, errMessage string) {
+	if len(errors) > 0 {
+		errLog := logger
+		for _, e := range errors {
+			errLog = errLog.WithError(e)
+		}
+		errLog.Fatal(errMessage)
+	}
 }

@@ -9,7 +9,7 @@ import (
 )
 
 func main() {
-	pluginBootstrap.InitPlugin(wip.ProwPluginName, handlerCreator, serverCreator, helpProvider)
+	pluginBootstrap.InitPlugin(wip.ProwPluginName, handlerCreator, serverCreator, helpProvider, registerMetrics)
 }
 
 func handlerCreator(githubClient ghclient.Client, botName string) server.GitHubEventHandler {
@@ -27,4 +27,8 @@ func helpProvider(enabledRepos []string) (*pluginhelp.PluginHelp, error) {
 	return &pluginhelp.PluginHelp{
 		Description: `Work-in-progress plugin`,
 	}, nil
+}
+
+func registerMetrics() []error {
+	return make([]error, 0)
 }

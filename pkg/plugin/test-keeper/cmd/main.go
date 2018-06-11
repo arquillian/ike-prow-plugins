@@ -10,7 +10,7 @@ import (
 )
 
 func main() {
-	pluginBootstrap.InitPlugin(testkeeper.ProwPluginName, eventHandler, eventServer, helpProvider)
+	pluginBootstrap.InitPlugin(testkeeper.ProwPluginName, eventHandler, eventServer, helpProvider, testkeeper.RegisterMetrics)
 }
 
 func eventHandler(githubClient ghclient.Client, botName string) server.GitHubEventHandler {

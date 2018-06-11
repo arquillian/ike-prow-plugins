@@ -5,13 +5,13 @@ import (
 	. "github.com/onsi/gomega"
 	"net/http/httptest"
 	"github.com/arquillian/ike-prow-plugins/pkg/server"
-	dto "github.com/prometheus/client_model/go"
 	"github.com/prometheus/client_golang/prometheus"
 	. "github.com/arquillian/ike-prow-plugins/pkg/internal/test"
 	"gopkg.in/h2non/gock.v1"
 	"k8s.io/test-infra/prow/phony"
 	"github.com/arquillian/ike-prow-plugins/pkg/github"
 	"github.com/arquillian/ike-prow-plugins/pkg/log"
+	"github.com/arquillian/ike-prow-plugins/pkg/utils"
 )
 
 type DummyGHEventHandler struct {
@@ -73,7 +73,8 @@ var _ = Describe("Service Metrics", func() {
 		Ω(err).ShouldNot(HaveOccurred())
 		counter, err := serverMetrics.WebHookCounter.GetMetricWithLabelValues(fullName)
 		Ω(err).ShouldNot(HaveOccurred())
-		Expect(count(counter)).To(Equal(1))
+
+		verifyCount(counter, 1)
 	})
 
 	It("should count handled events", func() {
@@ -89,7 +90,8 @@ var _ = Describe("Service Metrics", func() {
 		Ω(err).ShouldNot(HaveOccurred())
 		counter, err := serverMetrics.HandledEventsCounter.GetMetricWithLabelValues(eventType)
 		Ω(err).ShouldNot(HaveOccurred())
-		Expect(count(counter)).To(Equal(1))
+
+		verifyCount(counter, 1)
 	})
 
 	It("should get Rate limit for GitHub API calls", func() {
@@ -105,11 +107,13 @@ var _ = Describe("Service Metrics", func() {
 
 		gauge, err := serverMetrics.RateLimit.GetMetricWithLabelValues("core")
 		Ω(err).ShouldNot(HaveOccurred())
-		Expect(gaugeValue(gauge)).To(Equal(8))
+
+		verifyGauge(gauge, 8)
 
 		gauge, err = serverMetrics.RateLimit.GetMetricWithLabelValues("search")
 		Ω(err).ShouldNot(HaveOccurred())
-		Expect(gaugeValue(gauge)).To(Equal(10))
+
+		verifyGauge(gauge, 10)
 	})
 })
 
@@ -123,14 +127,14 @@ func setGockMocks() {
 		EnableNetworking()
 }
 
-func count(counter prometheus.Counter) int {
-	m := &dto.Metric{}
-	counter.Write(m)
-	return int(m.Counter.GetValue())
+func verifyCount(c prometheus.Counter, expected int) {
+	count, err := utils.Count(c)
+	Ω(err).ShouldNot(HaveOccurred())
+	Expect(count).To(Equal(expected))
 }
 
-func gaugeValue(gauge prometheus.Gauge) int {
-	m := &dto.Metric{}
-	gauge.Write(m)
-	return int(m.Gauge.GetValue())
+func verifyGauge(g prometheus.Gauge, expected int)  {
+	gaugeValueSearch, err := utils.GaugeValue(g)
+	Ω(err).ShouldNot(HaveOccurred())
+	Expect(gaugeValueSearch).To(Equal(expected))
 }
