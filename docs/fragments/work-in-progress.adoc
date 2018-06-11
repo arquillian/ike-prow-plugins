@@ -2,9 +2,12 @@
 
 This plugin can help reviewers with focusing on work that really matters so they don't need to spend time with Pull Requests that are still in progress unless they were requested to do partial reviews.
 
-If the PR title starts with any of the default prefixes such as `WIP`, `DO NOT MERGE`, `DON'T MERGE`, `WORK-IN-PROGRESS` with combinations of `( )`, `[ ]`, `:` or any of the user configured prefixes as described below (non-case sensitive) then the plugin marks its check as **Failure**, or as **Success** otherwise.
+The plugin checks for the following cases to set the status for the PR in progress:
 
-In addition to managing the status for the PR in progress, it also manages adding/removing the GitHub label (`const:pkg/plugin/work-in-progress/configuration.go[name="DefaultLabel"]` by default or configured otherwise) for the given PR. 
+* If the PR title starts with any of the default prefixes such as `WIP`, `DO NOT MERGE`, `DON'T MERGE`, `WORK-IN-PROGRESS` with combinations of `( )`, `[ ]`, `:` or any of the user configured prefixes as described below (non-case sensitive) then the plugin marks its check as **Failure**, or as **Success** otherwise.
+* Or if the PR contains the default (`const:pkg/plugin/work-in-progress/configuration.go[name="DefaultLabel"]`) or any other user configured label then the plugin marks its check as **Failure**, or as **Success** otherwise.
+
+In addition to managing the status for the PR in progress, it also manages adding/removing the GitHub label (`const:pkg/plugin/work-in-progress/configuration.go[name="DefaultLabel"]` by default or configured otherwise) and updating the PR title in the event of updating the given PR by either removing the prefix title or removing the label. 
 
 === Plugin Configuration [[work-in-progress-config]]
 

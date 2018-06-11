@@ -1,6 +1,6 @@
 ==== Success [[wip-success]]
 
-Your Pull Request has been approved as the plugin didn't detect any sign of work in progress (the PR title doesn't start with any of the <<index#work-in-progress-config,"work in progress prefixes">>).
+Your Pull Request has been approved as the plugin didn't detect any sign of work in progress (the PR title doesn't start with any of the <<index#work-in-progress-config,"work in progress prefixes">> or contain any "work-in-progress" label).
 
 ifdef::only-status-details[]
 The complete documentation can be found at http://arquillian.org/ike-prow-plugins.
