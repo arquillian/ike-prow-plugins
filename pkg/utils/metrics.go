@@ -12,7 +12,7 @@ func Count(counter prometheus.Counter) (int, error) {
 	return int(m.Counter.GetValue()), e
 }
 
-// GaugeValue to get single numerical value as int from Guage Metric.
+// GaugeValue to get single numerical value as int from Gauge Metric.
 func GaugeValue(gauge prometheus.Gauge) (int, error) {
 	m := &dto.Metric{}
 	e := gauge.Write(m)
