@@ -10,11 +10,12 @@ import (
 	. "github.com/onsi/gomega"
 	"gopkg.in/h2non/gock.v1"
 
+	"fmt"
+
 	"github.com/arquillian/ike-prow-plugins/pkg/command"
 	"github.com/arquillian/ike-prow-plugins/pkg/github"
-	"fmt"
-	"github.com/arquillian/ike-prow-plugins/pkg/plugin"
 	"github.com/arquillian/ike-prow-plugins/pkg/github/service"
+	"github.com/arquillian/ike-prow-plugins/pkg/plugin"
 	"github.com/arquillian/ike-prow-plugins/pkg/plugin/test-keeper"
 )
 
@@ -25,7 +26,7 @@ const (
 
 var (
 	expectedContext = strings.Join([]string{botName, wip.ProwPluginName}, "/")
-	docStatusRoot = fmt.Sprintf("%s/status/%s", plugin.DocumentationURL, wip.ProwPluginName)
+	docStatusRoot   = fmt.Sprintf("%s/status/%s", plugin.DocumentationURL, wip.ProwPluginName)
 )
 
 var _ = Describe("Work In Progress Plugin features", func() {
@@ -48,6 +49,61 @@ var _ = Describe("Work In Progress Plugin features", func() {
 		HaveContext(expectedContext),
 		HaveTargetURL(fmt.Sprintf("%s/%s/%s.html", docStatusRoot, "failure", wip.InProgressDetailsPageName)),
 	)
+
+	Context("Pull Request label change trigger", func() {
+		BeforeEach(func() {
+			defer gock.OffAll()
+			handler = &wip.GitHubWIPPRHandler{Client: NewDefaultGitHubClient(), BotName: botName}
+		})
+
+		AfterEach(EnsureGockRequestsHaveBeenMatched)
+
+		It("should mark opened PR as work-in-progress when labeled with WIP", func() {
+			// given
+			NonExistingRawGitHubFiles("work-in-progress.yml", "work-in-progress.yaml")
+
+			gock.New("https://api.github.com").
+				Post("/repos/bartoszmajsak/wfswarm-booster-pipeline-test/statuses").
+				SetMatcher(ExpectPayload(toHaveFailureState)).
+				Reply(201) // This way we implicitly verify that call happened after `HandleEvent` call
+
+			statusPayload := LoadFromFile("test_fixtures/github_calls/pr_labeled_wip.json")
+
+			// when
+			err := handler.HandleEvent(log, github.PullRequest, statusPayload)
+
+			// then - implicit verification of /statuses call occurrence with proper payload
+			Ω(err).ShouldNot(HaveOccurred())
+		})
+
+		It("should mark opened PR as ready for review if WIP label removed", func() {
+			// given
+			NonExistingRawGitHubFiles("work-in-progress.yml", "work-in-progress.yaml")
+
+			gock.New("https://api.github.com").
+				Get("/repos/bartoszmajsak/wfswarm-booster-pipeline-test/issues/4/labels").
+				Reply(200).
+				BodyString("[]")
+
+			gock.New("https://api.github.com").
+				Patch("repos/bartoszmajsak/wfswarm-booster-pipeline-test/pulls/4").
+				Reply(200).
+				Body(FromFile("test_fixtures/github_calls/pr_edited_with_title_change.json"))
+
+			gock.New("https://api.github.com").
+				Post("/repos/bartoszmajsak/wfswarm-booster-pipeline-test/statuses").
+				SetMatcher(ExpectPayload(toHaveSuccessState)).
+				Reply(201) // This way we implicitly verify that call happened after `HandleEvent` call
+
+			statusPayload := LoadFromFile("test_fixtures/github_calls/wip_pr_unlabeled.json")
+
+			// when
+			err := handler.HandleEvent(log, github.PullRequest, statusPayload)
+
+			// then - implicit verification of /statuses call occurrence with proper payload
+			Ω(err).ShouldNot(HaveOccurred())
+		})
+	})
 
 	Context("Pull Request title change trigger", func() {
 		BeforeEach(func() {
@@ -279,7 +335,6 @@ var _ = Describe("Work In Progress Plugin features", func() {
 				Reply(200).
 				BodyString("work-in-progress")
 
-
 			gock.New("https://api.github.com").
 				Post("/repos/bartoszmajsak/wfswarm-booster-pipeline-test/statuses").
 				SetMatcher(ExpectPayload(toHaveFailureState)).
@@ -315,7 +370,7 @@ var _ = Describe("Work In Progress Plugin features", func() {
 
 			gock.New("https://api.github.com").
 				Post("/repos/bartoszmajsak/wfswarm-booster-pipeline-test/statuses").
-				Times(0)  // This way we implicitly verify that call not happened after `HandleEvent` call
+				Times(0) // This way we implicitly verify that call not happened after `HandleEvent` call
 
 			statusPayload := LoadFromFile("test_fixtures/github_calls/trigger_run_test-keeper_on_pr_by_pr_creator.json")
 
