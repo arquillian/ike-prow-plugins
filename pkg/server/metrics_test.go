@@ -1,17 +1,19 @@
 package server_test
 
 import (
+	"net/http/httptest"
+
+	"github.com/arquillian/ike-prow-plugins/pkg/github"
+	. "github.com/arquillian/ike-prow-plugins/pkg/internal/test"
+	"github.com/arquillian/ike-prow-plugins/pkg/log"
+	"github.com/arquillian/ike-prow-plugins/pkg/server"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
-	"net/http/httptest"
-	"github.com/arquillian/ike-prow-plugins/pkg/server"
-	dto "github.com/prometheus/client_model/go"
 	"github.com/prometheus/client_golang/prometheus"
-	. "github.com/arquillian/ike-prow-plugins/pkg/internal/test"
+	dto "github.com/prometheus/client_model/go"
 	"gopkg.in/h2non/gock.v1"
 	"k8s.io/test-infra/prow/phony"
-	"github.com/arquillian/ike-prow-plugins/pkg/github"
-	"github.com/arquillian/ike-prow-plugins/pkg/log"
+	"github.com/arquillian/ike-prow-plugins/pkg/plugin/test-keeper"
 )
 
 type DummyGHEventHandler struct {
@@ -62,12 +64,14 @@ var _ = Describe("Service Metrics", func() {
 
 	It("should count incoming webhook", func() {
 		// given
-		setGockMocks()
+		setRateLimitMocks()
 		fullName := "bartoszmajsak/wfswarm-booster-pipeline-test"
-		payload := LoadFromFile("../plugin/work-in-progress/test_fixtures/github_calls/ready_pr_opened.json")
+		eventPayload := MockPr(LoadedFrom("../plugin/work-in-progress/test_fixtures/github_calls/prs/pr_details.json")).
+			Create().
+			CreatePullRequestEvent("created")
 
 		// when
-		err := phony.SendHook(testServer.URL, "pull_request", payload, secret)
+		err := phony.SendHook(testServer.URL, string(github.PullRequest), eventPayload, secret)
 
 		// then
 		Ω(err).ShouldNot(HaveOccurred())
@@ -78,27 +82,30 @@ var _ = Describe("Service Metrics", func() {
 
 	It("should count handled events", func() {
 		// given
-		setGockMocks()
-		eventType := "issue_comment"
-		payload := LoadFromFile("../plugin/test-keeper/test_fixtures/github_calls/prs/without_tests/skip_comment_by_admin.json")
+		setRateLimitMocks()
+		eventPayload := MockPr(LoadedFrom("../plugin/work-in-progress/test_fixtures/github_calls/prs/pr_details.json")).
+			Create().
+			CreateCommentEvent(SentByRepoOwner, testkeeper.BypassCheckComment, "created")
 
 		// when
-		err := phony.SendHook(testServer.URL, "issue_comment", payload, secret)
+		err := phony.SendHook(testServer.URL, string(github.IssueComment), eventPayload, secret)
 
 		// then
 		Ω(err).ShouldNot(HaveOccurred())
-		counter, err := serverMetrics.HandledEventsCounter.GetMetricWithLabelValues(eventType)
+		counter, err := serverMetrics.HandledEventsCounter.GetMetricWithLabelValues(string(github.IssueComment))
 		Ω(err).ShouldNot(HaveOccurred())
 		Expect(count(counter)).To(Equal(1))
 	})
 
 	It("should get Rate limit for GitHub API calls", func() {
 		// given
-		setGockMocks()
-		payload := LoadFromFile("../plugin/test-keeper/test_fixtures/github_calls/prs/without_tests/skip_comment_by_admin.json")
+		setRateLimitMocks()
+		eventPayload := MockPr(LoadedFrom("../plugin/work-in-progress/test_fixtures/github_calls/prs/pr_details.json")).
+			Create().
+			CreateCommentEvent(SentByRepoOwner, testkeeper.BypassCheckComment, "created")
 
 		// when
-		err := phony.SendHook(testServer.URL, "issue_comment", payload, secret)
+		err := phony.SendHook(testServer.URL, string(github.IssueComment), eventPayload, secret)
 
 		// then
 		Ω(err).ShouldNot(HaveOccurred())
@@ -113,7 +120,7 @@ var _ = Describe("Service Metrics", func() {
 	})
 })
 
-func setGockMocks() {
+func setRateLimitMocks() {
 	gock.New("https://api.github.com").
 		Get("/rate_limit").
 		Reply(200).

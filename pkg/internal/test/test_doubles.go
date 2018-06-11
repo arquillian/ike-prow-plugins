@@ -24,6 +24,11 @@ func LoadFromFile(filePath string) []byte {
 }
 
 // nolint
+func LoadedFrom(filePath string) string {
+	return string(LoadFromFile(filePath))
+}
+
+// nolint
 func FromFile(filePath string) io.Reader {
 	file, err := os.Open(filePath)
 	if err != nil {
