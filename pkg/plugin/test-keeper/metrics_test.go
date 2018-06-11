@@ -14,6 +14,7 @@ import (
 	"github.com/arquillian/ike-prow-plugins/pkg/utils"
 	"github.com/arquillian/ike-prow-plugins/pkg/github/service"
 	"github.com/arquillian/ike-prow-plugins/pkg/plugin/test-keeper"
+	"errors"
 )
 
 var _ = Describe("TestKeeper Metrics", func() {
@@ -85,10 +86,12 @@ var _ = Describe("TestKeeper Metrics", func() {
 
 		// then - should not expect any additional request mocking
 		Ω(err).ShouldNot(HaveOccurred())
-		counter, err := testkeeper.OkWithoutTestsPullRequestWithLabelValues(repositoryName)
+		histogram, err := testkeeper.OkWithoutTestsPullRequestWithLabelValues(repositoryName)
 		Ω(err).ShouldNot(HaveOccurred())
 
-		verifyHistogram(toMetric(counter), 1, expectedBound, expectedCnt)
+		metric, err := toMetric(histogram)
+		Ω(err).ShouldNot(HaveOccurred())
+		verifyHistogram(metric, 1, expectedBound, expectedCnt)
 	})
 
 	It("should report pull requests with tests", func() {
@@ -175,8 +178,12 @@ func verifyCounter(label string, count int) {
 	Expect(actualCount).To(Equal(count))
 }
 
-func toMetric(counter prometheus.Histogram) *dto.Metric {
+func toMetric(counter prometheus.Observer) (*dto.Metric, error) {
 	metric := &dto.Metric{}
-	counter.Write(metric)
-	return metric
+	histogram, ok := counter.(prometheus.Histogram)
+	if !ok {
+		return nil, errors.New("Failed to convert prometheus.Observer to prometheus.Histogram!")
+	}
+	histogram.Write(metric)
+	return metric, nil
 }

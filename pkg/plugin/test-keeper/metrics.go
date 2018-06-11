@@ -59,14 +59,14 @@ func PullRequestCounterWithLabelValues(lvs ...string) (prometheus.Counter, error
 }
 
 // OkWithoutTestsPullRequestWithLabelValues replaces the method of the same name in MetricVec.
-func OkWithoutTestsPullRequestWithLabelValues(lvs ...string) (prometheus.Histogram, error) {
+func OkWithoutTestsPullRequestWithLabelValues(lvs ...string) (prometheus.Observer, error) {
 	return okWithoutTestsPullRequest.GetMetricWithLabelValues(lvs...)
 }
 
 // UnRegisterMetricsAndReset unregisters and reset prometheus collectors.
 func UnRegisterMetricsAndReset() {
-	prometheus.Unregister(pullRequestsCounter)
 	pullRequestsCounter.Reset()
-	prometheus.Unregister(okWithoutTestsPullRequest)
+	prometheus.Unregister(pullRequestsCounter)
 	okWithoutTestsPullRequest.Reset()
+	prometheus.Unregister(okWithoutTestsPullRequest)
 }
