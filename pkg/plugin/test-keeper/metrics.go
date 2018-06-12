@@ -20,7 +20,7 @@ var (
 		Help: "Total number of pull requests.",
 	}, []string{"full_name", "type"})
 	okWithoutTestsPullRequest = prometheus.NewHistogramVec(prometheus.HistogramOpts{
-		Name:    "pull_requests_changed_file_size",
+		Name:    "pull_requests_size",
 		Help:    "Histogram for changed file size of pull request with ok-without-tests.",
 		Buckets: prometheus.ExponentialBuckets(1, 5, 6),
 	}, []string{"full_name"})
