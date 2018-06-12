@@ -38,6 +38,7 @@ var _ = Describe("TestKeeper Metrics", func() {
 	BeforeEach(func() {
 		defer gock.OffAll()
 		handler = &testkeeper.GitHubTestEventsHandler{Client: NewDefaultGitHubClient(), BotName: botName}
+		testkeeper.UnRegisterMetricsAndReset()
 		testkeeper.RegisterMetrics()
 	})
 
@@ -155,16 +156,16 @@ var _ = Describe("TestKeeper Metrics", func() {
 
 func verifyHistogram(m *dto.Metric, expectedCount uint64, expectedBound []float64, expectedCnt []uint64) {
 	if expectedCount != m.Histogram.GetSampleCount() {
-		Fail(fmt.Sprintf("Histogram count was incorrect, want: %d, got: %d",
+		Fail(fmt.Sprintf("Histogram count was incorrect, expected: %d, actual: %d",
 			expectedCount, m.Histogram.GetSampleCount()))
 	}
 	for ind, bucket := range m.Histogram.GetBucket() {
 		if expectedBound[ind] != *bucket.UpperBound {
-			Fail(fmt.Sprintf("Bucket upper bound was incorrect, want: %f, got: %f\n",
+			Fail(fmt.Sprintf("Bucket upper bound was incorrect, expected: %f, actual: %f\n",
 				expectedBound[ind], *bucket.UpperBound))
 		}
 		if expectedCnt[ind] != *bucket.CumulativeCount {
-			Fail(fmt.Sprintf("Bucket cumulative count was incorrect, want: %d, got: %d\n",
+			Fail(fmt.Sprintf("Bucket cumulative count was incorrect, expected: %d, actual: %d\n",
 				expectedCnt[ind], *bucket.CumulativeCount))
 		}
 	}
