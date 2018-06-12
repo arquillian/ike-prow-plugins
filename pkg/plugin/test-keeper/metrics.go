@@ -49,7 +49,7 @@ func reportPullRequest(l log.Logger, pr *gogh.PullRequest, prType string) {
 	}
 }
 
-func reportOkWithoutTestsPullRequest(pr *gogh.PullRequest) {
+func reportBypassCommand(pr *gogh.PullRequest) {
 	okWithoutTestsPullRequest.WithLabelValues(*pr.Base.Repo.FullName).Observe(float64(*pr.ChangedFiles))
 }
 
