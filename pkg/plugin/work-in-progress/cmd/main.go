@@ -9,26 +9,22 @@ import (
 )
 
 func main() {
-	pluginBootstrap.InitPlugin(wip.ProwPluginName, handlerCreator, serverCreator, helpProvider, registerMetrics)
+	pluginBootstrap.InitPlugin(wip.ProwPluginName, handlerCreator, serverCreator, helpProvider)
 }
 
 func handlerCreator(githubClient ghclient.Client, botName string) server.GitHubEventHandler {
 	return &wip.GitHubWIPPRHandler{Client: githubClient, BotName: botName}
 }
 
-func serverCreator(webhookSecret []byte, eventHandler server.GitHubEventHandler) *server.Server {
+func serverCreator(webhookSecret []byte, eventHandler server.GitHubEventHandler) (*server.Server, []error) {
 	return &server.Server{
 		GitHubEventHandler: eventHandler,
 		HmacSecret:         webhookSecret,
-	}
+	}, nil
 }
 
 func helpProvider(enabledRepos []string) (*pluginhelp.PluginHelp, error) {
 	return &pluginhelp.PluginHelp{
 		Description: `Work-in-progress plugin`,
 	}, nil
-}
-
-func registerMetrics() []error {
-	return make([]error, 0)
 }

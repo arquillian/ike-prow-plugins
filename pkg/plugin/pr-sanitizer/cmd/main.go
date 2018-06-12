@@ -21,18 +21,18 @@ type GitHubLabelsEventsHandler struct {
 }
 
 func main() {
-	pluginBootstrap.InitPlugin(ProwPluginName, handlerCreator, serverCreator, helpProvider, registerMetrics)
+	pluginBootstrap.InitPlugin(ProwPluginName, handlerCreator, serverCreator, helpProvider)
 }
 
 func handlerCreator(githubClient ghclient.Client, botName string) server.GitHubEventHandler {
 	return &GitHubLabelsEventsHandler{Client: githubClient, BotName: botName}
 }
 
-func serverCreator(webhookSecret []byte, eventHandler server.GitHubEventHandler) *server.Server {
+func serverCreator(webhookSecret []byte, eventHandler server.GitHubEventHandler) (*server.Server, []error) {
 	return &server.Server{
 		GitHubEventHandler: eventHandler,
 		HmacSecret:         webhookSecret,
-	}
+	}, nil
 }
 
 // HandleEvent is an entry point for the plugin logic. This method is invoked by the Server when
@@ -46,8 +46,4 @@ func helpProvider(enabledRepos []string) (*pluginhelp.PluginHelp, error) {
 	return &pluginhelp.PluginHelp{
 		Description: `PR Sanitizer plugin`,
 	}, nil
-}
-
-func registerMetrics() []error {
-	return make([]error, 0)
 }

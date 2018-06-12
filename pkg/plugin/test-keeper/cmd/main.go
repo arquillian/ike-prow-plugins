@@ -10,18 +10,20 @@ import (
 )
 
 func main() {
-	pluginBootstrap.InitPlugin(testkeeper.ProwPluginName, eventHandler, eventServer, helpProvider, testkeeper.RegisterMetrics)
+	pluginBootstrap.InitPlugin(testkeeper.ProwPluginName, eventHandler, eventServer, helpProvider)
 }
 
 func eventHandler(githubClient ghclient.Client, botName string) server.GitHubEventHandler {
 	return &testkeeper.GitHubTestEventsHandler{Client: githubClient, BotName: botName}
 }
 
-func eventServer(webhookSecret []byte, eventHandler server.GitHubEventHandler) *server.Server {
+func eventServer(webhookSecret []byte, eventHandler server.GitHubEventHandler) (*server.Server, []error) {
+	errors := testkeeper.RegisterMetrics()
+
 	return &server.Server{
 		GitHubEventHandler: eventHandler,
 		HmacSecret:         webhookSecret,
-	}
+	}, errors
 }
 
 func helpProvider(enabledRepos []string) (*pluginhelp.PluginHelp, error) {

@@ -24,7 +24,6 @@ import (
 	"github.com/arquillian/ike-prow-plugins/pkg/server"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"github.com/sirupsen/logrus"
-	"fmt"
 )
 
 // nolint
@@ -51,15 +50,12 @@ const DocumentationURL = "http://arquillian.org/ike-prow-plugins"
 type EventHandlerCreator func(client ghclient.Client, botName string) server.GitHubEventHandler
 
 // ServerCreator is a func type that wires Server and server.GitHubEventHandler together
-type ServerCreator func(hmacSecret []byte, evenHandler server.GitHubEventHandler) *server.Server
-
-// RegisterMetrics registers prometheus collectors to collect plugin specific metrics.
-type RegisterMetrics func() ([]error)
+type ServerCreator func(hmacSecret []byte, evenHandler server.GitHubEventHandler) (*server.Server, []error)
 
 // InitPlugin instantiates logger, loads the secrets from the flags, sets context to background and starts server with
 // the attached event handler.
 func InitPlugin(pluginName string, newEventHandler EventHandlerCreator, newServer ServerCreator,
-	helpProvider externalplugins.ExternalPluginHelpProvider, registerMetrics RegisterMetrics) {
+	helpProvider externalplugins.ExternalPluginHelpProvider) {
 
 	// Ignore SIGTERM so that we don't drop hooks when the pod is removed.
 	// We'll get SIGTERM first and then SIGKILL after our graceful termination deadline.
@@ -97,14 +93,14 @@ func InitPlugin(pluginName string, newEventHandler EventHandlerCreator, newServe
 
 	handler := newEventHandler(githubClient, *pluginBotName)
 
-	pluginServer := newServer(webhookSecret, handler)
-	metrics, errs := server.RegisterMetrics(githubClient)
-	logErrors(errs, logger, "Prometheus metrics registration failed!")
+	pluginServer, errs := newServer(webhookSecret, handler)
+	metrics, errors := server.RegisterMetrics(githubClient)
+	if errs != nil && len(errs) > 0 {
+		errors = append(errors, errs...)
+	}
+	logErrors(errors, logger, "Prometheus metrics registration failed!")
 
 	pluginServer.Metrics = metrics
-
-	errors := registerMetrics()
-	logErrors(errors, logger, fmt.Sprintf("Prometheus metrics registration failed for plugin %s!", pluginName))
 
 	port := strconv.Itoa(*port)
 	logger.Infof("Starting server on port %s", port)
