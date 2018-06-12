@@ -41,7 +41,7 @@ func RegisterMetrics() []error {
 }
 
 func reportPullRequest(l log.Logger, pr *gogh.PullRequest, prType string) {
-	fullName := *pr.Head.Repo.FullName
+	fullName := *pr.Base.Repo.FullName
 	if counter, err := pullRequestsCounter.GetMetricWithLabelValues(fullName, prType); err != nil {
 		l.Errorf("Failed to get pull request metric for Repository: %q. Cause: %q", fullName, err)
 	} else {
@@ -50,7 +50,7 @@ func reportPullRequest(l log.Logger, pr *gogh.PullRequest, prType string) {
 }
 
 func reportOkWithoutTestsPullRequest(pr *gogh.PullRequest) {
-	okWithoutTestsPullRequest.WithLabelValues(*pr.Head.Repo.FullName).Observe(float64(*pr.ChangedFiles))
+	okWithoutTestsPullRequest.WithLabelValues(*pr.Base.Repo.FullName).Observe(float64(*pr.ChangedFiles))
 }
 
 // PullRequestCounterWithLabelValues replaces the method of the same name in MetricVec.
