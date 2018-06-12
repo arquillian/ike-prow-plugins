@@ -2,13 +2,13 @@
     "action": "labeled",
     "number": 4,
     "pull_request": {
-      "url": "https://api.github.com/repos/bartoszmajsak/wfswarm-booster-pipeline-test/pulls/3",
-      "id": 188365880,
-      "html_url": "https://github.com/bartoszmajsak/wfswarm-booster-pipeline-test/pull/3",
-      "diff_url": "https://github.com/bartoszmajsak/wfswarm-booster-pipeline-test/pull/3.diff",
-      "patch_url": "https://github.com/bartoszmajsak/wfswarm-booster-pipeline-test/pull/3.patch",
-      "issue_url": "https://api.github.com/repos/bartoszmajsak/wfswarm-booster-pipeline-test/issues/3",
-      "number": 3,
+      "url": "https://api.github.com/repos/bartoszmajsak/wfswarm-booster-pipeline-test/pulls/4",
+      "id": 188465880,
+      "html_url": "https://github.com/bartoszmajsak/wfswarm-booster-pipeline-test/pull/4",
+      "diff_url": "https://github.com/bartoszmajsak/wfswarm-booster-pipeline-test/pull/4.diff",
+      "patch_url": "https://github.com/bartoszmajsak/wfswarm-booster-pipeline-test/pull/4.patch",
+      "issue_url": "https://api.github.com/repos/bartoszmajsak/wfswarm-booster-pipeline-test/issues/4",
+      "number": 4,
       "state": "open",
       "locked": false,
       "title": "adds a new endpoint.",
@@ -57,10 +57,10 @@
         }
       ],
       "milestone": null,
-      "commits_url": "https://api.github.com/repos/bartoszmajsak/wfswarm-booster-pipeline-test/pulls/3/commits",
-      "review_comments_url": "https://api.github.com/repos/bartoszmajsak/wfswarm-booster-pipeline-test/pulls/3/comments",
+      "commits_url": "https://api.github.com/repos/bartoszmajsak/wfswarm-booster-pipeline-test/pulls/4/commits",
+      "review_comments_url": "https://api.github.com/repos/bartoszmajsak/wfswarm-booster-pipeline-test/pulls/4/comments",
       "review_comment_url": "https://api.github.com/repos/bartoszmajsak/wfswarm-booster-pipeline-test/pulls/comments{/number}",
-      "comments_url": "https://api.github.com/repos/bartoszmajsak/wfswarm-booster-pipeline-test/issues/3/comments",
+      "comments_url": "https://api.github.com/repos/bartoszmajsak/wfswarm-booster-pipeline-test/issues/4/comments",
       "statuses_url": "https://api.github.com/repos/bartoszmajsak/wfswarm-booster-pipeline-test/statuses/b2c64583331d7c839f20542fbd7a66d0b582b07e",
       "head": {
         "label": "bartoszmajsak:wip-pull-request",
@@ -304,25 +304,25 @@
       },
       "_links": {
         "self": {
-          "href": "https://api.github.com/repos/bartoszmajsak/wfswarm-booster-pipeline-test/pulls/3"
+          "href": "https://api.github.com/repos/bartoszmajsak/wfswarm-booster-pipeline-test/pulls/4"
         },
         "html": {
-          "href": "https://github.com/bartoszmajsak/wfswarm-booster-pipeline-test/pull/3"
+          "href": "https://github.com/bartoszmajsak/wfswarm-booster-pipeline-test/pull/4"
         },
         "issue": {
-          "href": "https://api.github.com/repos/bartoszmajsak/wfswarm-booster-pipeline-test/issues/3"
+          "href": "https://api.github.com/repos/bartoszmajsak/wfswarm-booster-pipeline-test/issues/4"
         },
         "comments": {
-          "href": "https://api.github.com/repos/bartoszmajsak/wfswarm-booster-pipeline-test/issues/3/comments"
+          "href": "https://api.github.com/repos/bartoszmajsak/wfswarm-booster-pipeline-test/issues/4/comments"
         },
         "review_comments": {
-          "href": "https://api.github.com/repos/bartoszmajsak/wfswarm-booster-pipeline-test/pulls/3/comments"
+          "href": "https://api.github.com/repos/bartoszmajsak/wfswarm-booster-pipeline-test/pulls/4/comments"
         },
         "review_comment": {
           "href": "https://api.github.com/repos/bartoszmajsak/wfswarm-booster-pipeline-test/pulls/comments{/number}"
         },
         "commits": {
-          "href": "https://api.github.com/repos/bartoszmajsak/wfswarm-booster-pipeline-test/pulls/3/commits"
+          "href": "https://api.github.com/repos/bartoszmajsak/wfswarm-booster-pipeline-test/pulls/4/commits"
         },
         "statuses": {
           "href": "https://api.github.com/repos/bartoszmajsak/wfswarm-booster-pipeline-test/statuses/b2c64583331d7c839f20542fbd7a66d0b582b07e"

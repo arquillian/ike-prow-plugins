@@ -63,6 +63,13 @@ var _ = Describe("Work In Progress Plugin features", func() {
 			NonExistingRawGitHubFiles("work-in-progress.yml", "work-in-progress.yaml")
 
 			gock.New("https://api.github.com").
+				Get("/repos/bartoszmajsak/wfswarm-booster-pipeline-test/issues/4/labels").
+				Reply(200).
+				BodyString(`[{"id": 934813958,` +
+					`"url": "https://api.github.com/repos/bartoszmajsak/wfswarm-booster-pipeline-test/labels/work-in-progress",` +
+					`"name": "work-in-progress", "color": "ededed", "default": false}]`)
+
+			gock.New("https://api.github.com").
 				Post("/repos/bartoszmajsak/wfswarm-booster-pipeline-test/statuses").
 				SetMatcher(ExpectPayload(toHaveFailureState)).
 				Reply(201) // This way we implicitly verify that call happened after `HandleEvent` call
