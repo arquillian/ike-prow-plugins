@@ -171,8 +171,8 @@ func (gh *GitHubWIPPRHandler) updateTitleAndResetStatus(log log.Logger, change s
 			if err != nil {
 				log.Warnf("failed to update PR title [%q]. cause: %s", *pullRequest, err)
 			}
-			return statusService.Success(ReadyForReviewMessage, ReadyForReviewDetailsPageName)
 		}
+		return statusService.Success(ReadyForReviewMessage, ReadyForReviewDetailsPageName)
 	}
 	return statusService.Failure(InProgressMessage, InProgressDetailsPageName)
 }
