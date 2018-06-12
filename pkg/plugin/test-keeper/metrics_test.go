@@ -50,9 +50,8 @@ var _ = Describe("TestKeeper Metrics", func() {
 	It("should report pull requests with /ok-without-tests in histogram", func() {
 		//given
 		expectedBound := []float64{1, 5, 25, 125, 625, 3125}
-		expectedCnt := []uint64{0, 1, 1, 1, 1, 1, 1}
+		expectedCnt := []uint64{0, 1, 1, 2, 2, 2, 2}
 
-		// given
 		NonExistingRawGitHubFiles("test-keeper.yml", "test-keeper.yaml")
 
 		gock.New("https://api.github.com").
@@ -61,11 +60,13 @@ var _ = Describe("TestKeeper Metrics", func() {
 			Body(FromFile("test_fixtures/github_calls/prs/without_tests/pr_details.json"))
 
 		gock.New("https://api.github.com").
+			Times(2).
 			Get("/repos/" + repositoryName + "/collaborators/bartoszmajsak/permission").
 			Reply(200).
 			Body(FromFile("test_fixtures/github_calls/collaborators_repo-admin_permission.json"))
 
 		gock.New("https://api.github.com").
+			Times(2).
 			Get("/repos/" + repositoryName + "/pulls/1/reviews").
 			Reply(200).
 			BodyString(`[]`)
@@ -76,6 +77,7 @@ var _ = Describe("TestKeeper Metrics", func() {
 		)
 
 		gock.New("https://api.github.com").
+			Times(2).
 			Post("/repos/" + repositoryName + "/statuses").
 			SetMatcher(ExpectPayload(toHaveEnforcedSuccessState)).
 			Reply(201) // This way we implicitly verify that call happened after `HandleEvent` call
@@ -85,6 +87,20 @@ var _ = Describe("TestKeeper Metrics", func() {
 		// when
 		err := handler.HandleEvent(log, github.IssueComment, statusPayload)
 
+		// then
+		Ω(err).ShouldNot(HaveOccurred())
+
+		// given
+		gock.New("https://api.github.com").
+			Get("/repos/" + repositoryName + "/pulls/1").
+			Reply(200).
+			Body(FromFile("test_fixtures/github_calls/prs/without_tests/pr_details_for_metrics.json"))
+
+		statusPayload = LoadFromFile("test_fixtures/github_calls/prs/without_tests/skip_comment_by_admin.json")
+
+		// when
+		err = handler.HandleEvent(log, github.IssueComment, statusPayload)
+
 		// then - should not expect any additional request mocking
 		Ω(err).ShouldNot(HaveOccurred())
 		histogram, err := testkeeper.OkWithoutTestsPullRequestWithLabelValues(repositoryName)
@@ -92,7 +108,7 @@ var _ = Describe("TestKeeper Metrics", func() {
 
 		metric, err := toMetric(histogram)
 		Ω(err).ShouldNot(HaveOccurred())
-		verifyHistogram(metric, 1, expectedBound, expectedCnt)
+		verifyHistogram(metric, 2, expectedBound, expectedCnt)
 	})
 
 	It("should report pull requests with tests", func() {
