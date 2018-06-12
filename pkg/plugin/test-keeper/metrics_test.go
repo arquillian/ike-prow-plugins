@@ -103,7 +103,7 @@ var _ = Describe("TestKeeper Metrics", func() {
 
 		// then - should not expect any additional request mocking
 		Ω(err).ShouldNot(HaveOccurred())
-		histogram, err := testkeeper.OkWithoutTestsPullRequestWithLabelValues(repositoryName)
+		histogram, err := testkeeper.OkWithoutTestsPullRequestWithLabelValues(repositoryName, testkeeper.ProwPluginName)
 		Ω(err).ShouldNot(HaveOccurred())
 
 		metric, err := toMetric(histogram)
@@ -188,7 +188,7 @@ func verifyHistogram(m *dto.Metric, expectedCount uint64, expectedBound []float6
 }
 
 func verifyCounter(label string, count int) {
-	counter, err := testkeeper.PullRequestCounterWithLabelValues(repositoryName, label)
+	counter, err := testkeeper.PullRequestCounterWithLabelValues(repositoryName, label, testkeeper.ProwPluginName)
 	Ω(err).ShouldNot(HaveOccurred())
 	actualCount, err := utils.Count(counter)
 	Ω(err).ShouldNot(HaveOccurred())
