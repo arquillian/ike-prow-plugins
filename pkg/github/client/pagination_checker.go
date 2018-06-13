@@ -15,7 +15,7 @@ func NewPaginationChecker() AroundFunctionCreator {
 func (r paginationChecker) createAroundFunction(earlierAround aroundFunction) aroundFunction {
 	return func(doFunction doFunction) doFunction {
 		return func(doContext aroundContext) (func(), *gogh.Response, error) {
-			return r.checkNextPage(doFunction, doContext)
+			return r.checkNextPage(earlierAround(doFunction), doContext)
 		}
 	}
 }

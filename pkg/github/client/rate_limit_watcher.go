@@ -20,7 +20,7 @@ func NewRateLimitWatcher(c Client, log log.Logger, threshold int) AroundFunction
 func (r rateLimitWatcher) createAroundFunction(earlierAround aroundFunction) aroundFunction {
 	return func(doFunction doFunction) doFunction {
 		return func(aroundContext aroundContext) (func(), *gogh.Response, error) {
-			return r.logRateLimitsAfter(doFunction, aroundContext)
+			return r.logRateLimitsAfter(earlierAround(doFunction), aroundContext)
 		}
 	}
 }
