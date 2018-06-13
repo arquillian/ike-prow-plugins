@@ -26,10 +26,10 @@ type Client interface {
 	ListIssueComments(issue scm.RepositoryIssue) ([]*gogh.IssueComment, error)
 	CreateIssueComment(issue scm.RepositoryIssue, commentMsg *string) error
 	CreateStatus(change scm.RepositoryChange, repoStatus *gogh.RepoStatus) error
-	EditPullRequest(change scm.RepositoryChange, prNumber int, pullRequest *gogh.PullRequest) error
 	ListPullRequestLabels(change scm.RepositoryChange, prNumber int) ([]*gogh.Label, error)
 	AddPullRequestLabel(change scm.RepositoryChange, prNumber int, label []string) error
 	RemovePullRequestLabel(change scm.RepositoryChange, prNumber int, label string) error
+	EditPullRequest(*gogh.PullRequest) error
 	GetRateLimit() (*gogh.RateLimits, error)
 
 	RegisterAroundFunctions(aroundCreators ...AroundFunctionCreator)
@@ -172,10 +172,10 @@ func (c *client) CreateStatus(change scm.RepositoryChange, repoStatus *gogh.Repo
 	return err
 }
 
-func (c *client) EditPullRequest(change scm.RepositoryChange, prNumber int, pullRequest *gogh.PullRequest) error {
+func (c *client) EditPullRequest(pr *gogh.PullRequest) error {
 	err := c.do(func(aroundContext aroundContext) (func(), *gogh.Response, error) {
 		_, response, e :=
-			c.gh.PullRequests.Edit(context.Background(), change.Owner, change.RepoName, prNumber, pullRequest)
+			c.gh.PullRequests.Edit(context.Background(), *pr.Base.Repo.Owner.Login, *pr.Base.Repo.Name, *pr.Number, pr)
 		return func() {}, response, c.checkHTTPCode(response, e)
 	})
 
