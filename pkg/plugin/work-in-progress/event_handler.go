@@ -172,14 +172,15 @@ func (gh *GitHubWIPPRHandler) HasWorkInProgressPrefix(title string, config Plugi
 			prefixes = config.Prefix
 		}
 	}
-	return gh.hasPrefix(strings.ToLower(title), prefixes)
+	return gh.hasPrefix(title, prefixes)
 }
 
 func (gh *GitHubWIPPRHandler) hasPrefix(title string, prefixes []string) (bool, string) {
 	for _, prefix := range prefixes {
 		pattern := `(?mi)^(\[|\()?` + prefix + `(\]|\))?(:| )+`
-		if match, _ := regexp.MatchString(pattern, title); match {
-			return true, prefix
+		r, _ := regexp.Compile(pattern)
+		if match := r.FindString(title); match != "" {
+			return true, match
 		}
 	}
 	return false, ""
