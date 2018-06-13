@@ -2,7 +2,7 @@ package command
 
 var (
 	// Anybody allows to any user
-	Anybody = func() (*PermissionStatus, error) {
+	Anybody = func(evaluate bool) (*PermissionStatus, error) {
 		return &PermissionStatus{UserIsApproved: true, ApprovedRoles: []string{Anyone}}, nil
 	}
 
@@ -18,12 +18,12 @@ var (
 )
 
 // PermissionCheck represents any check of the user's permissions and returns PermissionStatus that contains the result
-type PermissionCheck func() (*PermissionStatus, error)
+type PermissionCheck func(evaluate bool) (*PermissionStatus, error)
 
 // Not reverses the given permission check
 var Not = func(restriction PermissionCheck) PermissionCheck {
-	return func() (*PermissionStatus, error) {
-		status, err := restriction()
+	return func(evaluate bool) (*PermissionStatus, error) {
+		status, err := restriction(evaluate)
 		reversedStatus := &PermissionStatus{User: status.User}
 		reversedStatus.UserIsApproved = !status.UserIsApproved
 		reversedStatus.RejectedRoles = status.ApprovedRoles
@@ -33,11 +33,14 @@ var Not = func(restriction PermissionCheck) PermissionCheck {
 }
 
 func of(any bool, permissionChecks ...PermissionCheck) PermissionCheck {
-	return func() (*PermissionStatus, error) {
+	return func(evaluate bool) (*PermissionStatus, error) {
 		statuses := make([]*PermissionStatus, 0, len(permissionChecks))
 		for _, checkPermission := range permissionChecks {
 
-			status, err := checkPermission()
+			status, err := checkPermission(evaluate)
+			if status.UserIsApproved && any {
+				evaluate = false
+			}
 			statuses = append(statuses, status)
 			if err != nil {
 				return Flatten(statuses, any), err

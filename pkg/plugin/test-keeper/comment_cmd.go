@@ -53,7 +53,7 @@ func IsValidBypassCmd(comment *gogh.IssueComment, prLoader *ghservice.PullReques
 
 	user := is.NewPermissionService(prLoader.Client, *comment.User.Login, prLoader)
 
-	status, err := is.AllOf(whoCanTrigger(user)...)()
+	status, err := is.AllOf(whoCanTrigger(user)...)(true)
 	if err != nil || !status.UserIsApproved {
 		return false
 	}

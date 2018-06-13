@@ -169,11 +169,7 @@ var _ = Describe("Command executor features", func() {
 
 				triggeredCommand.Sender = &gogh.User{Login: utils.String("sender")}
 
-				user := is.PermissionService{
-					Client:   client,
-					User:     "sender",
-					PRLoader: ghservice.NewPullRequestLazyLoaderFromComment(client, triggeredCommand),
-				}
+				user := is.NewPermissionService(client, "sender", ghservice.NewPullRequestLazyLoaderFromComment(client, triggeredCommand))
 
 				executed := false
 				command := is.CmdExecutor{Command: "/command"}
