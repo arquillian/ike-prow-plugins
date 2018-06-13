@@ -83,10 +83,10 @@ func (gh *GitHubWIPPRHandler) handlePrEvent(log log.Logger, event *gogh.PullRequ
 	}
 
 	switch *event.Action {
-	case "labeled":
+	case github.ActionLabeled:
 		return gh.checkLabelAndSetStatus(log, event.PullRequest)
 
-	case "unlabeled":
+	case github.ActionUnlabeled:
 		return gh.updateTitleAndResetStatus(log, event.PullRequest)
 
 	default:
@@ -124,13 +124,12 @@ func (gh *GitHubWIPPRHandler) handlePrComment(log log.Logger, comment *gogh.Issu
 }
 
 func (gh *GitHubWIPPRHandler) checkTitleAndSetStatus(log log.Logger, pullRequest *gogh.PullRequest) error {
-	change := gh.getRepositoryChange(pullRequest)
+	change := ghservice.NewRepositoryChangeForPR(pullRequest)
 	statusService := gh.getStatusService(log, change)
-	labels := gh.getPullRequestLabels(log, change, pullRequest)
 	configuration := LoadConfiguration(log, change)
 
-	labelExists := gh.hasWorkInProgressLabel(labels, configuration.Label)
-	if _, ok := gh.IsWorkInProgress(*pullRequest.Title, configuration); ok {
+	labelExists := gh.hasWorkInProgressLabel(pullRequest.Labels, configuration.Label)
+	if ok, _ := gh.HasWorkInProgressPrefix(*pullRequest.Title, configuration); ok {
 		if !labelExists {
 			if err := gh.Client.AddPullRequestLabel(change, *pullRequest.Number, strings.Fields(configuration.Label)); err != nil {
 				log.Errorf("failed to add label on PR [%q]. cause: %s", *pullRequest, err)
@@ -148,16 +147,15 @@ func (gh *GitHubWIPPRHandler) checkTitleAndSetStatus(log log.Logger, pullRequest
 }
 
 func (gh *GitHubWIPPRHandler) updateTitleAndResetStatus(log log.Logger, pullRequest *gogh.PullRequest) error {
-	change := gh.getRepositoryChange(pullRequest)
+	change := ghservice.NewRepositoryChangeForPR(pullRequest)
 	statusService := gh.getStatusService(log, change)
-	labels := gh.getPullRequestLabels(log, change, pullRequest)
 	configuration := LoadConfiguration(log, change)
 
-	labelExists := gh.hasWorkInProgressLabel(labels, configuration.Label)
+	labelExists := gh.hasWorkInProgressLabel(pullRequest.Labels, configuration.Label)
 	if !labelExists {
-		if prefix, ok := gh.IsWorkInProgress(*pullRequest.Title, configuration); ok {
+		if ok, prefix := gh.HasWorkInProgressPrefix(*pullRequest.Title, configuration); ok {
 			*pullRequest.Title = strings.TrimPrefix(*pullRequest.Title, prefix)
-			err := gh.Client.EditPullRequest(change, *pullRequest.Number, pullRequest)
+			err := gh.Client.EditPullRequest(pullRequest)
 			if err != nil {
 				log.Warnf("failed to update PR title [%q]. cause: %s", *pullRequest, err)
 			}
@@ -168,24 +166,15 @@ func (gh *GitHubWIPPRHandler) updateTitleAndResetStatus(log log.Logger, pullRequ
 }
 
 func (gh *GitHubWIPPRHandler) checkLabelAndSetStatus(log log.Logger, pullRequest *gogh.PullRequest) error {
-	change := gh.getRepositoryChange(pullRequest)
+	change := ghservice.NewRepositoryChangeForPR(pullRequest)
 	statusService := gh.getStatusService(log, change)
-	labels := gh.getPullRequestLabels(log, change, pullRequest)
 	configuration := LoadConfiguration(log, change)
 
-	labelExists := gh.hasWorkInProgressLabel(labels, configuration.Label)
+	labelExists := gh.hasWorkInProgressLabel(pullRequest.Labels, configuration.Label)
 	if labelExists {
 		return statusService.Failure(InProgressMessage, InProgressDetailsPageName)
 	}
 	return statusService.Success(ReadyForReviewMessage, ReadyForReviewDetailsPageName)
-}
-
-func (gh *GitHubWIPPRHandler) getPullRequestLabels(log log.Logger, change scm.RepositoryChange, pullRequest *gogh.PullRequest) []*gogh.Label {
-	labels, err := gh.Client.ListPullRequestLabels(change, *pullRequest.Number)
-	if err != nil {
-		log.Warnf("failed to list labels on PR [%q]. cause: %s", *pullRequest, err)
-	}
-	return labels
 }
 
 func (gh *GitHubWIPPRHandler) hasWorkInProgressLabel(labels []*gogh.Label, wipLabel string) bool {
@@ -197,8 +186,8 @@ func (gh *GitHubWIPPRHandler) hasWorkInProgressLabel(labels []*gogh.Label, wipLa
 	return false
 }
 
-// IsWorkInProgress checks if title is marked as Work In Progress
-func (gh *GitHubWIPPRHandler) IsWorkInProgress(title string, config PluginConfiguration) (string, bool) {
+// HasWorkInProgressPrefix checks if title is marked as Work In Progress
+func (gh *GitHubWIPPRHandler) HasWorkInProgressPrefix(title string, config PluginConfiguration) (bool, string) {
 	prefixes := defaultPrefixes
 	if len(config.Prefix) != 0 {
 		if config.Combine {
@@ -210,22 +199,14 @@ func (gh *GitHubWIPPRHandler) IsWorkInProgress(title string, config PluginConfig
 	return gh.hasPrefix(strings.ToLower(title), prefixes)
 }
 
-func (gh *GitHubWIPPRHandler) hasPrefix(title string, prefixes []string) (string, bool) {
+func (gh *GitHubWIPPRHandler) hasPrefix(title string, prefixes []string) (bool, string) {
 	for _, prefix := range prefixes {
 		pattern := `(?mi)^(\[|\()?` + prefix + `(\]|\))?(:| )+`
 		if match, _ := regexp.MatchString(pattern, title); match {
-			return prefix, true
+			return true, prefix
 		}
 	}
-	return "", false
-}
-
-func (gh *GitHubWIPPRHandler) getRepositoryChange(pullRequest *gogh.PullRequest) scm.RepositoryChange {
-	return scm.RepositoryChange{
-		Owner:    *pullRequest.Base.Repo.Owner.Login,
-		RepoName: *pullRequest.Base.Repo.Name,
-		Hash:     *pullRequest.Head.SHA,
-	}
+	return false, ""
 }
 
 func (gh *GitHubWIPPRHandler) getStatusService(log log.Logger, change scm.RepositoryChange) scm.StatusService {

@@ -20,7 +20,7 @@ var _ = Describe("Work-in-progress Plugin features", func() {
 
 		DescribeTable("should recognize PR as work-in-progress if title starts with configured or default prefix",
 			func(title string) {
-				_, state := handler.IsWorkInProgress(title, wip.PluginConfiguration{Prefix: []string{`On Hold`}, Combine: true})
+				state, _ := handler.HasWorkInProgressPrefix(title, wip.PluginConfiguration{Prefix: []string{`On Hold`}, Combine: true})
 				Expect(state).To(BeTrue())
 			},
 			Entry("Default Wip prefix", "Wip fix(#1): off-by one bug"),
@@ -30,7 +30,7 @@ var _ = Describe("Work-in-progress Plugin features", func() {
 
 		DescribeTable("should recognize PR as work-in-progress if title starts with any default prefix",
 			func(title string) {
-				_, state := handler.IsWorkInProgress(title, wip.PluginConfiguration{})
+				state, _ := handler.HasWorkInProgressPrefix(title, wip.PluginConfiguration{})
 				Expect(state).To(BeTrue())
 			},
 			Entry("Uppercase WIP prefix", "WIP fix(#1): off-by one bug"),
@@ -46,7 +46,7 @@ var _ = Describe("Work-in-progress Plugin features", func() {
 
 		DescribeTable("should not recognize PR as work-in-progress if title doesn't start with any default prefix",
 			func(title string) {
-				_, state := handler.IsWorkInProgress(title, wip.PluginConfiguration{})
+				state, _ := handler.HasWorkInProgressPrefix(title, wip.PluginConfiguration{})
 				Expect(state).To(BeFalse())
 			},
 			Entry("regular PR title", "fix(#1): off-by one bug"),
@@ -57,7 +57,7 @@ var _ = Describe("Work-in-progress Plugin features", func() {
 
 		DescribeTable("should not recognize PR as work-in-progress if title starts with default prefix when custom prefix is configured with combine false",
 			func(title string) {
-				_, state := handler.IsWorkInProgress(title, wip.PluginConfiguration{Prefix: []string{`On Hold`}, Combine: false})
+				state, _ := handler.HasWorkInProgressPrefix(title, wip.PluginConfiguration{Prefix: []string{`On Hold`}, Combine: false})
 				Expect(state).To(BeFalse())
 			},
 			Entry("Default Wip prefix", "Wip fix(#1): off-by one bug"),
