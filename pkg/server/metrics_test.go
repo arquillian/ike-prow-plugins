@@ -25,7 +25,6 @@ var _ = Describe("Service Metrics", func() {
 	secret := []byte("123abc")
 	client := NewDefaultGitHubClient()
 	var (
-		serverMetrics *server.Metrics
 		testServer    *httptest.Server
 	)
 
@@ -35,7 +34,7 @@ var _ = Describe("Service Metrics", func() {
 			PluginName:         "dummy-name",
 			HmacSecret:         secret,
 		}
-		metrics, errs := server.RegisterMetrics(client)
+		errs := server.RegisterMetrics(client)
 		if len(errs) > 0 {
 			var msg string
 			for _, er := range errs {
@@ -43,20 +42,13 @@ var _ = Describe("Service Metrics", func() {
 			}
 			Fail("Prometheus serverMetrics registration failed with errors:\n" + msg)
 		}
-		prowServer.Metrics = metrics
-		serverMetrics = metrics
 		testServer = httptest.NewServer(prowServer)
 		defer gock.OffAll()
 	})
 
 	AfterEach(func() {
 		testServer.Close()
-		prometheus.Unregister(serverMetrics.WebHookCounter)
-		serverMetrics.WebHookCounter.Reset()
-		prometheus.Unregister(serverMetrics.RateLimit)
-		serverMetrics.RateLimit.Reset()
-		prometheus.Unregister(serverMetrics.HandledEventsCounter)
-		serverMetrics.HandledEventsCounter.Reset()
+		server.UnRegisterAndResetMetrics()
 		EnsureGockRequestsHaveBeenMatched()
 	})
 
@@ -71,7 +63,7 @@ var _ = Describe("Service Metrics", func() {
 
 		// then
 		Ω(err).ShouldNot(HaveOccurred())
-		counter, err := serverMetrics.WebHookCounter.GetMetricWithLabelValues(fullName)
+		counter, err := server.WebHookCounterWithLabelValues(fullName)
 		Ω(err).ShouldNot(HaveOccurred())
 
 		verifyCount(counter, 1)
@@ -88,7 +80,7 @@ var _ = Describe("Service Metrics", func() {
 
 		// then
 		Ω(err).ShouldNot(HaveOccurred())
-		counter, err := serverMetrics.HandledEventsCounter.GetMetricWithLabelValues(eventType)
+		counter, err := server.HandledEventsCounterWithLabelValues(eventType)
 		Ω(err).ShouldNot(HaveOccurred())
 
 		verifyCount(counter, 1)
@@ -105,12 +97,12 @@ var _ = Describe("Service Metrics", func() {
 		// then
 		Ω(err).ShouldNot(HaveOccurred())
 
-		gauge, err := serverMetrics.RateLimit.GetMetricWithLabelValues("core")
+		gauge, err := server.RateLimitWithLabelValues("core")
 		Ω(err).ShouldNot(HaveOccurred())
 
 		verifyGauge(gauge, 8)
 
-		gauge, err = serverMetrics.RateLimit.GetMetricWithLabelValues("search")
+		gauge, err = server.RateLimitWithLabelValues("search")
 		Ω(err).ShouldNot(HaveOccurred())
 
 		verifyGauge(gauge, 10)
@@ -133,7 +125,7 @@ func verifyCount(c prometheus.Counter, expected int) {
 	Expect(count).To(Equal(expected))
 }
 
-func verifyGauge(g prometheus.Gauge, expected int)  {
+func verifyGauge(g prometheus.Gauge, expected int) {
 	gaugeValueSearch, err := utils.GaugeValue(g)
 	Ω(err).ShouldNot(HaveOccurred())
 	Expect(gaugeValueSearch).To(Equal(expected))

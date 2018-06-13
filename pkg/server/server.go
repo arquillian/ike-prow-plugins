@@ -24,7 +24,6 @@ type Server struct {
 	GitHubEventHandler GitHubEventHandler
 	HmacSecret         []byte
 	PluginName         string
-	Metrics            *Metrics
 }
 
 // repoEvent is a minimal common subset of most of the events sent by GitHub (such as IssueComment or PullRequest)
@@ -61,9 +60,9 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	}
 
 	fullName := *event.Repo.FullName
-	s.Metrics.reportIncomingWebHooks(l, fullName)
-	s.Metrics.reportHandledEvents(l, eventType)
-	s.Metrics.reportRateLimit(l)
+	reportIncomingWebHooks(l, fullName)
+	reportHandledEvents(l, eventType)
+	reportRateLimit(l)
 
 	if err := s.GitHubEventHandler.HandleEvent(l, github.EventType(eventType), payload); err != nil {
 		l.WithError(err).Error("error parsing event.")

@@ -38,12 +38,12 @@ var _ = Describe("TestKeeper Metrics", func() {
 	BeforeEach(func() {
 		defer gock.OffAll()
 		handler = &testkeeper.GitHubTestEventsHandler{Client: NewDefaultGitHubClient(), BotName: botName}
-		testkeeper.UnRegisterMetricsAndReset()
+		testkeeper.UnRegisterAndResetMetrics()
 		testkeeper.RegisterMetrics()
 	})
 
 	AfterEach(func() {
-		testkeeper.UnRegisterMetricsAndReset()
+		testkeeper.UnRegisterAndResetMetrics()
 		EnsureGockRequestsHaveBeenMatched()
 	})
 

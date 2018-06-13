@@ -63,8 +63,8 @@ func OkWithoutTestsPullRequestWithLabelValues(lvs ...string) (prometheus.Observe
 	return okWithoutTestsPullRequest.GetMetricWithLabelValues(lvs...)
 }
 
-// UnRegisterMetricsAndReset unregisters and reset prometheus collectors.
-func UnRegisterMetricsAndReset() {
+// UnRegisterAndResetMetrics unregisters and reset prometheus collectors.
+func UnRegisterAndResetMetrics() {
 	pullRequestsCounter.Reset()
 	prometheus.Unregister(pullRequestsCounter)
 	okWithoutTestsPullRequest.Reset()

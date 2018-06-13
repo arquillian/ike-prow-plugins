@@ -94,13 +94,11 @@ func InitPlugin(pluginName string, newEventHandler EventHandlerCreator, newServe
 	handler := newEventHandler(githubClient, *pluginBotName)
 
 	pluginServer, errs := newServer(webhookSecret, handler)
-	metrics, errors := server.RegisterMetrics(githubClient)
+	errors := server.RegisterMetrics(githubClient)
 	if errs != nil && len(errs) > 0 {
 		errors = append(errors, errs...)
 	}
 	logErrors(errors, logger, "Prometheus metrics registration failed!")
-
-	pluginServer.Metrics = metrics
 
 	port := strconv.Itoa(*port)
 	logger.Infof("Starting server on port %s", port)

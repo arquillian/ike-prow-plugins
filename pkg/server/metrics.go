@@ -19,28 +19,26 @@ var (
 		Name: "handled_events_total",
 		Help: "Total number of handled events.",
 	}, []string{"event_type"})
+	ghClient ghclient.Client
 )
 
 // RegisterMetrics registers prometheus collectors to collect metrics
-func RegisterMetrics(client ghclient.Client) (*Metrics, []error) {
+func RegisterMetrics(client ghclient.Client) ([]error) {
 	errors := make([]error, 0, 3)
-	metrics := &Metrics{
-		ghClient: client,
-	}
-
+	ghClient = client
 	RegisterOrGet(rateLimit, &errors, func(collector prometheus.Collector) {
-		metrics.RateLimit = collector.(*prometheus.GaugeVec)
+		rateLimit = collector.(*prometheus.GaugeVec)
 	})
 
 	RegisterOrGet(webHookCounter, &errors, func(collector prometheus.Collector) {
-		metrics.WebHookCounter = collector.(*prometheus.CounterVec)
+		webHookCounter = collector.(*prometheus.CounterVec)
 	})
 
 	RegisterOrGet(handledEventsCounter, &errors, func(collector prometheus.Collector) {
-		metrics.HandledEventsCounter = collector.(*prometheus.CounterVec)
+		handledEventsCounter = collector.(*prometheus.CounterVec)
 	})
 
-	return metrics, errors
+	return errors
 }
 
 // RegisterOrGet registers the provided Collector with the DefaultRegisterer and
@@ -56,36 +54,52 @@ func RegisterOrGet(collector prometheus.Collector, errors *[]error, assign func(
 	assign(collector)
 }
 
-// Metrics is a set of metrics gathered by the Ike Prow Plugin.
-// It includes rate limit, incoming webhooks. handled events.
-type Metrics struct {
-	RateLimit            *prometheus.GaugeVec
-	WebHookCounter       *prometheus.CounterVec
-	HandledEventsCounter *prometheus.CounterVec
-	ghClient             ghclient.Client
-}
-
-func (m *Metrics) reportRateLimit(l log.Logger) {
-	if limits, err := m.ghClient.GetRateLimit(); err != nil {
+func reportRateLimit(l log.Logger) {
+	if limits, err := ghClient.GetRateLimit(); err != nil {
 		l.Errorf("Failed to get metric GH Client rate limit. Cause: %q", err)
 	} else {
-		m.RateLimit.WithLabelValues("core").Set(float64(limits.Core.Remaining))
-		m.RateLimit.WithLabelValues("search").Set(float64(limits.Search.Remaining))
+		rateLimit.WithLabelValues("core").Set(float64(limits.Core.Remaining))
+		rateLimit.WithLabelValues("search").Set(float64(limits.Search.Remaining))
 	}
 }
 
-func (m *Metrics) reportIncomingWebHooks(l log.Logger, label string) {
-	if counter, err := m.WebHookCounter.GetMetricWithLabelValues(label); err != nil {
+func reportIncomingWebHooks(l log.Logger, label string) {
+	if counter, err := webHookCounter.GetMetricWithLabelValues(label); err != nil {
 		l.Errorf("Failed to get metric for Repository: %q. Cause: %q", label, err)
 	} else {
 		counter.Inc()
 	}
 }
 
-func (m *Metrics) reportHandledEvents(l log.Logger, label string) {
-	if counter, err := m.HandledEventsCounter.GetMetricWithLabelValues(label); err != nil {
+func reportHandledEvents(l log.Logger, label string) {
+	if counter, err := handledEventsCounter.GetMetricWithLabelValues(label); err != nil {
 		l.Errorf("Failed to get metric for Event: %q. Cause: %q", label, err)
 	} else {
 		counter.Inc()
 	}
+}
+
+// RateLimitWithLabelValues replaces the method of the same name in MetricVec.
+func RateLimitWithLabelValues(lvs ...string) (prometheus.Gauge, error) {
+	return rateLimit.GetMetricWithLabelValues(lvs...)
+}
+
+// WebHookCounterWithLabelValues replaces the method of the same name in MetricVec.
+func WebHookCounterWithLabelValues(lvs ...string) (prometheus.Counter, error) {
+	return webHookCounter.GetMetricWithLabelValues(lvs...)
+}
+
+// HandledEventsCounterWithLabelValues replaces the method of the same name in MetricVec.
+func HandledEventsCounterWithLabelValues(lvs ...string) (prometheus.Counter, error) {
+	return handledEventsCounter.GetMetricWithLabelValues(lvs...)
+}
+
+// UnRegisterAndResetMetrics unregisters and reset prometheus collectors.
+func UnRegisterAndResetMetrics() {
+	prometheus.Unregister(webHookCounter)
+	webHookCounter.Reset()
+	prometheus.Unregister(rateLimit)
+	rateLimit.Reset()
+	prometheus.Unregister(handledEventsCounter)
+	handledEventsCounter.Reset()
 }
