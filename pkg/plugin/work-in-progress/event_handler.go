@@ -11,7 +11,6 @@ import (
 	"github.com/arquillian/ike-prow-plugins/pkg/github/client"
 	"github.com/arquillian/ike-prow-plugins/pkg/github/service"
 	"github.com/arquillian/ike-prow-plugins/pkg/log"
-	"github.com/arquillian/ike-prow-plugins/pkg/scm"
 	"github.com/arquillian/ike-prow-plugins/pkg/utils"
 	gogh "github.com/google/go-github/github"
 )
@@ -84,14 +83,10 @@ func (gh *GitHubWIPPRHandler) handlePrEvent(log log.Logger, event *gogh.PullRequ
 	}
 
 	switch *event.Action {
-	case github.ActionLabeled:
-		return gh.checkLabelAndSetStatus(log, event.PullRequest)
-
-	case github.ActionUnlabeled:
-		return gh.updateTitleAndResetStatus(log, event.PullRequest)
-
+	case github.ActionLabeled, github.ActionUnlabeled:
+		return gh.checkComponentsAndSetStatus(log, event.PullRequest, true)
 	default:
-		return gh.checkTitleAndSetStatus(log, event.PullRequest)
+		return gh.checkComponentsAndSetStatus(log, event.PullRequest, false)
 	}
 }
 
@@ -113,7 +108,7 @@ func (gh *GitHubWIPPRHandler) handlePrComment(log log.Logger, comment *gogh.Issu
 				return err
 			}
 
-			return gh.checkTitleAndSetStatus(log, pullRequest)
+			return gh.checkComponentsAndSetStatus(log, pullRequest, false)
 
 		}})
 
@@ -124,55 +119,35 @@ func (gh *GitHubWIPPRHandler) handlePrComment(log log.Logger, comment *gogh.Issu
 	return err
 }
 
-func (gh *GitHubWIPPRHandler) checkTitleAndSetStatus(log log.Logger, pullRequest *gogh.PullRequest) error {
+func (gh *GitHubWIPPRHandler) checkComponentsAndSetStatus(log log.Logger, pullRequest *gogh.PullRequest, labelUpdated bool) error {
 	change := ghservice.NewRepositoryChangeForPR(pullRequest)
-	statusService := gh.getStatusService(log, change)
-	configuration := LoadConfiguration(log, change)
+	statusContext := github.StatusContext{BotName: gh.BotName, PluginName: ProwPluginName}
+	statusService := ghservice.NewStatusService(gh.Client, log, change, statusContext)
 
+	configuration := LoadConfiguration(log, change)
 	labelExists := gh.hasWorkInProgressLabel(pullRequest.Labels, configuration.Label)
-	if ok, _ := gh.HasWorkInProgressPrefix(*pullRequest.Title, configuration); ok {
-		if !labelExists {
-			if err := gh.Client.AddPullRequestLabel(change, *pullRequest.Number, strings.Fields(configuration.Label)); err != nil {
-				log.Errorf("failed to add label on PR [%q]. cause: %s", *pullRequest, err)
+	prefixExists, prefix := gh.HasWorkInProgressPrefix(*pullRequest.Title, configuration)
+
+	if prefixExists && !labelExists {
+		if labelUpdated {
+			*pullRequest.Title = strings.TrimPrefix(*pullRequest.Title, prefix)
+			if err := gh.Client.EditPullRequest(pullRequest); err != nil {
+				return fmt.Errorf("failed to update PR title [%q]. cause: %s", *pullRequest, err)
 			}
+			return statusService.Success(ReadyForReviewMessage, ReadyForReviewDetailsPageName)
+		}
+		if err := gh.Client.AddPullRequestLabel(change, *pullRequest.Number, strings.Fields(configuration.Label)); err != nil {
+			log.Errorf("failed to add label on PR [%q]. cause: %s", *pullRequest, err)
 		}
 		return statusService.Failure(InProgressMessage, InProgressDetailsPageName)
 	}
 	if labelExists {
-		if err := gh.Client.RemovePullRequestLabel(change, *pullRequest.Number, configuration.Label); err != nil {
-			log.Errorf("failed to remove label on PR [%q]. cause: %s", *pullRequest, err)
-		}
-	}
-	return statusService.Success(ReadyForReviewMessage, ReadyForReviewDetailsPageName)
-
-}
-
-func (gh *GitHubWIPPRHandler) updateTitleAndResetStatus(log log.Logger, pullRequest *gogh.PullRequest) error {
-	change := ghservice.NewRepositoryChangeForPR(pullRequest)
-	statusService := gh.getStatusService(log, change)
-	configuration := LoadConfiguration(log, change)
-
-	labelExists := gh.hasWorkInProgressLabel(pullRequest.Labels, configuration.Label)
-	if !labelExists {
-		if ok, prefix := gh.HasWorkInProgressPrefix(*pullRequest.Title, configuration); ok {
-			*pullRequest.Title = strings.TrimPrefix(*pullRequest.Title, prefix)
-			err := gh.Client.EditPullRequest(pullRequest)
-			if err != nil {
-				return fmt.Errorf("failed to update PR title [%q]. cause: %s", *pullRequest, err)
+		if !prefixExists && !labelUpdated {
+			if err := gh.Client.RemovePullRequestLabel(change, *pullRequest.Number, configuration.Label); err != nil {
+				log.Errorf("failed to remove label on PR [%q]. cause: %s", *pullRequest, err)
 			}
+			return statusService.Success(ReadyForReviewMessage, ReadyForReviewDetailsPageName)
 		}
-		return statusService.Success(ReadyForReviewMessage, ReadyForReviewDetailsPageName)
-	}
-	return statusService.Failure(InProgressMessage, InProgressDetailsPageName)
-}
-
-func (gh *GitHubWIPPRHandler) checkLabelAndSetStatus(log log.Logger, pullRequest *gogh.PullRequest) error {
-	change := ghservice.NewRepositoryChangeForPR(pullRequest)
-	statusService := gh.getStatusService(log, change)
-	configuration := LoadConfiguration(log, change)
-
-	labelExists := gh.hasWorkInProgressLabel(pullRequest.Labels, configuration.Label)
-	if labelExists {
 		return statusService.Failure(InProgressMessage, InProgressDetailsPageName)
 	}
 	return statusService.Success(ReadyForReviewMessage, ReadyForReviewDetailsPageName)
@@ -208,9 +183,4 @@ func (gh *GitHubWIPPRHandler) hasPrefix(title string, prefixes []string) (bool, 
 		}
 	}
 	return false, ""
-}
-
-func (gh *GitHubWIPPRHandler) getStatusService(log log.Logger, change scm.RepositoryChange) scm.StatusService {
-	statusContext := github.StatusContext{BotName: gh.BotName, PluginName: ProwPluginName}
-	return ghservice.NewStatusService(gh.Client, log, change, statusContext)
 }
