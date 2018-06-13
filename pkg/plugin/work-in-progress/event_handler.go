@@ -2,6 +2,7 @@ package wip
 
 import (
 	"encoding/json"
+	"fmt"
 	"regexp"
 	"strings"
 
@@ -157,7 +158,7 @@ func (gh *GitHubWIPPRHandler) updateTitleAndResetStatus(log log.Logger, pullRequ
 			*pullRequest.Title = strings.TrimPrefix(*pullRequest.Title, prefix)
 			err := gh.Client.EditPullRequest(pullRequest)
 			if err != nil {
-				log.Warnf("failed to update PR title [%q]. cause: %s", *pullRequest, err)
+				return fmt.Errorf("failed to update PR title [%q]. cause: %s", *pullRequest, err)
 			}
 		}
 		return statusService.Success(ReadyForReviewMessage, ReadyForReviewDetailsPageName)
