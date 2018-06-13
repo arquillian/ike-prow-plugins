@@ -67,7 +67,7 @@ func (gh *GitHubTestEventsHandler) handlePrEvent(log log.Logger, event *gogh.Pul
 	if !utils.Contains(handledPrActions, *event.Action) {
 		return nil
 	}
-	return gh.checkTestsAndSetStatus(log, event.PullRequest)
+	return gh.checkTestsAndSetStatus(log, ghservice.NewPullRequestLazyLoaderWithPR(gh.Client, event.PullRequest))
 }
 
 func (gh *GitHubTestEventsHandler) checkIfBypassed(log log.Logger, commentsLoader *ghservice.IssueCommentsLazyLoader, pr *gogh.PullRequest) (bool, string) {
@@ -100,13 +100,13 @@ func (gh *GitHubTestEventsHandler) handlePrComment(log log.Logger, comment *gogh
 		PluginName:            ProwPluginName,
 		UserPermissionService: userPerm,
 		WhenAddedOrEdited: func() error {
-			return gh.loadPRCheckTestsAndSetStatus(prLoader, log)
+			return gh.checkTestsAndSetStatus(log, prLoader)
 		}})
 
 	cmdHandler.Register(&BypassCmd{
 		userPermissionService: userPerm,
 		whenDeleted: func() error {
-			return gh.loadPRCheckTestsAndSetStatus(prLoader, log)
+			return gh.checkTestsAndSetStatus(log, prLoader)
 		},
 		whenAddedOrEdited: func() error {
 			pullRequest, err := prLoader.Load()
@@ -125,7 +125,11 @@ func (gh *GitHubTestEventsHandler) handlePrComment(log log.Logger, comment *gogh
 	return err
 }
 
-func (gh *GitHubTestEventsHandler) checkTestsAndSetStatus(log log.Logger, pr *gogh.PullRequest) error {
+func (gh *GitHubTestEventsHandler) checkTestsAndSetStatus(log log.Logger, prLoader *ghservice.PullRequestLazyLoader) error {
+	pr, err := prLoader.Load()
+	if err != nil {
+		return err
+	}
 	change := ghservice.NewRepositoryChangeForPR(pr)
 	configuration := LoadConfiguration(log, change)
 	fileCategories, err := gh.checkTests(log, change, configuration, *pr.Number)
@@ -192,12 +196,4 @@ func (gh *GitHubTestEventsHandler) checkTests(log log.Logger, change scm.Reposit
 	}
 
 	return fileCategories, err
-}
-
-func (gh *GitHubTestEventsHandler) loadPRCheckTestsAndSetStatus(prLoader *ghservice.PullRequestLazyLoader, log log.Logger) error {
-	pullRequest, err := prLoader.Load()
-	if err != nil {
-		return err
-	}
-	return gh.checkTestsAndSetStatus(log, pullRequest)
 }
