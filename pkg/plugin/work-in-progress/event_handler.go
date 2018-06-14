@@ -136,7 +136,7 @@ func (gh *GitHubWIPPRHandler) checkComponentsAndSetStatus(log log.Logger, pullRe
 			}
 			return statusService.Success(ReadyForReviewMessage, ReadyForReviewDetailsPageName)
 		}
-		if err := gh.Client.AddPullRequestLabel(change, *pullRequest.Number, strings.Fields(configuration.Label)); err != nil {
+		if err := gh.Client.AddPullRequestLabel(change, *pullRequest.Number, []string{configuration.Label}); err != nil {
 			log.Errorf("failed to add label on PR [%q]. cause: %s", *pullRequest, err)
 		}
 		return statusService.Failure(InProgressMessage, InProgressDetailsPageName)
