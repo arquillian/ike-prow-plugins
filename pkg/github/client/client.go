@@ -26,7 +26,6 @@ type Client interface {
 	ListIssueComments(issue scm.RepositoryIssue) ([]*gogh.IssueComment, error)
 	CreateIssueComment(issue scm.RepositoryIssue, commentMsg *string) error
 	CreateStatus(change scm.RepositoryChange, repoStatus *gogh.RepoStatus) error
-	ListPullRequestLabels(change scm.RepositoryChange, prNumber int) ([]*gogh.Label, error)
 	AddPullRequestLabel(change scm.RepositoryChange, prNumber int, label []string) error
 	RemovePullRequestLabel(change scm.RepositoryChange, prNumber int, label string) error
 	EditPullRequest(*gogh.PullRequest) error
@@ -180,19 +179,6 @@ func (c *client) EditPullRequest(pr *gogh.PullRequest) error {
 	})
 
 	return err
-}
-
-func (c *client) ListPullRequestLabels(change scm.RepositoryChange, prNumber int) ([]*gogh.Label, error) {
-	allLabels := make([]*gogh.Label, 0)
-
-	err := c.do(func(aroundCtx aroundContext) (func(), *gogh.Response, error) {
-		labels, response, e := c.gh.Issues.ListLabelsByIssue(context.Background(), change.Owner, change.RepoName, prNumber, listOpts(aroundCtx))
-		return func() {
-			allLabels = append(allLabels, labels...)
-		}, response, c.checkHTTPCode(response, e)
-	})
-
-	return allLabels, err
 }
 
 func (c *client) AddPullRequestLabel(change scm.RepositoryChange, prNumber int, label []string) error {

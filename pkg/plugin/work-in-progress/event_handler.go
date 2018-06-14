@@ -130,7 +130,7 @@ func (gh *GitHubWIPPRHandler) checkComponentsAndSetStatus(log log.Logger, pullRe
 
 	if prefixExists && !labelExists {
 		if labelUpdated {
-			*pullRequest.Title = strings.TrimPrefix(*pullRequest.Title, prefix)
+			*pullRequest.Title = strings.TrimSpace(strings.TrimPrefix(*pullRequest.Title, prefix))
 			if err := gh.Client.EditPullRequest(pullRequest); err != nil {
 				return fmt.Errorf("failed to update PR title [%q]. cause: %s", *pullRequest, err)
 			}
@@ -180,7 +180,7 @@ func (gh *GitHubWIPPRHandler) hasPrefix(title string, prefixes []string) (bool, 
 		pattern := `(?mi)^(\[|\()?` + prefix + `(\]|\))?(:| )+`
 		r, _ := regexp.Compile(pattern)
 		if match := r.FindString(title); match != "" {
-			return true, match
+			return true, strings.TrimSpace(match)
 		}
 	}
 	return false, ""
