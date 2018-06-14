@@ -95,10 +95,7 @@ func InitPlugin(pluginName string, newEventHandler EventHandlerCreator, newServe
 
 	pluginServer, errs := newServer(webhookSecret, handler)
 	errors := server.RegisterMetrics(githubClient)
-	if errs != nil && len(errs) > 0 {
-		errors = append(errors, errs...)
-	}
-	logErrors(errors, logger, "Prometheus metrics registration failed!")
+	logErrors(append(errors, errs...), logger, "Prometheus metrics registration failed!")
 
 	port := strconv.Itoa(*port)
 	logger.Infof("Starting server on port %s", port)
@@ -107,6 +104,7 @@ func InitPlugin(pluginName string, newEventHandler EventHandlerCreator, newServe
 	http.Handle("/version", probeshandler.NewProbesHandler(logger))
 
 	externalplugins.ServeExternalPluginHelp(http.DefaultServeMux, logger, helpProvider)
+
 
 	if *httpAddress == *metricsHttpAddress {
 		http.Handle("/metrics", promhttp.Handler())
