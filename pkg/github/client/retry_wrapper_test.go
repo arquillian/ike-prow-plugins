@@ -8,12 +8,17 @@ import (
 	. "github.com/onsi/gomega"
 	"gopkg.in/h2non/gock.v1"
 	"github.com/arquillian/ike-prow-plugins/pkg/github/client"
+	"github.com/arquillian/ike-prow-plugins/pkg/log"
+	gogh "github.com/google/go-github/github"
 )
 
 var _ = Describe("Retry client features", func() {
 
-	client := NewDefaultGitHubClient()
-	client.RegisterAroundFunctions(ghclient.NewRetryWrapper( 3, 0))
+	client := ghclient.NewClient(gogh.NewClient(nil), log.NewTestLogger())
+	client.RegisterAroundFunctions(
+		ghclient.NewRateLimitWatcher(client, log.NewTestLogger(), 100),
+		ghclient.NewRetryWrapper(3, 0),
+		ghclient.NewPaginationChecker())
 
 	Context("Client should try 3 times to get the correct response", func() {
 
@@ -26,7 +31,7 @@ var _ = Describe("Retry client features", func() {
 		It("should try to get the response 3 times and then fail when client gets only 404", func() {
 			// given
 			calls := 0
-
+			mockHighRateLimit()
 			gock.New("https://api.github.com").
 				Get("/repos/owner/repo/pulls/123/files").
 				SetMatcher(spyOnCalls(&calls)).
@@ -45,7 +50,7 @@ var _ = Describe("Retry client features", func() {
 		It("should stop resending requests and not fail when client gets 408 and then 200", func() {
 			// given
 			calls := 0
-
+			mockHighRateLimit()
 			gock.New("https://api.github.com").
 				Get("/repos/owner/repo/pulls/123/files").
 				SetMatcher(spyOnCalls(&calls)).
