@@ -24,7 +24,11 @@ type FilePattern struct {
 
 // Matches checks if the given string (representing path to a file) contains a substring that matches Regexp stored in this matcher
 func (matcher *FilePattern) Matches(filename string) bool {
-	return regexp.MustCompile(matcher.Regexp).MatchString(filename)
+	regexp, err := regexp.Compile(matcher.Regexp)
+	if err != nil {
+		return false
+	}
+	return regexp.MatchString(filename)
 }
 
 // FilePatterns is an alias type representing slice of FilePattern
