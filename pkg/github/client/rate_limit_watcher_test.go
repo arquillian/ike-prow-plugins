@@ -7,12 +7,13 @@ import (
 	. "github.com/onsi/gomega"
 	"github.com/sirupsen/logrus/hooks/test"
 	"gopkg.in/h2non/gock.v1"
+	gogh "github.com/google/go-github/github"
 )
 
 var _ = Describe("Rate limit watcher", func() {
 
 	logger, hook := test.NewNullLogger()
-	client := NewDefaultGitHubClient()
+	client := ghclient.NewClient(gogh.NewClient(nil), logger)
 	client.RegisterAroundFunctions(
 		ghclient.NewRateLimitWatcher(client, logger, 10),
 		ghclient.NewRetryWrapper(3, 0),

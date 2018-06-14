@@ -8,12 +8,13 @@ import (
 	"github.com/arquillian/ike-prow-plugins/pkg/scm"
 	"github.com/arquillian/ike-prow-plugins/pkg/github/client"
 	"github.com/arquillian/ike-prow-plugins/pkg/log"
+	gogh "github.com/google/go-github/github"
 )
 
 var _ = Describe("Pagination checker", func() {
 
 	const repositoryName = "bartoszmajsak/wfswarm-booster-pipeline-test"
-	client := NewDefaultGitHubClient()
+	client := ghclient.NewClient(gogh.NewClient(nil), log.NewTestLogger())
 	client.RegisterAroundFunctions(
 		ghclient.NewRateLimitWatcher(client, log.NewTestLogger(), 100),
 		ghclient.NewRetryWrapper(3, 0),
