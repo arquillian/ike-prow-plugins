@@ -1,6 +1,6 @@
 ==== Failed [[wip-failed]]
 
-Your Pull Request has been rejected because the plugin detected that either the PR title starts with one of the "work in progress prefixes" or has the "work-in-progress" label (both of them are <<index#work-in-progress-config, configurable>>), so it seems that there is still an ongoing work.
+Your Pull Request has been rejected because the plugin detected that either the PR title starts with one of the <<index#work-in-progress-config,"work in progress prefixes">> or has the "work-in-progress" label (both of them are <<index#work-in-progress-config, configurable>>), so it seems that there is still an ongoing work.
 
 When the PR is done and ready for review and merge, then remove the prefix from the title or the "work-in-progress" label to make the status green. Removing the prefix also triggers removing the added GitHub "work-in-progress" label from the PR and vice-versa.
 
