@@ -1,6 +1,6 @@
 ==== Success [[pr-sanitizer-success]]
 
-Your Pull Request has been approved as the plugin detected that the PR title starts with one of the <<index#pr-sanitizer-config,"type prefixes">>.
+Your Pull Request has been approved as it complies with the PR conventions given by the `pr-sanitizer` plugin.
 
 ifdef::only-status-details[]
 The complete documentation can be found at http://arquillian.org/ike-prow-plugins.

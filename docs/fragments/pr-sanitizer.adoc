@@ -1,36 +1,22 @@
 == PR Sanitizer Plugin
 
-This plugin enforces that the PR title comforms with the semantic commit message style. Conformance with the semantic commit message style not only makes your changelog and git history clean and easy to navigate but also encourages making atomic commits that are more clearly understood.
+This plugin enforces writing effective pull requests that confirm with proper naming conventions and description to clearly convey its purpose and provide better collaboration, tracebility and maintainabilty by giving a clear and concise context to the reviewer of what’s being solved at a high level, taking off an extra step for the reviewer.
 
-A rigid semantic commit message style obeys the below format.
+=== Title Verification
+
+This ensures that the PR title comforms with the semantic commit message style. Conformance with the semantic commit message style not only makes your changelog and git history clean and easy to navigate but also encourages making atomic pull requests that address only a single concern, better reflect the change within and are more clearly understood.
+
+The format below shows a rigid semantic commit message style.
 
 [source, shell, indent=0]
 ----
 <type>(<scope>): <subject>
 ----
+
 * where `<scope>` is optional.
-
-*Example* 
-
-[source, shell, indent=0]
-----
-feat: add beta sequence
-^--^  ^---------------^
-|     |
-|     +-> Summary in present tense.
-|
-+-------> Type: chore, docs, feat, fix, refactor, style, or test.
-----
-* where each of `<type>` categorizes the PR according to the change introduced.
-  - `feat`: introducing new feature in codebase
-  - `fix`: patching bug in codebase
-  - `docs`: changes to the documentation
-  - `style`: formatting, missing semi colons, etc; no production code change
-  - `refactor`: refactoring production code, eg. renaming a variable
-  - `test`: adding missing tests, refactoring tests; no production code change
-  - `chore`: updating build scripts, grunt tasks etc; no production code change
-
-If the PR title is prefixed with any of the default types listed above or any of the user configured types as described below (non-case sensitive) then the plugin marks its check as **Success**, or as **Failure** otherwise.
+* and each of `<type>` categorizes the PR according to the change introduced (such as `feat` if introducing a new feature or `fix` if patching a bug in codebase)
+ 
+If the PR title is prefixed with any of the default types (`feat`, `fix`, `docs`, `style`, `refactor`, `test`, `chore`) or any of the user configured types as described below (non-case sensitive) then the plugin marks its check as **Success**, or as **Failure** otherwise.
 
 === Plugin Configuration [[pr-sanitizer-config]]
 
@@ -48,4 +34,4 @@ include::../../pkg/plugin/pr-sanitizer/test_fixtures/github_calls/pr-sanitizer.y
 === Status details
 
 include::{asciidoctor-source}/fragments/status/pr-sanitizer/success/pr-sanitizer-success.adoc[leveloffset=1]
-include::{asciidoctor-source}/fragments/status/pr-sanitizer/failure/pr-sanitizer-failed.adoc[leveloffset=1]
+include::{asciidoctor-source}/fragments/status/pr-sanitizer/failure/title-verification-failed.adoc[leveloffset=1]

@@ -1,4 +1,4 @@
-==== Failed [[pr-sanitizer-failed]]
+==== Failed - title missing semantic commit style [[title-verification-failed]]
 
 Your Pull Request has been rejected because the plugin detected that the PR title does not starts with any of the <<index#pr-sanitizer-config,"type prefixes">>, so it seems that it does not conform with the sematic commit message style.
 
