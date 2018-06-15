@@ -2,7 +2,7 @@
 
 This plugin enforces writing effective pull requests that confirm with proper naming conventions and description to clearly convey its purpose and provide better collaboration, tracebility and maintainabilty by giving a clear and concise context to the reviewer of what’s being solved at a high level, taking off an extra step for the reviewer.
 
-=== Title Verification
+=== Title Verification [[title-verification]]
 
 This ensures that the PR title comforms with the semantic commit message style. Conformance with the semantic commit message style not only makes your changelog and git history clean and easy to navigate but also encourages making atomic pull requests that address only a single concern, better reflect the change within and are more clearly understood.
 
