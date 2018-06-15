@@ -14,7 +14,7 @@ The format below shows a rigid semantic commit message style.
 ----
 
 * where `<scope>` is optional.
-* and each of `<type>` categorizes the PR according to the change introduced (such as `feat` if introducing a new feature or `fix` if patching a bug in codebase)
+* and each of `<type>` categorizes the PR according to the change introduced (such as `feat` for introducing a new feature and `fix` for patching a bug in codebase)
  
 If the PR title is prefixed with any of the default types (`feat`, `fix`, `docs`, `style`, `refactor`, `test`, `chore`) or any of the user configured types as described below (non-case sensitive) then the plugin marks its check as **Success**, or as **Failure** otherwise.
 
