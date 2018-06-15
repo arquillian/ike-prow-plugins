@@ -1,10 +1,28 @@
-== Work In Progress plugin
+== Work In Progress Plugin
 
 This plugin can help reviewers with focusing on work that really matters so they don't need to spend time with Pull Requests that are still in progress unless they were requested to do partial reviews.
 
-If the PR title starts with any of the default prefixes such as `WIP`, `DO NOT MERGE`, `DON'T MERGE`, `WORK-IN-PROGRESS` with combinations of `( )`, `[ ]`, `:` or any of the user configured prefixes as described below (non-case sensitive) then the plugin marks its check as **Failure**, or as **Success** otherwise.
+The plugin checks the PR for the presence of "work in progress" prefix in title and the GitHub label to manage the status of the PR in progress and or manage the addition/deletion of the label or the prefix respectively as described in the following cases:
 
-In addition to managing the status for the PR in progress, it also manages adding/removing the GitHub label (`const:pkg/plugin/work-in-progress/configuration.go[name="DefaultLabel"]` by default or configured otherwise) for the given PR. 
+****
+**Case 1:** The PR is has a "work in progress" label but the "work in progress" prefix is missing in the title.
+
+* The PR status is marked as **Failure** and the title is left as it is.
+
+**Case 2:** The PR title contains the "work in progress" prefix but no "work in progress" label is included.
+
+* The PR status is marked as **Failure** and the "work in progress" label is added automatically.
+
+**Case 3:** The PR title is updated and "work in progress" prefix is removed.
+
+* The PR status is changed to **Success** and the "work in progress" label is removed automatically.
+
+**Case 4:** The PR is updated and the "work in progress" label is removed.
+
+* The PR status is changed to **Success** and the "work in progress" prefix is removed automatically.
+****
+
+where the PR title's "work in progress" prefix can have any of the default prefixes (`WIP`, `DO NOT MERGE`, `DON'T MERGE`, `WORK-IN-PROGRESS` with combinations of `( )`, `[ ]`, `:` ) or any of the user configured prefixes as described below (non-case sensitive) and the "work in progress" GitHub label can have the default value (`const:pkg/plugin/work-in-progress/configuration.go[name="DefaultLabel"]`) or any other user configured value as described below as valid values. 
 
 === Plugin Configuration [[work-in-progress-config]]
 
