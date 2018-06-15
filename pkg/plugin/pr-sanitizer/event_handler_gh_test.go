@@ -38,14 +38,14 @@ var _ = Describe("PR Sanitizer Plugin features", func() {
 			HaveState(github.StatusSuccess),
 			HaveDescription(prsanitizer.SuccessMessage),
 			HaveContext(expectedContext),
-			HaveTargetURL(fmt.Sprintf("%s/%s/%s.html", docStatusRoot, "success", prsanitizer.SuccessDetailsLink)),
+			HaveTargetURL(fmt.Sprintf("%s/%s/%s.html", docStatusRoot, "success", prsanitizer.SuccessDetailsPageName)),
 		)
 
 		toHaveFailureState := SoftlySatisfyAll(
 			HaveState(github.StatusFailure),
-			HaveDescription(prsanitizer.FailureMessage),
+			HaveDescription(prsanitizer.TitleVerificationFailureMessage),
 			HaveContext(expectedContext),
-			HaveTargetURL(fmt.Sprintf("%s/%s/%s.html", docStatusRoot, "failure", prsanitizer.FailureDetailsLink)),
+			HaveTargetURL(fmt.Sprintf("%s/%s/%s.html", docStatusRoot, "failure", prsanitizer.TitleVerificationFailureDetailsPageName)),
 		)
 
 		BeforeEach(func() {

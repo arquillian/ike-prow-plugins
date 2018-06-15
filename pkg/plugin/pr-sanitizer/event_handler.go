@@ -4,6 +4,8 @@ import (
 	"encoding/json"
 	"strings"
 
+	"github.com/arquillian/ike-prow-plugins/pkg/plugin/work-in-progress"
+
 	"github.com/arquillian/ike-prow-plugins/pkg/github"
 	"github.com/arquillian/ike-prow-plugins/pkg/github/client"
 	"github.com/arquillian/ike-prow-plugins/pkg/github/service"
@@ -17,16 +19,16 @@ const (
 	// ProwPluginName is an external prow plugin name used to register this service
 	ProwPluginName = "pr-sanitizer"
 
-	// FailureMessage is a message used in GH Status as description when the PR title does not follow semantic message style
-	FailureMessage = "PR title does not conform with semantic commit message style."
+	// TitleVerificationFailureMessage is a message used in GH Status as description when the PR title does not follow semantic message style
+	TitleVerificationFailureMessage = "PR title does not conform with semantic commit message style."
 
-	// FailureDetailsLink is a link to an anchor in arq documentation that contains additional status details for failure state
-	FailureDetailsLink = "pr-sanitizer-failed"
+	// TitleVerificationFailureDetailsPageName is a name of a documentation page that contains additional status details for title verification failure.
+	TitleVerificationFailureDetailsPageName = "pr-sanitizer-failed"
 
 	// SuccessMessage is a message used in GH Status as description when the PR title conforms to the semantic commit message style
 	SuccessMessage = "PR title conforms with semantic commit message style."
-	// SuccessDetailsLink is a link to an anchor in arq documentation that contains additional status details for success state
-	SuccessDetailsLink = "pr-sanitizer-success"
+	// SuccessDetailsPageName is a name of a documentation page that contains additional status details for success state
+	SuccessDetailsPageName = "pr-sanitizer-success"
 )
 
 // GitHubLabelsEventsHandler is the event handler for the plugin.
@@ -63,11 +65,19 @@ func (gh *GitHubLabelsEventsHandler) HandleEvent(log log.Logger, eventType githu
 		}
 		statusContext := github.StatusContext{BotName: gh.BotName, PluginName: ProwPluginName}
 		statusService := ghservice.NewStatusService(gh.Client, log, change, statusContext)
+
+		wipPluginConfig := wip.LoadConfiguration(log, change)
+		wipHandler := &wip.GitHubWIPPRHandler{Client: gh.Client, BotName: gh.BotName}
+
+		if ok, prefix := wipHandler.HasWorkInProgressPrefix(*event.PullRequest.Title, wipPluginConfig); ok {
+			*event.PullRequest.Title = strings.TrimSpace(strings.TrimPrefix(*event.PullRequest.Title, prefix))
+		}
+
 		configuration := LoadConfiguration(log, change)
 		if gh.HasTitleWithValidType(*event.PullRequest.Title, configuration) {
-			return statusService.Success(SuccessMessage, SuccessDetailsLink)
+			return statusService.Success(SuccessMessage, SuccessDetailsPageName)
 		}
-		return statusService.Failure(FailureMessage, FailureDetailsLink)
+		return statusService.Failure(TitleVerificationFailureMessage, TitleVerificationFailureDetailsPageName)
 
 	default:
 		log.Warnf("received an event of type %q but didn't ask for it", eventType)
