@@ -57,7 +57,7 @@ var _ = Describe("PR Sanitizer Plugin features", func() {
 
 		It("should mark status as success if PR title prefixed with semantic commit message type", func() {
 			// given
-			NonExistingRawGitHubFiles("pr-sanitizer.yml", "pr-sanitizer.yaml")
+			NonExistingRawGitHubFiles("pr-sanitizer.yml", "pr-sanitizer.yaml", "work-in-progress.yml", "work-in-progress.yaml")
 
 			gock.New("https://api.github.com").
 				Post("/repos/bartoszmajsak/wfswarm-booster-pipeline-test/statuses").
@@ -75,7 +75,7 @@ var _ = Describe("PR Sanitizer Plugin features", func() {
 
 		It("should mark status as failed (thus block PR merge) when not prefixed with semantic commit message type", func() {
 			// given
-			NonExistingRawGitHubFiles("pr-sanitizer.yml", "pr-sanitizer.yaml")
+			NonExistingRawGitHubFiles("pr-sanitizer.yml", "pr-sanitizer.yaml", "work-in-progress.yml", "work-in-progress.yaml")
 
 			gock.New("https://api.github.com").
 				Post("/repos/bartoszmajsak/wfswarm-booster-pipeline-test/statuses").
@@ -93,6 +93,8 @@ var _ = Describe("PR Sanitizer Plugin features", func() {
 
 		It("should mark status as success when title starts with configured semantic commit message type", func() {
 			// given
+			NonExistingRawGitHubFiles("work-in-progress.yml", "work-in-progress.yaml")
+
 			gock.New("https://raw.githubusercontent.com").
 				Get("bartoszmajsak/wfswarm-booster-pipeline-test/8111c2d99b596877ff8e2059409688d83487da0e/" + configFilePath + ".yml").
 				Reply(200).
@@ -114,7 +116,7 @@ var _ = Describe("PR Sanitizer Plugin features", func() {
 
 		It("should mark status as success (thus unblock PR merge) when title updated to contain semantic commit message type", func() {
 			// given
-			NonExistingRawGitHubFiles("pr-sanitizer.yml", "pr-sanitizer.yaml")
+			NonExistingRawGitHubFiles("pr-sanitizer.yml", "pr-sanitizer.yaml", "work-in-progress.yml", "work-in-progress.yaml")
 
 			gock.New("https://api.github.com").
 				Post("/repos/bartoszmajsak/wfswarm-booster-pipeline-test/statuses").
@@ -129,6 +131,42 @@ var _ = Describe("PR Sanitizer Plugin features", func() {
 			// then - implicit verification of /statuses call occurrence with proper payload
 			Ω(err).ShouldNot(HaveOccurred())
 
+		})
+
+		It("should mark status as success if PR title prefixed with wip and conforms with semantic commit message type", func() {
+			// given
+			NonExistingRawGitHubFiles("pr-sanitizer.yml", "pr-sanitizer.yaml", "work-in-progress.yml", "work-in-progress.yaml")
+
+			gock.New("https://api.github.com").
+				Post("/repos/bartoszmajsak/wfswarm-booster-pipeline-test/statuses").
+				SetMatcher(ExpectPayload(toHaveSuccessState)).
+				Reply(201) // This way we implicitly verify that call happened after `HandleEvent` call
+
+			statusPayload := LoadFromFile("test_fixtures/github_calls/semantically_correct_wip_pr_opened.json")
+
+			// when
+			err := handler.HandleEvent(log, github.PullRequest, statusPayload)
+
+			// then - implicit verification of /statuses call occurrence with proper payload
+			Ω(err).ShouldNot(HaveOccurred())
+		})
+
+		It("should mark status as failed (thus block PR merge) when prefixed with wip and does not conform with semantic commit message type", func() {
+			// given
+			NonExistingRawGitHubFiles("pr-sanitizer.yml", "pr-sanitizer.yaml", "work-in-progress.yml", "work-in-progress.yaml")
+
+			gock.New("https://api.github.com").
+				Post("/repos/bartoszmajsak/wfswarm-booster-pipeline-test/statuses").
+				SetMatcher(ExpectPayload(toHaveFailureState)).
+				Reply(201) // This way we implicitly verify that call happened after `HandleEvent` call
+
+			statusPayload := LoadFromFile("test_fixtures/github_calls/semantically_incorrect_wip_pr_opened.json")
+
+			// when
+			err := handler.HandleEvent(log, github.PullRequest, statusPayload)
+
+			// then - implicit verification of /statuses call occurrence with proper payload
+			Ω(err).ShouldNot(HaveOccurred())
 		})
 
 	})

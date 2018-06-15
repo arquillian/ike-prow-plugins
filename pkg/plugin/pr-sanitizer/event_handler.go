@@ -4,12 +4,11 @@ import (
 	"encoding/json"
 	"strings"
 
-	"github.com/arquillian/ike-prow-plugins/pkg/plugin/work-in-progress"
-
 	"github.com/arquillian/ike-prow-plugins/pkg/github"
 	"github.com/arquillian/ike-prow-plugins/pkg/github/client"
 	"github.com/arquillian/ike-prow-plugins/pkg/github/service"
 	"github.com/arquillian/ike-prow-plugins/pkg/log"
+	"github.com/arquillian/ike-prow-plugins/pkg/plugin/work-in-progress"
 	"github.com/arquillian/ike-prow-plugins/pkg/scm"
 	"github.com/arquillian/ike-prow-plugins/pkg/utils"
 	gogh "github.com/google/go-github/github"
@@ -66,15 +65,7 @@ func (gh *GitHubLabelsEventsHandler) HandleEvent(log log.Logger, eventType githu
 		statusContext := github.StatusContext{BotName: gh.BotName, PluginName: ProwPluginName}
 		statusService := ghservice.NewStatusService(gh.Client, log, change, statusContext)
 
-		wipPluginConfig := wip.LoadConfiguration(log, change)
-		wipHandler := &wip.GitHubWIPPRHandler{Client: gh.Client, BotName: gh.BotName}
-
-		if ok, prefix := wipHandler.HasWorkInProgressPrefix(*event.PullRequest.Title, wipPluginConfig); ok {
-			*event.PullRequest.Title = strings.TrimSpace(strings.TrimPrefix(*event.PullRequest.Title, prefix))
-		}
-
-		configuration := LoadConfiguration(log, change)
-		if gh.HasTitleWithValidType(*event.PullRequest.Title, configuration) {
+		if gh.HasTitleWithValidType(log, change, *event.PullRequest.Title) {
 			return statusService.Success(SuccessMessage, SuccessDetailsPageName)
 		}
 		return statusService.Failure(TitleVerificationFailureMessage, TitleVerificationFailureDetailsPageName)
@@ -86,7 +77,10 @@ func (gh *GitHubLabelsEventsHandler) HandleEvent(log log.Logger, eventType githu
 }
 
 // HasTitleWithValidType checks if title prefix conforms with semantic message style
-func (gh *GitHubLabelsEventsHandler) HasTitleWithValidType(title string, config PluginConfiguration) bool {
+func (gh *GitHubLabelsEventsHandler) HasTitleWithValidType(log log.Logger, change scm.RepositoryChange, title string) bool {
+	title = gh.trimWorkInProgressPrefix(log, change, title)
+
+	config := LoadConfiguration(log, change)
 	prefixes := defaultTypes
 	if len(config.TypePrefix) != 0 {
 		if config.Combine {
@@ -102,4 +96,14 @@ func (gh *GitHubLabelsEventsHandler) HasTitleWithValidType(title string, config 
 		}
 	}
 	return false
+}
+
+func (gh *GitHubLabelsEventsHandler) trimWorkInProgressPrefix(log log.Logger, change scm.RepositoryChange, title string) string {
+	wipPluginConfig := wip.LoadConfiguration(log, change)
+	wipHandler := &wip.GitHubWIPPRHandler{Client: gh.Client, BotName: gh.BotName}
+
+	if ok, prefix := wipHandler.HasWorkInProgressPrefix(title, wipPluginConfig); ok {
+		title = strings.TrimSpace(strings.TrimPrefix(title, prefix))
+	}
+	return title
 }
