@@ -530,7 +530,7 @@ table.CodeRay td.code>pre{padding:0}
 <ul class="sectlevel2">
 <li><a href="#_configuration">3.1. Configuration</a></li>
 <li><a href="#_test_keeper_plugin">3.2. Test Keeper plugin</a></li>
-<li><a href="#_work_in_progress_plugin">3.3. Work In Progress plugin</a></li>
+<li><a href="#_work_in_progress_plugin">3.3. Work In Progress Plugin</a></li>
 <li><a href="#_trigger_plugins_on_demand">3.4. Trigger Plugins on Demand</a></li>
 </ul>
 </li>
@@ -1271,15 +1271,59 @@ If you need to reconfigure the plugin then read the section <a href="index.html#
 </div>
 </div>
 <div class="sect2">
-<h3 id="_work_in_progress_plugin"><a class="anchor" href="#_work_in_progress_plugin"></a>3.3. Work In Progress plugin</h3>
+<h3 id="_work_in_progress_plugin"><a class="anchor" href="#_work_in_progress_plugin"></a>3.3. Work In Progress Plugin</h3>
 <div class="paragraph">
 <p>This plugin can help reviewers with focusing on work that really matters so they don&#8217;t need to spend time with Pull Requests that are still in progress unless they were requested to do partial reviews.</p>
 </div>
 <div class="paragraph">
-<p>If the PR title starts with any of the default prefixes such as <code>WIP</code>, <code>DO NOT MERGE</code>, <code>DON&#8217;T MERGE</code>, <code>WORK-IN-PROGRESS</code> with combinations of <code>( )</code>, <code>[ ]</code>, <code>:</code> or any of the user configured prefixes as described below (non-case sensitive) then the plugin marks its check as <strong>Failure</strong>, or as <strong>Success</strong> otherwise.</p>
+<p>The plugin checks the PR for the presence of "work in progress" prefix in title and the GitHub label to manage the status of the PR in progress and or manage the addition/deletion of the label or the prefix respectively as described in the following cases:</p>
+</div>
+<div class="sidebarblock">
+<div class="content">
+<div class="paragraph">
+<p><strong>Case 1:</strong> The PR is has a "work in progress" label but the "work in progress" prefix is missing in the title.</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>The PR status is marked as <strong>Failure</strong> and the title is left as it is.</p>
+</li>
+</ul>
 </div>
 <div class="paragraph">
-<p>In addition to managing the status for the PR in progress, it also manages adding/removing the GitHub label (<code>work-in-progress</code> by default or configured otherwise) for the given PR.</p>
+<p><strong>Case 2:</strong> The PR title contains the "work in progress" prefix but no "work in progress" label is included.</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>The PR status is marked as <strong>Failure</strong> and the "work in progress" label is added automatically.</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p><strong>Case 3:</strong> The PR title is updated and "work in progress" prefix is removed.</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>The PR status is changed to <strong>Success</strong> and the "work in progress" label is removed automatically.</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p><strong>Case 4:</strong> The PR is updated and the "work in progress" label is removed.</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>The PR status is changed to <strong>Success</strong> and the "work in progress" prefix is removed automatically.</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="paragraph">
+<p>where the PR title&#8217;s "work in progress" prefix can have any of the default prefixes (<code>WIP</code>, <code>DO NOT MERGE</code>, <code>DON&#8217;T MERGE</code>, <code>WORK-IN-PROGRESS</code> with combinations of <code>( )</code>, <code>[ ]</code>, <code>:</code> ) or any of the user configured prefixes as described below (non-case sensitive) and the "work in progress" GitHub label can have the default value (<code>work-in-progress</code>) or any other user configured value as described below as valid values.</p>
 </div>
 <div class="sect3">
 <h4 id="work-in-progress-config"><a class="anchor" href="#work-in-progress-config"></a>3.3.1. Plugin Configuration</h4>
@@ -1317,16 +1361,16 @@ If you need to reconfigure the plugin then read the section <a href="index.html#
 <div class="sect4">
 <h5 id="wip-success"><a class="anchor" href="#wip-success"></a>Success</h5>
 <div class="paragraph">
-<p>Your Pull Request has been approved as the plugin didn&#8217;t detect any sign of work in progress (the PR title doesn&#8217;t start with any of the <a href="index.html#work-in-progress-config">work in progress prefixes</a>).</p>
+<p>Your Pull Request has been approved as the plugin didn&#8217;t detect any sign of work in progress (the PR title doesn&#8217;t start with any of the "work in progress prefixes" or contain any "work-in-progress" label (both of them are <a href="index.html#work-in-progress-config">configurable</a>)).</p>
 </div>
 </div>
 <div class="sect4">
 <h5 id="wip-failed"><a class="anchor" href="#wip-failed"></a>Failed</h5>
 <div class="paragraph">
-<p>Your Pull Request has been rejected because the plugin detected that the PR title starts with one of the <a href="index.html#work-in-progress-config">work in progress prefixes</a>, so it seems that there is still an ongoing work.</p>
+<p>Your Pull Request has been rejected because the plugin detected that either the PR title starts with one of the "work in progress prefixes" or has the "work-in-progress" label (both of them are <a href="index.html#work-in-progress-config">configurable</a>), so it seems that there is still an ongoing work.</p>
 </div>
 <div class="paragraph">
-<p>When the PR is done and ready for review and merge, then remove the prefix from the title to make the status green. Removing the prefix also triggers removing the added GitHub "work-in-progress label" from the PR.</p>
+<p>When the PR is done and ready for review and merge, then remove the prefix from the title or the "work-in-progress" label to make the status green. Removing the prefix also triggers removing the added GitHub "work-in-progress" label from the PR and vice-versa.</p>
 </div>
 </div>
 </div>
@@ -1343,7 +1387,7 @@ However if you want to run all plugins configured for your repository, just add 
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2018-06-14 12:12:40 UTC
+Last updated 2018-06-15 07:24:54 UTC
 </div>
 </div>
 <script>
