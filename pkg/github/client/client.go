@@ -3,11 +3,12 @@ package ghclient
 import (
 	"context"
 
+	"fmt"
+
 	"github.com/arquillian/ike-prow-plugins/pkg/log"
 	"github.com/arquillian/ike-prow-plugins/pkg/scm"
 	gogh "github.com/google/go-github/github"
 	"golang.org/x/oauth2"
-	"fmt"
 )
 
 type client struct {
@@ -25,9 +26,9 @@ type Client interface {
 	ListIssueComments(issue scm.RepositoryIssue) ([]*gogh.IssueComment, error)
 	CreateIssueComment(issue scm.RepositoryIssue, commentMsg *string) error
 	CreateStatus(change scm.RepositoryChange, repoStatus *gogh.RepoStatus) error
-	ListPullRequestLabels(change scm.RepositoryChange, prNumber int) ([]*gogh.Label, error)
 	AddPullRequestLabel(change scm.RepositoryChange, prNumber int, label []string) error
 	RemovePullRequestLabel(change scm.RepositoryChange, prNumber int, label string) error
+	EditPullRequest(*gogh.PullRequest) error
 	GetRateLimit() (*gogh.RateLimits, error)
 
 	RegisterAroundFunctions(aroundCreators ...AroundFunctionCreator)
@@ -56,7 +57,7 @@ type aroundContext struct {
 	pageNumber int
 }
 
-var emptyAround = func(doFunction doFunction) (doFunction) {
+var emptyAround = func(doFunction doFunction) doFunction {
 	return doFunction
 }
 
@@ -67,7 +68,7 @@ func (c *client) RegisterAroundFunctions(aroundCreators ...AroundFunctionCreator
 	}
 }
 
-func (c *client) do(function doFunction) (error) {
+func (c *client) do(function doFunction) error {
 	around := c.allAround(function)
 	_, _, e := around(aroundContext{})
 	return e
@@ -170,20 +171,17 @@ func (c *client) CreateStatus(change scm.RepositoryChange, repoStatus *gogh.Repo
 	return err
 }
 
-func (c client) ListPullRequestLabels(change scm.RepositoryChange, prNumber int) ([]*gogh.Label, error) {
-	allLabels := make([]*gogh.Label, 0)
-
-	err := c.do(func(aroundCtx aroundContext) (func(), *gogh.Response, error) {
-		labels, response, e := c.gh.Issues.ListLabelsByIssue(context.Background(), change.Owner, change.RepoName, prNumber, listOpts(aroundCtx))
-		return func() {
-			allLabels = append(allLabels, labels...)
-		}, response, c.checkHTTPCode(response, e)
+func (c *client) EditPullRequest(pr *gogh.PullRequest) error {
+	err := c.do(func(aroundContext aroundContext) (func(), *gogh.Response, error) {
+		_, response, e :=
+			c.gh.PullRequests.Edit(context.Background(), *pr.Base.Repo.Owner.Login, *pr.Base.Repo.Name, *pr.Number, pr)
+		return func() {}, response, c.checkHTTPCode(response, e)
 	})
 
-	return allLabels, err
+	return err
 }
 
-func (c client) AddPullRequestLabel(change scm.RepositoryChange, prNumber int, label []string) error {
+func (c *client) AddPullRequestLabel(change scm.RepositoryChange, prNumber int, label []string) error {
 	err := c.do(func(aroundContext aroundContext) (func(), *gogh.Response, error) {
 		_, response, e := c.gh.Issues.AddLabelsToIssue(context.Background(), change.Owner, change.RepoName, prNumber, label)
 		return func() {}, response, c.checkHTTPCode(response, e)
@@ -192,7 +190,7 @@ func (c client) AddPullRequestLabel(change scm.RepositoryChange, prNumber int, l
 	return err
 }
 
-func (c client) RemovePullRequestLabel(change scm.RepositoryChange, prNumber int, label string) error {
+func (c *client) RemovePullRequestLabel(change scm.RepositoryChange, prNumber int, label string) error {
 	err := c.do(func(aroundContext aroundContext) (func(), *gogh.Response, error) {
 		response, e := c.gh.Issues.RemoveLabelForIssue(context.Background(), change.Owner, change.RepoName, prNumber, label)
 		return func() {}, response, c.checkHTTPCode(response, e)
