@@ -126,7 +126,7 @@ func (gh *GitHubWIPPRHandler) checkComponentsAndSetStatus(log log.Logger, pullRe
 
 	configuration := LoadConfiguration(log, change)
 	labelExists := gh.hasWorkInProgressLabel(pullRequest.Labels, configuration.Label)
-	prefixExists, prefix := gh.HasWorkInProgressPrefix(*pullRequest.Title, configuration)
+	prefixExists, prefix := HasWorkInProgressPrefix(*pullRequest.Title, configuration)
 
 	if prefixExists && !labelExists {
 		if labelUpdated {
@@ -163,7 +163,7 @@ func (gh *GitHubWIPPRHandler) hasWorkInProgressLabel(labels []*gogh.Label, wipLa
 }
 
 // HasWorkInProgressPrefix checks if title is marked as Work In Progress
-func (gh *GitHubWIPPRHandler) HasWorkInProgressPrefix(title string, config PluginConfiguration) (bool, string) {
+func HasWorkInProgressPrefix(title string, config PluginConfiguration) (bool, string) {
 	prefixes := defaultPrefixes
 	if len(config.Prefix) != 0 {
 		if config.Combine {
@@ -172,10 +172,10 @@ func (gh *GitHubWIPPRHandler) HasWorkInProgressPrefix(title string, config Plugi
 			prefixes = config.Prefix
 		}
 	}
-	return gh.hasPrefix(title, prefixes)
+	return hasPrefix(title, prefixes)
 }
 
-func (gh *GitHubWIPPRHandler) hasPrefix(title string, prefixes []string) (bool, string) {
+func hasPrefix(title string, prefixes []string) (bool, string) {
 	for _, prefix := range prefixes {
 		pattern := `(?mi)^(\[|\()?` + prefix + `(\]|\))?(:| )+`
 		r, _ := regexp.Compile(pattern)

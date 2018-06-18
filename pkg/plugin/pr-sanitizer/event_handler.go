@@ -67,7 +67,7 @@ func (gh *GitHubLabelsEventsHandler) HandleEvent(log log.Logger, eventType githu
 
 		if gh.HasTitleWithValidType(log, change, *event.PullRequest.Title) {
 			return statusService.Success(SuccessMessage, SuccessDetailsPageName)
-		}
+		} 
 		return statusService.Failure(TitleVerificationFailureMessage, TitleVerificationFailureDetailsPageName)
 
 	default:
@@ -100,9 +100,7 @@ func (gh *GitHubLabelsEventsHandler) HasTitleWithValidType(log log.Logger, chang
 
 func (gh *GitHubLabelsEventsHandler) trimWorkInProgressPrefix(log log.Logger, change scm.RepositoryChange, title string) string {
 	wipPluginConfig := wip.LoadConfiguration(log, change)
-	wipHandler := &wip.GitHubWIPPRHandler{Client: gh.Client, BotName: gh.BotName}
-
-	if ok, prefix := wipHandler.HasWorkInProgressPrefix(title, wipPluginConfig); ok {
+	if ok, prefix := wip.HasWorkInProgressPrefix(title, wipPluginConfig); ok {
 		title = strings.TrimSpace(strings.TrimPrefix(title, prefix))
 	}
 	return title
