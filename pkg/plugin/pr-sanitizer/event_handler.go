@@ -65,9 +65,15 @@ func (gh *GitHubLabelsEventsHandler) HandleEvent(log log.Logger, eventType githu
 		statusContext := github.StatusContext{BotName: gh.BotName, PluginName: ProwPluginName}
 		statusService := ghservice.NewStatusService(gh.Client, log, change, statusContext)
 
-		if gh.HasTitleWithValidType(log, change, *event.PullRequest.Title) {
+		config := LoadConfiguration(log, change)
+		if gh.HasTitleWithValidType(config, *event.PullRequest.Title) {
 			return statusService.Success(SuccessMessage, SuccessDetailsPageName)
-		} 
+		} else if ok, prefix := wip.HasWorkInProgressPrefix(*event.PullRequest.Title, wip.LoadConfiguration(log, change)); ok {
+			trimmedTitle := strings.TrimSpace(strings.TrimPrefix(*event.PullRequest.Title, prefix))
+			if gh.HasTitleWithValidType(config, trimmedTitle) {
+				return statusService.Success(SuccessMessage, SuccessDetailsPageName)
+			}
+		}
 		return statusService.Failure(TitleVerificationFailureMessage, TitleVerificationFailureDetailsPageName)
 
 	default:
@@ -77,10 +83,7 @@ func (gh *GitHubLabelsEventsHandler) HandleEvent(log log.Logger, eventType githu
 }
 
 // HasTitleWithValidType checks if title prefix conforms with semantic message style
-func (gh *GitHubLabelsEventsHandler) HasTitleWithValidType(log log.Logger, change scm.RepositoryChange, title string) bool {
-	title = gh.trimWorkInProgressPrefix(log, change, title)
-
-	config := LoadConfiguration(log, change)
+func (gh *GitHubLabelsEventsHandler) HasTitleWithValidType(config PluginConfiguration, title string) bool {
 	prefixes := defaultTypes
 	if len(config.TypePrefix) != 0 {
 		if config.Combine {
@@ -96,12 +99,4 @@ func (gh *GitHubLabelsEventsHandler) HasTitleWithValidType(log log.Logger, chang
 		}
 	}
 	return false
-}
-
-func (gh *GitHubLabelsEventsHandler) trimWorkInProgressPrefix(log log.Logger, change scm.RepositoryChange, title string) string {
-	wipPluginConfig := wip.LoadConfiguration(log, change)
-	if ok, prefix := wip.HasWorkInProgressPrefix(title, wipPluginConfig); ok {
-		title = strings.TrimSpace(strings.TrimPrefix(title, prefix))
-	}
-	return title
 }
