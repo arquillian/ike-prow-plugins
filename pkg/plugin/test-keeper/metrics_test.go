@@ -49,7 +49,7 @@ var _ = Describe("TestKeeper Metrics", func() {
 
 	It("should report pull requests with /ok-without-tests in histogram", func() {
 		//given
-		expectedBound := []float64{1, 5, 25, 125, 625, 3125}
+		expectedBound := []float64{1, 3, 9, 27, 81, 243}
 		expectedCnt := []uint64{0, 1, 1, 2, 2, 2, 2}
 
 		NonExistingRawGitHubFiles("test-keeper.yml", "test-keeper.yaml")
