@@ -18,12 +18,12 @@ var (
 	pullRequestsCounter = prometheus.NewCounterVec(prometheus.CounterOpts{
 		Name: "pull_requests_total",
 		Help: "Total number of pull requests.",
-	}, []string{"full_name", "type", "plugin_name"})
+	}, []string{"full_name", "type"})
 	okWithoutTestsPullRequest = prometheus.NewHistogramVec(prometheus.HistogramOpts{
 		Name:    "pull_requests_size",
 		Help:    "Histogram for changed file size of pull request with ok-without-tests.",
 		Buckets: prometheus.ExponentialBuckets(1, 5, 6),
-	}, []string{"full_name", "plugin_name"})
+	}, []string{"full_name"})
 )
 
 // RegisterMetrics registers prometheus collectors to collect metrics for test-keeper.
@@ -42,7 +42,7 @@ func RegisterMetrics() []error {
 
 func reportPullRequest(l log.Logger, pr *gogh.PullRequest, prType string) {
 	fullName := *pr.Base.Repo.FullName
-	if counter, err := pullRequestsCounter.GetMetricWithLabelValues(fullName, prType, ProwPluginName); err != nil {
+	if counter, err := pullRequestsCounter.GetMetricWithLabelValues(fullName, prType); err != nil {
 		l.Errorf("Failed to get pull request metric for Repository: %q. Cause: %q", fullName, err)
 	} else {
 		counter.Inc()
@@ -50,7 +50,7 @@ func reportPullRequest(l log.Logger, pr *gogh.PullRequest, prType string) {
 }
 
 func reportBypassCommand(pr *gogh.PullRequest) {
-	okWithoutTestsPullRequest.WithLabelValues(*pr.Base.Repo.FullName, ProwPluginName).Observe(float64(*pr.ChangedFiles))
+	okWithoutTestsPullRequest.WithLabelValues(*pr.Base.Repo.FullName).Observe(float64(*pr.ChangedFiles))
 }
 
 // PullRequestCounterWithLabelValues replaces the method of the same name in MetricVec.
