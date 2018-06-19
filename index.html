@@ -531,7 +531,8 @@ table.CodeRay td.code>pre{padding:0}
 <li><a href="#_configuration">3.1. Configuration</a></li>
 <li><a href="#_test_keeper_plugin">3.2. Test Keeper plugin</a></li>
 <li><a href="#_work_in_progress_plugin">3.3. Work In Progress Plugin</a></li>
-<li><a href="#_trigger_plugins_on_demand">3.4. Trigger Plugins on Demand</a></li>
+<li><a href="#_pr_sanitizer_plugin">3.4. PR Sanitizer Plugin</a></li>
+<li><a href="#_trigger_plugins_on_demand">3.5. Trigger Plugins on Demand</a></li>
 </ul>
 </li>
 </ul>
@@ -1376,7 +1377,90 @@ If you need to reconfigure the plugin then read the section <a href="index.html#
 </div>
 </div>
 <div class="sect2">
-<h3 id="_trigger_plugins_on_demand"><a class="anchor" href="#_trigger_plugins_on_demand"></a>3.4. Trigger Plugins on Demand</h3>
+<h3 id="_pr_sanitizer_plugin"><a class="anchor" href="#_pr_sanitizer_plugin"></a>3.4. PR Sanitizer Plugin</h3>
+<div class="paragraph">
+<p>This plugin enforces writing effective pull requests that confirm with proper naming conventions and description to clearly convey its purpose and provide better collaboration, tracebility and maintainabilty by giving a clear and concise context to the reviewer of what’s being solved at a high level, taking off an extra step for the reviewer.</p>
+</div>
+<div class="sect3">
+<h4 id="title-verification"><a class="anchor" href="#title-verification"></a>3.4.1. Title Verification</h4>
+<div class="paragraph">
+<p>This ensures that the PR title comforms with the semantic commit message style. Conformance with the semantic commit message style not only makes your changelog and git history clean and easy to navigate but also encourages making atomic pull requests that address only a single concern, better reflect the change within and are more clearly understood.</p>
+</div>
+<div class="paragraph">
+<p>The format below shows a rigid semantic commit message style.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="shell">&lt;type&gt;(&lt;scope&gt;): &lt;subject&gt;</code></pre>
+</div>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>where <code>&lt;scope&gt;</code> is optional.</p>
+</li>
+<li>
+<p>and each of <code>&lt;type&gt;</code> categorizes the PR according to the change introduced (such as <code>feat</code> for introducing a new feature and <code>fix</code> for patching a bug in codebase)</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>If the PR title is prefixed with any of the default types (<code>feat</code>, <code>fix</code>, <code>docs</code>, <code>style</code>, <code>refactor</code>, <code>test</code>, <code>chore</code>) or any of the user configured types as described below (non-case sensitive) then the plugin marks its check as <strong>Success</strong>, or as <strong>Failure</strong> otherwise.</p>
+</div>
+<div class="paragraph">
+<p>For more explanation regarding the semantic style commit message style check <a href="https://seesparkbox.com/foundry/semantic_commit_messages">here</a>.</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="pr-sanitizer-config"><a class="anchor" href="#pr-sanitizer-config"></a>3.4.2. Plugin Configuration</h4>
+<div class="paragraph">
+<p>To configure PR Sanitizer plugin place <code>pr-sanitizer.yml</code> (or <code>pr-sanitizer.yaml</code>) file inside of the directory <code>.ike-prow/</code> in your project and use properties described below.</p>
+</div>
+<div class="listingblock">
+<div class="title">pr-sanitizer.yaml</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="yml"><span class="key">type_prefixes</span>:            <i class="conum" data-value="1"></i><b>(1)</b>
+  - <span class="string"><span class="content">':star:'</span></span>
+<span class="key">combine_defaults</span>: <span class="string"><span class="content">true   </span></span> <i class="conum" data-value="2"></i><b>(2)</b></code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>Defines set of custom types which will be used to match titles prefixes in changeset and determine if Pull Requests Title conforms with the semantic message style. (Eg. above code snippet configures <a href="https://medium.com/walmartlabs/semantic-commit-messages-with-emojis-dba2541cea9a">emoji style</a> semantic commit message.)</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>Allows you to decide if you want to combine your patterns with the list (<code>feat</code>, <code>fix</code>, <code>refactor</code>, <code>docs</code>, <code>test</code>, <code>chore</code>, <code>style</code>) of predefined default types (<code>true</code> by default).</td>
+</tr>
+</table>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_status_details_3"><a class="anchor" href="#_status_details_3"></a>3.4.3. Status details</h4>
+<div class="sect4">
+<h5 id="pr-sanitizer-success"><a class="anchor" href="#pr-sanitizer-success"></a>Success</h5>
+<div class="paragraph">
+<p>Your Pull Request has been approved as it complies with the PR conventions given by the <code>pr-sanitizer</code> plugin.</p>
+</div>
+</div>
+<div class="sect4">
+<h5 id="title-verification-failed"><a class="anchor" href="#title-verification-failed"></a>Failure - title missing semantic commit style</h5>
+<div class="paragraph">
+<p>Your Pull Request has been rejected because the plugin detected that the PR title does not starts with any of the "type prefixes", so it seems that it does not conform with the sematic commit message style.</p>
+</div>
+<div class="paragraph">
+<p>Edit the PR title to conform with the semantic commit message style by prefixing it with one of the "type prefixes" to make the status green.</p>
+</div>
+<div class="paragraph">
+<p>For more information see <a href="index.html#title-verification">Title Verification</a> and <a href="index.html#pr-sanitizer-config">Plugin Configuration</a> sections.</p>
+</div>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_trigger_plugins_on_demand"><a class="anchor" href="#_trigger_plugins_on_demand"></a>3.5. Trigger Plugins on Demand</h3>
 <div class="paragraph">
 <p>In order to trigger plugin on demand, just add <code>/run plugin-name</code>(e.g. <code>/run test-keeper</code>) comment on pull request. If you want to trigger only specific set of plugins, you can trigger it by adding comment <code>/run plugin-A plugin-B</code>(e.g. <code>/run test-keeper work-in-progress</code>).
 However if you want to run all plugins configured for your repository, just add <code>/run all</code> comment on pull request.</p>
@@ -1387,7 +1471,7 @@ However if you want to run all plugins configured for your repository, just add 
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2018-06-15 07:24:54 UTC
+Last updated 2018-06-19 12:44:35 UTC
 </div>
 </div>
 <script>
