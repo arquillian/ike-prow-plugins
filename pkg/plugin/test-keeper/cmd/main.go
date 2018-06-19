@@ -17,11 +17,13 @@ func eventHandler(githubClient ghclient.Client, botName string) server.GitHubEve
 	return &testkeeper.GitHubTestEventsHandler{Client: githubClient, BotName: botName}
 }
 
-func eventServer(webhookSecret []byte, eventHandler server.GitHubEventHandler) *server.Server {
+func eventServer(webhookSecret []byte, eventHandler server.GitHubEventHandler) (*server.Server, []error) {
+	errors := testkeeper.RegisterMetrics()
+
 	return &server.Server{
 		GitHubEventHandler: eventHandler,
 		HmacSecret:         webhookSecret,
-	}
+	}, errors
 }
 
 func helpProvider(enabledRepos []string) (*pluginhelp.PluginHelp, error) {

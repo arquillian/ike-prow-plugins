@@ -1,4 +1,4 @@
-package server_test
+package prsanitizer
 
 import (
 	"testing"
@@ -8,7 +8,7 @@ import (
 	. "github.com/onsi/gomega"
 )
 
-func TestServer(t *testing.T) {
+func TestSuitePRSantizerPlugin(t *testing.T) {
 	RegisterFailHandler(Fail)
-	RunSpecWithJUnitReporter(t, "Server Suite")
+	RunSpecWithJUnitReporter(t, "Prow Event Handler PR-Sanitizer Plugin Suite")
 }

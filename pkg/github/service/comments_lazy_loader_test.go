@@ -3,12 +3,12 @@ package ghservice_test
 import (
 	"github.com/arquillian/ike-prow-plugins/pkg/github/service"
 	. "github.com/arquillian/ike-prow-plugins/pkg/internal/test"
-	. "github.com/onsi/ginkgo"
-	. "github.com/onsi/gomega"
-	"gopkg.in/h2non/gock.v1"
 	"github.com/arquillian/ike-prow-plugins/pkg/scm"
 	"github.com/arquillian/ike-prow-plugins/pkg/utils"
 	"github.com/google/go-github/github"
+	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/gomega"
+	"gopkg.in/h2non/gock.v1"
 )
 
 var _ = Describe("Issue comments lazy loading", func() {
@@ -40,7 +40,7 @@ var _ = Describe("Issue comments lazy loading", func() {
 		Ω(err).ShouldNot(HaveOccurred())
 		Expect(calls).To(Equal(1))
 		expComment := &github.IssueComment{
-			User: &github.User{Login:utils.String("commenter")},
+			User: &github.User{Login: utils.String("commenter")},
 			Body: utils.String("cool comment"),
 		}
 		Expect(comments).To(ConsistOf(expComment))
@@ -66,8 +66,9 @@ var _ = Describe("Issue comments lazy loading", func() {
 		Ω(err).ShouldNot(HaveOccurred())
 		Expect(counter).To(Equal(1))
 		expComment := &github.IssueComment{
-			User: &github.User{Login:utils.String("commenter")},
+			User: &github.User{Login: utils.String("commenter")},
 			Body: utils.String("cool comment"),
 		}
-		Expect(comments).To(ConsistOf(expComment))	})
+		Expect(comments).To(ConsistOf(expComment))
+	})
 })

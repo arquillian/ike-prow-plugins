@@ -5,8 +5,8 @@ import (
 	"fmt"
 	"time"
 
-	gogh "github.com/google/go-github/github"
 	"github.com/arquillian/ike-prow-plugins/pkg/retry"
+	gogh "github.com/google/go-github/github"
 )
 
 type retryWrapper struct {

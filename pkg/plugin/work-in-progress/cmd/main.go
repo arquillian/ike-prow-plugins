@@ -16,11 +16,11 @@ func handlerCreator(githubClient ghclient.Client, botName string) server.GitHubE
 	return &wip.GitHubWIPPRHandler{Client: githubClient, BotName: botName}
 }
 
-func serverCreator(webhookSecret []byte, eventHandler server.GitHubEventHandler) *server.Server {
+func serverCreator(webhookSecret []byte, eventHandler server.GitHubEventHandler) (*server.Server, []error) {
 	return &server.Server{
 		GitHubEventHandler: eventHandler,
 		HmacSecret:         webhookSecret,
-	}
+	}, nil
 }
 
 func helpProvider(enabledRepos []string) (*pluginhelp.PluginHelp, error) {

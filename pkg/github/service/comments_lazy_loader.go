@@ -2,8 +2,8 @@ package ghservice
 
 import (
 	"github.com/arquillian/ike-prow-plugins/pkg/github/client"
-	gogh "github.com/google/go-github/github"
 	"github.com/arquillian/ike-prow-plugins/pkg/scm"
+	gogh "github.com/google/go-github/github"
 )
 
 // IssueCommentsLazyLoader represents a lazy loader of issue comments - is loaded when needed and only once

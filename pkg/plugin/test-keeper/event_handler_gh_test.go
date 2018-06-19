@@ -4,16 +4,16 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/arquillian/ike-prow-plugins/pkg/command"
 	"github.com/arquillian/ike-prow-plugins/pkg/github"
 	"github.com/arquillian/ike-prow-plugins/pkg/github/service"
 	. "github.com/arquillian/ike-prow-plugins/pkg/internal/test"
 	"github.com/arquillian/ike-prow-plugins/pkg/log"
+	"github.com/arquillian/ike-prow-plugins/pkg/plugin"
 	"github.com/arquillian/ike-prow-plugins/pkg/plugin/test-keeper"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	"gopkg.in/h2non/gock.v1"
-	"github.com/arquillian/ike-prow-plugins/pkg/plugin"
-	"github.com/arquillian/ike-prow-plugins/pkg/command"
 )
 
 const (
@@ -23,7 +23,7 @@ const (
 
 var (
 	expectedContext = strings.Join([]string{botName, testkeeper.ProwPluginName}, "/")
-	docStatusRoot = fmt.Sprintf("%s/status/%s", plugin.DocumentationURL, testkeeper.ProwPluginName)
+	docStatusRoot   = fmt.Sprintf("%s/status/%s", plugin.DocumentationURL, testkeeper.ProwPluginName)
 )
 
 var _ = Describe("Test Keeper Plugin features", func() {
@@ -89,7 +89,7 @@ var _ = Describe("Test Keeper Plugin features", func() {
 				Get(repositoryName + "/5d6e9b25da90edfc19f488e595e0645c081c1575/" + configFilePath + ".yml").
 				Reply(200).
 				BodyString("test_patterns: ['**/*_test_suite.go']\n" +
-				"skip_validation_for: ['README.adoc']")
+					"skip_validation_for: ['README.adoc']")
 
 			gock.New("https://api.github.com").
 				Get("/repos/" + repositoryName + "/pulls/2/files").
@@ -150,8 +150,8 @@ var _ = Describe("Test Keeper Plugin features", func() {
 				Body(FromFile("test_fixtures/github_calls/prs/with_tests/test-keeper.yml"))
 
 			gock.New("https://api.github.com").
-				Get("/repos/" + repositoryName + "/pulls/2/files").
-				MatchParam("per_page","100").
+				Get("/repos/"+repositoryName+"/pulls/2/files").
+				MatchParam("per_page", "100").
 				MatchParam("page", "1").
 				Reply(200).
 				Body(FromFile("test_fixtures/github_calls/prs/with_tests/changes_go_files.json"))
@@ -177,7 +177,7 @@ var _ = Describe("Test Keeper Plugin features", func() {
 
 		It("should block newly created pull request when no tests are included", func() {
 			// given
-			NonExistingRawGitHubFiles("test-keeper.yml", "test-keeper.yaml","test-keeper_hint.md")
+			NonExistingRawGitHubFiles("test-keeper.yml", "test-keeper.yaml", "test-keeper_hint.md")
 			gockEmptyComments(1)
 
 			gock.New("https://api.github.com").
@@ -336,7 +336,7 @@ var _ = Describe("Test Keeper Plugin features", func() {
 				Get("/repos/" + repositoryName + "/issues/1/comments").
 				Reply(200).
 				BodyString(`[{"user":{"login":"bartoszmajsak-test"}, "body":"` + testkeeper.BypassCheckComment + `"},` +
-				`{"body":"` + fmt.Sprintf(ghservice.PluginTitleTemplate, testkeeper.ProwPluginName) + `"}]`)
+					`{"body":"` + fmt.Sprintf(ghservice.PluginTitleTemplate, testkeeper.ProwPluginName) + `"}]`)
 
 			gock.New("https://api.github.com").
 				Get("/repos/" + repositoryName + "/pulls/1/reviews").
@@ -443,9 +443,9 @@ var _ = Describe("Test Keeper Plugin features", func() {
 			gock.New("https://api.github.com").
 				Post("/repos/" + repositoryName + "/issues/1/comments").
 				SetMatcher(
-				ExpectPayload(To(
-					HaveBodyThatContains("Hey @bartoszmajsak-test! It seems you tried to trigger `/ok-without-tests` command"),
-					HaveBodyThatContains("You have to be admin or requested reviewer or pull request approver, but not pull request creator")))).
+					ExpectPayload(To(
+							HaveBodyThatContains("Hey @bartoszmajsak-test! It seems you tried to trigger `/ok-without-tests` command"),
+							HaveBodyThatContains("You have to be admin or requested reviewer or pull request approver, but not pull request creator")))).
 				Reply(201) // This way we implicitly verify that call happened after `HandleEvent` call
 
 			statusPayload := LoadFromFile("test_fixtures/github_calls/prs/without_tests/skip_comment_by_external.json")
@@ -612,7 +612,7 @@ var _ = Describe("Test Keeper Plugin features", func() {
 func gockEmptyComments(prNumber int) {
 	gock.New("https://api.github.com").
 		Get(fmt.Sprintf("/repos/%s/issues/%d/comments", repositoryName, prNumber)).
-		MatchParam("per_page","100").
+		MatchParam("per_page", "100").
 		MatchParam("page", "1").
 		Reply(200).
 		BodyString("[]")

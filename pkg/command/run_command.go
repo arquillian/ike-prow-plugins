@@ -5,8 +5,8 @@ import (
 
 	"github.com/arquillian/ike-prow-plugins/pkg/github/client"
 	"github.com/arquillian/ike-prow-plugins/pkg/log"
-	gogh "github.com/google/go-github/github"
 	"github.com/arquillian/ike-prow-plugins/pkg/utils"
+	gogh "github.com/google/go-github/github"
 )
 
 // RunCommentPrefix is used as a command prefix to trigger plugin with it's name

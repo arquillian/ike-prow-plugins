@@ -34,7 +34,7 @@ func NewHinter(client ghclient.Client, log log.Logger, commentsLoader *IssueComm
 	return &Hinter{
 		CommentService: &CommentService{
 			client: client,
-			issue: commentsLoader.Issue,
+			issue:  commentsLoader.Issue,
 		},
 		log:            log,
 		commentContext: commentContext,

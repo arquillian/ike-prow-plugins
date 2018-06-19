@@ -1,0 +1,39 @@
+== PR Sanitizer Plugin
+
+This plugin enforces writing effective pull requests that confirm with proper naming conventions and description to clearly convey its purpose and provide better collaboration, tracebility and maintainabilty by giving a clear and concise context to the reviewer of what’s being solved at a high level, taking off an extra step for the reviewer.
+
+=== Title Verification [[title-verification]]
+
+This ensures that the PR title comforms with the semantic commit message style. Conformance with the semantic commit message style not only makes your changelog and git history clean and easy to navigate but also encourages making atomic pull requests that address only a single concern, better reflect the change within and are more clearly understood.
+
+The format below shows a rigid semantic commit message style.
+
+[source, shell, indent=0]
+----
+<type>(<scope>): <subject>
+----
+
+* where `<scope>` is optional.
+* and each of `<type>` categorizes the PR according to the change introduced (such as `feat` for introducing a new feature and `fix` for patching a bug in codebase)
+ 
+If the PR title is prefixed with any of the default types (`feat`, `fix`, `docs`, `style`, `refactor`, `test`, `chore`) or any of the user configured types as described below (non-case sensitive) then the plugin marks its check as **Success**, or as **Failure** otherwise.
+
+For more explanation regarding the semantic style commit message style check link:https://seesparkbox.com/foundry/semantic_commit_messages[here].
+
+=== Plugin Configuration [[pr-sanitizer-config]]
+
+To configure PR Sanitizer plugin place `pr-sanitizer.yml` (or `pr-sanitizer.yaml`) file inside of the directory `.ike-prow/` in your project and use properties described below.
+
+.pr-sanitizer.yaml
+[source, yml, indent=0]
+----
+include::../../pkg/plugin/pr-sanitizer/test_fixtures/github_calls/pr-sanitizer.yml[]
+----
+
+<1> Defines set of custom types which will be used to match titles prefixes in changeset and determine if Pull Requests Title conforms with the semantic message style. (Eg. above code snippet configures link:https://medium.com/walmartlabs/semantic-commit-messages-with-emojis-dba2541cea9a[emoji style] semantic commit message.)
+<2> Allows you to decide if you want to combine your patterns with the list (`feat`, `fix`, `refactor`, `docs`, `test`, `chore`, `style`) of predefined default types (`true` by default).
+
+=== Status details
+
+include::{asciidoctor-source}/fragments/status/pr-sanitizer/success/pr-sanitizer-success.adoc[leveloffset=1]
+include::{asciidoctor-source}/fragments/status/pr-sanitizer/failure/title-verification-failed.adoc[leveloffset=1]

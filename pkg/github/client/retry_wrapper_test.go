@@ -3,13 +3,13 @@ package ghclient_test
 import (
 	"net/http"
 
+	"github.com/arquillian/ike-prow-plugins/pkg/github/client"
 	. "github.com/arquillian/ike-prow-plugins/pkg/internal/test"
+	"github.com/arquillian/ike-prow-plugins/pkg/log"
+	gogh "github.com/google/go-github/github"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	"gopkg.in/h2non/gock.v1"
-	"github.com/arquillian/ike-prow-plugins/pkg/github/client"
-	"github.com/arquillian/ike-prow-plugins/pkg/log"
-	gogh "github.com/google/go-github/github"
 )
 
 var _ = Describe("Retry client features", func() {
