@@ -68,8 +68,8 @@ func (gh *GitHubLabelsEventsHandler) HandleEvent(log log.Logger, eventType githu
 		config := LoadConfiguration(log, change)
 		if gh.HasTitleWithValidType(config, *event.PullRequest.Title) {
 			return statusService.Success(SuccessMessage, SuccessDetailsPageName)
-		} else if ok, prefix := wip.HasWorkInProgressPrefix(*event.PullRequest.Title, wip.LoadConfiguration(log, change)); ok {
-			trimmedTitle := strings.TrimSpace(strings.TrimPrefix(*event.PullRequest.Title, prefix))
+		} else if prefix, ok := wip.GetWorkInProgressPrefix(*event.PullRequest.Title, wip.LoadConfiguration(log, change)); ok {
+			trimmedTitle := strings.TrimPrefix(*event.PullRequest.Title, prefix)
 			if gh.HasTitleWithValidType(config, trimmedTitle) {
 				return statusService.Success(SuccessMessage, SuccessDetailsPageName)
 			}
@@ -94,7 +94,7 @@ func (gh *GitHubLabelsEventsHandler) HasTitleWithValidType(config PluginConfigur
 	}
 
 	for _, prefix := range prefixes {
-		if strings.HasPrefix(strings.ToLower(title), strings.ToLower(prefix)) {
+		if strings.HasPrefix(strings.ToLower(strings.TrimSpace(title)), strings.ToLower(strings.TrimSpace(prefix))) {
 			return true
 		}
 	}

@@ -90,7 +90,7 @@ var _ = Describe("Work In Progress Plugin features", func() {
 				Patch("repos/bartoszmajsak/wfswarm-booster-pipeline-test/pulls/4").
 				SetMatcher(ExpectPayload(toHaveModifiedTitle)).
 				Reply(200)
-		
+
 			gock.New("https://api.github.com").
 				Post("/repos/bartoszmajsak/wfswarm-booster-pipeline-test/statuses").
 				SetMatcher(ExpectPayload(toHaveSuccessState)).
