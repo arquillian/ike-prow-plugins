@@ -17,11 +17,11 @@ const (
 var (
 	pullRequestsCounter = prometheus.NewCounterVec(prometheus.CounterOpts{
 		Name: "pull_requests_total",
-		Help: "Total number of pull requests.",
+		Help: "Total number of pull requests received",
 	}, []string{"full_name", "type"})
 	okWithoutTestsPullRequest = prometheus.NewHistogramVec(prometheus.HistogramOpts{
 		Name:    "pull_requests_size",
-		Help:    "Histogram for changed file size of pull request with ok-without-tests.",
+		Help:    "Histogram for pull request size with ok-without-tests command applied.",
 		Buckets: prometheus.ExponentialBuckets(1, 3, 6),
 	}, []string{"full_name"})
 )
