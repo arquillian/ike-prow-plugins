@@ -1,0 +1,11 @@
+==== Failure - title missing semantic commit style [[title-verification-failed]]
+
+Your Pull Request has been rejected because the plugin detected that the PR title does not starts with any of the "type prefixes", so it seems that it does not conform with the sematic commit message style.
+
+Edit the PR title to conform with the semantic commit message style by prefixing it with one of the "type prefixes" to make the status green.
+
+For more information see <<index#title-verification,Title Verification>> and <<index#pr-sanitizer-config,Plugin Configuration>> sections.
+ 
+ifdef::only-status-details[]
+The complete documentation can be found at http://arquillian.org/ike-prow-plugins.
+endif::only-status-details[]
