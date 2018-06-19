@@ -29,11 +29,11 @@ var (
 // RegisterMetrics registers prometheus collectors to collect metrics for test-keeper.
 func RegisterMetrics() []error {
 	errors := make([]error, 0, 2)
-	server.RegisterOrGet(pullRequestsCounter, &errors, func(collector prometheus.Collector) {
+	server.RegisterOrAssignCollector(pullRequestsCounter, &errors, func(collector prometheus.Collector) {
 		pullRequestsCounter = collector.(*prometheus.CounterVec)
 	})
 
-	server.RegisterOrGet(okWithoutTestsPullRequest, &errors, func(collector prometheus.Collector) {
+	server.RegisterOrAssignCollector(okWithoutTestsPullRequest, &errors, func(collector prometheus.Collector) {
 		okWithoutTestsPullRequest = collector.(*prometheus.HistogramVec)
 	})
 
