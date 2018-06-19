@@ -76,6 +76,15 @@ func HaveTargetURL(expectedTargetURL string) SoftMatcher {
 		"target_url")
 }
 
+// HaveTitle gets "title" key from map[string]interface{} and compares its value with expectedTitle
+// This matcher is used to verify title content sent in request to GitHub API
+func HaveTitle(expectedBody string) SoftMatcher {
+	return TransformWithName(
+		func(s map[string]interface{}) interface{} { return s["title"] },
+		gomega.Equal(expectedBody),
+		"title")
+}
+
 // HaveBody gets "body" key from map[string]interface{} and compares its value with expectedBody
 // This matcher is used to verify body content sent in request to GitHub API
 func HaveBody(expectedBody string) SoftMatcher {
