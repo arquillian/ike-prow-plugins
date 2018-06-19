@@ -50,7 +50,7 @@ const DocumentationURL = "http://arquillian.org/ike-prow-plugins"
 type EventHandlerCreator func(client ghclient.Client, botName string) server.GitHubEventHandler
 
 // ServerCreator is a func type that wires Server and server.GitHubEventHandler together
-type ServerCreator func(hmacSecret []byte, evenHandler server.GitHubEventHandler) *server.Server
+type ServerCreator func(hmacSecret []byte, evenHandler server.GitHubEventHandler) (*server.Server, []error)
 
 // InitPlugin instantiates logger, loads the secrets from the flags, sets context to background and starts server with
 // the attached event handler.
@@ -93,16 +93,9 @@ func InitPlugin(pluginName string, newEventHandler EventHandlerCreator, newServe
 
 	handler := newEventHandler(githubClient, *pluginBotName)
 
-	pluginServer := newServer(webhookSecret, handler)
-	metrics, errs := server.RegisterMetrics(githubClient)
-	if len(errs) > 0 {
-		errLog := logger
-		for _, e := range errs {
-			errLog = errLog.WithError(e)
-		}
-		errLog.Fatal("Prometheus metrics registration failed!")
-	}
-	pluginServer.Metrics = metrics
+	pluginServer, errs := newServer(webhookSecret, handler)
+	errors := server.RegisterMetrics(githubClient)
+	logErrors(append(errors, errs...), logger, "Prometheus metrics registration failed!")
 
 	port := strconv.Itoa(*port)
 	logger.Infof("Starting server on port %s", port)
@@ -111,6 +104,7 @@ func InitPlugin(pluginName string, newEventHandler EventHandlerCreator, newServe
 	http.Handle("/version", probeshandler.NewProbesHandler(logger))
 
 	externalplugins.ServeExternalPluginHelp(http.DefaultServeMux, logger, helpProvider)
+
 
 	if *httpAddress == *metricsHttpAddress {
 		http.Handle("/metrics", promhttp.Handler())
@@ -149,4 +143,14 @@ func configureLogger(pluginName string) *logrus.Entry {
 	}
 
 	return logger
+}
+
+func logErrors(errors []error, logger *logrus.Entry, errMessage string) {
+	if len(errors) > 0 {
+		errLog := logger
+		for _, e := range errors {
+			errLog = errLog.WithError(e)
+		}
+		errLog.Fatal(errMessage)
+	}
 }

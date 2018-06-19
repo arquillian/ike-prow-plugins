@@ -114,6 +114,7 @@ func (gh *GitHubTestEventsHandler) handlePrComment(log log.Logger, comment *gogh
 				return err
 			}
 			statusService := gh.newTestStatusService(log, ghservice.NewRepositoryChangeForPR(pullRequest))
+			reportBypassCommand(pullRequest)
 			return statusService.okWithoutTests(*comment.Sender.Login)
 		}})
 
@@ -145,15 +146,18 @@ func (gh *GitHubTestEventsHandler) checkTestsAndSetStatus(log log.Logger, prLoad
 	}
 
 	if fileCategories.TestsExist() {
+		reportPullRequest(log, pr, WithTests)
 		return statusService.okTestsExist()
 	}
 
 	commentsLoader := ghservice.NewIssueCommentsLazyLoader(gh.Client, pr)
 	bypassed, user := gh.checkIfBypassed(log, commentsLoader, pr)
 	if bypassed {
+		reportBypassCommand(pr)
 		return statusService.okWithoutTests(user)
 	}
 
+	reportPullRequest(log, pr, WithoutTests)
 	err = statusService.failNoTests()
 	if err != nil {
 		log.Errorf("failed to report status on PR [%q]. cause: %s", *pr, err)
