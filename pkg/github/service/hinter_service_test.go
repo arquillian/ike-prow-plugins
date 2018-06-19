@@ -34,7 +34,7 @@ var _ = Describe("Config loader features", func() {
 
 			commentsLoader := &ghservice.IssueCommentsLazyLoader{
 				Client: client,
-				Issue: *scm.NewRepositoryIssue("owner", "repo", 2),
+				Issue:  *scm.NewRepositoryIssue("owner", "repo", 2),
 			}
 			hintContext := ghservice.HintContext{
 				PluginName: "my-plugin-name",
@@ -69,7 +69,7 @@ var _ = Describe("Config loader features", func() {
 
 			commentsLoader := &ghservice.IssueCommentsLazyLoader{
 				Client: client,
-				Issue: *scm.NewRepositoryIssue("owner", "repo", 2),
+				Issue:  *scm.NewRepositoryIssue("owner", "repo", 2),
 			}
 			hintContext := ghservice.HintContext{
 				PluginName: "test-keeper",
@@ -94,7 +94,7 @@ var _ = Describe("Config loader features", func() {
 
 			commentsLoader := &ghservice.IssueCommentsLazyLoader{
 				Client: client,
-				Issue: *scm.NewRepositoryIssue("owner", "repo", 2),
+				Issue:  *scm.NewRepositoryIssue("owner", "repo", 2),
 			}
 			hintContext := ghservice.HintContext{
 				PluginName: "another-plugin",

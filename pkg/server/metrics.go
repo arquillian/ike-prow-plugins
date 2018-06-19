@@ -1,9 +1,9 @@
 package server
 
 import (
-	"github.com/prometheus/client_golang/prometheus"
-	"github.com/arquillian/ike-prow-plugins/pkg/log"
 	"github.com/arquillian/ike-prow-plugins/pkg/github/client"
+	"github.com/arquillian/ike-prow-plugins/pkg/log"
+	"github.com/prometheus/client_golang/prometheus"
 )
 
 var (
@@ -23,7 +23,7 @@ var (
 )
 
 // RegisterMetrics registers prometheus collectors to collect metrics
-func RegisterMetrics(client ghclient.Client) ([]error) {
+func RegisterMetrics(client ghclient.Client) []error {
 	errors := make([]error, 0, 3)
 	ghClient = client
 	RegisterOrAssignCollector(rateLimit, &errors, func(collector prometheus.Collector) {

@@ -1,8 +1,8 @@
 package hint_test
 
 import (
-	"github.com/arquillian/ike-prow-plugins/pkg/hint"
 	"github.com/arquillian/ike-prow-plugins/pkg/config"
+	"github.com/arquillian/ike-prow-plugins/pkg/hint"
 	. "github.com/arquillian/ike-prow-plugins/pkg/internal/test"
 	"github.com/arquillian/ike-prow-plugins/pkg/scm"
 	. "github.com/onsi/ginkgo"

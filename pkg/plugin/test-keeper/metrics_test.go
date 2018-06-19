@@ -1,20 +1,21 @@
 package testkeeper_test
 
 import (
+	"errors"
+	"fmt"
+	"strings"
+
+	"github.com/arquillian/ike-prow-plugins/pkg/github"
+	"github.com/arquillian/ike-prow-plugins/pkg/github/service"
+	. "github.com/arquillian/ike-prow-plugins/pkg/internal/test"
+	"github.com/arquillian/ike-prow-plugins/pkg/log"
+	"github.com/arquillian/ike-prow-plugins/pkg/plugin/test-keeper"
+	"github.com/arquillian/ike-prow-plugins/pkg/utils"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	"github.com/prometheus/client_golang/prometheus"
-	. "github.com/arquillian/ike-prow-plugins/pkg/internal/test"
-	"gopkg.in/h2non/gock.v1"
-	"fmt"
-	"github.com/arquillian/ike-prow-plugins/pkg/github"
-	"github.com/arquillian/ike-prow-plugins/pkg/log"
 	dto "github.com/prometheus/client_model/go"
-	"strings"
-	"github.com/arquillian/ike-prow-plugins/pkg/utils"
-	"github.com/arquillian/ike-prow-plugins/pkg/github/service"
-	"github.com/arquillian/ike-prow-plugins/pkg/plugin/test-keeper"
-	"errors"
+	"gopkg.in/h2non/gock.v1"
 )
 
 var _ = Describe("TestKeeper Metrics", func() {

@@ -8,9 +8,9 @@ import (
 	"github.com/arquillian/ike-prow-plugins/pkg/github/client"
 	"github.com/arquillian/ike-prow-plugins/pkg/github/service"
 	"github.com/arquillian/ike-prow-plugins/pkg/log"
+	"github.com/arquillian/ike-prow-plugins/pkg/scm"
 	"github.com/arquillian/ike-prow-plugins/pkg/utils"
 	gogh "github.com/google/go-github/github"
-	"github.com/arquillian/ike-prow-plugins/pkg/scm"
 )
 
 // GitHubTestEventsHandler is the event handler for the plugin.

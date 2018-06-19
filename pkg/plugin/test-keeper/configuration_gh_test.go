@@ -1,6 +1,7 @@
 package testkeeper_test
 
 import (
+	"github.com/arquillian/ike-prow-plugins/pkg/github/service"
 	. "github.com/arquillian/ike-prow-plugins/pkg/internal/test"
 	"github.com/arquillian/ike-prow-plugins/pkg/log"
 	"github.com/arquillian/ike-prow-plugins/pkg/plugin/test-keeper"
@@ -8,7 +9,6 @@ import (
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	"gopkg.in/h2non/gock.v1"
-	"github.com/arquillian/ike-prow-plugins/pkg/github/service"
 )
 
 var _ = Describe("Test keeper config loader features", func() {
@@ -27,7 +27,7 @@ var _ = Describe("Test keeper config loader features", func() {
 		It("should load test-keeper configuration yml file", func() {
 			// given
 			gock.New("https://raw.githubusercontent.com").
-				Get("owner/repo/46cb8fac44709e4ccaae97448c65e8f7320cfea7/" + configFilePath  + ".yml").
+				Get("owner/repo/46cb8fac44709e4ccaae97448c65e8f7320cfea7/" + configFilePath + ".yml").
 				Reply(200).
 				BodyString("test_patterns: ['*my', 'test.go', 'pattern.js']\n" +
 					"skip_validation_for: ['pom.xml', 'regex{{*\\.adoc}}']\n" +
@@ -51,7 +51,7 @@ var _ = Describe("Test keeper config loader features", func() {
 		It("should load test-keeper configuration yml file", func() {
 			// given
 			gock.New("https://raw.githubusercontent.com").
-				Get("owner/repo/46cb8fac44709e4ccaae97448c65e8f7320cfea7/" + configFilePath  + ".yml").
+				Get("owner/repo/46cb8fac44709e4ccaae97448c65e8f7320cfea7/" + configFilePath + ".yml").
 				Reply(200).
 				BodyString("test_patterns: ['*my', 'test.go', 'pattern.js']\n" +
 					"skip_validation_for: ['pom.xml', 'regex{{*\\.adoc}}']\n" +
@@ -78,7 +78,7 @@ var _ = Describe("Test keeper config loader features", func() {
 			NonExistingRawGitHubFiles(".ike-prow/test-keeper.yml")
 
 			gock.New("https://raw.githubusercontent.com").
-				Get("owner/repo/46cb8fac44709e4ccaae97448c65e8f7320cfea7/" + configFilePath  + ".yaml").
+				Get("owner/repo/46cb8fac44709e4ccaae97448c65e8f7320cfea7/" + configFilePath + ".yaml").
 				Reply(200).
 				BodyString("test_patterns: ['*my', 'test.go', 'pattern.js']\n" +
 					"skip_validation_for: ['pom.xml', 'regex{{*\\.adoc}}']\n" +

@@ -20,7 +20,7 @@ func (s *RawFileService) GetRawFileURL(path string) string {
 
 // GetRelativePath creates repository specific relative path
 func (s *RawFileService) GetRelativePath(path string, useBlob bool) string {
-	repoPath := s.Change.Owner +"/"+ s.Change.RepoName
+	repoPath := s.Change.Owner + "/" + s.Change.RepoName
 	if useBlob {
 		repoPath += "/blob"
 	}

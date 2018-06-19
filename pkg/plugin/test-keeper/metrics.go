@@ -2,9 +2,9 @@ package testkeeper
 
 import (
 	"github.com/arquillian/ike-prow-plugins/pkg/log"
+	"github.com/arquillian/ike-prow-plugins/pkg/server"
 	gogh "github.com/google/go-github/github"
 	"github.com/prometheus/client_golang/prometheus"
-	"github.com/arquillian/ike-prow-plugins/pkg/server"
 )
 
 const (

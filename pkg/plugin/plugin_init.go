@@ -105,7 +105,6 @@ func InitPlugin(pluginName string, newEventHandler EventHandlerCreator, newServe
 
 	externalplugins.ServeExternalPluginHelp(http.DefaultServeMux, logger, helpProvider)
 
-
 	if *httpAddress == *metricsHttpAddress {
 		http.Handle("/metrics", promhttp.Handler())
 	} else {

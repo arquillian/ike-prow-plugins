@@ -1,17 +1,18 @@
 package server_test
 
 import (
+	"net/http/httptest"
+
+	"github.com/arquillian/ike-prow-plugins/pkg/github"
+	. "github.com/arquillian/ike-prow-plugins/pkg/internal/test"
+	"github.com/arquillian/ike-prow-plugins/pkg/log"
+	"github.com/arquillian/ike-prow-plugins/pkg/server"
+	"github.com/arquillian/ike-prow-plugins/pkg/utils"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
-	"net/http/httptest"
-	"github.com/arquillian/ike-prow-plugins/pkg/server"
 	"github.com/prometheus/client_golang/prometheus"
-	. "github.com/arquillian/ike-prow-plugins/pkg/internal/test"
 	"gopkg.in/h2non/gock.v1"
 	"k8s.io/test-infra/prow/phony"
-	"github.com/arquillian/ike-prow-plugins/pkg/github"
-	"github.com/arquillian/ike-prow-plugins/pkg/log"
-	"github.com/arquillian/ike-prow-plugins/pkg/utils"
 )
 
 type DummyGHEventHandler struct {
@@ -25,7 +26,7 @@ var _ = Describe("Service Metrics", func() {
 	secret := []byte("123abc")
 	client := NewDefaultGitHubClient()
 	var (
-		testServer    *httptest.Server
+		testServer *httptest.Server
 	)
 
 	BeforeEach(func() {

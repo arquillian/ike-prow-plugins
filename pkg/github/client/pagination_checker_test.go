@@ -1,14 +1,14 @@
 package ghclient_test
 
 import (
+	"github.com/arquillian/ike-prow-plugins/pkg/github/client"
 	. "github.com/arquillian/ike-prow-plugins/pkg/internal/test"
+	"github.com/arquillian/ike-prow-plugins/pkg/log"
+	"github.com/arquillian/ike-prow-plugins/pkg/scm"
+	gogh "github.com/google/go-github/github"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	"gopkg.in/h2non/gock.v1"
-	"github.com/arquillian/ike-prow-plugins/pkg/scm"
-	"github.com/arquillian/ike-prow-plugins/pkg/github/client"
-	"github.com/arquillian/ike-prow-plugins/pkg/log"
-	gogh "github.com/google/go-github/github"
 )
 
 var _ = Describe("Pagination checker", func() {
@@ -32,36 +32,36 @@ var _ = Describe("Pagination checker", func() {
 			// given
 			mockHighRateLimit()
 			gock.New("https://api.github.com").
-				Get("/repos/" + repositoryName + "/pulls/2/files").
+				Get("/repos/"+repositoryName+"/pulls/2/files").
 				MatchParam("per_page", "100").
 				MatchParam("page", "1").
 				Reply(200).
 				Body(FromFile("test_fixtures/gh/list_files_page_1.json")).
 				AddHeader("Link",
-				"<https://api.github.com/repositories/121737972/pulls/2/files?per_page=1&page=2>; rel=\"next\", "+
-					"<https://api.github.com/repositories/121737972/pulls/2/files?per_page=1&page=3>; rel=\"last\"")
+					"<https://api.github.com/repositories/121737972/pulls/2/files?per_page=1&page=2>; rel=\"next\", "+
+						"<https://api.github.com/repositories/121737972/pulls/2/files?per_page=1&page=3>; rel=\"last\"")
 
 			gock.New("https://api.github.com").
-				Get("/repos/" + repositoryName + "/pulls/2/files").
+				Get("/repos/"+repositoryName+"/pulls/2/files").
 				MatchParam("per_page", "100").
 				MatchParam("page", "2").
 				Reply(200).
 				Body(FromFile("test_fixtures/gh/list_files_page_2.json")).
 				AddHeader("Link",
-				"<https://api.github.com/repositories/121737972/pulls/2/files?per_page=1&page=1>; rel=\"prev\", "+
-					"<https://api.github.com/repositories/121737972/pulls/2/files?per_page=1&page=3>; rel=\"next\", "+
-					"<https://api.github.com/repositories/121737972/pulls/2/files?per_page=1&page=3>; rel=\"last\", "+
-					"<https://api.github.com/repositories/121737972/pulls/2/files?per_page=1&page=1>; rel=\"first\"")
+					"<https://api.github.com/repositories/121737972/pulls/2/files?per_page=1&page=1>; rel=\"prev\", "+
+						"<https://api.github.com/repositories/121737972/pulls/2/files?per_page=1&page=3>; rel=\"next\", "+
+						"<https://api.github.com/repositories/121737972/pulls/2/files?per_page=1&page=3>; rel=\"last\", "+
+						"<https://api.github.com/repositories/121737972/pulls/2/files?per_page=1&page=1>; rel=\"first\"")
 
 			gock.New("https://api.github.com").
-				Get("/repos/" + repositoryName + "/pulls/2/files").
+				Get("/repos/"+repositoryName+"/pulls/2/files").
 				MatchParam("per_page", "100").
 				MatchParam("page", "3").
 				Reply(200).
 				Body(FromFile("test_fixtures/gh/list_files_page_3.json")).
 				AddHeader("Link",
-				"<https://api.github.com/repositories/121737972/pulls/2/files?per_page=1&page=2>; rel=\"prev\", "+
-					"<https://api.github.com/repositories/121737972/pulls/2/files?per_page=1&page=1>; rel=\"first\"")
+					"<https://api.github.com/repositories/121737972/pulls/2/files?per_page=1&page=2>; rel=\"prev\", "+
+						"<https://api.github.com/repositories/121737972/pulls/2/files?per_page=1&page=1>; rel=\"first\"")
 
 			// when
 			files, err := client.ListPullRequestFiles("bartoszmajsak", "wfswarm-booster-pipeline-test", 2)

@@ -20,7 +20,7 @@ var _ = Describe("Test liveliness and readiness probes.", func() {
 	)
 
 	var versionEnv string
-	
+
 	var _ = BeforeSuite(func() {
 		var found bool
 		if versionEnv, found = os.LookupEnv("VERSION"); !found {
