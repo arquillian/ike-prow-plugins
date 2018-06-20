@@ -13,21 +13,8 @@ var _ = Describe("Permission service with permission checks features", func() {
 
 	Context("Getting and validating user's permissions", func() {
 
-		client := NewDefaultGitHubClient()
-		var user is.PermissionService
-
 		BeforeEach(func() {
 			gock.Off()
-			user = is.PermissionService{
-				Client: client,
-				User:   "user",
-				PRLoader: &ghservice.PullRequestLazyLoader{
-					Client:    client,
-					RepoOwner: "owner",
-					RepoName:  "repo",
-					Number:    1,
-				},
-			}
 		})
 
 		AfterEach(EnsureGockRequestsHaveBeenMatched)
@@ -40,7 +27,7 @@ var _ = Describe("Permission service with permission checks features", func() {
 				BodyString(`{"permission": "read"}`)
 
 			// when
-			status, err := user.Admin()
+			status, err := user().Admin(true)
 
 			// then
 			Ω(err).ShouldNot(HaveOccurred())
@@ -58,7 +45,7 @@ var _ = Describe("Permission service with permission checks features", func() {
 				BodyString(`{"permission": "admin"}`)
 
 			// when
-			status, err := user.Admin()
+			status, err := user().Admin(true)
 
 			// then
 			Ω(err).ShouldNot(HaveOccurred())
@@ -76,7 +63,7 @@ var _ = Describe("Permission service with permission checks features", func() {
 				BodyString(`{"user": {"login": "creator"}}`)
 
 			// when
-			status, err := user.PRCreator()
+			status, err := user().PRCreator(true)
 
 			// then
 			Ω(err).ShouldNot(HaveOccurred())
@@ -94,7 +81,7 @@ var _ = Describe("Permission service with permission checks features", func() {
 				BodyString(`{"user": {"login": "user"}}`)
 
 			// when
-			status, err := user.PRCreator()
+			status, err := user().PRCreator(true)
 
 			// then
 			Ω(err).ShouldNot(HaveOccurred())
@@ -112,13 +99,13 @@ var _ = Describe("Permission service with permission checks features", func() {
 				BodyString(`{"requested_reviewers": [{"login": "reviewer1"}, {"login": "reviewer2"}]}`)
 
 			// when
-			status, err := user.PRReviewer()
+			status, err := user().PRReviewer(true)
 
 			// then
 			Ω(err).ShouldNot(HaveOccurred())
 			ExpectPermissionStatus(status).To(
 				HaveRejectedUser("user"),
-				HaveApprovedRoles(is.RequestReviewer),
+				HaveApprovedRoles(is.RequestedReviewer),
 				HaveNoRejectedRoles())
 		})
 
@@ -130,13 +117,13 @@ var _ = Describe("Permission service with permission checks features", func() {
 				BodyString(`{"requested_reviewers": [{"login": "reviewer1"}, {"login": "user"}]}`)
 
 			// when
-			status, err := user.PRReviewer()
+			status, err := user().PRReviewer(true)
 
 			// then
 			Ω(err).ShouldNot(HaveOccurred())
 			ExpectPermissionStatus(status).To(
 				HaveApprovedUser("user"),
-				HaveApprovedRoles(is.RequestReviewer),
+				HaveApprovedRoles(is.RequestedReviewer),
 				HaveNoRejectedRoles())
 		})
 
@@ -149,7 +136,7 @@ var _ = Describe("Permission service with permission checks features", func() {
 					`{"user": {"login": "user"}, "state": "COMMENTED"}]`)
 
 			// when
-			status, err := user.PRApprover()
+			status, err := user().PRApprover(true)
 
 			// then
 			Ω(err).ShouldNot(HaveOccurred())
@@ -167,7 +154,7 @@ var _ = Describe("Permission service with permission checks features", func() {
 				BodyString(`[{"user": {"login": "user"}, "state": "APPROVED"}]`)
 
 			// when
-			status, err := user.PRApprover()
+			status, err := user().PRApprover(true)
 
 			// then
 			Ω(err).ShouldNot(HaveOccurred())
@@ -185,7 +172,7 @@ var _ = Describe("Permission service with permission checks features", func() {
 
 		It("should approve everyone", func() {
 			// when
-			status, err := is.Anybody()
+			status, err := is.Anybody(true)
 
 			// then
 			Ω(err).ShouldNot(HaveOccurred())
@@ -196,7 +183,7 @@ var _ = Describe("Permission service with permission checks features", func() {
 		})
 
 		It("should approve everyone when no restrictions are set", func() {
-			status, err := is.AnyOf()()
+			status, err := is.AnyOf()(true)
 
 			// then
 			Ω(err).ShouldNot(HaveOccurred())
@@ -208,7 +195,7 @@ var _ = Describe("Permission service with permission checks features", func() {
 
 		It("should approve when at least one restriction is fulfilled", func() {
 			// when
-			status, err := is.AnyOf(newCheck(rejected), newCheck(approved))()
+			status, err := is.AnyOf(newCheck(rejected), newCheck(approved))(true)
 
 			// then
 			Ω(err).ShouldNot(HaveOccurred())
@@ -223,7 +210,7 @@ var _ = Describe("Permission service with permission checks features", func() {
 			secondRejected := *is.NewPermissionStatus("user", false, []string{is.Admin}, []string{})
 
 			// when
-			status, err := is.AnyOf(newCheck(rejected), newCheck(secondRejected))()
+			status, err := is.AnyOf(newCheck(rejected), newCheck(secondRejected))(true)
 
 			// then
 			Ω(err).ShouldNot(HaveOccurred())
@@ -238,7 +225,7 @@ var _ = Describe("Permission service with permission checks features", func() {
 			secondApproved := *is.NewPermissionStatus("user", true, []string{is.Admin}, []string{})
 
 			// when
-			status, err := is.AllOf(newCheck(approved), newCheck(rejected), newCheck(secondApproved))()
+			status, err := is.AllOf(newCheck(approved), newCheck(rejected), newCheck(secondApproved))(true)
 
 			// then
 			Ω(err).ShouldNot(HaveOccurred())
@@ -253,7 +240,7 @@ var _ = Describe("Permission service with permission checks features", func() {
 			secondApproved := *is.NewPermissionStatus("user", true, []string{is.Admin}, []string{})
 
 			// when
-			status, err := is.AllOf(newCheck(approved), newCheck(secondApproved))()
+			status, err := is.AllOf(newCheck(approved), newCheck(secondApproved))(true)
 
 			// then
 			Ω(err).ShouldNot(HaveOccurred())
@@ -265,7 +252,7 @@ var _ = Describe("Permission service with permission checks features", func() {
 
 		It("should reverse the approval to rejection", func() {
 			// when
-			status, err := is.Not(newCheck(approved))()
+			status, err := is.Not(newCheck(approved))(true)
 
 			// then
 			Ω(err).ShouldNot(HaveOccurred())
@@ -275,10 +262,77 @@ var _ = Describe("Permission service with permission checks features", func() {
 				HaveNoApprovedRoles())
 		})
 	})
+
+	Context("Lazy evaluation of the anyOff permission check function", func() {
+
+		BeforeEach(func() {
+			gock.Off()
+		})
+
+		AfterEach(EnsureGockRequestsHaveBeenMatched)
+
+		It("should approve based on first condition and not evaluate the remaining ones", func() {
+			// given
+			gock.New("https://api.github.com").
+				Get("/repos/owner/repo/collaborators/user/permission").
+				Reply(200).
+				BodyString(`{"permission": "read"}`)
+			gock.New("https://api.github.com").
+				Get("/repos/owner/repo/pulls/1").
+				Times(0).
+				Reply(200)
+			user := user()
+
+			// when
+			status, err := is.AnyOf(is.Not(user.Admin), user.PRReviewer, is.AllOf(user.PRApprover, user.PRCreator))(true)
+
+			// then
+			Ω(err).ShouldNot(HaveOccurred())
+			ExpectPermissionStatus(status).To(
+				HaveApprovedUser("user"),
+				HaveApprovedRoles(is.RequestedReviewer, is.PullRequestApprover, is.PullRequestCreator),
+				HaveRejectedRoles(is.Admin))
+		})
+
+		It("should approve based on first condition in nested anyOf check and not evaluate the remaining ones", func() {
+			// given
+			gock.New("https://api.github.com").
+				Get("/repos/owner/repo/pulls/1").
+				Times(1).
+				Reply(200).
+				BodyString(`{"user": {"login": "user"}}`)
+			gock.New("https://api.github.com").
+				Get("/repos/owner/repo/collaborators/user/permission").
+				Times(0).
+				Reply(200)
+			user := user()
+
+			// when
+			status, err := is.AnyOf(user.PRReviewer, is.AnyOf(user.PRCreator, user.Admin), user.PRApprover)(true)
+
+			// then
+			Ω(err).ShouldNot(HaveOccurred())
+			ExpectPermissionStatus(status).To(
+				HaveApprovedUser("user"),
+				HaveApprovedRoles(is.Admin, is.RequestedReviewer, is.PullRequestApprover, is.PullRequestCreator),
+				HaveNoRejectedRoles())
+		})
+
+	})
 })
 
-func newCheck(status is.PermissionStatus) func() (*is.PermissionStatus, error) {
-	return func() (*is.PermissionStatus, error) {
+func user() *is.PermissionService {
+	client := NewDefaultGitHubClient()
+	return is.NewPermissionService(client, "user", &ghservice.PullRequestLazyLoader{
+		Client:    client,
+		RepoOwner: "owner",
+		RepoName:  "repo",
+		Number:    1,
+	})
+}
+
+func newCheck(status is.PermissionStatus) func(evaluate bool) (*is.PermissionStatus, error) {
+	return func(evaluate bool) (*is.PermissionStatus, error) {
 		return &status, nil
 	}
 }
