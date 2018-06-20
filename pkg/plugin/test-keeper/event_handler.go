@@ -113,8 +113,8 @@ func (gh *GitHubTestEventsHandler) handlePrComment(log log.Logger, comment *gogh
 			if err != nil {
 				return err
 			}
-			statusService := gh.newTestStatusService(log, ghservice.NewRepositoryChangeForPR(pullRequest))
 			reportBypassCommand(pullRequest)
+			statusService := gh.newTestStatusService(log, pullRequest)
 			return statusService.okWithoutTests(*comment.Sender.Login)
 		}})
 
@@ -133,7 +133,9 @@ func (gh *GitHubTestEventsHandler) checkTestsAndSetStatus(log log.Logger, prLoad
 	change := ghservice.NewRepositoryChangeForPR(pr)
 	configuration := LoadConfiguration(log, change)
 	fileCategories, err := gh.checkTests(log, change, configuration, *pr.Number)
-	statusService := gh.newTestStatusService(log, change)
+	commentsLoader := ghservice.NewIssueCommentsLazyLoader(gh.Client, pr)
+
+	statusService := gh.newTestStatusServiceWithMessages(log, pr, commentsLoader, configuration)
 	if err != nil {
 		if statusErr := statusService.reportError(); statusErr != nil {
 			log.Errorf("failed to report error status on PR [%q]. cause: %s", *pr, statusErr)
@@ -142,15 +144,16 @@ func (gh *GitHubTestEventsHandler) checkTestsAndSetStatus(log log.Logger, prLoad
 	}
 
 	if fileCategories.OnlySkippedFiles() {
+		statusService.onlySkippedMessage()
 		return statusService.okOnlySkippedFiles()
 	}
 
 	if fileCategories.TestsExist() {
 		reportPullRequest(log, pr, WithTests)
+		statusService.withTestsMessage()
 		return statusService.okTestsExist()
 	}
 
-	commentsLoader := ghservice.NewIssueCommentsLazyLoader(gh.Client, pr)
 	bypassed, user := gh.checkIfBypassed(log, commentsLoader, pr)
 	if bypassed {
 		reportBypassCommand(pr)
@@ -158,20 +161,11 @@ func (gh *GitHubTestEventsHandler) checkTestsAndSetStatus(log log.Logger, prLoad
 	}
 
 	reportPullRequest(log, pr, WithoutTests)
+	statusService.withoutTestsMessage()
 	err = statusService.failNoTests()
 	if err != nil {
 		log.Errorf("failed to report status on PR [%q]. cause: %s", *pr, err)
 	}
-
-	hintContext := ghservice.HintContext{PluginName: ProwPluginName, Assignee: *pr.User.Login}
-	hinter := ghservice.NewHinter(gh.Client, log, commentsLoader, hintContext)
-
-	cerr := hinter.PluginComment(CreateHintMessage(configuration, change, log))
-	if cerr != nil {
-		log.Errorf("failed to comment on PR [%q]. cause: %s", *pr, cerr)
-		return cerr
-	}
-
 	return err
 }
 

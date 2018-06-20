@@ -6,10 +6,10 @@ import (
 	"strings"
 
 	"github.com/arquillian/ike-prow-plugins/pkg/github"
-	"github.com/arquillian/ike-prow-plugins/pkg/github/service"
 	. "github.com/arquillian/ike-prow-plugins/pkg/internal/test"
 	"github.com/arquillian/ike-prow-plugins/pkg/log"
 	"github.com/arquillian/ike-prow-plugins/pkg/plugin/test-keeper"
+	"github.com/arquillian/ike-prow-plugins/pkg/status/message"
 	"github.com/arquillian/ike-prow-plugins/pkg/utils"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -32,7 +32,7 @@ var _ = Describe("TestKeeper Metrics", func() {
 	}
 
 	toHaveBodyWithWholePluginsComment := SoftlySatisfyAll(
-		HaveBodyThatContains(fmt.Sprintf(ghservice.PluginTitleTemplate, testkeeper.ProwPluginName)),
+		HaveBodyThatContains(fmt.Sprintf(message.PluginTitleTemplate, testkeeper.ProwPluginName)),
 		HaveBodyThatContains("@bartoszmajsak"),
 	)
 
@@ -140,7 +140,7 @@ var _ = Describe("TestKeeper Metrics", func() {
 
 	It("should report pull requests without tests", func() {
 		//given
-		NonExistingRawGitHubFiles("test-keeper.yml", "test-keeper.yaml", "test-keeper_hint.md")
+		NonExistingRawGitHubFiles("test-keeper.yml", "test-keeper.yaml", "test-keeper_without_tests_message.md")
 		gockEmptyComments(1)
 
 		gock.New("https://api.github.com").

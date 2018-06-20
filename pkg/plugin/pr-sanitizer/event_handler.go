@@ -10,6 +10,7 @@ import (
 	"github.com/arquillian/ike-prow-plugins/pkg/github/service"
 	"github.com/arquillian/ike-prow-plugins/pkg/log"
 	"github.com/arquillian/ike-prow-plugins/pkg/plugin/work-in-progress"
+	"github.com/arquillian/ike-prow-plugins/pkg/status"
 	"github.com/arquillian/ike-prow-plugins/pkg/utils"
 	gogh "github.com/google/go-github/github"
 )
@@ -115,7 +116,7 @@ func (gh *GitHubLabelsEventsHandler) handlePrComment(log log.Logger, comment *go
 func (gh *GitHubLabelsEventsHandler) checkTitleAndSetStatus(log log.Logger, pullRequest *gogh.PullRequest) error {
 	change := ghservice.NewRepositoryChangeForPR(pullRequest)
 	statusContext := github.StatusContext{BotName: gh.BotName, PluginName: ProwPluginName}
-	statusService := ghservice.NewStatusService(gh.Client, log, change, statusContext)
+	statusService := status.NewStatusService(gh.Client, log, change, statusContext)
 
 	config := LoadConfiguration(log, change)
 	if gh.HasTitleWithValidType(config, *pullRequest.Title) {

@@ -1,7 +1,0 @@
-{{.Thumbnail}}
-
-{{.Description}}
-
-Your plugin configuration is stored in the [file]({{.ConfigFile}}).
-
-In the configuration file you pointed to the custom comment file, but the plugin wasn't able to retrieve it from the defined location ({{.MessageFileURL}}). Make sure it is either a valid URL or a path to an existing file in this repository.

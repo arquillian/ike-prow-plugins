@@ -11,6 +11,7 @@ import (
 	"github.com/arquillian/ike-prow-plugins/pkg/log"
 	"github.com/arquillian/ike-prow-plugins/pkg/plugin"
 	"github.com/arquillian/ike-prow-plugins/pkg/plugin/test-keeper"
+	"github.com/arquillian/ike-prow-plugins/pkg/status/message"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	"gopkg.in/h2non/gock.v1"
@@ -44,8 +45,9 @@ var _ = Describe("Test Keeper Plugin features", func() {
 	}
 
 	toHaveBodyWithWholePluginsComment := SoftlySatisfyAll(
-		HaveBodyThatContains(fmt.Sprintf(ghservice.PluginTitleTemplate, testkeeper.ProwPluginName)),
+		HaveBodyThatContains(fmt.Sprintf(message.PluginTitleTemplate, testkeeper.ProwPluginName)),
 		HaveBodyThatContains("@bartoszmajsak"),
+		HaveBodyThatContains("It appears that no tests have been added or updated in this PR."),
 	)
 
 	Context("Pull Request event handling", func() {
@@ -57,15 +59,28 @@ var _ = Describe("Test Keeper Plugin features", func() {
 
 		AfterEach(EnsureGockRequestsHaveBeenMatched)
 
-		It("should approve opened pull request when tests included", func() {
+		It("should approve opened pull request and update status message when tests included", func() {
 			// given
-			NonExistingRawGitHubFiles("test-keeper.yml", "test-keeper.yaml", "test-keeper_hint.md")
-			gockEmptyComments(2)
+			NonExistingRawGitHubFiles("test-keeper.yml", "test-keeper.yaml", "test-keeper_with_tests_message.md")
 
 			gock.New("https://api.github.com").
 				Get("/repos/" + repositoryName + "/pulls/2/files").
 				Reply(200).
 				Body(FromFile("test_fixtures/github_calls/prs/with_tests/changes.json"))
+
+			gock.New("https://api.github.com").
+				Get("/repos/" + repositoryName + "/issues/2/comments").
+				Reply(200).
+				Body(FromFile("test_fixtures/github_calls/prs/comments_with_no_test_status_msg.json"))
+
+			gock.New("https://api.github.com").
+				Patch("/repos/" + repositoryName + "/issues/comments/397622617").
+				SetMatcher(ExpectPayload(SoftlySatisfyAll(
+					HaveBodyThatContains(fmt.Sprintf(message.PluginTitleTemplate, testkeeper.ProwPluginName)),
+					HaveBodyThatContains("@bartoszmajsak"),
+					HaveBodyThatContains("It seems that this PR already contains some added or changed tests. Good job!"),
+				))).
+				Reply(201)
 
 			gock.New("https://api.github.com").
 				Post("/repos/" + repositoryName + "/statuses").
@@ -140,8 +155,7 @@ var _ = Describe("Test Keeper Plugin features", func() {
 
 		It("should reject opened pull request when no tests are matching defined pattern with no defaults implicitly combined", func() {
 			// given
-
-			NonExistingRawGitHubFiles("test-keeper_hint.md")
+			NonExistingRawGitHubFiles("test-keeper_without_tests_message.md")
 			gockEmptyComments(2)
 
 			gock.New("https://raw.githubusercontent.com").
@@ -177,7 +191,7 @@ var _ = Describe("Test Keeper Plugin features", func() {
 
 		It("should block newly created pull request when no tests are included", func() {
 			// given
-			NonExistingRawGitHubFiles("test-keeper.yml", "test-keeper.yaml", "test-keeper_hint.md")
+			NonExistingRawGitHubFiles("test-keeper.yml", "test-keeper.yaml", "test-keeper_without_tests_message.md")
 			gockEmptyComments(1)
 
 			gock.New("https://api.github.com").
@@ -206,7 +220,7 @@ var _ = Describe("Test Keeper Plugin features", func() {
 
 		It("should not block newly created pull request when documentation and build files are the only changes", func() {
 			// given
-			NonExistingRawGitHubFiles("test-keeper.yml", "test-keeper.yaml")
+			NonExistingRawGitHubFiles("test-keeper.yml", "test-keeper.yaml", "test-keeper_only_skipped_message.md")
 			gockEmptyComments(1)
 
 			gock.New("https://api.github.com").
@@ -230,7 +244,7 @@ var _ = Describe("Test Keeper Plugin features", func() {
 
 		It("should block newly created pull request when deletions in the tests are the only changes", func() {
 			// given
-			NonExistingRawGitHubFiles("test-keeper.yml", "test-keeper.yaml", "test-keeper_hint.md")
+			NonExistingRawGitHubFiles("test-keeper.yml", "test-keeper.yaml", "test-keeper_without_tests_message.md")
 			gockEmptyComments(1)
 
 			gock.New("https://api.github.com").
@@ -259,7 +273,7 @@ var _ = Describe("Test Keeper Plugin features", func() {
 
 		It("should block newly created pull request when there are changes in the business logic but only deletions in the tests", func() {
 			// given
-			NonExistingRawGitHubFiles("test-keeper.yml", "test-keeper.yaml", "test-keeper_hint.md")
+			NonExistingRawGitHubFiles("test-keeper.yml", "test-keeper.yaml", "test-keeper_without_tests_message.md")
 			gockEmptyComments(1)
 
 			gock.New("https://api.github.com").
@@ -330,13 +344,12 @@ var _ = Describe("Test Keeper Plugin features", func() {
 
 		It("should block pull request without tests and with comments containing bypass message added by user with insufficient permissions", func() {
 			// given
-			NonExistingRawGitHubFiles("test-keeper.yml", "test-keeper.yaml", "test-keeper_hint.md")
+			NonExistingRawGitHubFiles("test-keeper.yml", "test-keeper.yaml", "test-keeper_without_tests_message.md")
 
 			gock.New("https://api.github.com").
 				Get("/repos/" + repositoryName + "/issues/1/comments").
 				Reply(200).
-				BodyString(`[{"user":{"login":"bartoszmajsak-test"}, "body":"` + testkeeper.BypassCheckComment + `"},` +
-					`{"body":"` + fmt.Sprintf(ghservice.PluginTitleTemplate, testkeeper.ProwPluginName) + `"}]`)
+				Body(FromFile("test_fixtures/github_calls/prs/comments_with_no_test_status_msg.json"))
 
 			gock.New("https://api.github.com").
 				Get("/repos/" + repositoryName + "/pulls/1/reviews").
@@ -466,7 +479,7 @@ var _ = Describe("Test Keeper Plugin features", func() {
 
 		AfterEach(EnsureGockRequestsHaveBeenMatched)
 		It("should block newly created pull request without tests when "+command.RunCommentPrefix+" all command is used by admin user", func() {
-			NonExistingRawGitHubFiles("test-keeper.yml", "test-keeper.yaml", "test-keeper_hint.md")
+			NonExistingRawGitHubFiles("test-keeper.yml", "test-keeper.yaml", "test-keeper_without_tests_message.md")
 
 			gock.New("https://api.github.com").
 				Get("/repos/" + repositoryName + "/pulls/1").
@@ -513,7 +526,7 @@ var _ = Describe("Test Keeper Plugin features", func() {
 		})
 
 		It("should approve newly created pull request with tests when "+command.RunCommentPrefix+" "+testkeeper.ProwPluginName+" command is triggered by pr reviewer", func() {
-			NonExistingRawGitHubFiles("test-keeper.yml", "test-keeper.yaml")
+			NonExistingRawGitHubFiles("test-keeper.yml", "test-keeper.yaml", "test-keeper_with_tests_message.md")
 
 			gock.New("https://api.github.com").
 				Get("/repos/" + repositoryName + "/pulls/2").
