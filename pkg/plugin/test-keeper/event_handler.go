@@ -25,7 +25,7 @@ const ProwPluginName = "test-keeper"
 
 var (
 	handledPrActions      = []string{"opened", "reopened", "edited", "synchronize"}
-	handledCommentActions = []string{"created", "deleted"}
+	handledCommentActions = []string{"created", "edited", "deleted"}
 )
 
 // HandleEvent is an entry point for the plugin logic. This method is invoked by the Server when
