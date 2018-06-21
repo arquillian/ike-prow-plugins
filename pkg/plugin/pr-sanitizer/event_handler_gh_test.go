@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/arquillian/ike-prow-plugins/pkg/command"
 	. "github.com/arquillian/ike-prow-plugins/pkg/internal/test"
 	"github.com/arquillian/ike-prow-plugins/pkg/log"
 	"github.com/arquillian/ike-prow-plugins/pkg/plugin"
@@ -17,7 +18,8 @@ import (
 )
 
 const (
-	botName = "alien-ike"
+	botName        = "alien-ike"
+	repositoryName = "bartoszmajsak/wfswarm-booster-pipeline-test"
 )
 
 var (
@@ -27,27 +29,26 @@ var (
 
 var _ = Describe("PR Sanitizer Plugin features", func() {
 
+	var handler *prsanitizer.GitHubLabelsEventsHandler
+
+	log := log.NewTestLogger()
+	configFilePath := ghservice.ConfigHome + prsanitizer.ProwPluginName
+
+	toHaveSuccessState := SoftlySatisfyAll(
+		HaveState(github.StatusSuccess),
+		HaveDescription(prsanitizer.SuccessMessage),
+		HaveContext(expectedContext),
+		HaveTargetURL(fmt.Sprintf("%s/%s/%s.html", docStatusRoot, "success", prsanitizer.SuccessDetailsPageName)),
+	)
+
+	toHaveFailureState := SoftlySatisfyAll(
+		HaveState(github.StatusFailure),
+		HaveDescription(prsanitizer.TitleVerificationFailureMessage),
+		HaveContext(expectedContext),
+		HaveTargetURL(fmt.Sprintf("%s/%s/%s.html", docStatusRoot, "failure", prsanitizer.TitleVerificationFailureDetailsPageName)),
+	)
+
 	Context("Pull Request title change trigger", func() {
-
-		var handler *prsanitizer.GitHubLabelsEventsHandler
-
-		log := log.NewTestLogger()
-		configFilePath := ghservice.ConfigHome + prsanitizer.ProwPluginName
-
-		toHaveSuccessState := SoftlySatisfyAll(
-			HaveState(github.StatusSuccess),
-			HaveDescription(prsanitizer.SuccessMessage),
-			HaveContext(expectedContext),
-			HaveTargetURL(fmt.Sprintf("%s/%s/%s.html", docStatusRoot, "success", prsanitizer.SuccessDetailsPageName)),
-		)
-
-		toHaveFailureState := SoftlySatisfyAll(
-			HaveState(github.StatusFailure),
-			HaveDescription(prsanitizer.TitleVerificationFailureMessage),
-			HaveContext(expectedContext),
-			HaveTargetURL(fmt.Sprintf("%s/%s/%s.html", docStatusRoot, "failure", prsanitizer.TitleVerificationFailureDetailsPageName)),
-		)
-
 		BeforeEach(func() {
 			defer gock.OffAll()
 			handler = &prsanitizer.GitHubLabelsEventsHandler{Client: NewDefaultGitHubClient(), BotName: botName}
@@ -57,10 +58,10 @@ var _ = Describe("PR Sanitizer Plugin features", func() {
 
 		It("should mark status as success if PR title prefixed with semantic commit message type", func() {
 			// given
-			NonExistingRawGitHubFiles("pr-sanitizer.yml", "pr-sanitizer.yaml", "work-in-progress.yml", "work-in-progress.yaml")
+			NonExistingRawGitHubFiles("pr-sanitizer.yml", "pr-sanitizer.yaml")
 
 			gock.New("https://api.github.com").
-				Post("/repos/bartoszmajsak/wfswarm-booster-pipeline-test/statuses").
+				Post("/repos/" + repositoryName + "/statuses").
 				SetMatcher(ExpectPayload(toHaveSuccessState)).
 				Reply(201) // This way we implicitly verify that call happened after `HandleEvent` call
 
@@ -78,7 +79,7 @@ var _ = Describe("PR Sanitizer Plugin features", func() {
 			NonExistingRawGitHubFiles("pr-sanitizer.yml", "pr-sanitizer.yaml", "work-in-progress.yml", "work-in-progress.yaml")
 
 			gock.New("https://api.github.com").
-				Post("/repos/bartoszmajsak/wfswarm-booster-pipeline-test/statuses").
+				Post("/repos/" + repositoryName + "/statuses").
 				SetMatcher(ExpectPayload(toHaveFailureState)).
 				Reply(201) // This way we implicitly verify that call happened after `HandleEvent` call
 
@@ -93,15 +94,13 @@ var _ = Describe("PR Sanitizer Plugin features", func() {
 
 		It("should mark status as success when title starts with configured semantic commit message type", func() {
 			// given
-			NonExistingRawGitHubFiles("work-in-progress.yml", "work-in-progress.yaml")
-
 			gock.New("https://raw.githubusercontent.com").
-				Get("bartoszmajsak/wfswarm-booster-pipeline-test/8111c2d99b596877ff8e2059409688d83487da0e/" + configFilePath + ".yml").
+				Get(repositoryName + "/8111c2d99b596877ff8e2059409688d83487da0e/" + configFilePath + ".yml").
 				Reply(200).
 				Body(FromFile("test_fixtures/github_calls/pr-sanitizer.yml"))
 
 			gock.New("https://api.github.com").
-				Post("/repos/bartoszmajsak/wfswarm-booster-pipeline-test/statuses").
+				Post("/repos/" + repositoryName + "/statuses").
 				SetMatcher(ExpectPayload(toHaveSuccessState)).
 				Reply(201) // This way we implicitly verify that call happened after `HandleEvent` call
 
@@ -116,10 +115,10 @@ var _ = Describe("PR Sanitizer Plugin features", func() {
 
 		It("should mark status as success (thus unblock PR merge) when title updated to contain semantic commit message type", func() {
 			// given
-			NonExistingRawGitHubFiles("pr-sanitizer.yml", "pr-sanitizer.yaml", "work-in-progress.yml", "work-in-progress.yaml")
+			NonExistingRawGitHubFiles("pr-sanitizer.yml", "pr-sanitizer.yaml")
 
 			gock.New("https://api.github.com").
-				Post("/repos/bartoszmajsak/wfswarm-booster-pipeline-test/statuses").
+				Post("/repos/" + repositoryName + "/statuses").
 				SetMatcher(ExpectPayload(toHaveSuccessState)).
 				Reply(201) // This way we implicitly verify that call happened after `HandleEvent` call
 
@@ -138,7 +137,7 @@ var _ = Describe("PR Sanitizer Plugin features", func() {
 			NonExistingRawGitHubFiles("pr-sanitizer.yml", "pr-sanitizer.yaml", "work-in-progress.yml", "work-in-progress.yaml")
 
 			gock.New("https://api.github.com").
-				Post("/repos/bartoszmajsak/wfswarm-booster-pipeline-test/statuses").
+				Post("/repos/" + repositoryName + "/statuses").
 				SetMatcher(ExpectPayload(toHaveSuccessState)).
 				Reply(201) // This way we implicitly verify that call happened after `HandleEvent` call
 
@@ -156,7 +155,7 @@ var _ = Describe("PR Sanitizer Plugin features", func() {
 			NonExistingRawGitHubFiles("pr-sanitizer.yml", "pr-sanitizer.yaml", "work-in-progress.yml", "work-in-progress.yaml")
 
 			gock.New("https://api.github.com").
-				Post("/repos/bartoszmajsak/wfswarm-booster-pipeline-test/statuses").
+				Post("/repos/" + repositoryName + "/statuses").
 				SetMatcher(ExpectPayload(toHaveFailureState)).
 				Reply(201) // This way we implicitly verify that call happened after `HandleEvent` call
 
@@ -171,4 +170,78 @@ var _ = Describe("PR Sanitizer Plugin features", func() {
 
 	})
 
+	Context("Trigger pr-sanitizer plugin by triggering comment on pull request", func() {
+		BeforeEach(func() {
+			defer gock.OffAll()
+			handler = &prsanitizer.GitHubLabelsEventsHandler{Client: NewDefaultGitHubClient(), BotName: botName}
+		})
+
+		AfterEach(EnsureGockRequestsHaveBeenMatched)
+
+		It("should mark status as success if PR title prefixed with semantic commit message type when "+command.RunCommentPrefix+" "+prsanitizer.ProwPluginName+" command is triggered by pr creator", func() {
+			// given
+			NonExistingRawGitHubFiles("pr-sanitizer.yml", "pr-sanitizer.yaml")
+
+			gock.New("https://api.github.com").
+				Get("/repos/" + repositoryName + "/pulls/11").
+				Reply(200).
+				Body(FromFile("test_fixtures/github_calls/pr_details_w_title_type.json"))
+
+			gock.New("https://api.github.com").
+				Get("/repos/" + repositoryName + "/pulls/11/reviews").
+				Reply(200).
+				BodyString(`[]`)
+
+			gock.New("https://api.github.com").
+				Get("/repos/" + repositoryName + "/collaborators/bartoszmajsak-test/permission").
+				Reply(200).
+				BodyString(`{"permission": "read"}`)
+
+			gock.New("https://api.github.com").
+				Post("/repos/" + repositoryName + "/statuses").
+				SetMatcher(ExpectPayload(toHaveSuccessState)).
+				Reply(201) // This way we implicitly verify that call happened after `HandleEvent` call
+
+			statusPayload := LoadFromFile("test_fixtures/github_calls/trigger_run_pr-sanitizer_on_pr_by_pr_creator.json")
+
+			// when
+			err := handler.HandleEvent(log, github.IssueComment, statusPayload)
+
+			// then - implicit verification of /statuses call occurrence with proper payload
+			Ω(err).ShouldNot(HaveOccurred())
+		})
+
+		It("should mark status as failed (thus block PR merge) when not prefixed with semantic commit message type when "+command.RunCommentPrefix+" all command is used by admin", func() {
+			// given
+			NonExistingRawGitHubFiles("pr-sanitizer.yml", "pr-sanitizer.yaml", "work-in-progress.yml", "work-in-progress.yaml")
+
+			gock.New("https://api.github.com").
+				Get("/repos/" + repositoryName + "/pulls/11").
+				Reply(200).
+				Body(FromFile("test_fixtures/github_calls/pr_details_wo_title_type.json"))
+
+			gock.New("https://api.github.com").
+				Get("/repos/" + repositoryName + "/pulls/11/reviews").
+				Reply(200).
+				BodyString(`[]`)
+
+			gock.New("https://api.github.com").
+				Get("/repos/" + repositoryName + "/collaborators/bartoszmajsak/permission").
+				Reply(200).
+				BodyString(`{"permission": "admin"}`)
+
+			gock.New("https://api.github.com").
+				Post("/repos/" + repositoryName + "/statuses").
+				SetMatcher(ExpectPayload(toHaveFailureState)).
+				Reply(201) // This way we implicitly verify that call happened after `HandleEvent` call
+
+			statusPayload := LoadFromFile("test_fixtures/github_calls/trigger_run_all_on_pr_by_admin.json")
+
+			// when
+			err := handler.HandleEvent(log, github.IssueComment, statusPayload)
+
+			// then - implicit verification of /statuses call occurrence with proper payload
+			Ω(err).ShouldNot(HaveOccurred())
+		})
+	})
 })

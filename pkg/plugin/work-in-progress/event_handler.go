@@ -37,7 +37,7 @@ type GitHubWIPPRHandler struct {
 }
 
 var (
-	handledCommentActions = []string{"created"}
+	handledCommentActions = []string{"created", "edited"}
 	handledPrActions      = []string{"opened", "reopened", "edited", "synchronize", "labeled", "unlabeled"}
 	defaultPrefixes       = []string{"WIP", "DO NOT MERGE", "DON'T MERGE", "WORK-IN-PROGRESS"}
 )
