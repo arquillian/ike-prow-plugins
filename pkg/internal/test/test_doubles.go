@@ -34,16 +34,18 @@ func FromFile(filePath string) io.Reader {
 	return file
 }
 
-// TriggerIssueCommentEvent trigger new dummy event
-func TriggerIssueCommentEvent(payload []byte, event gogh.IssueCommentEvent) *gogh.IssueCommentEvent {
+// NewIssueCommentEvent creates an instance of gogh.PullRequestEvent with the given values
+func NewIssueCommentEvent(payload []byte) *gogh.IssueCommentEvent {
+	var event gogh.IssueCommentEvent
 	if err := json.Unmarshal(payload, &event); err != nil {
 		ginkgo.Fail(fmt.Sprintf("Failed while parsing '%q' event with payload: %q cause %q.", github.IssueComment, event, err))
 	}
 	return &event
 }
 
-// TriggerPullRequestEvent trigger new dummy event
-func TriggerPullRequestEvent(payload []byte, event gogh.PullRequestEvent) *gogh.PullRequestEvent {
+// NewPullRequestEvent creates an instance of gogh.PullRequestEvent with the given values
+func NewPullRequestEvent(payload []byte) *gogh.PullRequestEvent {
+	var event gogh.PullRequestEvent
 	if err := json.Unmarshal(payload, &event); err != nil {
 		ginkgo.Fail(fmt.Sprintf("Failed while parsing '%q' event with payload: %q cause %q.", github.PullRequest, event, err))
 	}

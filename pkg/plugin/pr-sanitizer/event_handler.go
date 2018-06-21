@@ -43,7 +43,7 @@ var (
 )
 
 // HandlePullRequestEvent is an entry point for the plugin logic. This method is invoked by the Server when
-// events are dispatched from the /hook service
+// Pull Request Event is dispatched from the /hook service
 func (gh *GitHubLabelsEventsHandler) HandlePullRequestEvent(log log.Logger, event *gogh.PullRequestEvent) error {
 	if !utils.Contains(handledPrActions, *event.Action) {
 		return nil
