@@ -61,7 +61,7 @@ var _ = Describe("PR Sanitizer Plugin features", func() {
 			NonExistingRawGitHubFiles("pr-sanitizer.yml", "pr-sanitizer.yaml")
 
 			gock.New("https://api.github.com").
-				Post("/repos/bartoszmajsak/wfswarm-booster-pipeline-test/statuses").
+				Post("/repos/" + repositoryName + "/statuses").
 				SetMatcher(ExpectPayload(toHaveSuccessState)).
 				Reply(201) // This way we implicitly verify that call happened after `HandleEvent` call
 
@@ -79,7 +79,7 @@ var _ = Describe("PR Sanitizer Plugin features", func() {
 			NonExistingRawGitHubFiles("pr-sanitizer.yml", "pr-sanitizer.yaml", "work-in-progress.yml", "work-in-progress.yaml")
 
 			gock.New("https://api.github.com").
-				Post("/repos/bartoszmajsak/wfswarm-booster-pipeline-test/statuses").
+				Post("/repos/" + repositoryName + "/statuses").
 				SetMatcher(ExpectPayload(toHaveFailureState)).
 				Reply(201) // This way we implicitly verify that call happened after `HandleEvent` call
 
@@ -95,12 +95,12 @@ var _ = Describe("PR Sanitizer Plugin features", func() {
 		It("should mark status as success when title starts with configured semantic commit message type", func() {
 			// given
 			gock.New("https://raw.githubusercontent.com").
-				Get("bartoszmajsak/wfswarm-booster-pipeline-test/8111c2d99b596877ff8e2059409688d83487da0e/" + configFilePath + ".yml").
+				Get(repositoryName + "/8111c2d99b596877ff8e2059409688d83487da0e/" + configFilePath + ".yml").
 				Reply(200).
 				Body(FromFile("test_fixtures/github_calls/pr-sanitizer.yml"))
 
 			gock.New("https://api.github.com").
-				Post("/repos/bartoszmajsak/wfswarm-booster-pipeline-test/statuses").
+				Post("/repos/" + repositoryName + "/statuses").
 				SetMatcher(ExpectPayload(toHaveSuccessState)).
 				Reply(201) // This way we implicitly verify that call happened after `HandleEvent` call
 
@@ -118,7 +118,7 @@ var _ = Describe("PR Sanitizer Plugin features", func() {
 			NonExistingRawGitHubFiles("pr-sanitizer.yml", "pr-sanitizer.yaml")
 
 			gock.New("https://api.github.com").
-				Post("/repos/bartoszmajsak/wfswarm-booster-pipeline-test/statuses").
+				Post("/repos/" + repositoryName + "/statuses").
 				SetMatcher(ExpectPayload(toHaveSuccessState)).
 				Reply(201) // This way we implicitly verify that call happened after `HandleEvent` call
 
@@ -137,7 +137,7 @@ var _ = Describe("PR Sanitizer Plugin features", func() {
 			NonExistingRawGitHubFiles("pr-sanitizer.yml", "pr-sanitizer.yaml", "work-in-progress.yml", "work-in-progress.yaml")
 
 			gock.New("https://api.github.com").
-				Post("/repos/bartoszmajsak/wfswarm-booster-pipeline-test/statuses").
+				Post("/repos/" + repositoryName + "/statuses").
 				SetMatcher(ExpectPayload(toHaveSuccessState)).
 				Reply(201) // This way we implicitly verify that call happened after `HandleEvent` call
 
@@ -155,7 +155,7 @@ var _ = Describe("PR Sanitizer Plugin features", func() {
 			NonExistingRawGitHubFiles("pr-sanitizer.yml", "pr-sanitizer.yaml", "work-in-progress.yml", "work-in-progress.yaml")
 
 			gock.New("https://api.github.com").
-				Post("/repos/bartoszmajsak/wfswarm-booster-pipeline-test/statuses").
+				Post("/repos/" + repositoryName + "/statuses").
 				SetMatcher(ExpectPayload(toHaveFailureState)).
 				Reply(201) // This way we implicitly verify that call happened after `HandleEvent` call
 
@@ -198,7 +198,7 @@ var _ = Describe("PR Sanitizer Plugin features", func() {
 				BodyString(`{"permission": "read"}`)
 
 			gock.New("https://api.github.com").
-				Post("/repos/bartoszmajsak/wfswarm-booster-pipeline-test/statuses").
+				Post("/repos/" + repositoryName + "/statuses").
 				SetMatcher(ExpectPayload(toHaveSuccessState)).
 				Reply(201) // This way we implicitly verify that call happened after `HandleEvent` call
 
@@ -231,7 +231,7 @@ var _ = Describe("PR Sanitizer Plugin features", func() {
 				BodyString(`{"permission": "admin"}`)
 
 			gock.New("https://api.github.com").
-				Post("/repos/bartoszmajsak/wfswarm-booster-pipeline-test/statuses").
+				Post("/repos/" + repositoryName + "/statuses").
 				SetMatcher(ExpectPayload(toHaveFailureState)).
 				Reply(201) // This way we implicitly verify that call happened after `HandleEvent` call
 

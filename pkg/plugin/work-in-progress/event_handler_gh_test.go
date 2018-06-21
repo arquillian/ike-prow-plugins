@@ -63,7 +63,7 @@ var _ = Describe("Work In Progress Plugin features", func() {
 			NonExistingRawGitHubFiles("work-in-progress.yml", "work-in-progress.yaml")
 
 			gock.New("https://api.github.com").
-				Post("/repos/bartoszmajsak/wfswarm-booster-pipeline-test/statuses").
+				Post("/repos/" + repositoryName + "/statuses").
 				SetMatcher(ExpectPayload(toHaveFailureState)).
 				Reply(201) // This way we implicitly verify that call happened after `HandleEvent` call
 
@@ -87,12 +87,12 @@ var _ = Describe("Work In Progress Plugin features", func() {
 			)
 
 			gock.New("https://api.github.com").
-				Patch("repos/bartoszmajsak/wfswarm-booster-pipeline-test/pulls/4").
+				Patch("/repos/" + repositoryName + "/pulls/4").
 				SetMatcher(ExpectPayload(toHaveModifiedTitle)).
 				Reply(200)
 
 			gock.New("https://api.github.com").
-				Post("/repos/bartoszmajsak/wfswarm-booster-pipeline-test/statuses").
+				Post("/repos/" + repositoryName + "/statuses").
 				SetMatcher(ExpectPayload(toHaveSuccessState)).
 				Reply(201) // This way we implicitly verify that call happened after `HandleEvent` call
 
@@ -119,7 +119,7 @@ var _ = Describe("Work In Progress Plugin features", func() {
 			NonExistingRawGitHubFiles("work-in-progress.yml", "work-in-progress.yaml")
 
 			gock.New("https://api.github.com").
-				Post("/repos/bartoszmajsak/wfswarm-booster-pipeline-test/statuses").
+				Post("/repos/" + repositoryName + "/statuses").
 				SetMatcher(ExpectPayload(toHaveSuccessState)).
 				Reply(201) // This way we implicitly verify that call happened after `HandleEvent` call
 
@@ -137,13 +137,13 @@ var _ = Describe("Work In Progress Plugin features", func() {
 			NonExistingRawGitHubFiles("work-in-progress.yml", "work-in-progress.yaml")
 
 			gock.New("https://api.github.com").
-				Post("/repos/bartoszmajsak/wfswarm-booster-pipeline-test/issues/4/labels").
+				Post("/repos/" + repositoryName + "/issues/4/labels").
 				SetMatcher(ExpectPayload(To(HaveBodyThatContains("work-in-progress")))).
 				Reply(200).
 				Body(FromFile("test_fixtures/github_calls/wip_pr_created_with_label.json"))
 
 			gock.New("https://api.github.com").
-				Post("/repos/bartoszmajsak/wfswarm-booster-pipeline-test/statuses").
+				Post("/repos/" + repositoryName + "/statuses").
 				SetMatcher(ExpectPayload(toHaveFailureState)).
 				Reply(201) // This way we implicitly verify that call happened after `HandleEvent` call
 
@@ -159,18 +159,18 @@ var _ = Describe("Work In Progress Plugin features", func() {
 		It("should mark opened PR as work-in-progress when title starts with configured prefix", func() {
 			// given
 			gock.New("https://raw.githubusercontent.com").
-				Get("bartoszmajsak/wfswarm-booster-pipeline-test/8111c2d99b596877ff8e2059409688d83487da0e/" + configFilePath + ".yml").
+				Get(repositoryName + "/8111c2d99b596877ff8e2059409688d83487da0e/" + configFilePath + ".yml").
 				Reply(200).
 				Body(FromFile("test_fixtures/github_calls/work-in-progress.yml"))
 
 			gock.New("https://api.github.com").
-				Post("/repos/bartoszmajsak/wfswarm-booster-pipeline-test/issues/4/labels").
+				Post("/repos/" + repositoryName + "/issues/4/labels").
 				SetMatcher(ExpectPayload(To(HaveBodyThatContains("wip")))).
 				Reply(200).
 				Body(FromFile("test_fixtures/github_calls/wip_pr_created_with_label.json"))
 
 			gock.New("https://api.github.com").
-				Post("/repos/bartoszmajsak/wfswarm-booster-pipeline-test/statuses").
+				Post("/repos/" + repositoryName + "/statuses").
 				SetMatcher(ExpectPayload(toHaveFailureState)).
 				Reply(201) // This way we implicitly verify that call happened after `HandleEvent` call
 
@@ -188,13 +188,13 @@ var _ = Describe("Work In Progress Plugin features", func() {
 			NonExistingRawGitHubFiles("work-in-progress.yml", "work-in-progress.yaml")
 
 			gock.New("https://api.github.com").
-				Post("/repos/bartoszmajsak/wfswarm-booster-pipeline-test/issues/4/labels").
+				Post("/repos/" + repositoryName + "/issues/4/labels").
 				SetMatcher(ExpectPayload(To(HaveBodyThatContains("work-in-progress")))).
 				Reply(200).
 				Body(FromFile("test_fixtures/github_calls/pr_edited_with_label.json"))
 
 			gock.New("https://api.github.com").
-				Post("/repos/bartoszmajsak/wfswarm-booster-pipeline-test/statuses").
+				Post("/repos/" + repositoryName + "/statuses").
 				SetMatcher(ExpectPayload(toHaveFailureState)).
 				Reply(201) // This way we implicitly verify that call happened after `HandleEvent` call
 
@@ -213,12 +213,12 @@ var _ = Describe("Work In Progress Plugin features", func() {
 			NonExistingRawGitHubFiles("work-in-progress.yml", "work-in-progress.yaml")
 
 			gock.New("https://api.github.com").
-				Delete("/repos/bartoszmajsak/wfswarm-booster-pipeline-test/issues/4/labels/work-in-progress").
+				Delete("/repos/" + repositoryName + "/issues/4/labels/work-in-progress").
 				Reply(200).
 				Body(FromFile("test_fixtures/github_calls/pr_edited_with_unlabel.json"))
 
 			gock.New("https://api.github.com").
-				Post("/repos/bartoszmajsak/wfswarm-booster-pipeline-test/statuses").
+				Post("/repos/" + repositoryName + "/statuses").
 				SetMatcher(ExpectPayload(toHaveSuccessState)).
 				Reply(201) // This way we implicitly verify that call happened after `HandleEvent` call
 
@@ -261,7 +261,7 @@ var _ = Describe("Work In Progress Plugin features", func() {
 				BodyString(`{"permission": "read"}`)
 
 			gock.New("https://api.github.com").
-				Post("/repos/bartoszmajsak/wfswarm-booster-pipeline-test/statuses").
+				Post("/repos/" + repositoryName + "/statuses").
 				SetMatcher(ExpectPayload(toHaveSuccessState)).
 				Reply(201) // This way we implicitly verify that call happened after `HandleEvent` call
 
@@ -294,13 +294,13 @@ var _ = Describe("Work In Progress Plugin features", func() {
 				BodyString(`{"permission": "admin"}`)
 
 			gock.New("https://api.github.com").
-				Post("/repos/bartoszmajsak/wfswarm-booster-pipeline-test/issues/11/labels").
+				Post("/repos/" + repositoryName + "/issues/11/labels").
 				SetMatcher(ExpectPayload(To(HaveBodyThatContains("work-in-progress")))).
 				Reply(200).
 				BodyString("work-in-progress")
 
 			gock.New("https://api.github.com").
-				Post("/repos/bartoszmajsak/wfswarm-booster-pipeline-test/statuses").
+				Post("/repos/" + repositoryName + "/statuses").
 				SetMatcher(ExpectPayload(toHaveFailureState)).
 				Reply(201) // This way we implicitly verify that call happened after `HandleEvent` call
 
@@ -333,7 +333,7 @@ var _ = Describe("Work In Progress Plugin features", func() {
 				BodyString(`{"permission": "read"}`)
 
 			gock.New("https://api.github.com").
-				Post("/repos/bartoszmajsak/wfswarm-booster-pipeline-test/statuses").
+				Post("/repos/" + repositoryName + "/statuses").
 				Times(0) // This way we implicitly verify that call not happened after `HandleEvent` call
 
 			statusPayload := LoadFromFile("test_fixtures/github_calls/trigger_run_test-keeper_on_pr_by_pr_creator.json")
