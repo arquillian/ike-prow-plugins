@@ -307,7 +307,7 @@ var _ = Describe("Test Keeper Plugin features", func() {
 			gock.New("https://api.github.com").
 				Get("/repos/" + repositoryName + "/collaborators/bartoszmajsak/permission").
 				Reply(200).
-				Body(FromFile("test_fixtures/github_calls/collaborators_repo-admin_permission.json"))
+				BodyString(`{"permission": "admin"}`)
 
 			toHaveEnforcedSuccessState := SoftlySatisfyAll(
 				HaveState(github.StatusSuccess),
@@ -346,7 +346,7 @@ var _ = Describe("Test Keeper Plugin features", func() {
 			gock.New("https://api.github.com").
 				Get("/repos/" + repositoryName + "/collaborators/bartoszmajsak-test/permission").
 				Reply(200).
-				Body(FromFile("test_fixtures/github_calls/collaborators_external-user_permission.json"))
+				BodyString(`{"permission": "read"}`)
 
 			gock.New("https://api.github.com").
 				Get("/repos/" + repositoryName + "/pulls/1/files").
@@ -390,7 +390,7 @@ var _ = Describe("Test Keeper Plugin features", func() {
 			gock.New("https://api.github.com").
 				Get("/repos/" + repositoryName + "/collaborators/bartoszmajsak/permission").
 				Reply(200).
-				Body(FromFile("test_fixtures/github_calls/collaborators_repo-admin_permission.json"))
+				BodyString(`{"permission": "admin"}`)
 
 			gock.New("https://api.github.com").
 				Get("/repos/" + repositoryName + "/pulls/1/reviews").
@@ -428,7 +428,7 @@ var _ = Describe("Test Keeper Plugin features", func() {
 			gock.New("https://api.github.com").
 				Get("/repos/" + repositoryName + "/collaborators/bartoszmajsak-test/permission").
 				Reply(200).
-				Body(FromFile("test_fixtures/github_calls/collaborators_external-user_permission.json"))
+				BodyString(`{"permission": "read"}`)
 
 			gock.New("https://api.github.com").
 				Post("/repos/" + repositoryName + "/statuses").
@@ -486,7 +486,7 @@ var _ = Describe("Test Keeper Plugin features", func() {
 			gock.New("https://api.github.com").
 				Get("/repos/" + repositoryName + "/collaborators/bartoszmajsak/permission").
 				Reply(200).
-				Body(FromFile("test_fixtures/github_calls/collaborators_repo-admin_permission.json"))
+				BodyString(`{"permission": "admin"}`)
 
 			gock.New("https://api.github.com").
 				Get("/repos/" + repositoryName + "/pulls/1/reviews").
@@ -533,7 +533,7 @@ var _ = Describe("Test Keeper Plugin features", func() {
 			gock.New("https://api.github.com").
 				Get("/repos/" + repositoryName + "/collaborators/bartoszmajsak-test/permission").
 				Reply(200).
-				Body(FromFile("test_fixtures/github_calls/collaborators_external-user_permission.json"))
+				BodyString(`{"permission": "read"}`)
 
 			gock.New("https://api.github.com").
 				Get("/repos/" + repositoryName + "/pulls/2/reviews").
@@ -582,7 +582,7 @@ var _ = Describe("Test Keeper Plugin features", func() {
 			gock.New("https://api.github.com").
 				Get("/repos/" + repositoryName + "/collaborators/bartoszmajsak-test/permission").
 				Reply(200).
-				Body(FromFile("test_fixtures/github_calls/collaborators_external-user_permission.json"))
+				BodyString(`{"permission": "read"}`)
 
 			gock.New("https://api.github.com").
 				Get("/repos/" + repositoryName + "/pulls/2/reviews").

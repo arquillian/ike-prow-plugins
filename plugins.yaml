@@ -17,4 +17,4 @@ external_plugins:
   - name: work-in-progress
     events:
       - pull_request
-      - issue_comment  
+      - issue_comment

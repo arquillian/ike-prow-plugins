@@ -258,7 +258,7 @@ var _ = Describe("Work In Progress Plugin features", func() {
 			gock.New("https://api.github.com").
 				Get("/repos/" + repositoryName + "/collaborators/bartoszmajsak-test/permission").
 				Reply(200).
-				Body(FromFile("test_fixtures/github_calls/collaborators_external-user_permission.json"))
+				BodyString(`{"permission": "read"}`)
 
 			gock.New("https://api.github.com").
 				Post("/repos/bartoszmajsak/wfswarm-booster-pipeline-test/statuses").
@@ -291,7 +291,7 @@ var _ = Describe("Work In Progress Plugin features", func() {
 			gock.New("https://api.github.com").
 				Get("/repos/" + repositoryName + "/collaborators/bartoszmajsak/permission").
 				Reply(200).
-				Body(FromFile("test_fixtures/github_calls/collaborators_repo-admin_permission.json"))
+				BodyString(`{"permission": "admin"}`)
 
 			gock.New("https://api.github.com").
 				Post("/repos/bartoszmajsak/wfswarm-booster-pipeline-test/issues/11/labels").
@@ -330,7 +330,7 @@ var _ = Describe("Work In Progress Plugin features", func() {
 			gock.New("https://api.github.com").
 				Get("/repos/" + repositoryName + "/collaborators/bartoszmajsak-test/permission").
 				Reply(200).
-				Body(FromFile("test_fixtures/github_calls/collaborators_external-user_permission.json"))
+				BodyString(`{"permission": "read"}`)
 
 			gock.New("https://api.github.com").
 				Post("/repos/bartoszmajsak/wfswarm-booster-pipeline-test/statuses").

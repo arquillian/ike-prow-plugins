@@ -8,7 +8,7 @@
   "number": 11,
   "state": "open",
   "locked": false,
-  "title": "WIP PR from external user without tests should be rejected",
+  "title": "PR from external user without tests should be rejected",
   "user": {
     "login": "bartoszmajsak-test",
     "id": 34574692,

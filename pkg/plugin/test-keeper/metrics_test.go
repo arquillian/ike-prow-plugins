@@ -64,7 +64,7 @@ var _ = Describe("TestKeeper Metrics", func() {
 			Times(2).
 			Get("/repos/" + repositoryName + "/collaborators/bartoszmajsak/permission").
 			Reply(200).
-			Body(FromFile("test_fixtures/github_calls/collaborators_repo-admin_permission.json"))
+			BodyString(`{"permission": "admin"}`)
 
 		gock.New("https://api.github.com").
 			Times(2).

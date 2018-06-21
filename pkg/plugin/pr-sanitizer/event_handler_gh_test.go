@@ -185,7 +185,7 @@ var _ = Describe("PR Sanitizer Plugin features", func() {
 			gock.New("https://api.github.com").
 				Get("/repos/" + repositoryName + "/pulls/11").
 				Reply(200).
-				Body(FromFile("test_fixtures/github_calls/pr_details.json"))
+				Body(FromFile("test_fixtures/github_calls/pr_details_w_title_type.json"))
 
 			gock.New("https://api.github.com").
 				Get("/repos/" + repositoryName + "/pulls/11/reviews").
@@ -195,7 +195,7 @@ var _ = Describe("PR Sanitizer Plugin features", func() {
 			gock.New("https://api.github.com").
 				Get("/repos/" + repositoryName + "/collaborators/bartoszmajsak-test/permission").
 				Reply(200).
-				Body(FromFile("test_fixtures/github_calls/collaborators_external-user_permission.json"))
+				BodyString(`{"permission": "read"}`)
 
 			gock.New("https://api.github.com").
 				Post("/repos/bartoszmajsak/wfswarm-booster-pipeline-test/statuses").
@@ -218,7 +218,7 @@ var _ = Describe("PR Sanitizer Plugin features", func() {
 			gock.New("https://api.github.com").
 				Get("/repos/" + repositoryName + "/pulls/11").
 				Reply(200).
-				Body(FromFile("test_fixtures/github_calls//pr_details_wip.json"))
+				Body(FromFile("test_fixtures/github_calls/pr_details_wo_title_type.json"))
 
 			gock.New("https://api.github.com").
 				Get("/repos/" + repositoryName + "/pulls/11/reviews").
@@ -228,7 +228,7 @@ var _ = Describe("PR Sanitizer Plugin features", func() {
 			gock.New("https://api.github.com").
 				Get("/repos/" + repositoryName + "/collaborators/bartoszmajsak/permission").
 				Reply(200).
-				Body(FromFile("test_fixtures/github_calls/collaborators_repo-admin_permission.json"))
+				BodyString(`{"permission": "admin"}`)
 
 			gock.New("https://api.github.com").
 				Post("/repos/bartoszmajsak/wfswarm-booster-pipeline-test/statuses").
