@@ -3,11 +3,11 @@ package server_test
 import (
 	"net/http/httptest"
 
-	"github.com/arquillian/ike-prow-plugins/pkg/github"
 	. "github.com/arquillian/ike-prow-plugins/pkg/internal/test"
 	"github.com/arquillian/ike-prow-plugins/pkg/log"
 	"github.com/arquillian/ike-prow-plugins/pkg/server"
 	"github.com/arquillian/ike-prow-plugins/pkg/utils"
+	gogh "github.com/google/go-github/github"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	"github.com/prometheus/client_golang/prometheus"
@@ -18,7 +18,11 @@ import (
 type DummyGHEventHandler struct {
 }
 
-func (gh *DummyGHEventHandler) HandleEvent(log log.Logger, eventType github.EventType, payload []byte) error {
+func (gh *DummyGHEventHandler) HandlePullRequestEvent(log log.Logger, event *gogh.PullRequestEvent) error {
+	return nil
+}
+
+func (gh *DummyGHEventHandler) HandleIssueCommentEvent(log log.Logger, event *gogh.IssueCommentEvent) error {
 	return nil
 }
 

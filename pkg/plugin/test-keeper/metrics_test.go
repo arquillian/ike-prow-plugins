@@ -11,6 +11,7 @@ import (
 	"github.com/arquillian/ike-prow-plugins/pkg/log"
 	"github.com/arquillian/ike-prow-plugins/pkg/plugin/test-keeper"
 	"github.com/arquillian/ike-prow-plugins/pkg/utils"
+	gogh "github.com/google/go-github/github"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	"github.com/prometheus/client_golang/prometheus"
@@ -84,9 +85,10 @@ var _ = Describe("TestKeeper Metrics", func() {
 			Reply(201) // This way we implicitly verify that call happened after `HandleEvent` call
 
 		statusPayload := LoadFromFile("test_fixtures/github_calls/prs/without_tests/skip_comment_by_admin.json")
+		issueCommentEvent := TriggerIssueCommentEvent(statusPayload, gogh.IssueCommentEvent{})
 
 		// when
-		err := handler.HandleEvent(log, github.IssueComment, statusPayload)
+		err := handler.HandleIssueCommentEvent(log, issueCommentEvent)
 
 		// then
 		Ω(err).ShouldNot(HaveOccurred())
@@ -98,9 +100,10 @@ var _ = Describe("TestKeeper Metrics", func() {
 			Body(FromFile("test_fixtures/github_calls/prs/without_tests/pr_details_for_metrics.json"))
 
 		statusPayload = LoadFromFile("test_fixtures/github_calls/prs/without_tests/skip_comment_by_admin.json")
+		issueCommentEvent = TriggerIssueCommentEvent(statusPayload, gogh.IssueCommentEvent{})
 
 		// when
-		err = handler.HandleEvent(log, github.IssueComment, statusPayload)
+		err = handler.HandleIssueCommentEvent(log, issueCommentEvent)
 
 		// then - should not expect any additional request mocking
 		Ω(err).ShouldNot(HaveOccurred())
@@ -128,9 +131,10 @@ var _ = Describe("TestKeeper Metrics", func() {
 			Reply(201) // This way we implicitly verify that call happened after `HandleEvent` call
 
 		statusPayload := LoadFromFile("test_fixtures/github_calls/prs/with_tests/status_opened.json")
+		pullRequestEvent := TriggerPullRequestEvent(statusPayload, gogh.PullRequestEvent{})
 
 		// when
-		err := handler.HandleEvent(log, github.PullRequest, statusPayload)
+		err := handler.HandlePullRequestEvent(log, pullRequestEvent)
 
 		//then
 		Ω(err).ShouldNot(HaveOccurred())
@@ -159,9 +163,10 @@ var _ = Describe("TestKeeper Metrics", func() {
 			Reply(201)
 
 		statusPayload := LoadFromFile("test_fixtures/github_calls/prs/without_tests/status_opened.json")
+		pullRequestEvent := TriggerPullRequestEvent(statusPayload, gogh.PullRequestEvent{})
 
 		// when
-		err := handler.HandleEvent(log, github.PullRequest, statusPayload)
+		err := handler.HandlePullRequestEvent(log, pullRequestEvent)
 
 		//then
 		Ω(err).ShouldNot(HaveOccurred())

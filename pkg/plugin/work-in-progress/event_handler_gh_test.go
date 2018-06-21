@@ -6,6 +6,7 @@ import (
 	. "github.com/arquillian/ike-prow-plugins/pkg/internal/test"
 	"github.com/arquillian/ike-prow-plugins/pkg/log"
 	"github.com/arquillian/ike-prow-plugins/pkg/plugin/work-in-progress"
+	gogh "github.com/google/go-github/github"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	"gopkg.in/h2non/gock.v1"
@@ -68,9 +69,10 @@ var _ = Describe("Work In Progress Plugin features", func() {
 				Reply(201) // This way we implicitly verify that call happened after `HandleEvent` call
 
 			statusPayload := LoadFromFile("test_fixtures/github_calls/pr_labeled_wip.json")
+			pullRequestEvent := TriggerPullRequestEvent(statusPayload, gogh.PullRequestEvent{})
 
 			// when
-			err := handler.HandleEvent(log, github.PullRequest, statusPayload)
+			err := handler.HandlePullRequestEvent(log, pullRequestEvent)
 
 			// then - implicit verification of /statuses call occurrence with proper payload
 			Ω(err).ShouldNot(HaveOccurred())
@@ -97,9 +99,10 @@ var _ = Describe("Work In Progress Plugin features", func() {
 				Reply(201) // This way we implicitly verify that call happened after `HandleEvent` call
 
 			statusPayload := LoadFromFile("test_fixtures/github_calls/wip_pr_unlabeled.json")
+			pullRequestEvent := TriggerPullRequestEvent(statusPayload, gogh.PullRequestEvent{})
 
 			// when
-			err := handler.HandleEvent(log, github.PullRequest, statusPayload)
+			err := handler.HandlePullRequestEvent(log, pullRequestEvent)
 
 			// then - implicit verification of /statuses call occurrence with proper payload
 			Ω(err).ShouldNot(HaveOccurred())
@@ -124,9 +127,10 @@ var _ = Describe("Work In Progress Plugin features", func() {
 				Reply(201) // This way we implicitly verify that call happened after `HandleEvent` call
 
 			statusPayload := LoadFromFile("test_fixtures/github_calls/ready_pr_opened.json")
+			pullRequestEvent := TriggerPullRequestEvent(statusPayload, gogh.PullRequestEvent{})
 
 			// when
-			err := handler.HandleEvent(log, github.PullRequest, statusPayload)
+			err := handler.HandlePullRequestEvent(log, pullRequestEvent)
 
 			// then - implicit verification of /statuses call occurrence with proper payload
 			Ω(err).ShouldNot(HaveOccurred())
@@ -148,9 +152,10 @@ var _ = Describe("Work In Progress Plugin features", func() {
 				Reply(201) // This way we implicitly verify that call happened after `HandleEvent` call
 
 			statusPayload := LoadFromFile("test_fixtures/github_calls/wip_pr_opened.json")
+			pullRequestEvent := TriggerPullRequestEvent(statusPayload, gogh.PullRequestEvent{})
 
 			// when
-			err := handler.HandleEvent(log, github.PullRequest, statusPayload)
+			err := handler.HandlePullRequestEvent(log, pullRequestEvent)
 
 			// then - implicit verification of /statuses call occurrence with proper payload
 			Ω(err).ShouldNot(HaveOccurred())
@@ -175,9 +180,10 @@ var _ = Describe("Work In Progress Plugin features", func() {
 				Reply(201) // This way we implicitly verify that call happened after `HandleEvent` call
 
 			statusPayload := LoadFromFile("test_fixtures/github_calls/custom_prefix_pr_opened.json")
+			pullRequestEvent := TriggerPullRequestEvent(statusPayload, gogh.PullRequestEvent{})
 
 			// when
-			err := handler.HandleEvent(log, github.PullRequest, statusPayload)
+			err := handler.HandlePullRequestEvent(log, pullRequestEvent)
 
 			// then - implicit verification of /statuses call occurrence with proper payload
 			Ω(err).ShouldNot(HaveOccurred())
@@ -199,9 +205,10 @@ var _ = Describe("Work In Progress Plugin features", func() {
 				Reply(201) // This way we implicitly verify that call happened after `HandleEvent` call
 
 			statusPayload := LoadFromFile("test_fixtures/github_calls/pr_edited_wip_added.json")
+			pullRequestEvent := TriggerPullRequestEvent(statusPayload, gogh.PullRequestEvent{})
 
 			// when
-			err := handler.HandleEvent(log, github.PullRequest, statusPayload)
+			err := handler.HandlePullRequestEvent(log, pullRequestEvent)
 
 			// then - implicit verification of /statuses call occurrence with proper payload
 			Ω(err).ShouldNot(HaveOccurred())
@@ -223,9 +230,10 @@ var _ = Describe("Work In Progress Plugin features", func() {
 				Reply(201) // This way we implicitly verify that call happened after `HandleEvent` call
 
 			statusPayload := LoadFromFile("test_fixtures/github_calls/pr_edited_wip_removed.json")
+			pullRequestEvent := TriggerPullRequestEvent(statusPayload, gogh.PullRequestEvent{})
 
 			// when
-			err := handler.HandleEvent(log, github.PullRequest, statusPayload)
+			err := handler.HandlePullRequestEvent(log, pullRequestEvent)
 
 			// then - implicit verification of /statuses call occurrence with proper payload
 			Ω(err).ShouldNot(HaveOccurred())
@@ -266,9 +274,10 @@ var _ = Describe("Work In Progress Plugin features", func() {
 				Reply(201) // This way we implicitly verify that call happened after `HandleEvent` call
 
 			statusPayload := LoadFromFile("test_fixtures/github_calls/trigger_run_work-in-progress_on_pr_by_pr_creator.json")
+			issueCommentEvent := TriggerIssueCommentEvent(statusPayload, gogh.IssueCommentEvent{})
 
 			// when
-			err := handler.HandleEvent(log, github.IssueComment, statusPayload)
+			err := handler.HandleIssueCommentEvent(log, issueCommentEvent)
 
 			// then - implicit verification of /statuses call occurrence with proper payload
 			Ω(err).ShouldNot(HaveOccurred())
@@ -305,9 +314,10 @@ var _ = Describe("Work In Progress Plugin features", func() {
 				Reply(201) // This way we implicitly verify that call happened after `HandleEvent` call
 
 			statusPayload := LoadFromFile("test_fixtures/github_calls/trigger_run_all_on_wip_pr_by_admin.json")
+			issueCommentEvent := TriggerIssueCommentEvent(statusPayload, gogh.IssueCommentEvent{})
 
 			// when
-			err := handler.HandleEvent(log, github.IssueComment, statusPayload)
+			err := handler.HandleIssueCommentEvent(log, issueCommentEvent)
 
 			// then - implicit verification of /statuses call occurrence with proper payload
 			Ω(err).ShouldNot(HaveOccurred())
@@ -337,9 +347,10 @@ var _ = Describe("Work In Progress Plugin features", func() {
 				Times(0) // This way we implicitly verify that call not happened after `HandleEvent` call
 
 			statusPayload := LoadFromFile("test_fixtures/github_calls/trigger_run_test-keeper_on_pr_by_pr_creator.json")
+			issueCommentEvent := TriggerIssueCommentEvent(statusPayload, gogh.IssueCommentEvent{})
 
 			// when
-			err := handler.HandleEvent(log, github.IssueComment, statusPayload)
+			err := handler.HandleIssueCommentEvent(log, issueCommentEvent)
 
 			// then
 			Ω(err).ShouldNot(HaveOccurred())

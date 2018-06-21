@@ -1,7 +1,6 @@
 package wip
 
 import (
-	"encoding/json"
 	"fmt"
 	"regexp"
 	"strings"
@@ -42,42 +41,9 @@ var (
 	defaultPrefixes       = []string{"WIP", "DO NOT MERGE", "DON'T MERGE", "WORK-IN-PROGRESS"}
 )
 
-// HandleEvent is an entry point for the plugin logic. This method is invoked by the Server when
+// HandlePullRequestEvent is an entry point for the plugin logic. This method is invoked by the Server when
 // events are dispatched from the /hook service
-func (gh *GitHubWIPPRHandler) HandleEvent(log log.Logger, eventType github.EventType, payload []byte) error {
-	switch eventType {
-	case github.PullRequest:
-		var event gogh.PullRequestEvent
-		if err := json.Unmarshal(payload, &event); err != nil {
-			log.Errorf("Failed while parsing '%q' event with payload: %q. Cause: %q", github.PullRequest, event, err)
-			return err
-		}
-
-		if err := gh.handlePrEvent(log, &event); err != nil {
-			log.Errorf("Error handling '%q' event with payload %q. Cause: %q", github.PullRequest, event, err)
-			return err
-		}
-
-	case github.IssueComment:
-		var event gogh.IssueCommentEvent
-		if err := json.Unmarshal(payload, &event); err != nil {
-			log.Errorf("Failed while parsing '%q' event with payload: %q. Cause: %q", github.IssueComment, event, err)
-			return err
-		}
-
-		if err := gh.handlePrComment(log, &event); err != nil {
-			log.Errorf("Error handling '%q' event with payload %q. Cause: %q", github.IssueComment, event, err)
-			return err
-		}
-
-	default:
-		log.Warnf("received an event of type %q but didn't ask for it", eventType)
-	}
-
-	return nil
-}
-
-func (gh *GitHubWIPPRHandler) handlePrEvent(log log.Logger, event *gogh.PullRequestEvent) error {
+func (gh *GitHubWIPPRHandler) HandlePullRequestEvent(log log.Logger, event *gogh.PullRequestEvent) error {
 	if !utils.Contains(handledPrActions, *event.Action) {
 		return nil
 	}
@@ -90,7 +56,9 @@ func (gh *GitHubWIPPRHandler) handlePrEvent(log log.Logger, event *gogh.PullRequ
 	}
 }
 
-func (gh *GitHubWIPPRHandler) handlePrComment(log log.Logger, comment *gogh.IssueCommentEvent) error {
+// HandleIssueCommentEvent is an entry point for the plugin logic. This method is invoked by the Server when
+// events are dispatched from the /hook service
+func (gh *GitHubWIPPRHandler) HandleIssueCommentEvent(log log.Logger, comment *gogh.IssueCommentEvent) error {
 	if !utils.Contains(handledCommentActions, *comment.Action) {
 		return nil
 	}
