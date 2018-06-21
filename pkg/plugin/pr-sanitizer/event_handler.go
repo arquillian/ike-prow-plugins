@@ -38,7 +38,7 @@ type GitHubLabelsEventsHandler struct {
 }
 
 var (
-	handledCommentActions = []string{"created"}
+	handledCommentActions = []string{"created", "edited"}
 	handledPrActions      = []string{"opened", "reopened", "edited", "synchronized"}
 	defaultTypes          = []string{"chore", "docs", "feat", "fix", "refactor", "style", "test"}
 )
