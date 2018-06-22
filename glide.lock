@@ -1,5 +1,5 @@
-hash: 89baf0cd29908af47405714762c68467df13cc85df8f24a51b297c51fc6a051c
-updated: 2018-06-20T17:43:57.704285941+05:30
+hash: ec491e3f9011b7709d9ebc6cddbc6a0d8af5d72ac15e77aa01243f65499cf5f0
+updated: 2018-06-22T14:10:56.338676246+05:30
 imports:
 - name: github.com/bazelbuild/buildtools
   version: a6baf7df1e358187d43bb6b9f3debc6da8454922
@@ -89,7 +89,7 @@ imports:
 - name: github.com/pkg/errors
   version: a22138067af1c4942683050411a841ade67fe1eb
 - name: github.com/prometheus/client_golang
-  version: f504d69affe11ec1ccb2e5948127f86878c9fd57
+  version: faf4ec335fe01ae5a6a0eaa34a5a9333bfbd1a30
   subpackages:
   - prometheus
   - prometheus/promhttp
