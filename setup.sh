@@ -48,9 +48,9 @@ function install_go_bins() {
       "${LIGHT_GREEN}export GOPATH=\$GOPATH:~/code/golang${CLEAR}"
   fi
 
-  if [ -z $(which glide 2>/dev/null) ]; then
-    echo -e "${CLEAR}${LIGHT_GREEN}Installing glide${CLEAR}"
-    curl https://glide.sh/get | sh
+  if [ -z $(which dep 2>/dev/null) ]; then
+    echo -e "${CLEAR}${LIGHT_GREEN}Installing dep${CLEAR}"
+    curl https://raw.githubusercontent.com/golang/dep/master/install.sh | sh
   fi
 }
 
