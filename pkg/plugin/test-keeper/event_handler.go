@@ -26,7 +26,7 @@ var (
 )
 
 // HandlePullRequestEvent is an entry point for the plugin logic. This method is invoked by the Server when
-// Pull Request Event is dispatched from the /hook service
+// pull request event is dispatched from the /hook service
 func (gh *GitHubTestEventsHandler) HandlePullRequestEvent(log log.Logger, event *gogh.PullRequestEvent) error {
 	if !utils.Contains(handledPrActions, *event.Action) {
 		return nil
@@ -35,7 +35,7 @@ func (gh *GitHubTestEventsHandler) HandlePullRequestEvent(log log.Logger, event 
 }
 
 // HandleIssueCommentEvent is an entry point for the plugin logic. This method is invoked by the Server when
-// Issue Comment Event is dispatched from the /hook service
+// issue comment event is dispatched from the /hook service
 func (gh *GitHubTestEventsHandler) HandleIssueCommentEvent(log log.Logger, comment *gogh.IssueCommentEvent) error {
 	if !utils.Contains(handledCommentActions, *comment.Action) {
 		return nil
