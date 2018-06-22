@@ -13,6 +13,10 @@ external_plugins:
       events:
         - pull_request
         - issue_comment
+    - name: pr-sanitizer
+      events:
+        - pull_request
+        - issue_comment
   fabric8-ui/fabric8-planner:
     - name: test-keeper
       events:
