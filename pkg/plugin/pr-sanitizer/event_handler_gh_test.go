@@ -65,10 +65,10 @@ var _ = Describe("PR Sanitizer Plugin features", func() {
 				SetMatcher(ExpectPayload(toHaveSuccessState)).
 				Reply(201) // This way we implicitly verify that call happened after `HandleEvent` call
 
-			statusPayload := LoadFromFile("test_fixtures/github_calls/semantically_correct_pr_opened.json")
+			event := LoadPullRequestEvent("test_fixtures/github_calls/semantically_correct_pr_opened.json")
 
 			// when
-			err := handler.HandlePullRequestEvent(log, NewPullRequestEvent(statusPayload))
+			err := handler.HandlePullRequestEvent(log, event)
 
 			// then - implicit verification of /statuses call occurrence with proper payload
 			Ω(err).ShouldNot(HaveOccurred())
@@ -83,10 +83,10 @@ var _ = Describe("PR Sanitizer Plugin features", func() {
 				SetMatcher(ExpectPayload(toHaveFailureState)).
 				Reply(201) // This way we implicitly verify that call happened after `HandleEvent` call
 
-			statusPayload := LoadFromFile("test_fixtures/github_calls/semantically_incorrect_pr_opened.json")
+			event := LoadPullRequestEvent("test_fixtures/github_calls/semantically_incorrect_pr_opened.json")
 
 			// when
-			err := handler.HandlePullRequestEvent(log, NewPullRequestEvent(statusPayload))
+			err := handler.HandlePullRequestEvent(log, event)
 
 			// then - implicit verification of /statuses call occurrence with proper payload
 			Ω(err).ShouldNot(HaveOccurred())
@@ -104,10 +104,10 @@ var _ = Describe("PR Sanitizer Plugin features", func() {
 				SetMatcher(ExpectPayload(toHaveSuccessState)).
 				Reply(201) // This way we implicitly verify that call happened after `HandleEvent` call
 
-			statusPayload := LoadFromFile("test_fixtures/github_calls/custom_prefix_pr_edited.json")
+			event := LoadPullRequestEvent("test_fixtures/github_calls/custom_prefix_pr_edited.json")
 
 			// when
-			err := handler.HandlePullRequestEvent(log, NewPullRequestEvent(statusPayload))
+			err := handler.HandlePullRequestEvent(log, event)
 
 			// then - implicit verification of /statuses call occurrence with proper payload
 			Ω(err).ShouldNot(HaveOccurred())
@@ -122,10 +122,10 @@ var _ = Describe("PR Sanitizer Plugin features", func() {
 				SetMatcher(ExpectPayload(toHaveSuccessState)).
 				Reply(201) // This way we implicitly verify that call happened after `HandleEvent` call
 
-			statusPayload := LoadFromFile("test_fixtures/github_calls/pr_edited_type_added.json")
+			event := LoadPullRequestEvent("test_fixtures/github_calls/pr_edited_type_added.json")
 
 			// when
-			err := handler.HandlePullRequestEvent(log, NewPullRequestEvent(statusPayload))
+			err := handler.HandlePullRequestEvent(log, event)
 
 			// then - implicit verification of /statuses call occurrence with proper payload
 			Ω(err).ShouldNot(HaveOccurred())
@@ -141,10 +141,10 @@ var _ = Describe("PR Sanitizer Plugin features", func() {
 				SetMatcher(ExpectPayload(toHaveSuccessState)).
 				Reply(201) // This way we implicitly verify that call happened after `HandleEvent` call
 
-			statusPayload := LoadFromFile("test_fixtures/github_calls/semantically_correct_wip_pr_opened.json")
+			event := LoadPullRequestEvent("test_fixtures/github_calls/semantically_correct_wip_pr_opened.json")
 
 			// when
-			err := handler.HandlePullRequestEvent(log, NewPullRequestEvent(statusPayload))
+			err := handler.HandlePullRequestEvent(log, event)
 
 			// then - implicit verification of /statuses call occurrence with proper payload
 			Ω(err).ShouldNot(HaveOccurred())
@@ -159,10 +159,10 @@ var _ = Describe("PR Sanitizer Plugin features", func() {
 				SetMatcher(ExpectPayload(toHaveFailureState)).
 				Reply(201) // This way we implicitly verify that call happened after `HandleEvent` call
 
-			statusPayload := LoadFromFile("test_fixtures/github_calls/semantically_incorrect_wip_pr_opened.json")
+			event := LoadPullRequestEvent("test_fixtures/github_calls/semantically_incorrect_wip_pr_opened.json")
 
 			// when
-			err := handler.HandlePullRequestEvent(log, NewPullRequestEvent(statusPayload))
+			err := handler.HandlePullRequestEvent(log, event)
 
 			// then - implicit verification of /statuses call occurrence with proper payload
 			Ω(err).ShouldNot(HaveOccurred())
@@ -202,10 +202,10 @@ var _ = Describe("PR Sanitizer Plugin features", func() {
 				SetMatcher(ExpectPayload(toHaveSuccessState)).
 				Reply(201) // This way we implicitly verify that call happened after `HandleEvent` call
 
-			statusPayload := LoadFromFile("test_fixtures/github_calls/trigger_run_pr-sanitizer_on_pr_by_pr_creator.json")
+			event := LoadIssueCommentEvent("test_fixtures/github_calls/trigger_run_pr-sanitizer_on_pr_by_pr_creator.json")
 
 			// when
-			err := handler.HandleIssueCommentEvent(log, NewIssueCommentEvent(statusPayload))
+			err := handler.HandleIssueCommentEvent(log, event)
 
 			// then - implicit verification of /statuses call occurrence with proper payload
 			Ω(err).ShouldNot(HaveOccurred())
@@ -235,10 +235,10 @@ var _ = Describe("PR Sanitizer Plugin features", func() {
 				SetMatcher(ExpectPayload(toHaveFailureState)).
 				Reply(201) // This way we implicitly verify that call happened after `HandleEvent` call
 
-			statusPayload := LoadFromFile("test_fixtures/github_calls/trigger_run_all_on_pr_by_admin.json")
+			event := LoadIssueCommentEvent("test_fixtures/github_calls/trigger_run_all_on_pr_by_admin.json")
 
 			// when
-			err := handler.HandleIssueCommentEvent(log, NewIssueCommentEvent(statusPayload))
+			err := handler.HandleIssueCommentEvent(log, event)
 
 			// then - implicit verification of /statuses call occurrence with proper payload
 			Ω(err).ShouldNot(HaveOccurred())
