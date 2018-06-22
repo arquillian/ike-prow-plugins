@@ -25,10 +25,15 @@ import:
   version: 1.0.5
 - package: github.com/evalphobia/logrus_sentry
   version: 0.4.5
-
 - package: github.com/prometheus/client_golang
   version: faf4ec335fe01ae5a6a0eaa34a5a9333bfbd1a30
-
+- package: github.com/alecthomas/gometalinter
+  version: 46cc1ea3778b247666c2949669a3333c532fa9c6
+- package: github.com/jteeuwen/go-bindata
+  version: 6025e8de665b31fa74ab1a66f2cddd8c0abf887e 
+- package: golang.org/x/tools/cmd/goimports
+  version: 77106db15f689a60e7d4e085d967ac557b918fb2   
+  
 # Normally these dependencies should belong to testImport,
 # but as they are used in shared internal packages they have to go as regular ones
 - package: github.com/onsi/gomega

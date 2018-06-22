@@ -1,6 +1,8 @@
-hash: ec491e3f9011b7709d9ebc6cddbc6a0d8af5d72ac15e77aa01243f65499cf5f0
-updated: 2018-06-21T16:58:05.578562323+05:30
+hash: 9fbd8f8d9870a94dbee487437d2193c8093ddf4f22ae952e516f6a4e03444484
+updated: 2018-06-22T14:03:37.065102742+05:30
 imports:
+- name: github.com/alecthomas/gometalinter
+  version: 46cc1ea3778b247666c2949669a3333c532fa9c6
 - name: github.com/bazelbuild/buildtools
   version: a6baf7df1e358187d43bb6b9f3debc6da8454922
   subpackages:
@@ -47,6 +49,8 @@ imports:
   version: e59506cc896acb7f7bf732d4fdf5e25f7ccd8983
 - name: github.com/gorilla/sessions
   version: a2f2a3de9a4a575047f73e3e36bc85ecc3546391
+- name: github.com/jteeuwen/go-bindata
+  version: 6025e8de665b31fa74ab1a66f2cddd8c0abf887e
 - name: github.com/matttproud/golang_protobuf_extensions
   version: c12348ce28de40eed0136aa2b644d0ee0650e56c
   subpackages:
@@ -176,6 +180,7 @@ imports:
 - name: golang.org/x/tools
   version: 77106db15f689a60e7d4e085d967ac557b918fb2
   subpackages:
+  - cmd/goimports
   - go/ast/astutil
   - go/gcexportdata
   - go/gcimporter15
