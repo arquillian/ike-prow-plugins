@@ -40,7 +40,7 @@ include::../../pkg/plugin/work-in-progress/test_fixtures/github_calls/work-in-pr
 
 === Status details
 
-Here, you can find status details description applicable for each state of the `work-in-progress` plugin.
+In this section, you can find status details description applicable for each state of the `work-in-progress` plugin.
 
 include::{asciidoctor-source}/fragments/status/work-in-progress/success/wip-success.adoc[leveloffset=1]
 include::{asciidoctor-source}/fragments/status/work-in-progress/failure/wip-failed.adoc[leveloffset=1]

@@ -35,7 +35,7 @@ include::../../pkg/plugin/pr-sanitizer/test_fixtures/github_calls/pr-sanitizer.y
 
 === Status details
 
-Here, you can find status details description applicable for each state of the `pr-sanitizer` plugin.
+In this section, you can find status details description applicable for each state of the `pr-sanitizer` plugin.
 
 include::{asciidoctor-source}/fragments/status/pr-sanitizer/success/pr-sanitizer-success.adoc[leveloffset=1]
 include::{asciidoctor-source}/fragments/status/pr-sanitizer/failure/title-verification-failed.adoc[leveloffset=1]
