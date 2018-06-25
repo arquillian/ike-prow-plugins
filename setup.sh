@@ -50,7 +50,7 @@ function install_go_bins() {
 
   if [ -z $(which dep 2>/dev/null) ]; then
     echo -e "${CLEAR}${LIGHT_GREEN}Installing dep${CLEAR}"
-    curl https://raw.githubusercontent.com/golang/dep/master/install.sh | sh
+    curl https://raw.githubusercontent.com/golang/dep/1550da37d8fab9ed2dbc4bd04290e6c8dd3ff04a/install.sh | sh
   fi
 }
 
