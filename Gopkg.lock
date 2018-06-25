@@ -374,7 +374,7 @@
     "go/internal/gcimporter",
     "go/types/typeutil"
   ]
-  revision = "25b95b48224cce18163c7d49dcfb89a2d5ecd209"
+  revision = "3c1bb8b785f2aa4d86f83a0cd87fc1df046c60de"
 
 [[projects]]
   name = "google.golang.org/appengine"
@@ -418,7 +418,7 @@
   branch = "master"
   name = "k8s.io/api"
   packages = ["core/v1"]
-  revision = "e622339dc5f39d70f000c70867b4dd20435d48ff"
+  revision = "00c78f6603af046dfcada47ba511ddc94e7a64ce"
 
 [[projects]]
   branch = "release-1.9"
@@ -452,7 +452,7 @@
   branch = "master"
   name = "k8s.io/kube-openapi"
   packages = ["pkg/common"]
-  revision = "91cfa479c814065e420cee7ed227db0f63a5854e"
+  revision = "4cac20de16b951c103aa40c4bafbc8cefdd18a12"
 
 [[projects]]
   name = "k8s.io/test-infra"

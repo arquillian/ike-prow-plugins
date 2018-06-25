@@ -15,12 +15,12 @@ tools: ## Installs required go tools
 install: generate ## Fetches all dependencies using dep
 	dep ensure -v
 
-.PHONY: ensure
-ensure: generate ## Updates all dependencies defined for dep
+.PHONY: update
+update: generate ## Updates all dependencies defined for dep
 	dep ensure -update -v
 
 .PHONY: compile
-compile: ensure compile-only ## Compiles all plugins and puts them in the bin/ folder (calls up target)
+compile: update compile-only ## Compiles all plugins and puts them in the bin/ folder (calls up target)
 
 .PHONY: compile-only
 compile-only: generate $(BINARIES)
