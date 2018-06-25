@@ -118,7 +118,7 @@ var _ = Describe("Config loader features", func() {
 			Ω(err).ShouldNot(HaveOccurred())
 		})
 
-		It("should modify existing comment when a new message is provided", func() {
+		It("should modify existing comment when a different content of the status message is provided", func() {
 			// given
 			gock.New("https://api.github.com").
 				Get("/repos/owner/repo/issues/2/comments").
