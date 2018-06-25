@@ -1,11 +1,13 @@
 package test
 
 import (
+	"encoding/json"
 	"fmt"
 	"io"
 	"io/ioutil"
 	"os"
 
+	"github.com/arquillian/ike-prow-plugins/pkg/github"
 	"github.com/arquillian/ike-prow-plugins/pkg/github/client"
 	"github.com/arquillian/ike-prow-plugins/pkg/log"
 	"github.com/arquillian/ike-prow-plugins/pkg/utils"
@@ -51,6 +53,26 @@ func NewPullRequest(repoOwner, repoName, sha, creator string) *gogh.PullRequest 
 			Login: utils.String(creator),
 		},
 	}
+}
+
+// LoadIssueCommentEvent creates an instance of gogh.PullRequestEvent with the given values
+func LoadIssueCommentEvent(filePath string) *gogh.IssueCommentEvent {
+	var event gogh.IssueCommentEvent
+	payload := LoadFromFile(filePath)
+	if err := json.Unmarshal(payload, &event); err != nil {
+		ginkgo.Fail(fmt.Sprintf("Failed while parsing '%q' event with payload: %q cause %q.", github.IssueComment, event, err))
+	}
+	return &event
+}
+
+// LoadPullRequestEvent creates an instance of gogh.PullRequestEvent with the given values
+func LoadPullRequestEvent(filePath string) *gogh.PullRequestEvent {
+	var event gogh.PullRequestEvent
+	payload := LoadFromFile(filePath)
+	if err := json.Unmarshal(payload, &event); err != nil {
+		ginkgo.Fail(fmt.Sprintf("Failed while parsing '%q' event with payload: %q cause %q.", github.PullRequest, event, err))
+	}
+	return &event
 }
 
 // NewDefaultGitHubClient creates a GH client with default go-github client (without any authentication token)

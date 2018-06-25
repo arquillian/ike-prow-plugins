@@ -67,10 +67,10 @@ var _ = Describe("Work In Progress Plugin features", func() {
 				SetMatcher(ExpectPayload(toHaveFailureState)).
 				Reply(201) // This way we implicitly verify that call happened after `HandleEvent` call
 
-			statusPayload := LoadFromFile("test_fixtures/github_calls/pr_labeled_wip.json")
+			event := LoadPullRequestEvent("test_fixtures/github_calls/pr_labeled_wip.json")
 
 			// when
-			err := handler.HandleEvent(log, github.PullRequest, statusPayload)
+			err := handler.HandlePullRequestEvent(log, event)
 
 			// then - implicit verification of /statuses call occurrence with proper payload
 			Ω(err).ShouldNot(HaveOccurred())
@@ -96,10 +96,10 @@ var _ = Describe("Work In Progress Plugin features", func() {
 				SetMatcher(ExpectPayload(toHaveSuccessState)).
 				Reply(201) // This way we implicitly verify that call happened after `HandleEvent` call
 
-			statusPayload := LoadFromFile("test_fixtures/github_calls/wip_pr_unlabeled.json")
+			event := LoadPullRequestEvent("test_fixtures/github_calls/wip_pr_unlabeled.json")
 
 			// when
-			err := handler.HandleEvent(log, github.PullRequest, statusPayload)
+			err := handler.HandlePullRequestEvent(log, event)
 
 			// then - implicit verification of /statuses call occurrence with proper payload
 			Ω(err).ShouldNot(HaveOccurred())
@@ -123,10 +123,10 @@ var _ = Describe("Work In Progress Plugin features", func() {
 				SetMatcher(ExpectPayload(toHaveSuccessState)).
 				Reply(201) // This way we implicitly verify that call happened after `HandleEvent` call
 
-			statusPayload := LoadFromFile("test_fixtures/github_calls/ready_pr_opened.json")
+			event := LoadPullRequestEvent("test_fixtures/github_calls/ready_pr_opened.json")
 
 			// when
-			err := handler.HandleEvent(log, github.PullRequest, statusPayload)
+			err := handler.HandlePullRequestEvent(log, event)
 
 			// then - implicit verification of /statuses call occurrence with proper payload
 			Ω(err).ShouldNot(HaveOccurred())
@@ -147,10 +147,10 @@ var _ = Describe("Work In Progress Plugin features", func() {
 				SetMatcher(ExpectPayload(toHaveFailureState)).
 				Reply(201) // This way we implicitly verify that call happened after `HandleEvent` call
 
-			statusPayload := LoadFromFile("test_fixtures/github_calls/wip_pr_opened.json")
+			event := LoadPullRequestEvent("test_fixtures/github_calls/wip_pr_opened.json")
 
 			// when
-			err := handler.HandleEvent(log, github.PullRequest, statusPayload)
+			err := handler.HandlePullRequestEvent(log, event)
 
 			// then - implicit verification of /statuses call occurrence with proper payload
 			Ω(err).ShouldNot(HaveOccurred())
@@ -174,10 +174,10 @@ var _ = Describe("Work In Progress Plugin features", func() {
 				SetMatcher(ExpectPayload(toHaveFailureState)).
 				Reply(201) // This way we implicitly verify that call happened after `HandleEvent` call
 
-			statusPayload := LoadFromFile("test_fixtures/github_calls/custom_prefix_pr_opened.json")
+			event := LoadPullRequestEvent("test_fixtures/github_calls/custom_prefix_pr_opened.json")
 
 			// when
-			err := handler.HandleEvent(log, github.PullRequest, statusPayload)
+			err := handler.HandlePullRequestEvent(log, event)
 
 			// then - implicit verification of /statuses call occurrence with proper payload
 			Ω(err).ShouldNot(HaveOccurred())
@@ -198,10 +198,10 @@ var _ = Describe("Work In Progress Plugin features", func() {
 				SetMatcher(ExpectPayload(toHaveFailureState)).
 				Reply(201) // This way we implicitly verify that call happened after `HandleEvent` call
 
-			statusPayload := LoadFromFile("test_fixtures/github_calls/pr_edited_wip_added.json")
+			event := LoadPullRequestEvent("test_fixtures/github_calls/pr_edited_wip_added.json")
 
 			// when
-			err := handler.HandleEvent(log, github.PullRequest, statusPayload)
+			err := handler.HandlePullRequestEvent(log, event)
 
 			// then - implicit verification of /statuses call occurrence with proper payload
 			Ω(err).ShouldNot(HaveOccurred())
@@ -222,10 +222,10 @@ var _ = Describe("Work In Progress Plugin features", func() {
 				SetMatcher(ExpectPayload(toHaveSuccessState)).
 				Reply(201) // This way we implicitly verify that call happened after `HandleEvent` call
 
-			statusPayload := LoadFromFile("test_fixtures/github_calls/pr_edited_wip_removed.json")
+			event := LoadPullRequestEvent("test_fixtures/github_calls/pr_edited_wip_removed.json")
 
 			// when
-			err := handler.HandleEvent(log, github.PullRequest, statusPayload)
+			err := handler.HandlePullRequestEvent(log, event)
 
 			// then - implicit verification of /statuses call occurrence with proper payload
 			Ω(err).ShouldNot(HaveOccurred())
@@ -265,10 +265,10 @@ var _ = Describe("Work In Progress Plugin features", func() {
 				SetMatcher(ExpectPayload(toHaveSuccessState)).
 				Reply(201) // This way we implicitly verify that call happened after `HandleEvent` call
 
-			statusPayload := LoadFromFile("test_fixtures/github_calls/trigger_run_work-in-progress_on_pr_by_pr_creator.json")
+			event := LoadIssueCommentEvent("test_fixtures/github_calls/trigger_run_work-in-progress_on_pr_by_pr_creator.json")
 
 			// when
-			err := handler.HandleEvent(log, github.IssueComment, statusPayload)
+			err := handler.HandleIssueCommentEvent(log, event)
 
 			// then - implicit verification of /statuses call occurrence with proper payload
 			Ω(err).ShouldNot(HaveOccurred())
@@ -304,10 +304,10 @@ var _ = Describe("Work In Progress Plugin features", func() {
 				SetMatcher(ExpectPayload(toHaveFailureState)).
 				Reply(201) // This way we implicitly verify that call happened after `HandleEvent` call
 
-			statusPayload := LoadFromFile("test_fixtures/github_calls/trigger_run_all_on_wip_pr_by_admin.json")
+			event := LoadIssueCommentEvent("test_fixtures/github_calls/trigger_run_all_on_wip_pr_by_admin.json")
 
 			// when
-			err := handler.HandleEvent(log, github.IssueComment, statusPayload)
+			err := handler.HandleIssueCommentEvent(log, event)
 
 			// then - implicit verification of /statuses call occurrence with proper payload
 			Ω(err).ShouldNot(HaveOccurred())
@@ -336,10 +336,10 @@ var _ = Describe("Work In Progress Plugin features", func() {
 				Post("/repos/" + repositoryName + "/statuses").
 				Times(0) // This way we implicitly verify that call not happened after `HandleEvent` call
 
-			statusPayload := LoadFromFile("test_fixtures/github_calls/trigger_run_test-keeper_on_pr_by_pr_creator.json")
+			event := LoadIssueCommentEvent("test_fixtures/github_calls/trigger_run_test-keeper_on_pr_by_pr_creator.json")
 
 			// when
-			err := handler.HandleEvent(log, github.IssueComment, statusPayload)
+			err := handler.HandleIssueCommentEvent(log, event)
 
 			// then
 			Ω(err).ShouldNot(HaveOccurred())
