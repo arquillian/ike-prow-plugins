@@ -83,10 +83,10 @@ var _ = Describe("TestKeeper Metrics", func() {
 			SetMatcher(ExpectPayload(toHaveEnforcedSuccessState)).
 			Reply(201) // This way we implicitly verify that call happened after `HandleEvent` call
 
-		statusPayload := LoadFromFile("test_fixtures/github_calls/prs/without_tests/skip_comment_by_admin.json")
+		event := LoadIssueCommentEvent("test_fixtures/github_calls/prs/without_tests/skip_comment_by_admin.json")
 
 		// when
-		err := handler.HandleEvent(log, github.IssueComment, statusPayload)
+		err := handler.HandleIssueCommentEvent(log, event)
 
 		// then
 		Ω(err).ShouldNot(HaveOccurred())
@@ -97,10 +97,10 @@ var _ = Describe("TestKeeper Metrics", func() {
 			Reply(200).
 			Body(FromFile("test_fixtures/github_calls/prs/without_tests/pr_details_for_metrics.json"))
 
-		statusPayload = LoadFromFile("test_fixtures/github_calls/prs/without_tests/skip_comment_by_admin.json")
+		event = LoadIssueCommentEvent("test_fixtures/github_calls/prs/without_tests/skip_comment_by_admin.json")
 
 		// when
-		err = handler.HandleEvent(log, github.IssueComment, statusPayload)
+		err = handler.HandleIssueCommentEvent(log, event)
 
 		// then - should not expect any additional request mocking
 		Ω(err).ShouldNot(HaveOccurred())
@@ -127,10 +127,10 @@ var _ = Describe("TestKeeper Metrics", func() {
 			SetMatcher(ExpectPayload(toBe(github.StatusSuccess, testkeeper.TestsExistMessage, expectedContext, testkeeper.TestsExistDetailsPageName))).
 			Reply(201) // This way we implicitly verify that call happened after `HandleEvent` call
 
-		statusPayload := LoadFromFile("test_fixtures/github_calls/prs/with_tests/status_opened.json")
+		event := LoadPullRequestEvent("test_fixtures/github_calls/prs/with_tests/status_opened.json")
 
 		// when
-		err := handler.HandleEvent(log, github.PullRequest, statusPayload)
+		err := handler.HandlePullRequestEvent(log, event)
 
 		//then
 		Ω(err).ShouldNot(HaveOccurred())
@@ -158,10 +158,10 @@ var _ = Describe("TestKeeper Metrics", func() {
 			SetMatcher(ExpectPayload(toHaveBodyWithWholePluginsComment)).
 			Reply(201)
 
-		statusPayload := LoadFromFile("test_fixtures/github_calls/prs/without_tests/status_opened.json")
+		event := LoadPullRequestEvent("test_fixtures/github_calls/prs/without_tests/status_opened.json")
 
 		// when
-		err := handler.HandleEvent(log, github.PullRequest, statusPayload)
+		err := handler.HandlePullRequestEvent(log, event)
 
 		//then
 		Ω(err).ShouldNot(HaveOccurred())

@@ -1,5 +1,5 @@
 hash: ec491e3f9011b7709d9ebc6cddbc6a0d8af5d72ac15e77aa01243f65499cf5f0
-updated: 2018-06-21T16:58:05.578562323+05:30
+updated: 2018-06-22T14:10:56.338676246+05:30
 imports:
 - name: github.com/bazelbuild/buildtools
   version: a6baf7df1e358187d43bb6b9f3debc6da8454922
