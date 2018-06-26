@@ -46,5 +46,7 @@ This ensures that the PR description has issue link using keywords to close issu
 
 === Status details
 
+In this section, you can find status details description applicable for each state of the `pr-sanitizer` plugin.
+
 include::{asciidoctor-source}/fragments/status/pr-sanitizer/success/pr-sanitizer-success.adoc[leveloffset=1]
 include::{asciidoctor-source}/fragments/status/pr-sanitizer/failure/pr-sanitizer-failed.adoc[leveloffset=1]

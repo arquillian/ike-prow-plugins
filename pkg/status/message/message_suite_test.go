@@ -1,4 +1,4 @@
-package hint_test
+package message
 
 import (
 	"testing"
@@ -10,5 +10,5 @@ import (
 
 func TestConfig(t *testing.T) {
 	RegisterFailHandler(Fail)
-	RunSpecWithJUnitReporter(t, "Plugin Comment Loader Suite")
+	RunSpecWithJUnitReporter(t, "Status Message Loader Suite")
 }

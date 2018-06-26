@@ -16,7 +16,6 @@ type Source func() ([]byte, error)
 type PluginConfiguration struct {
 	PluginName  string
 	LocationURL string
-	PluginHint  string `yaml:"plugin_hint,omitempty"`
 }
 
 // Load loads configuration of the plugin based on strategies defined by SourcesProvider

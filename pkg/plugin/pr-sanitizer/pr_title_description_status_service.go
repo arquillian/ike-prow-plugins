@@ -2,9 +2,9 @@ package prsanitizer
 
 import (
 	"github.com/arquillian/ike-prow-plugins/pkg/github"
-	"github.com/arquillian/ike-prow-plugins/pkg/github/service"
 	"github.com/arquillian/ike-prow-plugins/pkg/log"
 	"github.com/arquillian/ike-prow-plugins/pkg/scm"
+	"github.com/arquillian/ike-prow-plugins/pkg/status"
 )
 
 type prTitleDescriptionStatusService struct {
@@ -27,7 +27,7 @@ const (
 
 func (gh *GitHubLabelsEventsHandler) newPRTitleDescriptionStatusService(log log.Logger, change scm.RepositoryChange) prTitleDescriptionStatusService {
 	statusContext := github.StatusContext{BotName: gh.BotName, PluginName: ProwPluginName}
-	statusService := ghservice.NewStatusService(gh.Client, log, change, statusContext)
+	statusService := status.NewStatusService(gh.Client, log, change, statusContext)
 	return prTitleDescriptionStatusService{statusService: statusService}
 }
 
