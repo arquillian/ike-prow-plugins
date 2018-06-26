@@ -5,9 +5,9 @@ import (
 
 	is "github.com/arquillian/ike-prow-plugins/pkg/command"
 	"github.com/arquillian/ike-prow-plugins/pkg/github/client"
+	"github.com/arquillian/ike-prow-plugins/pkg/github/service"
 	"github.com/arquillian/ike-prow-plugins/pkg/log"
 	gogh "github.com/google/go-github/github"
-	"github.com/arquillian/ike-prow-plugins/pkg/github/service"
 )
 
 // BypassCheckComment is used as a command to bypass test presence validation

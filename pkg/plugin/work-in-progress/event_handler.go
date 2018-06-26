@@ -5,6 +5,7 @@ import (
 	"regexp"
 	"strings"
 
+	"github.com/arquillian/ike-prow-plugins/pkg/command"
 	"github.com/arquillian/ike-prow-plugins/pkg/github"
 	"github.com/arquillian/ike-prow-plugins/pkg/github/client"
 	"github.com/arquillian/ike-prow-plugins/pkg/github/service"
@@ -12,7 +13,6 @@ import (
 	"github.com/arquillian/ike-prow-plugins/pkg/scm"
 	"github.com/arquillian/ike-prow-plugins/pkg/utils"
 	gogh "github.com/google/go-github/github"
-	"github.com/arquillian/ike-prow-plugins/pkg/command"
 )
 
 const (

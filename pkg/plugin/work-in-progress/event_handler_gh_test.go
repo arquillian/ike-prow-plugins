@@ -14,7 +14,7 @@ import (
 )
 
 const (
-	botName        = "alien-ike"
+	botName = "alien-ike"
 )
 
 var _ = Describe("Work In Progress Plugin features", func() {

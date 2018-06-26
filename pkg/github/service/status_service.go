@@ -3,14 +3,15 @@ package ghservice
 import (
 	"fmt"
 
+	"strings"
+
 	github_type "github.com/arquillian/ike-prow-plugins/pkg/github"
 	"github.com/arquillian/ike-prow-plugins/pkg/github/client"
 	"github.com/arquillian/ike-prow-plugins/pkg/log"
+	"github.com/arquillian/ike-prow-plugins/pkg/plugin"
 	"github.com/arquillian/ike-prow-plugins/pkg/scm"
 	"github.com/arquillian/ike-prow-plugins/pkg/utils"
 	"github.com/google/go-github/github"
-	"github.com/arquillian/ike-prow-plugins/pkg/plugin"
-	"strings"
 )
 
 // StatusService is a struct

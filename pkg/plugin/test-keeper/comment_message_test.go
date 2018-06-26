@@ -92,7 +92,7 @@ var _ = Describe("Test keeper comment message creation", func() {
 
 			conf := testkeeper.PluginConfiguration{
 				PluginConfiguration: config.PluginConfiguration{
-					PluginName:  testkeeper.ProwPluginName,
+					PluginName: testkeeper.ProwPluginName,
 				},
 			}
 

@@ -6,6 +6,7 @@ import (
 	"github.com/arquillian/ike-prow-plugins/pkg/github"
 	. "github.com/arquillian/ike-prow-plugins/pkg/internal/test"
 	"github.com/arquillian/ike-prow-plugins/pkg/log"
+	"github.com/arquillian/ike-prow-plugins/pkg/plugin/test-keeper"
 	"github.com/arquillian/ike-prow-plugins/pkg/server"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -13,7 +14,6 @@ import (
 	dto "github.com/prometheus/client_model/go"
 	"gopkg.in/h2non/gock.v1"
 	"k8s.io/test-infra/prow/phony"
-	"github.com/arquillian/ike-prow-plugins/pkg/plugin/test-keeper"
 )
 
 type DummyGHEventHandler struct {

@@ -3,11 +3,12 @@ package ghclient
 import (
 	"context"
 
+	"fmt"
+
 	"github.com/arquillian/ike-prow-plugins/pkg/log"
 	"github.com/arquillian/ike-prow-plugins/pkg/scm"
 	gogh "github.com/google/go-github/github"
 	"golang.org/x/oauth2"
-	"fmt"
 )
 
 type client struct {
@@ -56,7 +57,7 @@ type aroundContext struct {
 	pageNumber int
 }
 
-var emptyAround = func(doFunction doFunction) (doFunction) {
+var emptyAround = func(doFunction doFunction) doFunction {
 	return doFunction
 }
 
@@ -67,7 +68,7 @@ func (c *client) RegisterAroundFunctions(aroundCreators ...AroundFunctionCreator
 	}
 }
 
-func (c *client) do(function doFunction) (error) {
+func (c *client) do(function doFunction) error {
 	around := c.allAround(function)
 	_, _, e := around(aroundContext{})
 	return e
