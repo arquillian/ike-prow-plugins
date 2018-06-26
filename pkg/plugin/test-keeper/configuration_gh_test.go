@@ -30,8 +30,7 @@ var _ = Describe("Test keeper config loader features", func() {
 				Get("owner/repo/46cb8fac44709e4ccaae97448c65e8f7320cfea7/" + configFilePath + ".yml").
 				Reply(200).
 				BodyString("test_patterns: ['*my', 'test.go', 'pattern.js']\n" +
-					"skip_validation_for: ['pom.xml', 'regex{{*\\.adoc}}']\n" +
-					"plugin_hint: 'http://my.server.com/message.md'")
+					"skip_validation_for: ['pom.xml', 'regex{{*\\.adoc}}']\n")
 
 			change := scm.RepositoryChange{
 				Owner:    "owner",
@@ -45,7 +44,6 @@ var _ = Describe("Test keeper config loader features", func() {
 			// then
 			Expect(configuration.LocationURL).To(Equal("https://github.com/owner/repo/blob/46cb8fac44709e4ccaae97448c65e8f7320cfea7/.ike-prow/test-keeper.yml"))
 			Expect(configuration.PluginName).To(Equal(testkeeper.ProwPluginName))
-			Expect(configuration.PluginHint).To(Equal("http://my.server.com/message.md"))
 		})
 
 		It("should load test-keeper configuration yml file", func() {
@@ -54,8 +52,7 @@ var _ = Describe("Test keeper config loader features", func() {
 				Get("owner/repo/46cb8fac44709e4ccaae97448c65e8f7320cfea7/" + configFilePath + ".yml").
 				Reply(200).
 				BodyString("test_patterns: ['*my', 'test.go', 'pattern.js']\n" +
-					"skip_validation_for: ['pom.xml', 'regex{{*\\.adoc}}']\n" +
-					"plugin_hint: 'http://my.server.com/message.md'")
+					"skip_validation_for: ['pom.xml', 'regex{{*\\.adoc}}']\n")
 
 			change := scm.RepositoryChange{
 				Owner:    "owner",
@@ -67,7 +64,6 @@ var _ = Describe("Test keeper config loader features", func() {
 			configuration := testkeeper.LoadConfiguration(logger, change)
 
 			// then
-			Expect(configuration.PluginHint).To(Equal("http://my.server.com/message.md"))
 			Expect(configuration.Inclusions).To(ConsistOf("*my", "test.go", "pattern.js"))
 			Expect(configuration.Exclusions).To(ConsistOf("pom.xml", "regex{{*\\.adoc}}"))
 			Expect(configuration.Combine).To(BeTrue())
@@ -81,8 +77,7 @@ var _ = Describe("Test keeper config loader features", func() {
 				Get("owner/repo/46cb8fac44709e4ccaae97448c65e8f7320cfea7/" + configFilePath + ".yaml").
 				Reply(200).
 				BodyString("test_patterns: ['*my', 'test.go', 'pattern.js']\n" +
-					"skip_validation_for: ['pom.xml', 'regex{{*\\.adoc}}']\n" +
-					"plugin_hint: 'http://my.server.com/message.md'")
+					"skip_validation_for: ['pom.xml', 'regex{{*\\.adoc}}']\n")
 
 			change := scm.RepositoryChange{
 				Owner:    "owner",
@@ -94,7 +89,6 @@ var _ = Describe("Test keeper config loader features", func() {
 			configuration := testkeeper.LoadConfiguration(logger, change)
 
 			// then
-			Expect(configuration.PluginHint).To(Equal("http://my.server.com/message.md"))
 			Expect(configuration.Inclusions).To(ConsistOf("*my", "test.go", "pattern.js"))
 			Expect(configuration.Exclusions).To(ConsistOf("pom.xml", "regex{{*\\.adoc}}"))
 			Expect(configuration.Combine).To(BeTrue())
@@ -115,7 +109,6 @@ var _ = Describe("Test keeper config loader features", func() {
 
 			// then
 			Expect(configuration.LocationURL).To(BeEmpty())
-			Expect(configuration.PluginHint).To(BeEmpty())
 			Expect(configuration.Inclusions).To(BeEmpty())
 			Expect(configuration.Exclusions).To(BeEmpty())
 			Expect(configuration.Combine).To(BeTrue())

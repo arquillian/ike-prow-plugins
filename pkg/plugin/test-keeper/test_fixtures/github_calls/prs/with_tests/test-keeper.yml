@@ -3,4 +3,3 @@ test_patterns:
 skip_validation_for:
   - 'regex{{.*\.[xsd]?html$}}'             # <!--2-->
 combine_defaults: false                    # <!--3-->
-plugin_hint: .ike-prow/test-keeper_hint.md  # <!--4-->
