@@ -33,7 +33,18 @@ include::../../pkg/plugin/pr-sanitizer/test_fixtures/github_calls/pr-sanitizer.y
 <1> Defines set of custom types which will be used to match titles prefixes in changeset and determine if Pull Requests Title conforms with the semantic message style. (Eg. above code snippet configures link:https://medium.com/walmartlabs/semantic-commit-messages-with-emojis-dba2541cea9a[emoji style] semantic commit message.)
 <2> Allows you to decide if you want to combine your patterns with the list (`feat`, `fix`, `refactor`, `docs`, `test`, `chore`, `style`) of predefined default types (`true` by default).
 
+
+=== Description - Content Length Verification [[description-content-length-verification]]
+
+This ensures that the PR description has more than 50 characters to have more elaborated description from which anyone can understand all changes proposed in this PR.
+
+All issue link keywords(e.g. `close #1`) added to close an issue are not taken into consideration while measuring description length.
+
+=== Description - Issue Link Verification [[description-issue-link-verification]]
+
+This ensures that the PR description has issue link using keywords to close issue after merging pull request. Supported keywords for issue links are `closes`, `closed`, `fix`, `fixes`, `fixed`, `resolve`, `resolves`, `resolved`.
+
 === Status details
 
 include::{asciidoctor-source}/fragments/status/pr-sanitizer/success/pr-sanitizer-success.adoc[leveloffset=1]
-include::{asciidoctor-source}/fragments/status/pr-sanitizer/failure/title-verification-failed.adoc[leveloffset=1]
+include::{asciidoctor-source}/fragments/status/pr-sanitizer/failure/pr-sanitizer-failed.adoc[leveloffset=1]

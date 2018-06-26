@@ -43,9 +43,9 @@ var _ = Describe("PR Sanitizer Plugin features", func() {
 
 	toHaveFailureState := SoftlySatisfyAll(
 		HaveState(github.StatusFailure),
-		HaveDescription(prsanitizer.TitleVerificationFailureMessage),
+		HaveDescription(prsanitizer.TitleFailure),
 		HaveContext(expectedContext),
-		HaveTargetURL(fmt.Sprintf("%s/%s/%s.html", docStatusRoot, "failure", prsanitizer.TitleVerificationFailureDetailsPageName)),
+		HaveTargetURL(fmt.Sprintf("%s/%s/%s.html", docStatusRoot, "failure", prsanitizer.FailureDetailsPageName)),
 	)
 
 	Context("Pull Request title change trigger", func() {
@@ -160,6 +160,91 @@ var _ = Describe("PR Sanitizer Plugin features", func() {
 				Reply(201) // This way we implicitly verify that call happened after `HandleEvent` call
 
 			statusPayload := LoadFromFile("test_fixtures/github_calls/semantically_incorrect_wip_pr_opened.json")
+
+			// when
+			err := handler.HandleEvent(log, github.PullRequest, statusPayload)
+
+			// then - implicit verification of /statuses call occurrence with proper payload
+			Ω(err).ShouldNot(HaveOccurred())
+		})
+
+	})
+
+	Context("Pull Request Description verifier", func() {
+
+		toHaveFailureState = SoftlySatisfyAll(
+			HaveState(github.StatusFailure),
+			HaveContext(expectedContext),
+			HaveTargetURL(fmt.Sprintf("%s/%s/%s.html", docStatusRoot, "failure", prsanitizer.FailureDetailsPageName)),
+		)
+
+		toHaveBodyWithDescriptionShortComment := SoftlySatisfyAll(
+			HaveBodyThatContains(fmt.Sprintf(prsanitizer.DescriptionShortMessage, "bartoszmajsak")),
+		)
+
+		BeforeEach(func() {
+			defer gock.OffAll()
+			handler = &prsanitizer.GitHubLabelsEventsHandler{Client: NewDefaultGitHubClient(), BotName: botName}
+		})
+
+		AfterEach(EnsureGockRequestsHaveBeenMatched)
+
+		It("should mark status as failed (thus block PR merge) when PR doesn't have issue linked in the description", func() {
+			// given
+			NonExistingRawGitHubFiles("pr-sanitizer.yml", "pr-sanitizer.yaml")
+
+			gock.New("https://api.github.com").
+				Post("/repos/" + repositoryName + "/statuses").
+				SetMatcher(ExpectPayload(toHaveFailureState, HaveDescription(prsanitizer.IssueLinkMissing))).
+				Reply(201) // This way we implicitly verify that call happened after `HandleEvent` call
+
+			statusPayload := LoadFromFile("test_fixtures/github_calls/issue_link_missing_pr_opened.json")
+
+			// when
+			err := handler.HandleEvent(log, github.PullRequest, statusPayload)
+
+			// then - implicit verification of /statuses call occurrence with proper payload
+			Ω(err).ShouldNot(HaveOccurred())
+		})
+
+		It("should mark status as failed (thus block PR merge) when PR doesn't have description", func() {
+			// given
+			NonExistingRawGitHubFiles("pr-sanitizer.yml", "pr-sanitizer.yaml", "work-in-progress.yml", "work-in-progress.yaml")
+
+			gock.New("https://api.github.com").
+				Post("/repos/" + repositoryName + "/statuses").
+				SetMatcher(ExpectPayload(toHaveFailureState, HaveDescription(prsanitizer.TitleFailure+" "+prsanitizer.DescriptionLengthShort))).
+				Reply(201) // This way we implicitly verify that call happened after `HandleEvent` call
+
+			gock.New("https://api.github.com").
+				Post("/repos/" + repositoryName + "/issues/4/comments").
+				SetMatcher(ExpectPayload(toHaveBodyWithDescriptionShortComment)).
+				Reply(201)
+
+			statusPayload := LoadFromFile("test_fixtures/github_calls/semantically_incorrect_title_missing_description_pr_opened.json")
+
+			// when
+			err := handler.HandleEvent(log, github.PullRequest, statusPayload)
+
+			// then - implicit verification of /statuses call occurrence with proper payload
+			Ω(err).ShouldNot(HaveOccurred())
+		})
+
+		It("should mark status as failed (thus block PR merge) when prefixed with wip and does not conform with semantic commit message type and short description", func() {
+			// given
+			NonExistingRawGitHubFiles("pr-sanitizer.yml", "pr-sanitizer.yaml", "work-in-progress.yml", "work-in-progress.yaml")
+
+			gock.New("https://api.github.com").
+				Post("/repos/" + repositoryName + "/statuses").
+				SetMatcher(ExpectPayload(toHaveFailureState, HaveDescription(prsanitizer.TitleFailure+" "+prsanitizer.DescriptionLengthShort+" "+prsanitizer.IssueLinkMissing))).
+				Reply(201) // This way we implicitly verify that call happened after `HandleEvent` call
+
+			gock.New("https://api.github.com").
+				Post("/repos/" + repositoryName + "/issues/4/comments").
+				SetMatcher(ExpectPayload(toHaveBodyWithDescriptionShortComment)).
+				Reply(201)
+
+			statusPayload := LoadFromFile("test_fixtures/github_calls/semantically_incorrect_wip_short_desc_pr_opened.json")
 
 			// when
 			err := handler.HandleEvent(log, github.PullRequest, statusPayload)

@@ -2,7 +2,7 @@ package prsanitizer_test
 
 import (
 	. "github.com/arquillian/ike-prow-plugins/pkg/internal/test"
-	prsanitizer "github.com/arquillian/ike-prow-plugins/pkg/plugin/pr-sanitizer"
+	"github.com/arquillian/ike-prow-plugins/pkg/plugin/pr-sanitizer"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/ginkgo/extensions/table"
 	. "github.com/onsi/gomega"
@@ -38,6 +38,39 @@ var _ = Describe("PR-Sanitizer Plugin features", func() {
 			Entry("not a supported semantic commit prefix", "wip-fix off-by one bug"),
 			Entry("empty title", ""),
 			Entry("nil title", nil),
+		)
+	})
+
+	Context("Description verifier", func() {
+
+		var handler *prsanitizer.GitHubLabelsEventsHandler
+
+		BeforeEach(func() {
+			handler = &prsanitizer.GitHubLabelsEventsHandler{Client: NewDefaultGitHubClient()}
+		})
+
+		DescribeTable("should get issue link presence and PR description with excluding issue link keyword",
+			func(desc string, excluded string) {
+				descriptionWithIssueLinkExcluded, isIssueLinked := handler.GetDescriptionWithIssueLinkExcluded(desc)
+				Expect(isIssueLinked).To(BeTrue())
+				Expect(descriptionWithIssueLinkExcluded).To(Equal(excluded))
+			},
+			Entry("pr description", "test description.\r\n\r\nfixes: #1", "test description."),
+			Entry("pr description", "test description.\r\n\r\nclosed: org/repo#1", "test description."),
+			Entry("pr description", "test description.\r\n\r\nresolve: org/my-repo#1", "test description."),
+			Entry("pr description", "test description.\r\n\r\nfixes #1", "test description."),
+			Entry("pr description", "test description.\r\n\r\nclosed org/repo#1", "test description."),
+			Entry("pr description", "test description.\r\n\r\nresolve org/my-repo#1", "test description."),
+		)
+
+		DescribeTable("should get issue link presence and PR description with excluding issue link keyword ",
+			func(desc string, excluded string) {
+				descriptionWithIssueLinkExcluded, isIsssueLinked := handler.GetDescriptionWithIssueLinkExcluded(desc)
+				Expect(isIsssueLinked).To(BeFalse())
+				Expect(descriptionWithIssueLinkExcluded).To(Equal(excluded))
+			},
+			Entry("pr description", "test description.", "test description."),
+			Entry("pr description", "test description. verifies: org/repo#1", "test description. verifies: org/repo#1"),
 		)
 	})
 
