@@ -10,6 +10,7 @@ import (
 	"github.com/arquillian/ike-prow-plugins/pkg/github"
 	"github.com/arquillian/ike-prow-plugins/pkg/github/client"
 	"github.com/arquillian/ike-prow-plugins/pkg/log"
+	"github.com/arquillian/ike-prow-plugins/pkg/utils"
 	gogh "github.com/google/go-github/github"
 	"github.com/onsi/ginkgo"
 )
@@ -32,6 +33,26 @@ func FromFile(filePath string) io.Reader {
 		ginkgo.Fail(fmt.Sprintf("Unable to load test fixture. Reason: %q", err))
 	}
 	return file
+}
+
+// NewPullRequest creates an instance of gogh.PullRequest with the given values
+func NewPullRequest(repoOwner, repoName, sha, creator string) *gogh.PullRequest {
+	return &gogh.PullRequest{
+		Base: &gogh.PullRequestBranch{
+			Repo: &gogh.Repository{
+				Name: utils.String(repoName),
+				Owner: &gogh.User{
+					Login: utils.String(repoOwner),
+				},
+			},
+		},
+		Head: &gogh.PullRequestBranch{
+			SHA: utils.String(sha),
+		},
+		User: &gogh.User{
+			Login: utils.String(creator),
+		},
+	}
 }
 
 // LoadIssueCommentEvent creates an instance of gogh.PullRequestEvent with the given values

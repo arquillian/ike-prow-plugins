@@ -25,6 +25,7 @@ type Client interface {
 	GetPullRequestReviews(owner, repo string, prNumber int) ([]*gogh.PullRequestReview, error)
 	ListIssueComments(issue scm.RepositoryIssue) ([]*gogh.IssueComment, error)
 	CreateIssueComment(issue scm.RepositoryIssue, commentMsg *string) error
+	EditIssueComment(issue scm.RepositoryIssue, commentID int64, commentMsg *string) error
 	CreateStatus(change scm.RepositoryChange, repoStatus *gogh.RepoStatus) error
 	AddPullRequestLabel(change scm.RepositoryChange, prNumber int, label []string) error
 	RemovePullRequestLabel(change scm.RepositoryChange, prNumber int, label string) error
@@ -154,6 +155,19 @@ func (c *client) CreateIssueComment(issue scm.RepositoryIssue, commentMsg *strin
 	}
 	err := c.do(func(aroundContext aroundContext) (func(), *gogh.Response, error) {
 		_, response, e := c.gh.Issues.CreateComment(context.Background(), issue.Owner, issue.RepoName, issue.Number, comment)
+		return func() {}, response, c.checkHTTPCode(response, e)
+	})
+
+	return err
+}
+
+// EditIssueComment edits an already existing comment in the given issue.
+func (c *client) EditIssueComment(issue scm.RepositoryIssue, commentID int64, commentMsg *string) error {
+	comment := &gogh.IssueComment{
+		Body: commentMsg,
+	}
+	err := c.do(func(aroundContext aroundContext) (func(), *gogh.Response, error) {
+		_, response, e := c.gh.Issues.EditComment(context.Background(), issue.Owner, issue.RepoName, commentID, comment)
 		return func() {}, response, c.checkHTTPCode(response, e)
 	})
 

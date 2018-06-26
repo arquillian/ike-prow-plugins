@@ -1,12 +1,12 @@
-package ghservice_test
+package status_test
 
 import (
 	"github.com/arquillian/ike-prow-plugins/pkg/github"
-	"github.com/arquillian/ike-prow-plugins/pkg/github/service"
 	. "github.com/arquillian/ike-prow-plugins/pkg/internal/test"
 	"github.com/arquillian/ike-prow-plugins/pkg/log"
 	"github.com/arquillian/ike-prow-plugins/pkg/plugin"
 	"github.com/arquillian/ike-prow-plugins/pkg/scm"
+	"github.com/arquillian/ike-prow-plugins/pkg/status"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	"gopkg.in/h2non/gock.v1"
@@ -31,7 +31,7 @@ var _ = Describe("GitHub Status Service", func() {
 			defer gock.OffAll()
 			change := scm.RepositoryChange{RepoName: "test-repo", Owner: "alien-ike", Hash: "1232asdasd"}
 			context := github.StatusContext{BotName: "alien-ike", PluginName: "test-keeper"}
-			statusService = ghservice.NewStatusService(NewDefaultGitHubClient(), log.NewTestLogger(), change, context)
+			statusService = status.NewStatusService(NewDefaultGitHubClient(), log.NewTestLogger(), change, context)
 		})
 
 		AfterEach(EnsureGockRequestsHaveBeenMatched)
