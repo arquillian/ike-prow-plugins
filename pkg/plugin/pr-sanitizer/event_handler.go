@@ -1,7 +1,6 @@
 package prsanitizer
 
 import (
-	"encoding/json"
 	"strings"
 
 	"github.com/arquillian/ike-prow-plugins/pkg/command"
@@ -10,6 +9,7 @@ import (
 	"github.com/arquillian/ike-prow-plugins/pkg/github/service"
 	"github.com/arquillian/ike-prow-plugins/pkg/log"
 	"github.com/arquillian/ike-prow-plugins/pkg/plugin/work-in-progress"
+	"github.com/arquillian/ike-prow-plugins/pkg/status"
 	"github.com/arquillian/ike-prow-plugins/pkg/utils"
 	gogh "github.com/google/go-github/github"
 )
@@ -43,48 +43,18 @@ var (
 	defaultTypes          = []string{"chore", "docs", "feat", "fix", "refactor", "style", "test"}
 )
 
-// HandleEvent is an entry point for the plugin logic. This method is invoked by the Server when
-// events are dispatched from the /hook service
-func (gh *GitHubLabelsEventsHandler) HandleEvent(log log.Logger, eventType github.EventType, payload []byte) error {
-	switch eventType {
-	case github.PullRequest:
-		var event gogh.PullRequestEvent
-		if err := json.Unmarshal(payload, &event); err != nil {
-			log.Errorf("Failed while parsing '%q' event with payload: %q. Cause: %q", github.PullRequest, event, err)
-			return err
-		}
-
-		if err := gh.handlePrEvent(log, &event); err != nil {
-			log.Errorf("Error handling '%q' event with payload %q. Cause: %q", github.PullRequest, event, err)
-			return err
-		}
-
-	case github.IssueComment:
-		var event gogh.IssueCommentEvent
-		if err := json.Unmarshal(payload, &event); err != nil {
-			log.Errorf("Failed while parsing '%q' event with payload: %q. Cause: %q", github.IssueComment, event, err)
-			return err
-		}
-
-		if err := gh.handlePrComment(log, &event); err != nil {
-			log.Errorf("Error handling '%q' event with payload %q. Cause: %q", github.IssueComment, event, err)
-			return err
-		}
-
-	default:
-		log.Warnf("received an event of type %q but didn't ask for it", eventType)
-	}
-	return nil
-}
-
-func (gh *GitHubLabelsEventsHandler) handlePrEvent(log log.Logger, event *gogh.PullRequestEvent) error {
+// HandlePullRequestEvent is an entry point for the plugin logic. This method is invoked by the Server when
+// pull request event is dispatched from the /hook service
+func (gh *GitHubLabelsEventsHandler) HandlePullRequestEvent(log log.Logger, event *gogh.PullRequestEvent) error {
 	if !utils.Contains(handledPrActions, *event.Action) {
 		return nil
 	}
 	return gh.checkTitleAndSetStatus(log, event.PullRequest)
 }
 
-func (gh *GitHubLabelsEventsHandler) handlePrComment(log log.Logger, comment *gogh.IssueCommentEvent) error {
+// HandleIssueCommentEvent is an entry point for the plugin logic. This method is invoked by the Server when
+// issue comment event is dispatched from the /hook service
+func (gh *GitHubLabelsEventsHandler) HandleIssueCommentEvent(log log.Logger, comment *gogh.IssueCommentEvent) error {
 	if !utils.Contains(handledCommentActions, *comment.Action) {
 		return nil
 	}
@@ -115,7 +85,7 @@ func (gh *GitHubLabelsEventsHandler) handlePrComment(log log.Logger, comment *go
 func (gh *GitHubLabelsEventsHandler) checkTitleAndSetStatus(log log.Logger, pullRequest *gogh.PullRequest) error {
 	change := ghservice.NewRepositoryChangeForPR(pullRequest)
 	statusContext := github.StatusContext{BotName: gh.BotName, PluginName: ProwPluginName}
-	statusService := ghservice.NewStatusService(gh.Client, log, change, statusContext)
+	statusService := status.NewStatusService(gh.Client, log, change, statusContext)
 
 	config := LoadConfiguration(log, change)
 	if gh.HasTitleWithValidType(config, *pullRequest.Title) {

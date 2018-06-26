@@ -18,19 +18,15 @@ vendor: tools.timestamp ## Runs glide to vendor project dependencies
 	glide install -v
 	
 .PHONY: install
-install: generate ## Fetches all dependencies using Glide
-	glide install -v
+install: generate ## Fetches all dependencies using dep
+	dep ensure -v
 
-.PHONY: up
-up: generate ## Updates all dependencies defined for glide
-	glide up -v
-
-.PHONY: up-skip-test-quick
-up-skip-test-quick:
-	glide update --skip-test --quick ## Updates only things in glide.yaml and skips tests
+.PHONY: update
+update: generate ## Updates all dependencies defined for dep
+	dep ensure -update -v
 
 .PHONY: compile
-compile: up compile-only ## Compiles all plugins and puts them in the bin/ folder (calls up target)
+compile: update compile-only ## Compiles all plugins and puts them in the bin/ folder (calls up target)
 
 .PHONY: compile-only
 compile-only: generate $(BINARIES)

@@ -16,7 +16,7 @@ oc-deploy-hook: build-hook deploy-hook ## Deploys hook service only
 deploy-hook: build-hook-image push-hook-image
 
 .PHONY: build-hook
-build-hook: up-skip-test-quick
+build-hook: update
 	CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o bin/hook ./vendor/k8s.io/test-infra/prow/cmd/hook
 
 .PHONY: build-hook-image

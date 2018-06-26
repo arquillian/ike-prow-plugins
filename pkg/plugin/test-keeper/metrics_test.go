@@ -6,10 +6,10 @@ import (
 	"strings"
 
 	"github.com/arquillian/ike-prow-plugins/pkg/github"
-	"github.com/arquillian/ike-prow-plugins/pkg/github/service"
 	. "github.com/arquillian/ike-prow-plugins/pkg/internal/test"
 	"github.com/arquillian/ike-prow-plugins/pkg/log"
 	"github.com/arquillian/ike-prow-plugins/pkg/plugin/test-keeper"
+	"github.com/arquillian/ike-prow-plugins/pkg/status/message"
 	"github.com/arquillian/ike-prow-plugins/pkg/utils"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -32,7 +32,7 @@ var _ = Describe("TestKeeper Metrics", func() {
 	}
 
 	toHaveBodyWithWholePluginsComment := SoftlySatisfyAll(
-		HaveBodyThatContains(fmt.Sprintf(ghservice.PluginTitleTemplate, testkeeper.ProwPluginName)),
+		HaveBodyThatContains(fmt.Sprintf(message.PluginTitleTemplate, testkeeper.ProwPluginName)),
 		HaveBodyThatContains("@bartoszmajsak"),
 	)
 
@@ -83,10 +83,10 @@ var _ = Describe("TestKeeper Metrics", func() {
 			SetMatcher(ExpectPayload(toHaveEnforcedSuccessState)).
 			Reply(201) // This way we implicitly verify that call happened after `HandleEvent` call
 
-		statusPayload := LoadFromFile("test_fixtures/github_calls/prs/without_tests/skip_comment_by_admin.json")
+		event := LoadIssueCommentEvent("test_fixtures/github_calls/prs/without_tests/skip_comment_by_admin.json")
 
 		// when
-		err := handler.HandleEvent(log, github.IssueComment, statusPayload)
+		err := handler.HandleIssueCommentEvent(log, event)
 
 		// then
 		Ω(err).ShouldNot(HaveOccurred())
@@ -97,10 +97,10 @@ var _ = Describe("TestKeeper Metrics", func() {
 			Reply(200).
 			Body(FromFile("test_fixtures/github_calls/prs/without_tests/pr_details_for_metrics.json"))
 
-		statusPayload = LoadFromFile("test_fixtures/github_calls/prs/without_tests/skip_comment_by_admin.json")
+		event = LoadIssueCommentEvent("test_fixtures/github_calls/prs/without_tests/skip_comment_by_admin.json")
 
 		// when
-		err = handler.HandleEvent(log, github.IssueComment, statusPayload)
+		err = handler.HandleIssueCommentEvent(log, event)
 
 		// then - should not expect any additional request mocking
 		Ω(err).ShouldNot(HaveOccurred())
@@ -127,10 +127,10 @@ var _ = Describe("TestKeeper Metrics", func() {
 			SetMatcher(ExpectPayload(toBe(github.StatusSuccess, testkeeper.TestsExistMessage, expectedContext, testkeeper.TestsExistDetailsPageName))).
 			Reply(201) // This way we implicitly verify that call happened after `HandleEvent` call
 
-		statusPayload := LoadFromFile("test_fixtures/github_calls/prs/with_tests/status_opened.json")
+		event := LoadPullRequestEvent("test_fixtures/github_calls/prs/with_tests/status_opened.json")
 
 		// when
-		err := handler.HandleEvent(log, github.PullRequest, statusPayload)
+		err := handler.HandlePullRequestEvent(log, event)
 
 		//then
 		Ω(err).ShouldNot(HaveOccurred())
@@ -140,7 +140,7 @@ var _ = Describe("TestKeeper Metrics", func() {
 
 	It("should report pull requests without tests", func() {
 		//given
-		NonExistingRawGitHubFiles("test-keeper.yml", "test-keeper.yaml", "test-keeper_hint.md")
+		NonExistingRawGitHubFiles("test-keeper.yml", "test-keeper.yaml", "test-keeper_without_tests_message.md")
 		gockEmptyComments(1)
 
 		gock.New("https://api.github.com").
@@ -158,10 +158,10 @@ var _ = Describe("TestKeeper Metrics", func() {
 			SetMatcher(ExpectPayload(toHaveBodyWithWholePluginsComment)).
 			Reply(201)
 
-		statusPayload := LoadFromFile("test_fixtures/github_calls/prs/without_tests/status_opened.json")
+		event := LoadPullRequestEvent("test_fixtures/github_calls/prs/without_tests/status_opened.json")
 
 		// when
-		err := handler.HandleEvent(log, github.PullRequest, statusPayload)
+		err := handler.HandlePullRequestEvent(log, event)
 
 		//then
 		Ω(err).ShouldNot(HaveOccurred())
