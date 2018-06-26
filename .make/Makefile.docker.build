@@ -32,7 +32,7 @@ docker-image-builder:
 .PHONY: docker-start
 ## Starts the docker build container in the background (detached mode).
 ## After calling this command you can invoke all the make targets from the
-## normal Makefile (e.g. up, compile, build) inside the build container
+## normal Makefile (e.g. update, compile, build) inside the build container
 ## by prefixing them with "docker-". For example to execute "make compile"
 ## inside the build container, just run "make docker-compile".
 ## To remove the container when no longer needed, call "make docker-rm".
