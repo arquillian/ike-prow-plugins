@@ -61,6 +61,7 @@ var _ = Describe("PR-Sanitizer Plugin features", func() {
 			Entry("pr description", "test description.\r\n\r\nfixes #1", "test description."),
 			Entry("pr description", "test description.\r\n\r\nclosed org/repo#1", "test description."),
 			Entry("pr description", "test description.\r\n\r\nresolve org/my-repo#1", "test description."),
+			Entry("pr description", "test description.\r\n\r\nresolve org/my-repo#1 fix: #1", "test description."),
 		)
 
 		DescribeTable("should get issue link presence and PR description with excluding issue link keyword ",
