@@ -57,8 +57,9 @@ var _ = Describe("Test Keeper Plugin features", func() {
 				WithFiles(LoadedFrom("test_fixtures/github_calls/prs/with_tests/changes_go_files.json")).
 				WithoutComments().
 				WithConfigFile(
-					ConfigYml("test_patterns: ['**/*_test_suite.go']\n" +
-						"skip_validation_for: ['README.adoc']")).
+					ConfigYml(Containing(
+						Param("test_patterns", "['**/*_test_suite.go']"),
+						Param("skip_validation_for", "['README.adoc']")))).
 				Expecting(
 					Status(ToBe(github.StatusSuccess, testkeeper.TestsExistMessage, testkeeper.TestsExistDetailsPageName))).
 				Create()
@@ -75,7 +76,8 @@ var _ = Describe("Test Keeper Plugin features", func() {
 			prMock := mocker.MockPr().LoadedFromDefaultJSON().
 				WithFiles(LoadedFrom("test_fixtures/github_calls/prs/without_tests/changes-with-test-keeper-config-excluding-other-file-from-PR.json")).
 				WithConfigFile(
-					ConfigYml(LoadedFrom("test_fixtures/github_calls/prs/without_tests/test-keeper-ignore-randomfile.yml"))).
+					ConfigYml(Containing(
+						Param("skip_validation_for", "'**/Randomfile'")))).
 				WithoutComments().
 				Expecting(
 					Status(ToBe(github.StatusSuccess, testkeeper.OkOnlySkippedFilesMessage, testkeeper.OkOnlySkippedFilesDetailsPageName)),

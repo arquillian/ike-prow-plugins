@@ -32,8 +32,10 @@ var _ = Describe("Test keeper config loader features", func() {
 				Hash:     "46cb8fac44709e4ccaae97448c65e8f7320cfea7",
 			}
 
-			mocker.MockConfig(ConfigYml("test_patterns: ['*my', 'test.go', 'pattern.js']\n" +
-				"skip_validation_for: ['pom.xml', 'regex{{*\\.adoc}}']")).
+			mocker.MockConfig(
+				ConfigYaml(Containing(
+					Param("test_patterns", "['*my', 'test.go', 'pattern.js']"),
+					Param("skip_validation_for", "['pom.xml', 'regex{{*\\.adoc}}']")))).
 				ForChange(change)
 
 			// when
@@ -57,8 +59,10 @@ var _ = Describe("Test keeper config loader features", func() {
 				Hash:     "46cb8fac44709e4ccaae97448c65e8f7320cfea7",
 			}
 
-			mocker.MockConfig(ConfigYaml("test_patterns: ['*my', 'test.go', 'pattern.js']\n" +
-				"skip_validation_for: ['pom.xml', 'regex{{*\\.adoc}}']")).
+			mocker.MockConfig(
+				ConfigYaml(Containing(
+					Param("test_patterns", "['*my', 'test.go', 'pattern.js']"),
+					Param("skip_validation_for", "['pom.xml', 'regex{{*\\.adoc}}']")))).
 				ForChange(change)
 
 			// when

@@ -192,6 +192,23 @@ func (b *MockPrBuilder) WithConfigFile(configMock func(builder *MockPrBuilder)) 
 	return b
 }
 
+type keyValue func() (string, string)
+
+func Param(key, value string) keyValue {
+	return func() (string, string) {
+		return key, value
+	}
+}
+
+func Containing(params ...keyValue) string {
+	var content string
+	for _, param := range params {
+		key, value := param()
+		content += fmt.Sprintf("%s\n%s : %s", content, key, value)
+	}
+	return content
+}
+
 // ConfigYaml creates a representation of a config file with yaml suffix
 func ConfigYaml(content string) func(builder *MockPrBuilder) {
 	return func(builder *MockPrBuilder) {
