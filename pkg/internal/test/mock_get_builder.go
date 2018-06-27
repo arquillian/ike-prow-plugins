@@ -164,12 +164,16 @@ var page1 = func(request *gock.Request) {
 	request.MatchParam("page", "1")
 }
 
-// WithoutConfigFiles sets that the associated mocked PR shouldn't contain any configuration file
 func (b *MockPrBuilder) WithoutConfigFiles() *MockPrBuilder {
+	return b.WithoutConfigFilesForPlugin(b.pluginName)
+}
+
+// WithoutConfigFiles sets that the associated mocked PR shouldn't contain any configuration file
+func (b *MockPrBuilder) WithoutConfigFilesForPlugin(pluginName string) *MockPrBuilder {
 	configsToMock := []string{"%s.yaml", "%s.yml"}
 
 	for _, config := range configsToMock {
-		b.WithoutRawFiles(ghservice.ConfigHome + fmt.Sprintf(config, b.pluginName))
+		b.WithoutRawFiles(ghservice.ConfigHome + fmt.Sprintf(config, pluginName))
 	}
 	return b
 }
