@@ -34,37 +34,22 @@ type MockPrBuilder struct {
 // MockCreator creates a gock mock
 type MockCreator func(builder *MockPrBuilder)
 
-// LoadedFromDefaultJSON loads json from a location test_fixtures/github_calls/prs/pr_details.json
-func LoadedFromDefaultJSON() string {
-	return LoadedFrom("test_fixtures/github_calls/prs/pr_details.json")
-}
-
-// LoadedFromDefaultStruct loads a marshaled instance of default pull request
-func LoadedFromDefaultStruct() string {
-	pr, _ := json.Marshal(&gogh.PullRequest{
-		Number: utils.Int(1),
-		User:   createGhUser("bartoszmajsak-test"),
-		Base: &gogh.PullRequestBranch{
-			Repo: &gogh.Repository{
-				Owner: createGhUser("bartoszmajsak"),
-				Name:  utils.String("wfswarm-booster-pipeline-test"),
-			},
-		},
-		Head: &gogh.PullRequestBranch{
-			SHA: utils.String("df8e5cd15f05e1d975e17df322b9babedccf0a1a"),
-		},
-	})
-	return string(pr)
+// MockPr creates a builder for mocking a pull request calls
+func MockPr() *MockPrBuilderLoader {
+	return NewMockPluginTemplate("any").MockPr()
 }
 
 // MockPr creates a builder for mocking a pull request calls
-func MockPr(jsonContent string) *MockPrBuilder {
-	return NewMockPluginTemplate("any").MockPr(jsonContent)
+func (t MockPluginTemplate) MockPr() *MockPrBuilderLoader {
+	return &MockPrBuilderLoader{pluginName: t.pluginName}
 }
 
-// MockPr creates a builder for mocking a pull request calls
-func (t MockPluginTemplate) MockPr(jsonContent string) *MockPrBuilder {
-	builder := &MockPrBuilder{pluginName: t.pluginName}
+func (l *MockPrBuilderLoader) LoadedFrom(jsonPath string) *MockPrBuilder {
+	return l.load(LoadedFrom(jsonPath))
+}
+
+func (l *MockPrBuilderLoader) load(jsonContent string) *MockPrBuilder {
+	builder := &MockPrBuilder{pluginName: l.pluginName}
 	if err := json.Unmarshal([]byte(jsonContent), &builder.pullRequest); err != nil {
 		builder.errors = []error{err}
 	}
@@ -78,6 +63,34 @@ func (t MockPluginTemplate) MockPr(jsonContent string) *MockPrBuilder {
 		},
 	}
 	return builder
+}
+
+// LoadedFromDefaultJSON loads json from a location test_fixtures/github_calls/prs/pr_details.json
+func (l *MockPrBuilderLoader) LoadedFromDefaultJSON() *MockPrBuilder {
+	return l.LoadedFrom("test_fixtures/github_calls/prs/pr_details.json")
+}
+
+// LoadedFromDefaultStruct loads a marshaled instance of default pull request
+func (l *MockPrBuilderLoader) LoadedFromDefaultStruct() *MockPrBuilder {
+	pr, _ := json.Marshal(&gogh.PullRequest{
+		Number: utils.Int(1),
+		User:   createGhUser("bartoszmajsak-test"),
+		Base: &gogh.PullRequestBranch{
+			Repo: &gogh.Repository{
+				Owner: createGhUser("bartoszmajsak"),
+				Name:  utils.String("wfswarm-booster-pipeline-test"),
+			},
+		},
+		Head: &gogh.PullRequestBranch{
+			SHA: utils.String("df8e5cd15f05e1d975e17df322b9babedccf0a1a"),
+		},
+	})
+
+	return l.load(string(pr))
+}
+
+type MockPrBuilderLoader struct {
+	pluginName string
 }
 
 // WithTitle sets the given title to the mocked pull request

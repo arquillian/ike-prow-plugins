@@ -41,7 +41,7 @@ var _ = Describe("TestKeeper Metrics", func() {
 		expectedCnt := []uint64{0, 1, 1, 2, 2, 2, 2}
 		approvedBy := fmt.Sprintf(testkeeper.ApprovedByMessage, "admin")
 
-		mockPrBuilder := mocker.MockPr(LoadedFromDefaultJSON()).
+		mockPrBuilder := mocker.MockPr().LoadedFromDefaultJSON().
 			WithSize(2).
 			WithoutConfigFiles().
 			WithUsers(Admin("admin")).
@@ -78,7 +78,7 @@ var _ = Describe("TestKeeper Metrics", func() {
 
 	It("should report pull requests with tests", func() {
 		//given
-		prMock := mocker.MockPr(LoadedFromDefaultJSON()).
+		prMock := mocker.MockPr().LoadedFromDefaultJSON().
 			WithoutConfigFiles().
 			WithoutComments().
 			WithFiles(LoadedFrom("test_fixtures/github_calls/prs/with_tests/changes.json")).
@@ -97,7 +97,7 @@ var _ = Describe("TestKeeper Metrics", func() {
 
 	It("should report pull requests without tests", func() {
 		//given
-		prMock := mocker.MockPr(LoadedFromDefaultJSON()).
+		prMock := mocker.MockPr().LoadedFromDefaultJSON().
 			WithoutConfigFiles().
 			WithoutMessageFiles("test-keeper_without_tests_message.md").
 			WithoutComments().

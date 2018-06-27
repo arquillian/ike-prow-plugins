@@ -34,7 +34,7 @@ var _ = Describe("Test Keeper Plugin features", func() {
 
 		It("should approve opened pull request and update status message when tests included", func() {
 			// given
-			prMock := mocker.MockPr(LoadedFromDefaultJSON()).
+			prMock := mocker.MockPr().LoadedFromDefaultJSON().
 				WithFiles(LoadedFrom("test_fixtures/github_calls/prs/with_tests/changes.json")).
 				WithComments(LoadedFrom("test_fixtures/github_calls/prs/comments_with_no_test_status_msg.json")).
 				WithoutConfigFiles().
@@ -53,7 +53,7 @@ var _ = Describe("Test Keeper Plugin features", func() {
 
 		It("should approve opened pull request when tests included based on configured pattern and defaults (implicitly combined)", func() {
 			// given
-			prMock := mocker.MockPr(LoadedFromDefaultJSON()).
+			prMock := mocker.MockPr().LoadedFromDefaultJSON().
 				WithFiles(LoadedFrom("test_fixtures/github_calls/prs/with_tests/changes_go_files.json")).
 				WithoutComments().
 				WithConfigFile(
@@ -72,7 +72,7 @@ var _ = Describe("Test Keeper Plugin features", func() {
 
 		It("should approve new pull request without tests when it comes with configuration excluding all files from test presence check (implicitly combined)", func() {
 			// given
-			prMock := mocker.MockPr(LoadedFromDefaultJSON()).
+			prMock := mocker.MockPr().LoadedFromDefaultJSON().
 				WithFiles(LoadedFrom("test_fixtures/github_calls/prs/without_tests/changes-with-test-keeper-config-excluding-other-file-from-PR.json")).
 				WithConfigFile(
 					ConfigYml(LoadedFrom("test_fixtures/github_calls/prs/without_tests/test-keeper-ignore-randomfile.yml"))).
@@ -91,7 +91,7 @@ var _ = Describe("Test Keeper Plugin features", func() {
 
 		It("should reject opened pull request when no tests are matching defined pattern with no defaults implicitly combined", func() {
 			// given
-			prMock := mocker.MockPr(LoadedFromDefaultJSON()).
+			prMock := mocker.MockPr().LoadedFromDefaultJSON().
 				WithFiles(LoadedFrom("test_fixtures/github_calls/prs/with_tests/changes_go_files.json")).
 				WithoutRawFiles(ghservice.ConfigHome+"test-keeper_hint.md").
 				WithConfigFile(
@@ -112,7 +112,7 @@ var _ = Describe("Test Keeper Plugin features", func() {
 
 		It("should block newly created pull request when no tests are included", func() {
 			// given
-			prMock := mocker.MockPr(LoadedFromDefaultJSON()).
+			prMock := mocker.MockPr().LoadedFromDefaultJSON().
 				WithFiles(LoadedFrom("test_fixtures/github_calls/prs/without_tests/changes.json")).
 				WithoutConfigFiles().
 				WithoutMessageFiles("test-keeper_without_tests_message.md").
@@ -131,7 +131,7 @@ var _ = Describe("Test Keeper Plugin features", func() {
 
 		It("should not block newly created pull request when documentation and build files are the only changes", func() {
 			// given
-			prMock := mocker.MockPr(LoadedFromDefaultJSON()).
+			prMock := mocker.MockPr().LoadedFromDefaultJSON().
 				WithFiles(LoadedFrom("test_fixtures/github_calls/prs/without_tests/build_and_docs_only_changes.json")).
 				WithoutConfigFiles().
 				WithoutComments().
@@ -148,7 +148,7 @@ var _ = Describe("Test Keeper Plugin features", func() {
 
 		It("should block newly created pull request when deletions in the tests are the only changes", func() {
 			// given
-			prMock := mocker.MockPr(LoadedFromDefaultJSON()).
+			prMock := mocker.MockPr().LoadedFromDefaultJSON().
 				WithFiles(LoadedFrom("test_fixtures/github_calls/prs/without_tests/deletions_only_changes_in_tests.json")).
 				WithoutComments().
 				WithoutConfigFiles().
@@ -167,7 +167,7 @@ var _ = Describe("Test Keeper Plugin features", func() {
 
 		It("should block newly created pull request when there are changes in the business logic but only deletions in the tests", func() {
 			// given
-			prMock := mocker.MockPr(LoadedFromDefaultJSON()).
+			prMock := mocker.MockPr().LoadedFromDefaultJSON().
 				WithFiles(LoadedFrom("test_fixtures/github_calls/prs/without_tests/prod_code_changes_with_deletion_only_in_tests.json")).
 				WithoutComments().
 				WithoutConfigFiles().
@@ -187,7 +187,7 @@ var _ = Describe("Test Keeper Plugin features", func() {
 		It("should send ok status when PR contains no test but a comment with bypass command is present", func() {
 			approvedBy := fmt.Sprintf(testkeeper.ApprovedByMessage, "bartoszmajsak")
 
-			prMock := mocker.MockPr(LoadedFromDefaultJSON()).
+			prMock := mocker.MockPr().LoadedFromDefaultJSON().
 				WithFiles(LoadedFrom("test_fixtures/github_calls/prs/without_tests/changes.json")).
 				WithUsers(Admin("bartoszmajsak")).
 				WithComments(`[{"user":{"login":"bartoszmajsak"}, "body":"` + testkeeper.BypassCheckComment + `"}]`).
@@ -206,7 +206,7 @@ var _ = Describe("Test Keeper Plugin features", func() {
 
 		It("should block pull request without tests and with comments containing bypass message added by user with insufficient permissions", func() {
 			// given
-			prMock := mocker.MockPr(LoadedFromDefaultJSON()).
+			prMock := mocker.MockPr().LoadedFromDefaultJSON().
 				WithFiles(LoadedFrom("test_fixtures/github_calls/prs/without_tests/changes.json")).
 				WithUsers(ExternalUser("bartoszmajsak-test")).
 				WithComments(LoadedFrom("test_fixtures/github_calls/prs/comments_with_no_test_status_msg.json")).
@@ -237,7 +237,7 @@ var _ = Describe("Test Keeper Plugin features", func() {
 		It("should skip test existence check when "+testkeeper.BypassCheckComment+" command is used by admin user", func() {
 			// given
 			approvedBy := fmt.Sprintf(testkeeper.ApprovedByMessage, "bartoszmajsak")
-			prMock := mocker.MockPr(LoadedFromDefaultJSON()).
+			prMock := mocker.MockPr().LoadedFromDefaultJSON().
 				WithUsers(Admin("bartoszmajsak")).
 				WithoutReviews().
 				WithoutConfigFiles().
@@ -256,7 +256,7 @@ var _ = Describe("Test Keeper Plugin features", func() {
 
 		It("should ignore "+testkeeper.BypassCheckComment+" when used by non-admin user", func() {
 			// given
-			prMock := mocker.MockPr(LoadedFromDefaultJSON()).
+			prMock := mocker.MockPr().LoadedFromDefaultJSON().
 				WithUsers(ExternalUser("bartoszmajsak-test")).
 				WithoutReviews().
 				WithoutConfigFiles().
@@ -287,7 +287,7 @@ var _ = Describe("Test Keeper Plugin features", func() {
 
 		It("should block newly created pull request without tests when "+command.RunCommentPrefix+" all command is used by admin user", func() {
 			// given
-			prMock := mocker.MockPr(LoadedFromDefaultJSON()).
+			prMock := mocker.MockPr().LoadedFromDefaultJSON().
 				WithFiles(LoadedFrom("test_fixtures/github_calls/prs/without_tests/changes.json")).
 				WithoutComments().
 				WithUsers(Admin("bartoszmajsak")).
@@ -309,7 +309,7 @@ var _ = Describe("Test Keeper Plugin features", func() {
 
 		It("should approve newly created pull request with tests when "+command.RunCommentPrefix+" "+testkeeper.ProwPluginName+" command is triggered by pr reviewer", func() {
 			// given
-			prMock := mocker.MockPr(LoadedFromDefaultJSON()).
+			prMock := mocker.MockPr().LoadedFromDefaultJSON().
 				WithFiles(LoadedFrom("test_fixtures/github_calls/prs/with_tests/changes.json")).
 				WithoutComments().
 				WithUsers(ExternalUser("bartoszmajsak-test"), RequestedReviewer("bartoszmajsak-test")).
@@ -330,7 +330,7 @@ var _ = Describe("Test Keeper Plugin features", func() {
 
 		It("should do nothing for newly created pull request with tests when "+command.RunCommentPrefix+" work-in-progress command is triggered by pr reviewer", func() {
 			// given
-			prMock := mocker.MockPr(LoadedFromDefaultJSON()).
+			prMock := mocker.MockPr().LoadedFromDefaultJSON().
 				WithFiles(LoadedFrom("test_fixtures/github_calls/prs/with_tests/changes.json")).
 				WithoutComments().
 				WithUsers(ExternalUser("bartoszmajsak-test"), RequestedReviewer("bartoszmajsak-test")).

@@ -21,7 +21,7 @@ var _ = Describe("Permission service with permission checks features", func() {
 
 		It("should not approve the user when the permission is read", func() {
 			// given
-			mock := MockPr(LoadedFromDefaultStruct()).
+			mock := MockPr().LoadedFromDefaultStruct().
 				WithUsers(ExternalUser("user")).
 				Create()
 
@@ -38,7 +38,7 @@ var _ = Describe("Permission service with permission checks features", func() {
 
 		It("should approve the user when the permission is admin", func() {
 			// given
-			mock := MockPr(LoadedFromDefaultStruct()).
+			mock := MockPr().LoadedFromDefaultStruct().
 				WithUsers(Admin("user")).
 				Create()
 
@@ -55,7 +55,7 @@ var _ = Describe("Permission service with permission checks features", func() {
 
 		It("should not approve the user that is not the PR creator", func() {
 			// given
-			mock := MockPr(LoadedFromDefaultStruct()).
+			mock := MockPr().LoadedFromDefaultStruct().
 				WithUsers(PrCreator("creator")).
 				Create()
 
@@ -72,7 +72,7 @@ var _ = Describe("Permission service with permission checks features", func() {
 
 		It("should approve the user that is the PR creator", func() {
 			// given
-			mock := MockPr(LoadedFromDefaultStruct()).
+			mock := MockPr().LoadedFromDefaultStruct().
 				WithUsers(PrCreator("user")).
 				Create()
 
@@ -89,7 +89,7 @@ var _ = Describe("Permission service with permission checks features", func() {
 
 		It("should not approve the user that is not the requested PR reviewer", func() {
 			// given
-			mock := MockPr(LoadedFromDefaultStruct()).
+			mock := MockPr().LoadedFromDefaultStruct().
 				WithUsers(RequestedReviewer("reviewer1"), RequestedReviewer("reviewer2")).
 				Create()
 
@@ -106,7 +106,7 @@ var _ = Describe("Permission service with permission checks features", func() {
 
 		It("should approve the user that is one of the requested PR reviewers", func() {
 			// given
-			mock := MockPr(LoadedFromDefaultStruct()).
+			mock := MockPr().LoadedFromDefaultStruct().
 				WithUsers(RequestedReviewer("reviewer1"), RequestedReviewer("user")).
 				Create()
 
@@ -123,7 +123,7 @@ var _ = Describe("Permission service with permission checks features", func() {
 
 		It("should not approve the user that is not the PR approver", func() {
 			// given
-			mock := MockPr(LoadedFromDefaultStruct()).
+			mock := MockPr().LoadedFromDefaultStruct().
 				WithReviews(`[{"user": {"login": "user"}, "state": "CHANGES_REQUESTED"},` +
 					`{"user": {"login": "user"}, "state": "COMMENTED"}]`).
 				Create()
@@ -141,7 +141,7 @@ var _ = Describe("Permission service with permission checks features", func() {
 
 		It("should approve the user that is a PR approver", func() {
 			// given
-			mock := MockPr(LoadedFromDefaultStruct()).
+			mock := MockPr().LoadedFromDefaultStruct().
 				WithReviews(`[{"user": {"login": "user"}, "state": "APPROVED"}]`).
 				Create()
 

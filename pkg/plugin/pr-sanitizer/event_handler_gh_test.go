@@ -58,7 +58,7 @@ var _ = Describe("PR Sanitizer Plugin features", func() {
 
 		It("should mark status as success if PR title prefixed with semantic commit message type", func() {
 			// given
-			prMock := mocker.MockPr(LoadedFromDefaultJSON()).
+			prMock := mocker.MockPr().LoadedFromDefaultJSON().
 				WithTitle("feat: introduces dummy response").
 				WithoutConfigFiles().
 				Expecting(Status(To(haveSuccessState))).
@@ -73,7 +73,7 @@ var _ = Describe("PR Sanitizer Plugin features", func() {
 
 		It("should mark status as failed (thus block PR merge) when not prefixed with semantic commit message type", func() {
 			// given
-			prMock := mocker.MockPr(LoadedFromDefaultJSON()).
+			prMock := mocker.MockPr().LoadedFromDefaultJSON().
 				WithTitle("introduces dummy response").
 				WithoutConfigFiles().
 				WithoutConfigFilesForPlugin(wip.ProwPluginName).
@@ -89,7 +89,7 @@ var _ = Describe("PR Sanitizer Plugin features", func() {
 
 		It("should mark status as success when title starts with configured semantic commit message type", func() {
 			// given
-			prMock := mocker.MockPr(LoadedFromDefaultJSON()).
+			prMock := mocker.MockPr().LoadedFromDefaultJSON().
 				WithTitle(":star: configures plugin").
 				WithConfigFile(ConfigYml(LoadedFrom("test_fixtures/github_calls/pr-sanitizer.yml"))).
 				Expecting(Status(To(haveSuccessState))).
@@ -104,7 +104,7 @@ var _ = Describe("PR Sanitizer Plugin features", func() {
 
 		It("should mark status as success (thus unblock PR merge) when title updated to contain semantic commit message type", func() {
 			// given
-			prMock := mocker.MockPr(LoadedFromDefaultJSON()).
+			prMock := mocker.MockPr().LoadedFromDefaultJSON().
 				WithTitle("feat: introduces dummy response").
 				WithoutConfigFiles().
 				Expecting(Status(To(haveSuccessState))).
@@ -120,7 +120,7 @@ var _ = Describe("PR Sanitizer Plugin features", func() {
 
 		It("should mark status as success if PR title prefixed with wip and conforms with semantic commit message type", func() {
 			// given
-			prMock := mocker.MockPr(LoadedFromDefaultJSON()).
+			prMock := mocker.MockPr().LoadedFromDefaultJSON().
 				WithTitle("WIP feat: introduces dummy response").
 				WithoutConfigFiles().
 				WithoutConfigFilesForPlugin(wip.ProwPluginName).
@@ -136,7 +136,7 @@ var _ = Describe("PR Sanitizer Plugin features", func() {
 
 		It("should mark status as failed (thus block PR merge) when prefixed with wip and does not conform with semantic commit message type", func() {
 			// given
-			prMock := mocker.MockPr(LoadedFromDefaultJSON()).
+			prMock := mocker.MockPr().LoadedFromDefaultJSON().
 				WithTitle("WIP introduces dummy response").
 				WithoutConfigFiles().
 				WithoutConfigFilesForPlugin(wip.ProwPluginName).
@@ -162,7 +162,7 @@ var _ = Describe("PR Sanitizer Plugin features", func() {
 
 		It("should mark status as success if PR title prefixed with semantic commit message type when "+command.RunCommentPrefix+" "+prsanitizer.ProwPluginName+" command is triggered by pr creator", func() {
 			// given
-			prMock := mocker.MockPr(LoadedFromDefaultJSON()).
+			prMock := mocker.MockPr().LoadedFromDefaultJSON().
 				WithTitle("feat: PR from external user without tests should be rejected").
 				WithoutReviews().
 				WithoutConfigFiles().
@@ -178,7 +178,7 @@ var _ = Describe("PR Sanitizer Plugin features", func() {
 
 		It("should mark status as failed (thus block PR merge) when not prefixed with semantic commit message type when "+command.RunCommentPrefix+" all command is used by admin", func() {
 			// given
-			prMock := mocker.MockPr(LoadedFromDefaultJSON()).
+			prMock := mocker.MockPr().LoadedFromDefaultJSON().
 				WithTitle("PR from external user without tests should be rejected").
 				WithoutConfigFiles().
 				WithoutConfigFilesForPlugin(wip.ProwPluginName).

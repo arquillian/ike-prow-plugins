@@ -165,7 +165,7 @@ var _ = Describe("Command executor features", func() {
 
 			It("should not execute command when command name is not matching", func() {
 				// given
-				mock := MockPr(LoadedFromDefaultStruct()).
+				mock := MockPr().LoadedFromDefaultStruct().
 					WithUsers(ExternalUser("sender")).
 					Expecting(Comment(To(
 						HaveBodyThatContains("Hey @sender! It seems you tried to trigger `/command` command"),

@@ -35,7 +35,7 @@ var _ = Describe("Work In Progress Plugin features", func() {
 
 		It("should mark opened PR as work-in-progress when labeled with WIP", func() {
 			// given
-			prMock := mocker.MockPr(LoadedFromDefaultJSON()).
+			prMock := mocker.MockPr().LoadedFromDefaultJSON().
 				WithTitle("adds a new endpoint.").
 				WithoutConfigFiles().
 				WithLabels("work-in-progress").
@@ -51,7 +51,7 @@ var _ = Describe("Work In Progress Plugin features", func() {
 
 		It("should mark opened PR as ready for review if WIP label removed", func() {
 			// given
-			prMock := mocker.MockPr(LoadedFromDefaultJSON()).
+			prMock := mocker.MockPr().LoadedFromDefaultJSON().
 				WithTitle("[WIP]: feat: adds a new endpoint.").
 				WithoutConfigFiles().
 				WithoutLabels().
@@ -78,7 +78,7 @@ var _ = Describe("Work In Progress Plugin features", func() {
 
 		It("should mark opened PR as ready for review if not prefixed with WIP", func() {
 			// given
-			prMock := mocker.MockPr(LoadedFromDefaultJSON()).
+			prMock := mocker.MockPr().LoadedFromDefaultJSON().
 				WithTitle("feat: introduces dummy response").
 				WithoutConfigFiles().
 				WithoutLabels().
@@ -95,7 +95,7 @@ var _ = Describe("Work In Progress Plugin features", func() {
 
 		It("should mark opened PR as work-in-progress when prefixed with WIP", func() {
 			// given
-			prMock := mocker.MockPr(LoadedFromDefaultJSON()).
+			prMock := mocker.MockPr().LoadedFromDefaultJSON().
 				WithTitle("WIP feat: introduces dummy response").
 				WithoutConfigFiles().
 				WithoutLabels().
@@ -113,7 +113,7 @@ var _ = Describe("Work In Progress Plugin features", func() {
 
 		It("should mark opened PR as work-in-progress when title starts with configured prefix", func() {
 			// given
-			prMock := mocker.MockPr(LoadedFromDefaultJSON()).
+			prMock := mocker.MockPr().LoadedFromDefaultJSON().
 				WithTitle("WORK IN PROGRESS: configures plugin").
 				WithConfigFile(ConfigYml(LoadedFrom("test_fixtures/github_calls/work-in-progress.yml"))).
 				WithoutLabels().
@@ -131,7 +131,7 @@ var _ = Describe("Work In Progress Plugin features", func() {
 
 		It("should mark status as failed (thus block PR merge) when title updated to contain WIP", func() {
 			// given
-			prMock := mocker.MockPr(LoadedFromDefaultJSON()).
+			prMock := mocker.MockPr().LoadedFromDefaultJSON().
 				WithTitle("WIP feat: introduces dummy response").
 				WithoutConfigFiles().
 				WithoutLabels().
@@ -150,7 +150,7 @@ var _ = Describe("Work In Progress Plugin features", func() {
 
 		It("should mark status as success (thus unblock PR merge) when title has WIP removed", func() {
 			// given
-			prMock := mocker.MockPr(LoadedFromDefaultJSON()).
+			prMock := mocker.MockPr().LoadedFromDefaultJSON().
 				WithTitle("feat: introduces dummy response").
 				WithoutConfigFiles().
 				WithLabels("work-in-progress").
@@ -178,7 +178,7 @@ var _ = Describe("Work In Progress Plugin features", func() {
 
 		It("should mark opened PR as ready for review if not prefixed with WIP when "+command.RunCommentPrefix+" "+wip.ProwPluginName+" command is triggered by pr creator", func() {
 			// given
-			prMock := mocker.MockPr(LoadedFromDefaultJSON()).
+			prMock := mocker.MockPr().LoadedFromDefaultJSON().
 				WithTitle("PR from external user without tests should be rejected").
 				WithoutConfigFiles().
 				WithoutReviews().
@@ -199,7 +199,7 @@ var _ = Describe("Work In Progress Plugin features", func() {
 
 		It("should mark opened PR as work-in-progress if prefixed with WIP when "+command.RunCommentPrefix+" all command is used by admin", func() {
 			// given
-			prMock := mocker.MockPr(LoadedFromDefaultJSON()).
+			prMock := mocker.MockPr().LoadedFromDefaultJSON().
 				WithTitle("WIP PR from external user without tests should be rejected").
 				WithoutConfigFiles().
 				WithoutReviews().
@@ -221,7 +221,7 @@ var _ = Describe("Work In Progress Plugin features", func() {
 
 		It("should approve newly created pull request with tests when "+command.RunCommentPrefix+" "+testkeeper.ProwPluginName+" command is triggered by pr creator", func() {
 			// given
-			prMock := mocker.MockPr(LoadedFromDefaultJSON()).
+			prMock := mocker.MockPr().LoadedFromDefaultJSON().
 				WithoutConfigFiles().
 				WithoutReviews().
 				WithUsers(ExternalUser("bartoszmajsak-test")).

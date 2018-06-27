@@ -5,8 +5,8 @@ import (
 	"strings"
 
 	"github.com/arquillian/ike-prow-plugins/pkg/plugin"
-	"gopkg.in/h2non/gock.v1"
 	"github.com/arquillian/ike-prow-plugins/pkg/status/message"
+	"gopkg.in/h2non/gock.v1"
 )
 
 var (
@@ -32,7 +32,7 @@ func ContainingStatusMessage(statusMessage string) builderMatcher {
 	return func(builder *MockPrBuilder) SoftMatcher {
 		return SoftlySatisfyAll(
 			HaveBodyThatContains(fmt.Sprintf(message.PluginTitleTemplate, builder.pluginName)),
-			HaveBodyThatContains("@" + *builder.pullRequest.User.Login),
+			HaveBodyThatContains("@"+*builder.pullRequest.User.Login),
 			HaveBodyThatContains(statusMessage))
 	}
 }

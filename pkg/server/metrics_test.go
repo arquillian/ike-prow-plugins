@@ -3,6 +3,8 @@ package server_test
 import (
 	"net/http/httptest"
 
+	"encoding/json"
+
 	"github.com/arquillian/ike-prow-plugins/pkg/github"
 	. "github.com/arquillian/ike-prow-plugins/pkg/internal/test"
 	"github.com/arquillian/ike-prow-plugins/pkg/log"
@@ -15,7 +17,6 @@ import (
 	"github.com/prometheus/client_golang/prometheus"
 	"gopkg.in/h2non/gock.v1"
 	"k8s.io/test-infra/prow/phony"
-	"encoding/json"
 )
 
 type DummyGHEventHandler struct {
@@ -64,7 +65,8 @@ var _ = Describe("Service Metrics", func() {
 		// given
 		setRateLimitMocks()
 		fullName := "bartoszmajsak/wfswarm-booster-pipeline-test"
-		event := MockPr(LoadedFrom("../plugin/work-in-progress/test_fixtures/github_calls/prs/pr_details.json")).
+		event := MockPr().
+			LoadedFrom("../plugin/work-in-progress/test_fixtures/github_calls/prs/pr_details.json").
 			Create().
 			CreatePullRequestEvent("created")
 
@@ -82,7 +84,8 @@ var _ = Describe("Service Metrics", func() {
 	It("should count handled events", func() {
 		// given
 		setRateLimitMocks()
-		event := MockPr(LoadedFrom("../plugin/work-in-progress/test_fixtures/github_calls/prs/pr_details.json")).
+		event := MockPr().
+			LoadedFrom("../plugin/work-in-progress/test_fixtures/github_calls/prs/pr_details.json").
 			Create().
 			CreateCommentEvent(SentByRepoOwner, testkeeper.BypassCheckComment, "created")
 
@@ -100,7 +103,8 @@ var _ = Describe("Service Metrics", func() {
 	It("should get Rate limit for GitHub API calls", func() {
 		// given
 		setRateLimitMocks()
-		event := MockPr(LoadedFrom("../plugin/work-in-progress/test_fixtures/github_calls/prs/pr_details.json")).
+		event := MockPr().
+			LoadedFrom("../plugin/work-in-progress/test_fixtures/github_calls/prs/pr_details.json").
 			Create().
 			CreateCommentEvent(SentByRepoOwner, testkeeper.BypassCheckComment, "created")
 
