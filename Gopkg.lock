@@ -329,7 +329,7 @@
     "unix",
     "windows"
   ]
-  revision = "63fc586f45fe72d95d5240a5d5eb95e6503907d3"
+  revision = "c4afb3effaa53fd9a06ca61262dc7ce8df4c081b"
 
 [[projects]]
   name = "golang.org/x/text"
@@ -366,15 +366,14 @@
   version = "v0.3.0"
 
 [[projects]]
-  branch = "master"
   name = "golang.org/x/tools"
   packages = [
     "go/ast/astutil",
     "go/gcexportdata",
-    "go/internal/gcimporter",
+    "go/gcimporter15",
     "go/types/typeutil"
   ]
-  revision = "3c1bb8b785f2aa4d86f83a0cd87fc1df046c60de"
+  revision = "77106db15f689a60e7d4e085d967ac557b918fb2"
 
 [[projects]]
   name = "google.golang.org/appengine"
@@ -513,6 +512,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "c95fc3b9913cc5a6cc3e1b4031df111f63d52000774e94c9c1d96ae59718a8cf"
+  inputs-digest = "9e562a00d156dd471189e7fa7f50c64547d980e58215871d59701a1f282a925d"
   solver-name = "gps-cdcl"
   solver-version = 1

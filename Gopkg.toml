@@ -30,6 +30,18 @@ required = [
     "k8s.io/test-infra/prow/cmd/hook"
     ]
 
+[[override]]
+  name = "github.com/alecthomas/gometalinter"
+  revision = "46cc1ea3778b247666c2949669a3333c532fa9c6"
+
+[[override]]
+  name = "github.com/jteeuwen/go-bindata"
+  revision = "6025e8de665b31fa74ab1a66f2cddd8c0abf887e"
+
+[[override]]
+  name = "golang.org/x/tools"
+  revision = "77106db15f689a60e7d4e085d967ac557b918fb2"
+
 # We need explicit UUID version due to conflicts with k8s code
 [[constraint]]
   name = "github.com/satori/go.uuid"
