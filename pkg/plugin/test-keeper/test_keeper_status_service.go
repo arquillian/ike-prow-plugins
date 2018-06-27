@@ -77,7 +77,7 @@ func (ts *testStatusService) failNoTests() error {
 const (
 	paragraph = "\n\n"
 
-	withoutTestsMsg = "It appears that no tests have been added or updated in this PR." +
+	WithoutTestsMsg = "It appears that no tests have been added or updated in this PR." +
 		paragraph +
 		"Automated tests give us confidence in shipping reliable software. Please add some as part of this change." +
 		paragraph +
@@ -86,9 +86,9 @@ const (
 
 	documentationSection = "#_test_keeper_plugin"
 
-	withTestsMsg = "It seems that this PR already contains some added or changed tests. Good job!"
+	WithTestsMsg = "It seems that this PR already contains some added or changed tests. Good job!"
 
-	onlySkippedMsg = "It seems that this PR doesn't need any test as all changed files in the changeset match " +
+	OnlySkippedMsg = "It seems that this PR doesn't need any test as all changed files in the changeset match " +
 		"patterns for which the validation should be skipped."
 )
 
@@ -113,17 +113,17 @@ func (gh *GitHubTestEventsHandler) newTestStatusServiceWithMessages(log log.Logg
 
 // CreateWithoutTestsMessage creates a status message for the test-keeper plugin. If the status message is set in config then it takes that one, the default otherwise.
 func (ts *testStatusServiceWithMessages) withoutTestsMessage() {
-	ts.logError(ts.statusMsgService.SadStatusMessage(withoutTestsMsg, "without_tests", true))
+	ts.logError(ts.statusMsgService.SadStatusMessage(WithoutTestsMsg, "without_tests", true))
 }
 
 // CreateWithTestsMessage creates a status message for the test-keeper plugin. If the status message is set in config then it takes that one, the default otherwise.
 func (ts *testStatusServiceWithMessages) withTestsMessage() {
-	ts.logError(ts.statusMsgService.HappyStatusMessage(withTestsMsg, "with_tests", false))
+	ts.logError(ts.statusMsgService.HappyStatusMessage(WithTestsMsg, "with_tests", false))
 }
 
 // CreateOnlySkippedMessage creates a status message for the test-keeper plugin. If the status message is set in config then it takes that one, the default otherwise.
 func (ts *testStatusServiceWithMessages) onlySkippedMessage() {
-	ts.logError(ts.statusMsgService.HappyStatusMessage(onlySkippedMsg, "only_skipped", false))
+	ts.logError(ts.statusMsgService.HappyStatusMessage(OnlySkippedMsg, "only_skipped", false))
 }
 
 func (ts *testStatusServiceWithMessages) logError(err error) {

@@ -104,7 +104,7 @@ var _ = Describe("TestKeeper Metrics", func() {
 			WithFiles(LoadedFrom("test_fixtures/github_calls/prs/without_tests/changes.json")).
 			Expecting(
 				Status(ToBe(github.StatusFailure, testkeeper.NoTestsMessage, testkeeper.NoTestsDetailsPageName)),
-				Comment(ToHaveBodyWithWholePluginsComment)).
+				Comment(ContainingStatusMessage(testkeeper.WithoutTestsMsg))).
 			Create()
 
 		// when

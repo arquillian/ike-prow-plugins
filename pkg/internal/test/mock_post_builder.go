@@ -5,32 +5,44 @@ import (
 	"strings"
 
 	"github.com/arquillian/ike-prow-plugins/pkg/plugin"
-	"github.com/arquillian/ike-prow-plugins/pkg/status/message"
 	"gopkg.in/h2non/gock.v1"
+	"github.com/arquillian/ike-prow-plugins/pkg/status/message"
 )
 
 var (
 	// ToBe as a wrapper for a status matcher
-	ToBe = func(status, description, detailsLink string) func(pluginName string) SoftMatcher {
-		return func(pluginName string) SoftMatcher {
-			docStatusRoot := fmt.Sprintf("%s/status/%s", plugin.DocumentationURL, pluginName)
+	ToBe = func(status, description, detailsLink string) builderMatcher {
+		return func(builder *MockPrBuilder) SoftMatcher {
+			docStatusRoot := fmt.Sprintf("%s/status/%s", plugin.DocumentationURL, builder.pluginName)
 
 			return SoftlySatisfyAll(
 				HaveState(status),
 				HaveDescription(description),
-				HaveContext(strings.Join([]string{"alien-ike", pluginName}, "/")),
+				HaveContext(strings.Join([]string{"alien-ike", builder.pluginName}, "/")),
 				HaveTargetURL(fmt.Sprintf("%s/%s/%s.html", docStatusRoot, strings.ToLower(status), detailsLink)),
 			)
 		}
 	}
-	// ToHaveBodyWithWholePluginsComment verifies that the comment should contain the fixed part of plugins hint comment
-	ToHaveBodyWithWholePluginsComment = func(pluginName string) SoftMatcher {
-		return SoftlySatisfyAll(
-			HaveBodyThatContains(fmt.Sprintf(message.PluginTitleTemplate, pluginName)),
-			HaveBodyThatContains("@bartoszmajsak"),
-		)
-	}
 )
+
+type builderMatcher func(builder *MockPrBuilder) SoftMatcher
+
+// ToHaveBodyWithWholePluginsComment verifies that the comment should contain the fixed part of plugins hint comment
+func ContainingStatusMessage(statusMessage string) builderMatcher {
+	return func(builder *MockPrBuilder) SoftMatcher {
+		return SoftlySatisfyAll(
+			HaveBodyThatContains(fmt.Sprintf(message.PluginTitleTemplate, builder.pluginName)),
+			HaveBodyThatContains("@" + *builder.pullRequest.User.Login),
+			HaveBodyThatContains(statusMessage))
+	}
+}
+
+// To softly satisfies all the given matchers
+func To(matchers ...SoftMatcher) builderMatcher {
+	return func(builder *MockPrBuilder) SoftMatcher {
+		return SoftlySatisfyAll(matchers...)
+	}
+}
 
 // Expecting creates mocks for the given matchers
 func (b *MockPrBuilder) Expecting(mockCreators ...MockCreator) *MockPrBuilder {
@@ -39,23 +51,16 @@ func (b *MockPrBuilder) Expecting(mockCreators ...MockCreator) *MockPrBuilder {
 }
 
 // Comment creates a gock matcher to check that there is a Post with a comment that complies with the given restrictions
-func Comment(matherForPlugin func(pluginName string) SoftMatcher) MockCreator {
+func Comment(matherForPlugin builderMatcher) MockCreator {
 	return func(builder *MockPrBuilder) {
-		basePostCommentMock(builder)(matherForPlugin(builder.pluginName))
+		basePostCommentMock(builder)(matherForPlugin(builder))
 	}
 }
 
-// CommentTo creates a gock matcher to check that there is a Post with a comment that complies with the given restrictions
-func CommentTo(matchers ...SoftMatcher) MockCreator {
-	return func(builder *MockPrBuilder) {
-		basePostCommentMock(builder)(SoftlySatisfyAll(matchers...))
-	}
-}
-
-func ChangedCommentTo(commendId int, matchers ...SoftMatcher) MockCreator {
+func ChangedComment(commendId int, matherForPlugin builderMatcher) MockCreator {
 	return func(builder *MockPrBuilder) {
 		path := fmt.Sprintf("%s/issues/comments/%d", builder.baseRepoPath(), commendId)
-		basePatchMock(path)(SoftlySatisfyAll(matchers...))
+		basePatchMock(path)(matherForPlugin(builder))
 	}
 }
 
@@ -97,9 +102,9 @@ func basePatchMock(path string) func(mather SoftMatcher) {
 }
 
 // Status creates a gock matcher to check that there is a Post with a status that complies with the given restrictions
-func Status(matherForPlugin func(pluginName string) SoftMatcher) MockCreator {
+func Status(matherForPlugin builderMatcher) MockCreator {
 	return func(builder *MockPrBuilder) {
-		basePostStatusMock(builder)(matherForPlugin(builder.pluginName))
+		basePostStatusMock(builder)(matherForPlugin(builder))
 	}
 }
 
@@ -126,7 +131,7 @@ func RemovedLabel(labelName string, response string) MockCreator {
 func AddedLabel(labelContent string) MockCreator {
 	return func(builder *MockPrBuilder) {
 		path := fmt.Sprintf("%s/issues/%d/labels", builder.baseRepoPath(), *builder.pullRequest.Number)
-		basePostMock(path)(To(HaveBodyThatContains(labelContent)))
+		basePostMock(path)(SoftlySatisfyAll(HaveBodyThatContains(labelContent)))
 	}
 }
 
@@ -134,6 +139,6 @@ func AddedLabel(labelContent string) MockCreator {
 func ChangedTitle(newTitleContent string) MockCreator {
 	return func(builder *MockPrBuilder) {
 		path := fmt.Sprintf("%s/pulls/%d", builder.baseRepoPath(), *builder.pullRequest.Number)
-		basePatchMock(path)(To(HaveTitle(newTitleContent)))
+		basePatchMock(path)(SoftlySatisfyAll(HaveTitle(newTitleContent)))
 	}
 }

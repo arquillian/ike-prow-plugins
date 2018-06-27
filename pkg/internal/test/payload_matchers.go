@@ -14,11 +14,6 @@ func ExpectPayload(matchers ...SoftMatcher) gock.Matcher {
 	return createPayloadMatcher(matchers)
 }
 
-// To softly satisfies all the given matchers
-func To(matchers ...SoftMatcher) SoftMatcher {
-	return SoftlySatisfyAll(matchers...)
-}
-
 func createPayloadMatcher(matchers []SoftMatcher) gock.Matcher {
 	matcher := gock.NewBasicMatcher()
 	matcher.Add(func(req *http.Request, _ *gock.Request) (bool, error) {

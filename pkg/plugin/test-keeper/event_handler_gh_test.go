@@ -9,7 +9,6 @@ import (
 	. "github.com/arquillian/ike-prow-plugins/pkg/internal/test"
 	"github.com/arquillian/ike-prow-plugins/pkg/log"
 	"github.com/arquillian/ike-prow-plugins/pkg/plugin/test-keeper"
-	"github.com/arquillian/ike-prow-plugins/pkg/status/message"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	"gopkg.in/h2non/gock.v1"
@@ -42,9 +41,7 @@ var _ = Describe("Test Keeper Plugin features", func() {
 				WithoutMessageFiles("test-keeper_with_tests_message.md").
 				Expecting(
 					Status(ToBe(github.StatusSuccess, testkeeper.TestsExistMessage, testkeeper.TestsExistDetailsPageName)),
-					ChangedCommentTo(397622617, HaveBodyThatContains(fmt.Sprintf(message.PluginTitleTemplate, testkeeper.ProwPluginName)),
-						HaveBodyThatContains("@bartoszmajsak"),
-						HaveBodyThatContains("It seems that this PR already contains some added or changed tests. Good job!"))).
+					ChangedComment(397622617, ContainingStatusMessage(testkeeper.WithTestsMsg))).
 				Create()
 
 			// when
@@ -82,7 +79,7 @@ var _ = Describe("Test Keeper Plugin features", func() {
 				WithoutComments().
 				Expecting(
 					Status(ToBe(github.StatusSuccess, testkeeper.OkOnlySkippedFilesMessage, testkeeper.OkOnlySkippedFilesDetailsPageName)),
-					Comment(ToHaveBodyWithWholePluginsComment)).
+					Comment(ContainingStatusMessage(testkeeper.WithoutTestsMsg))).
 				Create()
 
 			// when
@@ -103,7 +100,7 @@ var _ = Describe("Test Keeper Plugin features", func() {
 				WithoutComments().
 				Expecting(
 					Status(ToBe(github.StatusFailure, testkeeper.NoTestsMessage, testkeeper.NoTestsDetailsPageName)),
-					Comment(ToHaveBodyWithWholePluginsComment)).
+					Comment(ContainingStatusMessage(testkeeper.WithoutTestsMsg))).
 				Create()
 
 			// when
@@ -122,7 +119,7 @@ var _ = Describe("Test Keeper Plugin features", func() {
 				WithoutComments().
 				Expecting(
 					Status(ToBe(github.StatusFailure, testkeeper.NoTestsMessage, testkeeper.NoTestsDetailsPageName)),
-					Comment(ToHaveBodyWithWholePluginsComment)).
+					Comment(ContainingStatusMessage(testkeeper.WithoutTestsMsg))).
 				Create()
 
 			// when
@@ -157,7 +154,7 @@ var _ = Describe("Test Keeper Plugin features", func() {
 				WithoutConfigFiles().
 				WithoutMessageFiles("test-keeper_without_tests_message.md").
 				Expecting(
-					Comment(ToHaveBodyWithWholePluginsComment),
+					Comment(ContainingStatusMessage(testkeeper.WithoutTestsMsg)),
 					Status(ToBe(github.StatusFailure, testkeeper.NoTestsMessage, testkeeper.NoTestsDetailsPageName))).
 				Create()
 
@@ -176,7 +173,7 @@ var _ = Describe("Test Keeper Plugin features", func() {
 				WithoutConfigFiles().
 				WithoutMessageFiles("test-keeper_without_tests_message.md").
 				Expecting(
-					Comment(ToHaveBodyWithWholePluginsComment),
+					Comment(ContainingStatusMessage(testkeeper.WithoutTestsMsg)),
 					Status(ToBe(github.StatusFailure, testkeeper.NoTestsMessage, testkeeper.NoTestsDetailsPageName))).
 				Create()
 
@@ -264,9 +261,9 @@ var _ = Describe("Test Keeper Plugin features", func() {
 				WithoutReviews().
 				WithoutConfigFiles().
 				Expecting(
-					CommentTo(
+					Comment(To(
 						HaveBodyThatContains("Hey @bartoszmajsak-test! It seems you tried to trigger `/ok-without-tests` command"),
-						HaveBodyThatContains("You have to be admin or requested reviewer or pull request approver, but not pull request creator")),
+						HaveBodyThatContains("You have to be admin or requested reviewer or pull request approver, but not pull request creator"))),
 					Status(ToBe(github.StatusFailure, testkeeper.NoTestsMessage, testkeeper.NoTestsDetailsPageName))).
 				Create()
 
@@ -297,7 +294,7 @@ var _ = Describe("Test Keeper Plugin features", func() {
 				WithoutReviews().
 				WithoutConfigFiles().
 				WithoutMessageFiles("test-keeper_without_tests_message.md").
-				Expecting(Comment(ToHaveBodyWithWholePluginsComment),
+				Expecting(Comment(ContainingStatusMessage(testkeeper.WithoutTestsMsg)),
 					Status(ToBe(github.StatusFailure, testkeeper.NoTestsMessage, testkeeper.NoTestsDetailsPageName))).
 				Create()
 
@@ -318,7 +315,7 @@ var _ = Describe("Test Keeper Plugin features", func() {
 				WithUsers(ExternalUser("bartoszmajsak-test"), RequestedReviewer("bartoszmajsak-test")).
 				WithoutReviews().
 				WithoutConfigFiles().
-				Expecting(Comment(ToHaveBodyWithWholePluginsComment),
+				Expecting(Comment(ContainingStatusMessage(testkeeper.WithoutTestsMsg)),
 					Status(ToBe(github.StatusSuccess, testkeeper.TestsExistMessage, testkeeper.TestsExistDetailsPageName))).
 				Create()
 
