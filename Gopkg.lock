@@ -329,7 +329,7 @@
     "unix",
     "windows"
   ]
-  revision = "63fc586f45fe72d95d5240a5d5eb95e6503907d3"
+  revision = "c4afb3effaa53fd9a06ca61262dc7ce8df4c081b"
 
 [[projects]]
   name = "golang.org/x/text"
@@ -374,7 +374,7 @@
     "go/internal/gcimporter",
     "go/types/typeutil"
   ]
-  revision = "3c1bb8b785f2aa4d86f83a0cd87fc1df046c60de"
+  revision = "56e9b8e653c818f46a96eb4828aba7be54271a69"
 
 [[projects]]
   name = "google.golang.org/appengine"
@@ -446,7 +446,7 @@
     "pkg/watch",
     "third_party/forked/golang/reflect"
   ]
-  revision = "21efb2924c7cf1920f76af05b1fd6a325bf46dfc"
+  revision = "fb40df2b502912cbe3a93aa61c2b2487f39cb42f"
 
 [[projects]]
   branch = "master"
