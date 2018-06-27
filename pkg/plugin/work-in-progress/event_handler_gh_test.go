@@ -13,9 +13,7 @@ import (
 	"github.com/arquillian/ike-prow-plugins/pkg/plugin/test-keeper"
 )
 
-const (
-	botName = "alien-ike"
-)
+const botName = "alien-ike"
 
 var _ = Describe("Work In Progress Plugin features", func() {
 
@@ -26,6 +24,49 @@ var _ = Describe("Work In Progress Plugin features", func() {
 
 	toHaveSuccessState := ToBe(github.StatusSuccess, wip.ReadyForReviewMessage, wip.ReadyForReviewDetailsPageName)
 	toHaveFailureState := ToBe(github.StatusFailure, wip.InProgressMessage, wip.InProgressDetailsPageName)
+
+	Context("Pull Request label change trigger", func() {
+		BeforeEach(func() {
+			defer gock.OffAll()
+			handler = &wip.GitHubWIPPRHandler{Client: NewDefaultGitHubClient(), BotName: botName}
+		})
+
+		AfterEach(EnsureGockRequestsHaveBeenMatched)
+
+		It("should mark opened PR as work-in-progress when labeled with WIP", func() {
+			// given
+			prMock := mocker.MockPr(LoadedFromDefaultJSON()).
+				WithTitle("adds a new endpoint.").
+				WithoutConfigFiles().
+				WithLabels("work-in-progress").
+				Expecting(Status(toHaveFailureState)).
+				Create()
+
+			// when
+			err := handler.HandlePullRequestEvent(log, prMock.CreatePullRequestEvent("labeled"))
+
+			// then - implicit verification of /statuses call occurrence with proper payload
+			Ω(err).ShouldNot(HaveOccurred())
+		})
+
+		It("should mark opened PR as ready for review if WIP label removed", func() {
+			// given
+			prMock := mocker.MockPr(LoadedFromDefaultJSON()).
+				WithTitle("[WIP]: feat: adds a new endpoint.").
+				WithoutConfigFiles().
+				WithoutLabels().
+				Expecting(
+					Status(toHaveSuccessState),
+					ChangedTitle("feat: adds a new endpoint.")).
+				Create()
+
+			// when
+			err := handler.HandlePullRequestEvent(log, prMock.CreatePullRequestEvent("unlabeled"))
+
+			// then - implicit verification of /statuses call occurrence with proper payload
+			Ω(err).ShouldNot(HaveOccurred())
+		})
+	})
 
 	Context("Pull Request title change trigger", func() {
 		BeforeEach(func() {
@@ -39,13 +80,14 @@ var _ = Describe("Work In Progress Plugin features", func() {
 			// given
 			prMock := mocker.MockPr(LoadedFromDefaultJSON()).
 				WithTitle("feat: introduces dummy response").
-				WithoutAllConfigFiles().
+				WithoutConfigFiles().
 				WithoutLabels().
-				Expecting(Status(toHaveSuccessState)).
+				Expecting(
+					Status(toHaveSuccessState)).
 				Create()
 
 			// when
-			err := handler.HandleEvent(log, github.PullRequest, prMock.CreatePullRequestEvent("opened"))
+			err := handler.HandlePullRequestEvent(log, prMock.CreatePullRequestEvent("opened"))
 
 			// then - implicit verification of /statuses call occurrence with proper payload
 			Ω(err).ShouldNot(HaveOccurred())
@@ -55,7 +97,7 @@ var _ = Describe("Work In Progress Plugin features", func() {
 			// given
 			prMock := mocker.MockPr(LoadedFromDefaultJSON()).
 				WithTitle("WIP feat: introduces dummy response").
-				WithoutAllConfigFiles().
+				WithoutConfigFiles().
 				WithoutLabels().
 				Expecting(
 					AddedLabel("work-in-progress"),
@@ -63,7 +105,7 @@ var _ = Describe("Work In Progress Plugin features", func() {
 				Create()
 
 			// when
-			err := handler.HandleEvent(log, github.PullRequest, prMock.CreatePullRequestEvent("opened"))
+			err := handler.HandlePullRequestEvent(log, prMock.CreatePullRequestEvent("opened"))
 
 			// then - implicit verification of /statuses call occurrence with proper payload
 			Ω(err).ShouldNot(HaveOccurred())
@@ -81,7 +123,7 @@ var _ = Describe("Work In Progress Plugin features", func() {
 				Create()
 
 			// when
-			err := handler.HandleEvent(log, github.PullRequest, prMock.CreatePullRequestEvent("opened"))
+			err := handler.HandlePullRequestEvent(log, prMock.CreatePullRequestEvent("opened"))
 
 			// then - implicit verification of /statuses call occurrence with proper payload
 			Ω(err).ShouldNot(HaveOccurred())
@@ -91,7 +133,7 @@ var _ = Describe("Work In Progress Plugin features", func() {
 			// given
 			prMock := mocker.MockPr(LoadedFromDefaultJSON()).
 				WithTitle("WIP feat: introduces dummy response").
-				WithoutAllConfigFiles().
+				WithoutConfigFiles().
 				WithoutLabels().
 				Expecting(
 					AddedLabel("work-in-progress"),
@@ -99,7 +141,7 @@ var _ = Describe("Work In Progress Plugin features", func() {
 				Create()
 
 			// when
-			err := handler.HandleEvent(log, github.PullRequest, prMock.CreatePullRequestEvent("edited"))
+			err := handler.HandlePullRequestEvent(log, prMock.CreatePullRequestEvent("edited"))
 
 			// then - implicit verification of /statuses call occurrence with proper payload
 			Ω(err).ShouldNot(HaveOccurred())
@@ -110,17 +152,15 @@ var _ = Describe("Work In Progress Plugin features", func() {
 			// given
 			prMock := mocker.MockPr(LoadedFromDefaultJSON()).
 				WithTitle("feat: introduces dummy response").
-				WithoutAllConfigFiles().
-				WithLabels(`[{"id": 934813958,`+
-					`"url": "https://api.github.com/repos/bartoszmajsak/wfswarm-booster-pipeline-test/labels/work-in-progress",`+
-					`"name": "work-in-progress", "color": "ededed", "default": false}]`).
+				WithoutConfigFiles().
+				WithLabels("work-in-progress").
 				Expecting(
 					RemovedLabel("work-in-progress", LoadedFrom("test_fixtures/github_calls/pr_edited_with_unlabel.json")),
 					Status(toHaveSuccessState)).
 				Create()
 
 			// when
-			err := handler.HandleEvent(log, github.PullRequest, prMock.CreatePullRequestEvent("edited"))
+			err := handler.HandlePullRequestEvent(log, prMock.CreatePullRequestEvent("edited"))
 
 			// then - implicit verification of /statuses call occurrence with proper payload
 			Ω(err).ShouldNot(HaveOccurred())
@@ -140,7 +180,7 @@ var _ = Describe("Work In Progress Plugin features", func() {
 			// given
 			prMock := mocker.MockPr(LoadedFromDefaultJSON()).
 				WithTitle("PR from external user without tests should be rejected").
-				WithoutAllConfigFiles().
+				WithoutConfigFiles().
 				WithoutReviews().
 				WithoutLabels().
 				WithUsers(ExternalUser("bartoszmajsak")).
@@ -151,7 +191,7 @@ var _ = Describe("Work In Progress Plugin features", func() {
 			commentEvent := prMock.CreateCommentEvent(SentByPrCreator, "/run work-in-progress", "created")
 
 			// when
-			err := handler.HandleEvent(log, github.IssueComment, commentEvent)
+			err := handler.HandleIssueCommentEvent(log, commentEvent)
 
 			// then - implicit verification of /statuses call occurrence with proper payload
 			Ω(err).ShouldNot(HaveOccurred())
@@ -161,7 +201,7 @@ var _ = Describe("Work In Progress Plugin features", func() {
 			// given
 			prMock := mocker.MockPr(LoadedFromDefaultJSON()).
 				WithTitle("WIP PR from external user without tests should be rejected").
-				WithoutAllConfigFiles().
+				WithoutConfigFiles().
 				WithoutReviews().
 				WithoutLabels().
 				WithUsers(Admin("bartoszmajsak-test")).
@@ -173,7 +213,7 @@ var _ = Describe("Work In Progress Plugin features", func() {
 			commentEvent := prMock.CreateCommentEvent(SentBy("bartoszmajsak-test"), "/run all", "created")
 
 			// when
-			err := handler.HandleEvent(log, github.IssueComment, commentEvent)
+			err := handler.HandleIssueCommentEvent(log, commentEvent)
 
 			// then - implicit verification of /statuses call occurrence with proper payload
 			Ω(err).ShouldNot(HaveOccurred())
@@ -182,7 +222,7 @@ var _ = Describe("Work In Progress Plugin features", func() {
 		It("should approve newly created pull request with tests when "+command.RunCommentPrefix+" "+testkeeper.ProwPluginName+" command is triggered by pr creator", func() {
 			// given
 			prMock := mocker.MockPr(LoadedFromDefaultJSON()).
-				WithoutAllConfigFiles().
+				WithoutConfigFiles().
 				WithoutReviews().
 				WithUsers(ExternalUser("bartoszmajsak-test")).
 				Expecting(NoStatus()).
@@ -191,7 +231,7 @@ var _ = Describe("Work In Progress Plugin features", func() {
 			commentEvent := prMock.CreateCommentEvent(SentByPrCreator, "/run test-keeper", "created")
 
 			// when
-			err := handler.HandleEvent(log, github.IssueComment, commentEvent)
+			err := handler.HandleIssueCommentEvent(log, commentEvent)
 
 			// then
 			Ω(err).ShouldNot(HaveOccurred())

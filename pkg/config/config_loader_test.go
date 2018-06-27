@@ -24,9 +24,9 @@ var onlyName = config.Source(func() ([]byte, error) {
 	return []byte("name: 'awesome-o'"), nil
 })
 
-var nameAndHint = config.Source(func() ([]byte, error) {
-	return []byte("name: 'name-and-hint'\n" +
-		"plugin_hint: 'I am just a hint'"), nil
+var nameAndSkip = config.Source(func() ([]byte, error) {
+	return []byte("name: 'name-and-skip'\n" +
+		"skip_validation_for: ['anything']"), nil
 })
 
 var faulty = config.Source(func() ([]byte, error) {
@@ -93,7 +93,7 @@ var _ = Describe("Config loader features", func() {
 		It("should load config from first working source (precedence)", func() {
 			// given
 			testConfigProviders := testConfigProvider(func() []config.Source {
-				return []config.Source{nameAndHint, onlyName}
+				return []config.Source{nameAndSkip, onlyName}
 			})
 
 			sampleConfig := sampleConfiguration{Name: "prototype"}
@@ -103,8 +103,8 @@ var _ = Describe("Config loader features", func() {
 
 			// then
 			Ω(err).ShouldNot(HaveOccurred())
-			Expect(sampleConfig.Name).To(Equal("name-and-hint"))
-			Expect(sampleConfig.PluginHint).To(Equal("I am just a hint"))
+			Expect(sampleConfig.Name).To(Equal("name-and-skip"))
+			Expect(sampleConfig.Skip).To(ConsistOf("anything"))
 		})
 
 		It("should preserve prototype config name when no sources provided", func() {

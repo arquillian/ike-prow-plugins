@@ -7,28 +7,31 @@ import (
 
 // PermissionService keeps user name and PR loader and provides information about the user's permissions
 type PermissionService struct {
-	Client   ghclient.Client
-	User     string
-	PRLoader *ghservice.PullRequestLazyLoader
+	client   ghclient.Client
+	user     string
+	prLoader *ghservice.PullRequestLazyLoader
 }
 
 // NewPermissionService creates a new instance of PermissionService with the given client, user and pr loader
 func NewPermissionService(client ghclient.Client, user string, prLoader *ghservice.PullRequestLazyLoader) *PermissionService {
 	return &PermissionService{
-		Client:   client,
-		User:     user,
-		PRLoader: prLoader,
+		client:   client,
+		user:     user,
+		prLoader: prLoader,
 	}
 }
 
 func (s *PermissionService) newPermissionStatus(allowedRoles ...string) *PermissionStatus {
-	return &PermissionStatus{User: s.User, ApprovedRoles: allowedRoles}
+	return &PermissionStatus{User: s.user, ApprovedRoles: allowedRoles}
 }
 
 // Admin checks if the user is admin
-func (s *PermissionService) Admin() (*PermissionStatus, error) {
+func (s *PermissionService) Admin(evaluate bool) (*PermissionStatus, error) {
 	status := s.newPermissionStatus(Admin)
-	permissionLevel, err := s.Client.GetPermissionLevel(s.PRLoader.RepoOwner, s.PRLoader.RepoName, s.User)
+	if !evaluate {
+		return status, nil
+	}
+	permissionLevel, err := s.client.GetPermissionLevel(s.prLoader.RepoOwner, s.prLoader.RepoName, s.user)
 	if err != nil {
 		return status.reject(), err
 	}
@@ -40,14 +43,17 @@ func (s *PermissionService) Admin() (*PermissionStatus, error) {
 }
 
 // PRReviewer checks if the user is pull request reviewer
-func (s *PermissionService) PRReviewer() (*PermissionStatus, error) {
-	status := s.newPermissionStatus(RequestReviewer)
-	pr, err := s.PRLoader.Load()
+func (s *PermissionService) PRReviewer(evaluate bool) (*PermissionStatus, error) {
+	status := s.newPermissionStatus(RequestedReviewer)
+	if !evaluate {
+		return status, nil
+	}
+	pr, err := s.prLoader.Load()
 	if err != nil {
 		return status.reject(), err
 	}
 	for _, reviewer := range pr.RequestedReviewers {
-		if s.User == *reviewer.Login {
+		if s.user == *reviewer.Login {
 			return status.allow(), nil
 		}
 	}
@@ -55,27 +61,33 @@ func (s *PermissionService) PRReviewer() (*PermissionStatus, error) {
 }
 
 // PRCreator checks if the user is pull request creator
-func (s *PermissionService) PRCreator() (*PermissionStatus, error) {
+func (s *PermissionService) PRCreator(evaluate bool) (*PermissionStatus, error) {
 	status := s.newPermissionStatus(PullRequestCreator)
-	pr, err := s.PRLoader.Load()
+	if !evaluate {
+		return status, nil
+	}
+	pr, err := s.prLoader.Load()
 	if err != nil {
 		return status.reject(), err
 	}
-	if s.User == *pr.User.Login {
+	if s.user == *pr.User.Login {
 		return status.allow(), nil
 	}
 	return status.reject(), nil
 }
 
 // PRApprover checks if the user approved the pull request
-func (s *PermissionService) PRApprover() (*PermissionStatus, error) {
+func (s *PermissionService) PRApprover(evaluate bool) (*PermissionStatus, error) {
 	status := s.newPermissionStatus(PullRequestApprover)
-	prReviews, err := s.Client.GetPullRequestReviews(s.PRLoader.RepoOwner, s.PRLoader.RepoName, s.PRLoader.Number)
+	if !evaluate {
+		return status, nil
+	}
+	prReviews, err := s.client.GetPullRequestReviews(s.prLoader.RepoOwner, s.prLoader.RepoName, s.prLoader.Number)
 	if err != nil {
 		return status.reject(), err
 	}
 	for _, review := range prReviews {
-		if *review.State == "APPROVED" && *review.User.Login == s.User {
+		if *review.State == "APPROVED" && *review.User.Login == s.user {
 			return status.allow(), nil
 		}
 	}

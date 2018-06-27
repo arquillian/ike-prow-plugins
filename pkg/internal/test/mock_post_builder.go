@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/arquillian/ike-prow-plugins/pkg/github/service"
 	"github.com/arquillian/ike-prow-plugins/pkg/plugin"
+	"github.com/arquillian/ike-prow-plugins/pkg/status/message"
 	"gopkg.in/h2non/gock.v1"
 )
 
@@ -26,7 +26,7 @@ var (
 	// ToHaveBodyWithWholePluginsComment verifies that the comment should contain the fixed part of plugins hint comment
 	ToHaveBodyWithWholePluginsComment = func(pluginName string) SoftMatcher {
 		return SoftlySatisfyAll(
-			HaveBodyThatContains(fmt.Sprintf(ghservice.PluginTitleTemplate, pluginName)),
+			HaveBodyThatContains(fmt.Sprintf(message.PluginTitleTemplate, pluginName)),
 			HaveBodyThatContains("@bartoszmajsak"),
 		)
 	}
@@ -49,6 +49,13 @@ func Comment(matherForPlugin func(pluginName string) SoftMatcher) MockCreator {
 func CommentTo(matchers ...SoftMatcher) MockCreator {
 	return func(builder *MockPrBuilder) {
 		basePostCommentMock(builder)(SoftlySatisfyAll(matchers...))
+	}
+}
+
+func ChangedCommentTo(commendId int, matchers ...SoftMatcher) MockCreator {
+	return func(builder *MockPrBuilder) {
+		path := fmt.Sprintf("%s/issues/comments/%d", builder.baseRepoPath(), commendId)
+		basePatchMock(path)(SoftlySatisfyAll(matchers...))
 	}
 }
 
@@ -79,6 +86,14 @@ func baseDeleteMock(path, responseBody string) {
 	baseGockMock(func(request *gock.Request) { request.Delete(path) }).
 		Reply(200).
 		BodyString(responseBody)
+}
+
+func basePatchMock(path string) func(mather SoftMatcher) {
+	return func(mather SoftMatcher) {
+		baseGockMock(func(request *gock.Request) { request.Patch(path) }).
+			SetMatcher(ExpectPayload(mather)).
+			Reply(200)
+	}
 }
 
 // Status creates a gock matcher to check that there is a Post with a status that complies with the given restrictions
@@ -112,5 +127,13 @@ func AddedLabel(labelContent string) MockCreator {
 	return func(builder *MockPrBuilder) {
 		path := fmt.Sprintf("%s/issues/%d/labels", builder.baseRepoPath(), *builder.pullRequest.Number)
 		basePostMock(path)(To(HaveBodyThatContains(labelContent)))
+	}
+}
+
+// AddedLabel creates a gock matcher to check that there is a Post request for the given label sent
+func ChangedTitle(newTitleContent string) MockCreator {
+	return func(builder *MockPrBuilder) {
+		path := fmt.Sprintf("%s/pulls/%d", builder.baseRepoPath(), *builder.pullRequest.Number)
+		basePatchMock(path)(To(HaveTitle(newTitleContent)))
 	}
 }

@@ -9,14 +9,13 @@ import (
 	. "github.com/arquillian/ike-prow-plugins/pkg/internal/test"
 	"github.com/arquillian/ike-prow-plugins/pkg/log"
 	"github.com/arquillian/ike-prow-plugins/pkg/plugin/test-keeper"
+	"github.com/arquillian/ike-prow-plugins/pkg/status/message"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	"gopkg.in/h2non/gock.v1"
 )
 
-const (
-	botName = "alien-ike"
-)
+const botName = "alien-ike"
 
 var _ = Describe("Test Keeper Plugin features", func() {
 
@@ -34,18 +33,22 @@ var _ = Describe("Test Keeper Plugin features", func() {
 
 		AfterEach(EnsureGockRequestsHaveBeenMatched)
 
-		It("should approve opened pull request when tests included", func() {
+		It("should approve opened pull request and update status message when tests included", func() {
 			// given
 			prMock := mocker.MockPr(LoadedFromDefaultJSON()).
 				WithFiles(LoadedFrom("test_fixtures/github_calls/prs/with_tests/changes.json")).
-				WithoutComments().
-				WithoutAllConfigFiles().
+				WithComments(LoadedFrom("test_fixtures/github_calls/prs/comments_with_no_test_status_msg.json")).
+				WithoutConfigFiles().
+				WithoutMessageFiles("test-keeper_with_tests_message.md").
 				Expecting(
-					Status(ToBe(github.StatusSuccess, testkeeper.TestsExistMessage, testkeeper.TestsExistDetailsPageName))).
+					Status(ToBe(github.StatusSuccess, testkeeper.TestsExistMessage, testkeeper.TestsExistDetailsPageName)),
+					ChangedCommentTo(397622617, HaveBodyThatContains(fmt.Sprintf(message.PluginTitleTemplate, testkeeper.ProwPluginName)),
+						HaveBodyThatContains("@bartoszmajsak"),
+						HaveBodyThatContains("It seems that this PR already contains some added or changed tests. Good job!"))).
 				Create()
 
 			// when
-			err := handler.HandleEvent(log, github.PullRequest, prMock.CreatePullRequestEvent("opened"))
+			err := handler.HandlePullRequestEvent(log, prMock.CreatePullRequestEvent("opened"))
 
 			// then - implicit verification of /statuses call occurrence with proper payload
 			Ω(err).ShouldNot(HaveOccurred())
@@ -64,7 +67,7 @@ var _ = Describe("Test Keeper Plugin features", func() {
 				Create()
 
 			// when
-			err := handler.HandleEvent(log, github.PullRequest, prMock.CreatePullRequestEvent("opened"))
+			err := handler.HandlePullRequestEvent(log, prMock.CreatePullRequestEvent("opened"))
 
 			// then - implicit verification of /statuses call occurrence with proper payload
 			Ω(err).ShouldNot(HaveOccurred())
@@ -83,7 +86,7 @@ var _ = Describe("Test Keeper Plugin features", func() {
 				Create()
 
 			// when
-			err := handler.HandleEvent(log, github.PullRequest, prMock.CreatePullRequestEvent("opened"))
+			err := handler.HandlePullRequestEvent(log, prMock.CreatePullRequestEvent("opened"))
 
 			// then - implicit verification of /statuses call occurrence with proper payload
 			Ω(err).ShouldNot(HaveOccurred())
@@ -96,6 +99,7 @@ var _ = Describe("Test Keeper Plugin features", func() {
 				WithoutRawFiles(ghservice.ConfigHome+"test-keeper_hint.md").
 				WithConfigFile(
 					ConfigYml(LoadedFrom("test_fixtures/github_calls/prs/with_tests/test-keeper.yml"))).
+				WithoutMessageFiles("test-keeper_without_tests_message.md").
 				WithoutComments().
 				Expecting(
 					Status(ToBe(github.StatusFailure, testkeeper.NoTestsMessage, testkeeper.NoTestsDetailsPageName)),
@@ -103,7 +107,7 @@ var _ = Describe("Test Keeper Plugin features", func() {
 				Create()
 
 			// when
-			err := handler.HandleEvent(log, github.PullRequest, prMock.CreatePullRequestEvent("opened"))
+			err := handler.HandlePullRequestEvent(log, prMock.CreatePullRequestEvent("opened"))
 
 			// then - implicit verification of /statuses call occurrence with proper payload
 			Ω(err).ShouldNot(HaveOccurred())
@@ -113,7 +117,8 @@ var _ = Describe("Test Keeper Plugin features", func() {
 			// given
 			prMock := mocker.MockPr(LoadedFromDefaultJSON()).
 				WithFiles(LoadedFrom("test_fixtures/github_calls/prs/without_tests/changes.json")).
-				WithoutAllConfigFiles().
+				WithoutConfigFiles().
+				WithoutMessageFiles("test-keeper_without_tests_message.md").
 				WithoutComments().
 				Expecting(
 					Status(ToBe(github.StatusFailure, testkeeper.NoTestsMessage, testkeeper.NoTestsDetailsPageName)),
@@ -121,7 +126,7 @@ var _ = Describe("Test Keeper Plugin features", func() {
 				Create()
 
 			// when
-			err := handler.HandleEvent(log, github.PullRequest, prMock.CreatePullRequestEvent("opened"))
+			err := handler.HandlePullRequestEvent(log, prMock.CreatePullRequestEvent("opened"))
 
 			// then - implicit verification of /statuses call occurrence with proper payload
 			Ω(err).ShouldNot(HaveOccurred())
@@ -131,14 +136,14 @@ var _ = Describe("Test Keeper Plugin features", func() {
 			// given
 			prMock := mocker.MockPr(LoadedFromDefaultJSON()).
 				WithFiles(LoadedFrom("test_fixtures/github_calls/prs/without_tests/build_and_docs_only_changes.json")).
-				WithoutAllConfigFiles().
+				WithoutConfigFiles().
 				WithoutComments().
 				Expecting(
 					Status(ToBe(github.StatusSuccess, testkeeper.OkOnlySkippedFilesMessage, testkeeper.OkOnlySkippedFilesDetailsPageName))).
 				Create()
 
 			// when
-			err := handler.HandleEvent(log, github.PullRequest, prMock.CreatePullRequestEvent("opened"))
+			err := handler.HandlePullRequestEvent(log, prMock.CreatePullRequestEvent("opened"))
 
 			// then - implicit verification of /statuses call occurrence with proper payload
 			Ω(err).ShouldNot(HaveOccurred())
@@ -149,14 +154,15 @@ var _ = Describe("Test Keeper Plugin features", func() {
 			prMock := mocker.MockPr(LoadedFromDefaultJSON()).
 				WithFiles(LoadedFrom("test_fixtures/github_calls/prs/without_tests/deletions_only_changes_in_tests.json")).
 				WithoutComments().
-				WithoutAllConfigFiles().
+				WithoutConfigFiles().
+				WithoutMessageFiles("test-keeper_without_tests_message.md").
 				Expecting(
 					Comment(ToHaveBodyWithWholePluginsComment),
 					Status(ToBe(github.StatusFailure, testkeeper.NoTestsMessage, testkeeper.NoTestsDetailsPageName))).
 				Create()
 
 			// when
-			err := handler.HandleEvent(log, github.PullRequest, prMock.CreatePullRequestEvent("opened"))
+			err := handler.HandlePullRequestEvent(log, prMock.CreatePullRequestEvent("opened"))
 
 			// then - implicit verification of /statuses call occurrence with proper payload
 			Ω(err).ShouldNot(HaveOccurred())
@@ -167,14 +173,15 @@ var _ = Describe("Test Keeper Plugin features", func() {
 			prMock := mocker.MockPr(LoadedFromDefaultJSON()).
 				WithFiles(LoadedFrom("test_fixtures/github_calls/prs/without_tests/prod_code_changes_with_deletion_only_in_tests.json")).
 				WithoutComments().
-				WithoutAllConfigFiles().
+				WithoutConfigFiles().
+				WithoutMessageFiles("test-keeper_without_tests_message.md").
 				Expecting(
 					Comment(ToHaveBodyWithWholePluginsComment),
 					Status(ToBe(github.StatusFailure, testkeeper.NoTestsMessage, testkeeper.NoTestsDetailsPageName))).
 				Create()
 
 			// when
-			err := handler.HandleEvent(log, github.PullRequest, prMock.CreatePullRequestEvent("opened"))
+			err := handler.HandlePullRequestEvent(log, prMock.CreatePullRequestEvent("opened"))
 
 			// then - implicit verification of /statuses call occurrence with proper payload
 			Ω(err).ShouldNot(HaveOccurred())
@@ -188,13 +195,13 @@ var _ = Describe("Test Keeper Plugin features", func() {
 				WithUsers(Admin("bartoszmajsak")).
 				WithComments(`[{"user":{"login":"bartoszmajsak"}, "body":"` + testkeeper.BypassCheckComment + `"}]`).
 				WithoutReviews().
-				WithoutAllConfigFiles().
+				WithoutConfigFiles().
 				Expecting(
 					Status(ToBe(github.StatusSuccess, approvedBy, testkeeper.ApprovedByDetailsPageName))).
 				Create()
 
 			// when
-			err := handler.HandleEvent(log, github.PullRequest, prMock.CreatePullRequestEvent("opened"))
+			err := handler.HandlePullRequestEvent(log, prMock.CreatePullRequestEvent("opened"))
 
 			// then - should not expect any additional request mocking
 			Ω(err).ShouldNot(HaveOccurred())
@@ -205,16 +212,16 @@ var _ = Describe("Test Keeper Plugin features", func() {
 			prMock := mocker.MockPr(LoadedFromDefaultJSON()).
 				WithFiles(LoadedFrom("test_fixtures/github_calls/prs/without_tests/changes.json")).
 				WithUsers(ExternalUser("bartoszmajsak-test")).
-				WithComments(`[{"user":{"login":"bartoszmajsak-test"}, "body":"` + testkeeper.BypassCheckComment + `"},` +
-					`{"body":"` + fmt.Sprintf(ghservice.PluginTitleTemplate, testkeeper.ProwPluginName) + `"}]`).
+				WithComments(LoadedFrom("test_fixtures/github_calls/prs/comments_with_no_test_status_msg.json")).
 				WithoutReviews().
-				WithoutAllConfigFiles().
+				WithoutConfigFiles().
+				WithoutMessageFiles("test-keeper_without_tests_message.md").
 				Expecting(
 					Status(ToBe(github.StatusFailure, testkeeper.NoTestsMessage, testkeeper.NoTestsDetailsPageName))).
 				Create()
 
 			// when
-			err := handler.HandleEvent(log, github.PullRequest, prMock.CreatePullRequestEvent("opened"))
+			err := handler.HandlePullRequestEvent(log, prMock.CreatePullRequestEvent("opened"))
 
 			// then - implicit verification of /statuses call occurrence with proper payload
 			Ω(err).ShouldNot(HaveOccurred())
@@ -233,19 +240,18 @@ var _ = Describe("Test Keeper Plugin features", func() {
 		It("should skip test existence check when "+testkeeper.BypassCheckComment+" command is used by admin user", func() {
 			// given
 			approvedBy := fmt.Sprintf(testkeeper.ApprovedByMessage, "bartoszmajsak")
-
 			prMock := mocker.MockPr(LoadedFromDefaultJSON()).
 				WithUsers(Admin("bartoszmajsak")).
 				WithoutReviews().
-				WithoutAllConfigFiles().
+				WithoutConfigFiles().
 				Expecting(
 					Status(ToBe(github.StatusSuccess, approvedBy, testkeeper.ApprovedByDetailsPageName))).
 				Create()
 
-			eventPayload := prMock.CreateCommentEvent(SentBy("bartoszmajsak"), testkeeper.BypassCheckComment, "created")
+			event := prMock.CreateCommentEvent(SentBy("bartoszmajsak"), testkeeper.BypassCheckComment, "created")
 
 			// when
-			err := handler.HandleEvent(log, github.IssueComment, eventPayload)
+			err := handler.HandleIssueCommentEvent(log, event)
 
 			// then - implicit verification of /statuses call occurrence with proper payload
 			Ω(err).ShouldNot(HaveOccurred())
@@ -256,7 +262,7 @@ var _ = Describe("Test Keeper Plugin features", func() {
 			prMock := mocker.MockPr(LoadedFromDefaultJSON()).
 				WithUsers(ExternalUser("bartoszmajsak-test")).
 				WithoutReviews().
-				WithoutAllConfigFiles().
+				WithoutConfigFiles().
 				Expecting(
 					CommentTo(
 						HaveBodyThatContains("Hey @bartoszmajsak-test! It seems you tried to trigger `/ok-without-tests` command"),
@@ -264,10 +270,10 @@ var _ = Describe("Test Keeper Plugin features", func() {
 					Status(ToBe(github.StatusFailure, testkeeper.NoTestsMessage, testkeeper.NoTestsDetailsPageName))).
 				Create()
 
-			eventPayload := prMock.CreateCommentEvent(SentBy("bartoszmajsak-test"), testkeeper.BypassCheckComment, "created")
+			event := prMock.CreateCommentEvent(SentBy("bartoszmajsak-test"), testkeeper.BypassCheckComment, "created")
 
 			// when
-			err := handler.HandleEvent(log, github.IssueComment, eventPayload)
+			err := handler.HandleIssueCommentEvent(log, event)
 
 			// then - implicit verification of /statuses call occurrence with proper payload
 			Ω(err).ShouldNot(HaveOccurred())
@@ -289,15 +295,16 @@ var _ = Describe("Test Keeper Plugin features", func() {
 				WithoutComments().
 				WithUsers(Admin("bartoszmajsak")).
 				WithoutReviews().
-				WithoutAllConfigFiles().
+				WithoutConfigFiles().
+				WithoutMessageFiles("test-keeper_without_tests_message.md").
 				Expecting(Comment(ToHaveBodyWithWholePluginsComment),
 					Status(ToBe(github.StatusFailure, testkeeper.NoTestsMessage, testkeeper.NoTestsDetailsPageName))).
 				Create()
 
-			eventPayload := prMock.CreateCommentEvent(SentBy("bartoszmajsak"), "/run all", "created")
+			event := prMock.CreateCommentEvent(SentBy("bartoszmajsak"), "/run all", "created")
 
 			// when
-			err := handler.HandleEvent(log, github.IssueComment, eventPayload)
+			err := handler.HandleIssueCommentEvent(log, event)
 
 			// then - implicit verification of /statuses call occurrence with proper payload
 			Ω(err).ShouldNot(HaveOccurred())
@@ -310,15 +317,15 @@ var _ = Describe("Test Keeper Plugin features", func() {
 				WithoutComments().
 				WithUsers(ExternalUser("bartoszmajsak-test"), RequestedReviewer("bartoszmajsak-test")).
 				WithoutReviews().
-				WithoutAllConfigFiles().
+				WithoutConfigFiles().
 				Expecting(Comment(ToHaveBodyWithWholePluginsComment),
 					Status(ToBe(github.StatusSuccess, testkeeper.TestsExistMessage, testkeeper.TestsExistDetailsPageName))).
 				Create()
 
-			eventPayload := prMock.CreateCommentEvent(SentByReviewer, "/run test-keeper", "created")
+			event := prMock.CreateCommentEvent(SentByReviewer, "/run test-keeper", "created")
 
 			// when
-			err := handler.HandleEvent(log, github.IssueComment, eventPayload)
+			err := handler.HandleIssueCommentEvent(log, event)
 
 			// then - implicit verification of /statuses call occurrence with proper payload
 			Ω(err).ShouldNot(HaveOccurred())
@@ -331,16 +338,16 @@ var _ = Describe("Test Keeper Plugin features", func() {
 				WithoutComments().
 				WithUsers(ExternalUser("bartoszmajsak-test"), RequestedReviewer("bartoszmajsak-test")).
 				WithoutReviews().
-				WithoutAllConfigFiles().
+				WithoutConfigFiles().
 				Expecting(
 					NoStatus(),
 					NoComment()).
 				Create()
 
-			eventPayload := prMock.CreateCommentEvent(SentByReviewer, "/run work-in-progress", "created")
+			event := prMock.CreateCommentEvent(SentByReviewer, "/run work-in-progress", "created")
 
 			// when
-			err := handler.HandleEvent(log, github.IssueComment, eventPayload)
+			err := handler.HandleIssueCommentEvent(log, event)
 
 			// then
 			Ω(err).ShouldNot(HaveOccurred())

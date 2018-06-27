@@ -41,7 +41,7 @@ You need to have following packages in place:
 * `git`
 * `make`
 * `go` (`>= v1.10.2`)
-* link:https://glide.sh/[`glide`] for dependency management
+* link:https://golang.github.io/dep/[`dep`] for dependency management
 * link:https://github.com/alecthomas/gometalinter[`gometalinter`]
 
 Assuming that you have all the link:https://golang.org/doc/install[Golang prerequisites] in place (such as `$GOPATH`), clone the repository first:

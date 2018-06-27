@@ -1,10 +1,7 @@
 package testkeeper
 
 import (
-	"encoding/json"
-
 	"github.com/arquillian/ike-prow-plugins/pkg/command"
-	"github.com/arquillian/ike-prow-plugins/pkg/github"
 	"github.com/arquillian/ike-prow-plugins/pkg/github/client"
 	"github.com/arquillian/ike-prow-plugins/pkg/github/service"
 	"github.com/arquillian/ike-prow-plugins/pkg/log"
@@ -25,49 +22,57 @@ const ProwPluginName = "test-keeper"
 
 var (
 	handledPrActions      = []string{"opened", "reopened", "edited", "synchronize"}
-	handledCommentActions = []string{"created", "deleted"}
+	handledCommentActions = []string{"created", "edited", "deleted"}
 )
 
-// HandleEvent is an entry point for the plugin logic. This method is invoked by the Server when
-// events are dispatched from the /hook service
-func (gh *GitHubTestEventsHandler) HandleEvent(log log.Logger, eventType github.EventType, payload []byte) error {
-
-	switch eventType {
-	case github.PullRequest:
-		var event gogh.PullRequestEvent
-		if err := json.Unmarshal(payload, &event); err != nil {
-			log.Errorf("Failed while parsing '%q' event with payload: %q. Cause: %q", github.PullRequest, event, err)
-			return err
-		}
-
-		if err := gh.handlePrEvent(log, &event); err != nil {
-			log.Errorf("Error handling '%q' event with payload %q. Cause: %q", github.PullRequest, event, err)
-			return err
-		}
-
-	case github.IssueComment:
-		var event gogh.IssueCommentEvent
-		if err := json.Unmarshal(payload, &event); err != nil {
-			log.Errorf("Failed while parsing '%q' event with payload: %q. Cause: %q", github.IssueComment, event, err)
-			return err
-		}
-
-		if err := gh.handlePrComment(log, &event); err != nil {
-			log.Errorf("Error handling '%q' event with payload %q. Cause: %q", github.IssueComment, event, err)
-			return err
-		}
-
-	default:
-		log.Warnf("received an event of type %q but didn't ask for it", eventType)
-	}
-	return nil
-}
-
-func (gh *GitHubTestEventsHandler) handlePrEvent(log log.Logger, event *gogh.PullRequestEvent) error {
+// HandlePullRequestEvent is an entry point for the plugin logic. This method is invoked by the Server when
+// pull request event is dispatched from the /hook service
+func (gh *GitHubTestEventsHandler) HandlePullRequestEvent(log log.Logger, event *gogh.PullRequestEvent) error {
 	if !utils.Contains(handledPrActions, *event.Action) {
 		return nil
 	}
-	return gh.checkTestsAndSetStatus(log, event.PullRequest)
+	return gh.checkTestsAndSetStatus(log, ghservice.NewPullRequestLazyLoaderWithPR(gh.Client, event.PullRequest))
+}
+
+// HandleIssueCommentEvent is an entry point for the plugin logic. This method is invoked by the Server when
+// issue comment event is dispatched from the /hook service
+func (gh *GitHubTestEventsHandler) HandleIssueCommentEvent(log log.Logger, comment *gogh.IssueCommentEvent) error {
+	if !utils.Contains(handledCommentActions, *comment.Action) {
+		return nil
+	}
+
+	prLoader := ghservice.NewPullRequestLazyLoaderFromComment(gh.Client, comment)
+	userPerm := command.NewPermissionService(gh.Client, *comment.Sender.Login, prLoader)
+
+	cmdHandler := command.CommentCmdHandler{Client: gh.Client}
+
+	cmdHandler.Register(&command.RunCmd{
+		PluginName:            ProwPluginName,
+		UserPermissionService: userPerm,
+		WhenAddedOrEdited: func() error {
+			return gh.checkTestsAndSetStatus(log, prLoader)
+		}})
+
+	cmdHandler.Register(&BypassCmd{
+		userPermissionService: userPerm,
+		whenDeleted: func() error {
+			return gh.checkTestsAndSetStatus(log, prLoader)
+		},
+		whenAddedOrEdited: func() error {
+			pullRequest, err := prLoader.Load()
+			if err != nil {
+				return err
+			}
+			reportBypassCommand(pullRequest)
+			statusService := gh.newTestStatusService(log, pullRequest)
+			return statusService.okWithoutTests(*comment.Sender.Login)
+		}})
+
+	err := cmdHandler.Handle(log, comment)
+	if err != nil {
+		log.Error(err)
+	}
+	return err
 }
 
 func (gh *GitHubTestEventsHandler) checkIfBypassed(log log.Logger, commentsLoader *ghservice.IssueCommentsLazyLoader, pr *gogh.PullRequest) (bool, string) {
@@ -86,49 +91,17 @@ func (gh *GitHubTestEventsHandler) checkIfBypassed(log log.Logger, commentsLoade
 	return false, ""
 }
 
-func (gh *GitHubTestEventsHandler) handlePrComment(log log.Logger, comment *gogh.IssueCommentEvent) error {
-	if !utils.Contains(handledCommentActions, *comment.Action) {
-		return nil
-	}
-
-	prLoader := ghservice.NewPullRequestLazyLoaderFromComment(gh.Client, comment)
-	userPerm := command.NewPermissionService(gh.Client, *comment.Sender.Login, prLoader)
-
-	cmdHandler := command.CommentCmdHandler{Client: gh.Client}
-
-	cmdHandler.Register(&command.RunCmd{
-		PluginName:            ProwPluginName,
-		UserPermissionService: userPerm,
-		WhenAddedOrEdited: func() error {
-			return gh.loadPRCheckTestsAndSetStatus(prLoader, log)
-		}})
-
-	cmdHandler.Register(&BypassCmd{
-		userPermissionService: userPerm,
-		whenDeleted: func() error {
-			return gh.loadPRCheckTestsAndSetStatus(prLoader, log)
-		},
-		whenAddedOrEdited: func() error {
-			pullRequest, err := prLoader.Load()
-			if err != nil {
-				return err
-			}
-			statusService := gh.newTestStatusService(log, ghservice.NewRepositoryChangeForPR(pullRequest))
-			return statusService.okWithoutTests(*comment.Sender.Login)
-		}})
-
-	err := cmdHandler.Handle(log, comment)
+func (gh *GitHubTestEventsHandler) checkTestsAndSetStatus(log log.Logger, prLoader *ghservice.PullRequestLazyLoader) error {
+	pr, err := prLoader.Load()
 	if err != nil {
-		log.Error(err)
+		return err
 	}
-	return err
-}
-
-func (gh *GitHubTestEventsHandler) checkTestsAndSetStatus(log log.Logger, pr *gogh.PullRequest) error {
 	change := ghservice.NewRepositoryChangeForPR(pr)
 	configuration := LoadConfiguration(log, change)
 	fileCategories, err := gh.checkTests(log, change, configuration, *pr.Number)
-	statusService := gh.newTestStatusService(log, change)
+	commentsLoader := ghservice.NewIssueCommentsLazyLoader(gh.Client, pr)
+
+	statusService := gh.newTestStatusServiceWithMessages(log, pr, commentsLoader, configuration)
 	if err != nil {
 		if statusErr := statusService.reportError(); statusErr != nil {
 			log.Errorf("failed to report error status on PR [%q]. cause: %s", *pr, statusErr)
@@ -137,33 +110,28 @@ func (gh *GitHubTestEventsHandler) checkTestsAndSetStatus(log log.Logger, pr *go
 	}
 
 	if fileCategories.OnlySkippedFiles() {
+		statusService.onlySkippedMessage()
 		return statusService.okOnlySkippedFiles()
 	}
 
 	if fileCategories.TestsExist() {
+		reportPullRequest(log, pr, WithTests)
+		statusService.withTestsMessage()
 		return statusService.okTestsExist()
 	}
 
-	commentsLoader := ghservice.NewIssueCommentsLazyLoader(gh.Client, pr)
 	bypassed, user := gh.checkIfBypassed(log, commentsLoader, pr)
 	if bypassed {
+		reportBypassCommand(pr)
 		return statusService.okWithoutTests(user)
 	}
 
+	reportPullRequest(log, pr, WithoutTests)
+	statusService.withoutTestsMessage()
 	err = statusService.failNoTests()
 	if err != nil {
 		log.Errorf("failed to report status on PR [%q]. cause: %s", *pr, err)
 	}
-
-	hintContext := ghservice.HintContext{PluginName: ProwPluginName, Assignee: *pr.User.Login}
-	hinter := ghservice.NewHinter(gh.Client, log, commentsLoader, hintContext)
-
-	cerr := hinter.PluginComment(CreateCommentMessage(configuration, change))
-	if cerr != nil {
-		log.Errorf("failed to comment on PR [%q]. cause: %s", *pr, cerr)
-		return cerr
-	}
-
 	return err
 }
 
@@ -188,12 +156,4 @@ func (gh *GitHubTestEventsHandler) checkTests(log log.Logger, change scm.Reposit
 	}
 
 	return fileCategories, err
-}
-
-func (gh *GitHubTestEventsHandler) loadPRCheckTestsAndSetStatus(prLoader *ghservice.PullRequestLazyLoader, log log.Logger) error {
-	pullRequest, err := prLoader.Load()
-	if err != nil {
-		return err
-	}
-	return gh.checkTestsAndSetStatus(log, pullRequest)
 }

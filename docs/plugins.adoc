@@ -13,22 +13,6 @@ include::../plugins.yaml[tag="external_plugins"]
 organization. Be aware however, that adding an external plugin both to the repository and its organization link:https://github.com/kubernetes/test-infra/blob/7de525b1f6943e5d08d9a127b0b668cec404c665/prow/plugins/plugins_test.go#L143[will result in an error].
 <2> You can limit events dispatched by hook to your plugin.
 
-==== Creating custom plugin hint messages
-
-Customized comment message can be configured as `plugin hint` to express suggestions regarding the plugin's intented behavior. + 
-Eg. Configuring `plugin hint` for the `test-keeper` plugin adds comment message to the Pull Request when no test is found. 
-
-By default, the custom plugin hint message is loaded from a file `PLUGINNAME_HINT.md` located in `.ike-prow/` directory (if present). The `PLUGINNAME` is a name of the plugin you want to set the custom hint message for, so for example `.ike-prow/test-keeper_hint.md`.
-It is also possible to set other location of the hint file or directly the content of the message by editing plugin's configuration file (eg. test-keeper.yaml) and adding the `plugin_hint` property there:
-
-.test-keeper.yaml
-[source, yml, indent=0]
-----
-plugin_hint: plugins/test-keeper_hint.md
-----
-
-The `plugin_hint` property can either have an inline string directly written inside of the config file or another file with case insensitive filename PLUGINNAME_HINT.md that contains the hint. The location of the file can be set by either a relative path or an absolute URL.
-
 ==== GitHub settings [[gh-settings]]
 
 You will need two secrets to be able to integrate with GitHub. The `config/hmac.token` file should contain the token that
@@ -57,6 +41,7 @@ NOTE: More details about GitHub hooks can be found in the link:https://developer
 
 include::{asciidoctor-source}/fragments/test-keeper.adoc[leveloffset=1]
 include::{asciidoctor-source}/fragments/work-in-progress.adoc[leveloffset=1]
+include::{asciidoctor-source}/fragments/pr-sanitizer.adoc[leveloffset=1]
 
 === Trigger Plugins on Demand
 In order to trigger plugin on demand, just add `/run plugin-name`(e.g. `/run test-keeper`) comment on pull request. If you want to trigger only specific set of plugins, you can trigger it by adding comment `/run plugin-A plugin-B`(e.g. `/run test-keeper work-in-progress`).

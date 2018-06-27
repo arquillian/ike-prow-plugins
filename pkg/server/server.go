@@ -15,7 +15,8 @@ import (
 // GitHubEventHandler is a type which keeps the logic of handling GitHub events for the given plugin implementation.
 // It is used by Server implementation to handle incoming events.
 type GitHubEventHandler interface {
-	HandleEvent(log log.Logger, eventType github.EventType, payload []byte) error
+	HandlePullRequestEvent(log log.Logger, event *gogh.PullRequestEvent) error
+	HandleIssueCommentEvent(log log.Logger, event *gogh.IssueCommentEvent) error
 }
 
 // Server implements http.Handler. It validates incoming GitHub webhooks and
@@ -24,7 +25,6 @@ type Server struct {
 	GitHubEventHandler GitHubEventHandler
 	HmacSecret         []byte
 	PluginName         string
-	Metrics            *Metrics
 }
 
 // repoEvent is a minimal common subset of most of the events sent by GitHub (such as IssueComment or PullRequest)
@@ -52,7 +52,7 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 	var event repoEvent
 	if err := json.Unmarshal(payload, &event); err != nil {
-		l.WithError(err).Warnf("Failed while parsing event with payload: %q.", string(payload))
+		l.WithError(err).Warnf("failed while parsing event with payload: %q.", string(payload))
 	} else {
 		l = l.WithFields(logrus.Fields{
 			github.RepoLogField:   event.Repo.URL,
@@ -61,12 +61,30 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	}
 
 	fullName := *event.Repo.FullName
-	s.Metrics.reportIncomingWebHooks(l, fullName)
-	s.Metrics.reportHandledEvents(l, eventType)
-	s.Metrics.reportRateLimit(l)
+	reportIncomingWebHooks(l, fullName)
+	reportHandledEvents(l, eventType)
+	reportRateLimit(l)
 
-	if err := s.GitHubEventHandler.HandleEvent(l, github.EventType(eventType), payload); err != nil {
-		l.WithError(err).Error("error parsing event.")
-		return
+	switch github.EventType(eventType) {
+	case github.PullRequest:
+		var event gogh.PullRequestEvent
+		if err := json.Unmarshal(payload, &event); err != nil {
+			l.WithError(err).Errorf("failed while parsing '%q' event with payload: %q.", github.PullRequest, event)
+		}
+		if err := s.GitHubEventHandler.HandlePullRequestEvent(l, &event); err != nil {
+			l.WithError(err).Errorf("error handling '%q' event with payload %q.", github.PullRequest, event)
+			return
+		}
+	case github.IssueComment:
+		var event gogh.IssueCommentEvent
+		if err := json.Unmarshal(payload, &event); err != nil {
+			l.WithError(err).Errorf("failed while parsing '%q' event with payload: %q.", github.IssueComment, event)
+		}
+		if err := s.GitHubEventHandler.HandleIssueCommentEvent(l, &event); err != nil {
+			l.WithError(err).Errorf("error handling '%q' event with payload %q.", github.IssueComment, event)
+			return
+		}
+	default:
+		l.Warnf("received an event of type %q but didn't ask for it", eventType)
 	}
 }

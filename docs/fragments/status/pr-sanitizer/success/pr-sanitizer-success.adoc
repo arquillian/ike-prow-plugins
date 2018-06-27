@@ -1,0 +1,7 @@
+==== Success [[pr-sanitizer-success]]
+
+Your Pull Request has been approved as it complies with the PR conventions given by the `pr-sanitizer` plugin.
+
+ifdef::only-status-details[]
+The complete documentation can be found at http://arquillian.org/ike-prow-plugins.
+endif::only-status-details[]

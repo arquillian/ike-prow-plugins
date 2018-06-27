@@ -9,8 +9,8 @@ import (
 var (
 	// Admin is a name of the admin role
 	Admin = "admin"
-	// RequestReviewer is a name of the requested reviewer role
-	RequestReviewer = "requested reviewer"
+	// RequestedReviewer is a name of the requested reviewer role
+	RequestedReviewer = "requested reviewer"
 	// PullRequestCreator is a name of the pull request creator role
 	PullRequestCreator = "pull request creator"
 	// PullRequestApprover is a name of a person who gave an approval to the PR

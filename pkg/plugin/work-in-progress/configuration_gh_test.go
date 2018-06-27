@@ -20,7 +20,7 @@ var _ = Describe("Work In Progress config loader features", func() {
 
 	AfterEach(EnsureGockRequestsHaveBeenMatched)
 
-	Context("Loading test-keeper configuration file from GitHub repository", func() {
+	Context("Loading work-in-progress configuration file from GitHub repository", func() {
 
 		logger := log.NewTestLogger()
 

@@ -25,10 +25,11 @@ type Client interface {
 	GetPullRequestReviews(owner, repo string, prNumber int) ([]*gogh.PullRequestReview, error)
 	ListIssueComments(issue scm.RepositoryIssue) ([]*gogh.IssueComment, error)
 	CreateIssueComment(issue scm.RepositoryIssue, commentMsg *string) error
+	EditIssueComment(issue scm.RepositoryIssue, commentID int64, commentMsg *string) error
 	CreateStatus(change scm.RepositoryChange, repoStatus *gogh.RepoStatus) error
-	ListPullRequestLabels(change scm.RepositoryChange, prNumber int) ([]*gogh.Label, error)
 	AddPullRequestLabel(change scm.RepositoryChange, prNumber int, label []string) error
 	RemovePullRequestLabel(change scm.RepositoryChange, prNumber int, label string) error
+	EditPullRequest(*gogh.PullRequest) error
 	GetRateLimit() (*gogh.RateLimits, error)
 
 	RegisterAroundFunctions(aroundCreators ...AroundFunctionCreator)
@@ -160,6 +161,19 @@ func (c *client) CreateIssueComment(issue scm.RepositoryIssue, commentMsg *strin
 	return err
 }
 
+// EditIssueComment edits an already existing comment in the given issue.
+func (c *client) EditIssueComment(issue scm.RepositoryIssue, commentID int64, commentMsg *string) error {
+	comment := &gogh.IssueComment{
+		Body: commentMsg,
+	}
+	err := c.do(func(aroundContext aroundContext) (func(), *gogh.Response, error) {
+		_, response, e := c.gh.Issues.EditComment(context.Background(), issue.Owner, issue.RepoName, commentID, comment)
+		return func() {}, response, c.checkHTTPCode(response, e)
+	})
+
+	return err
+}
+
 // CreateStatus creates a new status for a repository at the specified reference represented by a RepositoryChange
 func (c *client) CreateStatus(change scm.RepositoryChange, repoStatus *gogh.RepoStatus) error {
 	err := c.do(func(aroundContext aroundContext) (func(), *gogh.Response, error) {
@@ -171,20 +185,17 @@ func (c *client) CreateStatus(change scm.RepositoryChange, repoStatus *gogh.Repo
 	return err
 }
 
-func (c client) ListPullRequestLabels(change scm.RepositoryChange, prNumber int) ([]*gogh.Label, error) {
-	allLabels := make([]*gogh.Label, 0)
-
-	err := c.do(func(aroundCtx aroundContext) (func(), *gogh.Response, error) {
-		labels, response, e := c.gh.Issues.ListLabelsByIssue(context.Background(), change.Owner, change.RepoName, prNumber, listOpts(aroundCtx))
-		return func() {
-			allLabels = append(allLabels, labels...)
-		}, response, c.checkHTTPCode(response, e)
+func (c *client) EditPullRequest(pr *gogh.PullRequest) error {
+	err := c.do(func(aroundContext aroundContext) (func(), *gogh.Response, error) {
+		_, response, e :=
+			c.gh.PullRequests.Edit(context.Background(), *pr.Base.Repo.Owner.Login, *pr.Base.Repo.Name, *pr.Number, pr)
+		return func() {}, response, c.checkHTTPCode(response, e)
 	})
 
-	return allLabels, err
+	return err
 }
 
-func (c client) AddPullRequestLabel(change scm.RepositoryChange, prNumber int, label []string) error {
+func (c *client) AddPullRequestLabel(change scm.RepositoryChange, prNumber int, label []string) error {
 	err := c.do(func(aroundContext aroundContext) (func(), *gogh.Response, error) {
 		_, response, e := c.gh.Issues.AddLabelsToIssue(context.Background(), change.Owner, change.RepoName, prNumber, label)
 		return func() {}, response, c.checkHTTPCode(response, e)
@@ -193,7 +204,7 @@ func (c client) AddPullRequestLabel(change scm.RepositoryChange, prNumber int, l
 	return err
 }
 
-func (c client) RemovePullRequestLabel(change scm.RepositoryChange, prNumber int, label string) error {
+func (c *client) RemovePullRequestLabel(change scm.RepositoryChange, prNumber int, label string) error {
 	err := c.do(func(aroundContext aroundContext) (func(), *gogh.Response, error) {
 		response, e := c.gh.Issues.RemoveLabelForIssue(context.Background(), change.Owner, change.RepoName, prNumber, label)
 		return func() {}, response, c.checkHTTPCode(response, e)

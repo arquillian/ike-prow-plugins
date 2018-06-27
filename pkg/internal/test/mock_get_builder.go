@@ -5,6 +5,7 @@ import (
 	"fmt"
 
 	"github.com/arquillian/ike-prow-plugins/pkg/github/service"
+	"github.com/arquillian/ike-prow-plugins/pkg/utils"
 	gogh "github.com/google/go-github/github"
 	"gopkg.in/h2non/gock.v1"
 )
@@ -67,22 +68,18 @@ func (b *MockPrBuilder) mockReviews(content string, options ...RequestOption) {
 }
 
 // WithLabels sets the given payload containing list of labels to the mocked PR
-func (b *MockPrBuilder) WithLabels(jsonContent string, options ...RequestOption) *MockPrBuilder {
-	b.mockLabels(jsonContent, options...)
+func (b *MockPrBuilder) WithLabels(labelNames ...string) *MockPrBuilder {
+	//:= make([]*gogh.Label, 0, len(labelNames))
+	for _, labelName := range labelNames {
+		b.pullRequest.Labels = append(b.pullRequest.Labels, &gogh.Label{Name: utils.String(labelName)})
+	}
 	return b
 }
 
 // WithoutLabels sets an empty array as a payload representing pr/issue labels
-func (b *MockPrBuilder) WithoutLabels(options ...RequestOption) *MockPrBuilder {
-	b.mockLabels("[]", options...)
+func (b *MockPrBuilder) WithoutLabels() *MockPrBuilder {
+	b.pullRequest.Labels = make([]*gogh.Label, 0, 0)
 	return b
-}
-
-func (b *MockPrBuilder) mockLabels(content string, options ...RequestOption) {
-	if len(options) == 0 {
-		options = []RequestOption{perPage100, page1}
-	}
-	b.addMockCreator(b.mockGetForPR("issues", "/labels", content, options...))
 }
 
 func (b *MockPrBuilder) mockGetForPR(targetType, suffix string, body string, options ...RequestOption) MockCreator {
@@ -167,12 +164,20 @@ var page1 = func(request *gock.Request) {
 	request.MatchParam("page", "1")
 }
 
-// WithoutAllConfigFiles sets that the associated mocked PR shouldn't contain any configuration file
-func (b *MockPrBuilder) WithoutAllConfigFiles() *MockPrBuilder {
-	configsToMock := []string{"%s.yaml", "%s.yml", "%s_hint.md"}
+// WithoutConfigFiles sets that the associated mocked PR shouldn't contain any configuration file
+func (b *MockPrBuilder) WithoutConfigFiles() *MockPrBuilder {
+	configsToMock := []string{"%s.yaml", "%s.yml"}
 
 	for _, config := range configsToMock {
 		b.WithoutRawFiles(ghservice.ConfigHome + fmt.Sprintf(config, b.pluginName))
+	}
+	return b
+}
+
+// WithoutConfigFiles sets that the associated mocked PR shouldn't contain any configuration file
+func (b *MockPrBuilder) WithoutMessageFiles(fileNames ...string) *MockPrBuilder {
+	for _, fileName := range fileNames {
+		b.WithoutRawFiles(ghservice.ConfigHome + fileName)
 	}
 	return b
 }

@@ -166,12 +166,18 @@ var _ = Describe("Command executor features", func() {
 			It("should not execute command when command name is not matching", func() {
 				// given
 
+				//<<<<<<< HEAD
 				mock := MockPr(LoadedFromDefaultStruct()).
 					WithUsers(ExternalUser("sender")).
 					Expecting(CommentTo(
 						HaveBodyThatContains("Hey @sender! It seems you tried to trigger `/command` command"),
 						HaveBodyThatContains("You have to be admin"))).
 					Create()
+					//=======
+					//				triggeredCommand.Sender = &gogh.User{Login: utils.String("sender")}
+					//
+					//				user := is.NewPermissionService(client, "sender", ghservice.NewPullRequestLazyLoaderFromComment(client, triggeredCommand))
+					//>>>>>>> master
 
 				triggeredCommand.Repo = mock.PullRequest.Base.Repo
 				executed := false

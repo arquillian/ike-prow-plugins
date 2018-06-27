@@ -1,7 +1,7 @@
 package wip
 
 import (
-	"encoding/json"
+	"fmt"
 	"regexp"
 	"strings"
 
@@ -10,7 +10,7 @@ import (
 	"github.com/arquillian/ike-prow-plugins/pkg/github/client"
 	"github.com/arquillian/ike-prow-plugins/pkg/github/service"
 	"github.com/arquillian/ike-prow-plugins/pkg/log"
-	"github.com/arquillian/ike-prow-plugins/pkg/scm"
+	"github.com/arquillian/ike-prow-plugins/pkg/status"
 	"github.com/arquillian/ike-prow-plugins/pkg/utils"
 	gogh "github.com/google/go-github/github"
 )
@@ -37,87 +37,29 @@ type GitHubWIPPRHandler struct {
 }
 
 var (
-	handledCommentActions = []string{"created"}
-	handledPrActions      = []string{"opened", "reopened", "edited", "synchronize"}
+	handledCommentActions = []string{"created", "edited"}
+	handledPrActions      = []string{"opened", "reopened", "edited", "synchronize", "labeled", "unlabeled"}
 	defaultPrefixes       = []string{"WIP", "DO NOT MERGE", "DON'T MERGE", "WORK-IN-PROGRESS"}
 )
 
-// HandleEvent is an entry point for the plugin logic. This method is invoked by the Server when
-// events are dispatched from the /hook service
-func (gh *GitHubWIPPRHandler) HandleEvent(log log.Logger, eventType github.EventType, payload []byte) error {
-	switch eventType {
-	case github.PullRequest:
-		var event gogh.PullRequestEvent
-		if err := json.Unmarshal(payload, &event); err != nil {
-			log.Errorf("Failed while parsing '%q' event with payload: %q. Cause: %q", github.PullRequest, event, err)
-			return err
-		}
-
-		if err := gh.handlePrEvent(log, &event); err != nil {
-			log.Errorf("Error handling '%q' event with payload %q. Cause: %q", github.PullRequest, event, err)
-			return err
-		}
-
-	case github.IssueComment:
-		var event gogh.IssueCommentEvent
-		if err := json.Unmarshal(payload, &event); err != nil {
-			log.Errorf("Failed while parsing '%q' event with payload: %q. Cause: %q", github.IssueComment, event, err)
-			return err
-		}
-
-		if err := gh.handlePrComment(log, &event); err != nil {
-			log.Errorf("Error handling '%q' event with payload %q. Cause: %q", github.IssueComment, event, err)
-			return err
-		}
-
-	default:
-		log.Warnf("received an event of type %q but didn't ask for it", eventType)
-	}
-
-	return nil
-}
-
-func (gh *GitHubWIPPRHandler) handlePrEvent(log log.Logger, event *gogh.PullRequestEvent) error {
+// HandlePullRequestEvent is an entry point for the plugin logic. This method is invoked by the Server when
+// pull request vent is dispatched from the /hook service
+func (gh *GitHubWIPPRHandler) HandlePullRequestEvent(log log.Logger, event *gogh.PullRequestEvent) error {
 	if !utils.Contains(handledPrActions, *event.Action) {
 		return nil
 	}
 
-	return gh.checkTitleAndSetStatus(log, event.PullRequest)
-}
-
-func (gh *GitHubWIPPRHandler) hasWorkInProgressLabel(labels []*gogh.Label, wipLabel string) bool {
-	for _, label := range labels {
-		if label.GetName() == wipLabel {
-			return true
-		}
+	switch *event.Action {
+	case github.ActionLabeled, github.ActionUnlabeled:
+		return gh.checkComponentsAndSetStatus(log, event.PullRequest, true)
+	default:
+		return gh.checkComponentsAndSetStatus(log, event.PullRequest, false)
 	}
-	return false
 }
 
-// IsWorkInProgress checks if title is marked as Work In Progress
-func (gh *GitHubWIPPRHandler) IsWorkInProgress(title string, config PluginConfiguration) bool {
-	prefixes := defaultPrefixes
-	if len(config.Prefix) != 0 {
-		if config.Combine {
-			prefixes = append(prefixes, config.Prefix...)
-		} else {
-			prefixes = config.Prefix
-		}
-	}
-	return gh.hasPrefix(strings.ToLower(title), prefixes)
-}
-
-func (gh *GitHubWIPPRHandler) hasPrefix(title string, prefixes []string) bool {
-	for _, prefix := range prefixes {
-		pattern := `(?mi)^(\[|\()?` + prefix + `(\]|\))?(:| )+`
-		if match, _ := regexp.MatchString(pattern, title); match {
-			return true
-		}
-	}
-	return false
-}
-
-func (gh *GitHubWIPPRHandler) handlePrComment(log log.Logger, comment *gogh.IssueCommentEvent) error {
+// HandleIssueCommentEvent is an entry point for the plugin logic. This method is invoked by the Server when
+// issue comment event is dispatched from the /hook service
+func (gh *GitHubWIPPRHandler) HandleIssueCommentEvent(log log.Logger, comment *gogh.IssueCommentEvent) error {
 	if !utils.Contains(handledCommentActions, *comment.Action) {
 		return nil
 	}
@@ -135,7 +77,7 @@ func (gh *GitHubWIPPRHandler) handlePrComment(log log.Logger, comment *gogh.Issu
 				return err
 			}
 
-			return gh.checkTitleAndSetStatus(log, pullRequest)
+			return gh.checkComponentsAndSetStatus(log, pullRequest, false)
 
 		}})
 
@@ -146,35 +88,69 @@ func (gh *GitHubWIPPRHandler) handlePrComment(log log.Logger, comment *gogh.Issu
 	return err
 }
 
-func (gh *GitHubWIPPRHandler) checkTitleAndSetStatus(log log.Logger, pullRequest *gogh.PullRequest) error {
-	change := scm.RepositoryChange{
-		Owner:    *pullRequest.Base.Repo.Owner.Login,
-		RepoName: *pullRequest.Base.Repo.Name,
-		Hash:     *pullRequest.Head.SHA,
-	}
+func (gh *GitHubWIPPRHandler) checkComponentsAndSetStatus(log log.Logger, pullRequest *gogh.PullRequest, labelUpdated bool) error {
+	change := ghservice.NewRepositoryChangeForPR(pullRequest)
 	statusContext := github.StatusContext{BotName: gh.BotName, PluginName: ProwPluginName}
-	statusService := ghservice.NewStatusService(gh.Client, log, change, statusContext)
-
-	labels, err := gh.Client.ListPullRequestLabels(change, *pullRequest.Number)
-	if err != nil {
-		log.Warnf("failed to list labels on PR [%q]. cause: %s", *pullRequest, err)
-	}
+	statusService := status.NewStatusService(gh.Client, log, change, statusContext)
 
 	configuration := LoadConfiguration(log, change)
-	labelExists := gh.hasWorkInProgressLabel(labels, configuration.Label)
-	if gh.IsWorkInProgress(*pullRequest.Title, configuration) {
-		if !labelExists {
-			if err := gh.Client.AddPullRequestLabel(change, *pullRequest.Number, strings.Fields(configuration.Label)); err != nil {
-				log.Errorf("failed to add label on PR [%q]. cause: %s", *pullRequest, err)
+	labelExists := gh.hasWorkInProgressLabel(pullRequest.Labels, configuration.Label)
+	prefix, prefixExists := GetWorkInProgressPrefix(*pullRequest.Title, configuration)
+
+	if prefixExists && !labelExists {
+		if labelUpdated {
+			*pullRequest.Title = strings.TrimSpace(strings.TrimPrefix(*pullRequest.Title, prefix))
+			if err := gh.Client.EditPullRequest(pullRequest); err != nil {
+				return fmt.Errorf("failed to update PR title [%q]. cause: %s", *pullRequest, err)
 			}
+			return statusService.Success(ReadyForReviewMessage, ReadyForReviewDetailsPageName)
+		}
+		if err := gh.Client.AddPullRequestLabel(change, *pullRequest.Number, []string{configuration.Label}); err != nil {
+			log.Errorf("failed to add label on PR [%q]. cause: %s", *pullRequest, err)
 		}
 		return statusService.Failure(InProgressMessage, InProgressDetailsPageName)
 	}
 	if labelExists {
-		if err := gh.Client.RemovePullRequestLabel(change, *pullRequest.Number, configuration.Label); err != nil {
-			log.Errorf("failed to remove label on PR [%q]. cause: %s", *pullRequest, err)
+		if !prefixExists && !labelUpdated {
+			if err := gh.Client.RemovePullRequestLabel(change, *pullRequest.Number, configuration.Label); err != nil {
+				log.Errorf("failed to remove label on PR [%q]. cause: %s", *pullRequest, err)
+			}
+			return statusService.Success(ReadyForReviewMessage, ReadyForReviewDetailsPageName)
 		}
+		return statusService.Failure(InProgressMessage, InProgressDetailsPageName)
 	}
 	return statusService.Success(ReadyForReviewMessage, ReadyForReviewDetailsPageName)
+}
 
+func (gh *GitHubWIPPRHandler) hasWorkInProgressLabel(labels []*gogh.Label, wipLabel string) bool {
+	for _, label := range labels {
+		if label.GetName() == wipLabel {
+			return true
+		}
+	}
+	return false
+}
+
+// GetWorkInProgressPrefix checks if title is marked as Work In Progress
+func GetWorkInProgressPrefix(title string, config PluginConfiguration) (string, bool) {
+	prefixes := defaultPrefixes
+	if len(config.Prefix) != 0 {
+		if config.Combine {
+			prefixes = append(prefixes, config.Prefix...)
+		} else {
+			prefixes = config.Prefix
+		}
+	}
+	return hasPrefix(title, prefixes)
+}
+
+func hasPrefix(title string, prefixes []string) (string, bool) {
+	for _, prefix := range prefixes {
+		pattern := `(?mi)^(\[|\()?` + prefix + `(\]|\))?(:| )+`
+		r, _ := regexp.Compile(pattern)
+		if match := r.FindString(title); match != "" {
+			return strings.TrimSpace(match), true
+		}
+	}
+	return "", false
 }

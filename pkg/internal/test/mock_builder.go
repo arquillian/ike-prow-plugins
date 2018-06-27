@@ -86,6 +86,11 @@ func (b *MockPrBuilder) WithTitle(title string) *MockPrBuilder {
 	return b
 }
 
+func (b *MockPrBuilder) WithSize(size int) *MockPrBuilder {
+	b.pullRequest.ChangedFiles = &size
+	return b
+}
+
 // Create initializes the gock mocks based on the predefined information
 func (b *MockPrBuilder) Create() *PrMock {
 	for _, mock := range b.mockCreators {
@@ -126,9 +131,9 @@ func SentBy(name string) SenderCreator {
 	}
 }
 
-// CreateCommentEvent based on the mocked PR information creates a marshaled payload of the IssueCommentEvent struct
-func (pr *PrMock) CreateCommentEvent(userCreator SenderCreator, content, action string) []byte {
-	event := gogh.IssueCommentEvent{
+// CreateCommentEvent based on the mocked PR information creates an IssueCommentEvent
+func (pr *PrMock) CreateCommentEvent(userCreator SenderCreator, content, action string) *gogh.IssueCommentEvent {
+	return &gogh.IssueCommentEvent{
 		Action: utils.String(action),
 		Issue: &gogh.Issue{
 			Number: pr.PullRequest.Number,
@@ -139,7 +144,6 @@ func (pr *PrMock) CreateCommentEvent(userCreator SenderCreator, content, action 
 		Repo:   pr.PullRequest.Base.Repo,
 		Sender: userCreator(pr.PullRequest),
 	}
-	return marshalObject(event)
 }
 
 func createGhUser(name string) *gogh.User {
@@ -152,30 +156,27 @@ func marshalObject(toMarshal interface{}) []byte {
 	return json
 }
 
-// CreatePullRequestEvent based on the mocked PR information creates a marshaled payload of the PullRequestEvent struct
-func (pr *PrMock) CreatePullRequestEvent(action string) []byte {
-	event := gogh.PullRequestEvent{
+// CreatePullRequestEvent based on the mocked PR information creates a PullRequestEvent
+func (pr *PrMock) CreatePullRequestEvent(action string) *gogh.PullRequestEvent {
+	return &gogh.PullRequestEvent{
 		Action:      utils.String(action),
 		Number:      pr.PullRequest.Number,
 		PullRequest: pr.PullRequest,
 		Repo:        pr.PullRequest.Base.Repo,
 		Sender:      pr.PullRequest.User,
 	}
-	return marshalObject(event)
 }
 
 // CreateUserPermissionService based on the mocked PR information creates an instance of PermissionService
 func (pr *PrMock) CreateUserPermissionService(userName string) *command.PermissionService {
-	return &command.PermissionService{
-		Client: NewDefaultGitHubClient(),
-		User:   userName,
-		PRLoader: &ghservice.PullRequestLazyLoader{
+	return command.NewPermissionService(NewDefaultGitHubClient(), userName,
+		&ghservice.PullRequestLazyLoader{
 			Client:    NewDefaultGitHubClient(),
 			RepoOwner: *pr.PullRequest.Base.Repo.Owner.Login,
 			RepoName:  *pr.PullRequest.Base.Repo.Name,
 			Number:    *pr.PullRequest.Number,
 		},
-	}
+	)
 }
 
 // SubMockBuilder represents a builder to be used for mocking of a particular PR parameter

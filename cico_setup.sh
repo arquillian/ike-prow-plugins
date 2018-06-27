@@ -50,7 +50,7 @@ function cleanup_env {
 
 function deploy() {
   export REGISTRY="push.registry.devshift.net"
-  export PLUGINS='work-in-progress test-keeper'
+  export PLUGINS='work-in-progress test-keeper pr-sanitizer'
 
   if [ "${TARGET}" = "rhel" ]; then
     export DEPLOY_DOCKERFILE='Dockerfile.deploy.rhel'

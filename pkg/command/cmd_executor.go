@@ -70,7 +70,7 @@ func (p *DoFunctionProvider) Then(doFunction DoFunction) {
 			return nil
 		}
 
-		status, err := AllOf(p.permissionChecks...)()
+		status, err := AllOf(p.permissionChecks...)(true)
 		if status.UserIsApproved && err == nil {
 			return doFunction()
 		}

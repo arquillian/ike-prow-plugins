@@ -35,7 +35,7 @@ pmnsadd -n root prometheus
 # Add our lone prometheus source
 URLSD=$PCP_PMDAS_DIR/prometheus/urls.d
 mkdir -p $URLSD
-echo 'http://localhost:8080/metrics' > $URLSD/prow.url
+echo 'http://localhost:8888/metrics' > $URLSD/prow.url
 
 cd $PCP_LOG_DIR
 

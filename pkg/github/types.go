@@ -28,6 +28,12 @@ const (
 	StatusFailure = "failure"
 )
 
+// These are the possible actions for the Pull Request Event Type
+const (
+	ActionLabeled   = "labeled"
+	ActionUnlabeled = "unlabeled"
+)
+
 const (
 	IssueComment = EventType("issue_comment") // nolint
 	PullRequest  = EventType("pull_request")  // nolint
