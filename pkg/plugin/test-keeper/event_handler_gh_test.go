@@ -77,7 +77,7 @@ var _ = Describe("Test Keeper Plugin features", func() {
 				WithFiles(LoadedFrom("test_fixtures/github_calls/prs/without_tests/changes-with-test-keeper-config-excluding-other-file-from-PR.json")).
 				WithConfigFile(
 					ConfigYml(Containing(
-						Param("skip_validation_for", "'**/Randomfile'")))).
+						Param("skip_validation_for", "['**/Randomfile']")))).
 				WithoutComments().
 				Expecting(
 					Status(ToBe(github.StatusSuccess, testkeeper.OkOnlySkippedFilesMessage, testkeeper.OkOnlySkippedFilesDetailsPageName)),
