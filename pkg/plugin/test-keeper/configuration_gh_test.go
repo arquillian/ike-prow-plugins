@@ -32,11 +32,11 @@ var _ = Describe("Test keeper config loader features", func() {
 				Hash:     "46cb8fac44709e4ccaae97448c65e8f7320cfea7",
 			}
 
-			mocker.MockConfig(
+			mocker.AddConfig(
 				ConfigYml(Containing(
 					Param("test_patterns", "['*my', 'test.go', 'pattern.js']"),
 					Param("skip_validation_for", "['pom.xml', 'regex{{*\\.adoc}}']")))).
-				ForChange(change)
+				ToChange(change)
 
 			// when
 			configuration := testkeeper.LoadConfiguration(logger, change)
@@ -59,11 +59,11 @@ var _ = Describe("Test keeper config loader features", func() {
 				Hash:     "46cb8fac44709e4ccaae97448c65e8f7320cfea7",
 			}
 
-			mocker.MockConfig(
+			mocker.AddConfig(
 				ConfigYaml(Containing(
 					Param("test_patterns", "['*my', 'test.go', 'pattern.js']"),
 					Param("skip_validation_for", "['pom.xml', 'regex{{*\\.adoc}}']")))).
-				ForChange(change)
+				ToChange(change)
 
 			// when
 			configuration := testkeeper.LoadConfiguration(logger, change)

@@ -206,15 +206,15 @@ type SubMockBuilder struct {
 	prBuilder *MockPrBuilder
 }
 
-// MockConfig creates an instance of SubMockBuilder for the given configuration
-func (t MockPluginTemplate) MockConfig(configMock func(builder *MockPrBuilder)) *SubMockBuilder {
+// AddConfig creates an instance of SubMockBuilder for the given configuration
+func (t MockPluginTemplate) AddConfig(configMock func(builder *MockPrBuilder)) *SubMockBuilder {
 	builder := &SubMockBuilder{prBuilder: &MockPrBuilder{pluginName: t.pluginName}}
 	builder.prBuilder.WithConfigFile(configMock)
 	return builder
 }
 
-// ForChange defines that the predefined information should be applicable for the given scm.RepositoryChange
-func (b *SubMockBuilder) ForChange(change scm.RepositoryChange) {
+// ToChange defines that the predefined information should be applicable for the given scm.RepositoryChange
+func (b *SubMockBuilder) ToChange(change scm.RepositoryChange) {
 	b.prBuilder.pullRequest = changeToPr(change)
 	b.prBuilder.Create()
 }

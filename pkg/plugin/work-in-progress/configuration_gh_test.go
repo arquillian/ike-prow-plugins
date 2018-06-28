@@ -32,11 +32,11 @@ var _ = Describe("Work In Progress config loader features", func() {
 				Hash:     "46cb8fac44709e4ccaae97448c65e8f7320cfea7",
 			}
 
-			mocker.MockConfig(
+			mocker.AddConfig(
 				ConfigYml(Containing(
 					Param("title_prefixes", "['[work in progress]', 'work in progress']"),
 					Param("gh_label", "working-in-progress")))).
-				ForChange(change)
+				ToChange(change)
 
 			// when
 			configuration := wip.LoadConfiguration(logger, change)
