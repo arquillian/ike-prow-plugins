@@ -40,9 +40,14 @@ This ensures that the PR description has more than 50 characters to have more el
 
 All issue link keywords(e.g. `close #1`) added to close an issue are not taken into consideration while measuring description length.
 
+If it won't find Pull Request description more than 50 characters, it adds a comment with a hint message and marks its check as **Failure**, or as **Success** otherwise.
+
 === Description - Issue Link Verification [[description-issue-link-verification]]
 
 This ensures that the PR description has issue link using keywords to close issue after merging pull request. Supported keywords for issue links are `closes`, `closed`, `fix`, `fixes`, `fixed`, `resolve`, `resolves`, `resolved`.
+For More info about how can you close issues via PR can be found link:https://blog.github.com/2013-05-14-closing-issues-via-pull-requests[here].
+
+If it won't find issue link with keywords in Pull Request description, it marks its check as **Failure**, or as **success** otherwise.
 
 === Status details
 
