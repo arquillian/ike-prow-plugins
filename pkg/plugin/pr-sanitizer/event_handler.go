@@ -38,7 +38,7 @@ func (gh *GitHubPRSanitizerEventsHandler) HandlePullRequestEvent(log log.Logger,
 	if !utils.Contains(handledPrActions, *event.Action) {
 		return nil
 	}
-	return gh.checkTitleDescriptionAndSetStatus(log, event.PullRequest)
+	return gh.validatePullRequestTitleAndDescription(log, event.PullRequest)
 }
 
 // HandleIssueCommentEvent is an entry point for the plugin logic. This method is invoked by the Server when
@@ -61,7 +61,7 @@ func (gh *GitHubPRSanitizerEventsHandler) HandleIssueCommentEvent(log log.Logger
 				return err
 			}
 
-			return gh.checkTitleDescriptionAndSetStatus(log, pullRequest)
+			return gh.validatePullRequestTitleAndDescription(log, pullRequest)
 		}})
 
 	err := cmdHandler.Handle(log, comment)
@@ -71,7 +71,7 @@ func (gh *GitHubPRSanitizerEventsHandler) HandleIssueCommentEvent(log log.Logger
 	return err
 }
 
-func (gh *GitHubPRSanitizerEventsHandler) checkTitleDescriptionAndSetStatus(log log.Logger, pr *gogh.PullRequest) error {
+func (gh *GitHubPRSanitizerEventsHandler) validatePullRequestTitleAndDescription(log log.Logger, pr *gogh.PullRequest) error {
 	change := ghservice.NewRepositoryChangeForPR(pr)
 	statusService := gh.newPRTitleDescriptionStatusService(log, change)
 
