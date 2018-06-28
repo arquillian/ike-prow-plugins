@@ -24,7 +24,7 @@ type GitHubPRSanitizerEventsHandler struct {
 
 var (
 	handledCommentActions = []string{"created", "edited"}
-	handledPrActions      = []string{"opened", "reopened", "edited", "synchronized"}
+	handledPrActions      = []string{"opened", "reopened", "edited", "synchronize"}
 	defaultTypes          = []string{"chore", "docs", "feat", "fix", "refactor", "style", "test"}
 )
 
