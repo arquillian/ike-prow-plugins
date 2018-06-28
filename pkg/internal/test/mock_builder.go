@@ -180,14 +180,23 @@ func (pr *PrMock) CreatePullRequestEvent(action string) *gogh.PullRequestEvent {
 	}
 }
 
-// CreateUserPermissionService based on the mocked PR information creates an instance of PermissionService
-func (pr *PrMock) CreateUserPermissionService(userName string) *command.PermissionService {
-	return command.NewPermissionService(NewDefaultGitHubClient(), userName,
+// PermissionForUser based on the mocked PR information creates an instance of PermissionService
+func (pr *PrMock) PermissionForUser(userName string) *PermissionServiceMocker {
+	return &PermissionServiceMocker{userName: userName, pr: pr.PullRequest}
+}
+
+type PermissionServiceMocker struct {
+	userName string
+	pr       *gogh.PullRequest
+}
+
+func (m *PermissionServiceMocker) ThatIs() *command.PermissionService {
+	return command.NewPermissionService(NewDefaultGitHubClient(), m.userName,
 		&ghservice.PullRequestLazyLoader{
 			Client:    NewDefaultGitHubClient(),
-			RepoOwner: *pr.PullRequest.Base.Repo.Owner.Login,
-			RepoName:  *pr.PullRequest.Base.Repo.Name,
-			Number:    *pr.PullRequest.Number,
+			RepoOwner: *m.pr.Base.Repo.Owner.Login,
+			RepoName:  *m.pr.Base.Repo.Name,
+			Number:    *m.pr.Number,
 		},
 	)
 }

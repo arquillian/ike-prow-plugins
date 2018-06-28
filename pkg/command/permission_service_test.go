@@ -26,7 +26,7 @@ var _ = Describe("Permission service with permission checks features", func() {
 				Create()
 
 			// when
-			status, err := mock.CreateUserPermissionService("user").Admin(true)
+			status, err := mock.PermissionForUser("user").ThatIs().Admin(true)
 
 			// then
 			Ω(err).ShouldNot(HaveOccurred())
@@ -43,7 +43,7 @@ var _ = Describe("Permission service with permission checks features", func() {
 				Create()
 
 			// when
-			status, err := mock.CreateUserPermissionService("user").Admin(true)
+			status, err := mock.PermissionForUser("user").ThatIs().Admin(true)
 
 			// then
 			Ω(err).ShouldNot(HaveOccurred())
@@ -60,7 +60,7 @@ var _ = Describe("Permission service with permission checks features", func() {
 				Create()
 
 			// when
-			status, err := mock.CreateUserPermissionService("user").PRCreator(true)
+			status, err := mock.PermissionForUser("user").ThatIs().PRCreator(true)
 
 			// then
 			Ω(err).ShouldNot(HaveOccurred())
@@ -77,7 +77,7 @@ var _ = Describe("Permission service with permission checks features", func() {
 				Create()
 
 			// when
-			status, err := mock.CreateUserPermissionService("user").PRCreator(true)
+			status, err := mock.PermissionForUser("user").ThatIs().PRCreator(true)
 
 			// then
 			Ω(err).ShouldNot(HaveOccurred())
@@ -94,7 +94,7 @@ var _ = Describe("Permission service with permission checks features", func() {
 				Create()
 
 			// when
-			status, err := mock.CreateUserPermissionService("user").PRReviewer(true)
+			status, err := mock.PermissionForUser("user").ThatIs().PRReviewer(true)
 
 			// then
 			Ω(err).ShouldNot(HaveOccurred())
@@ -111,7 +111,7 @@ var _ = Describe("Permission service with permission checks features", func() {
 				Create()
 
 			// when
-			status, err := mock.CreateUserPermissionService("user").PRReviewer(true)
+			status, err := mock.PermissionForUser("user").ThatIs().PRReviewer(true)
 
 			// then
 			Ω(err).ShouldNot(HaveOccurred())
@@ -129,7 +129,7 @@ var _ = Describe("Permission service with permission checks features", func() {
 				Create()
 
 			// when
-			status, err := mock.CreateUserPermissionService("user").PRApprover(true)
+			status, err := mock.PermissionForUser("user").ThatIs().PRApprover(true)
 
 			// then
 			Ω(err).ShouldNot(HaveOccurred())
@@ -146,7 +146,7 @@ var _ = Describe("Permission service with permission checks features", func() {
 				Create()
 
 			// when
-			status, err := mock.CreateUserPermissionService("user").PRApprover(true)
+			status, err := mock.PermissionForUser("user").ThatIs().PRApprover(true)
 
 			// then
 			Ω(err).ShouldNot(HaveOccurred())

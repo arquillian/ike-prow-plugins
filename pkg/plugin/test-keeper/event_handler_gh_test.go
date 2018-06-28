@@ -59,7 +59,7 @@ var _ = Describe("Test Keeper Plugin features", func() {
 				WithConfigFile(
 					ConfigYml(Containing(
 						Param("test_patterns", "['**/*_test_suite.go']"),
-						Param("skip_validation_for", "['README.adoc']")))).
+						Param("skip_validation_for","['README.adoc']")))).
 				Expecting(
 					Status(ToBe(github.StatusSuccess, testkeeper.TestsExistMessage, testkeeper.TestsExistDetailsPageName))).
 				Create()

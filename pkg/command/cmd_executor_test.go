@@ -173,9 +173,10 @@ var _ = Describe("Command executor features", func() {
 					Create()
 
 				triggeredCommand.Repo = mock.PullRequest.Base.Repo
+				userThatIs := mock.PermissionForUser("sender").ThatIs()
 				executed := false
 				command := is.CmdExecutor{Command: "/command"}
-				command.When(is.Triggered).By(mock.CreateUserPermissionService("sender").Admin).Then(func() error {
+				command.When(is.Triggered).By(userThatIs.Admin).Then(func() error {
 					executed = true
 					return nil
 				})

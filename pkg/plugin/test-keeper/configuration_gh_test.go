@@ -33,7 +33,7 @@ var _ = Describe("Test keeper config loader features", func() {
 			}
 
 			mocker.MockConfig(
-				ConfigYaml(Containing(
+				ConfigYml(Containing(
 					Param("test_patterns", "['*my', 'test.go', 'pattern.js']"),
 					Param("skip_validation_for", "['pom.xml', 'regex{{*\\.adoc}}']")))).
 				ForChange(change)
