@@ -12,10 +12,10 @@ var _ = Describe("PR-Sanitizer Plugin features", func() {
 
 	Context("Title verifier", func() {
 
-		var handler *prsanitizer.GitHubLabelsEventsHandler
+		var handler *prsanitizer.GitHubPRSanitizerEventsHandler
 
 		BeforeEach(func() {
-			handler = &prsanitizer.GitHubLabelsEventsHandler{Client: NewDefaultGitHubClient()}
+			handler = &prsanitizer.GitHubPRSanitizerEventsHandler{Client: NewDefaultGitHubClient()}
 		})
 
 		DescribeTable("should recognize PR as compliant with semantic commit message if title starts with any default prefix",
@@ -43,10 +43,10 @@ var _ = Describe("PR-Sanitizer Plugin features", func() {
 
 	Context("Description verifier", func() {
 
-		var handler *prsanitizer.GitHubLabelsEventsHandler
+		var handler *prsanitizer.GitHubPRSanitizerEventsHandler
 
 		BeforeEach(func() {
-			handler = &prsanitizer.GitHubLabelsEventsHandler{Client: NewDefaultGitHubClient()}
+			handler = &prsanitizer.GitHubPRSanitizerEventsHandler{Client: NewDefaultGitHubClient()}
 		})
 
 		DescribeTable("should get issue link presence and PR description with excluding issue link keyword",

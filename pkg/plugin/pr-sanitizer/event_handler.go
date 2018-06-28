@@ -15,9 +15,9 @@ import (
 	"fmt"
 )
 
-// GitHubLabelsEventsHandler is the event handler for the plugin.
+// GitHubPRSanitizerEventsHandler is the event handler for the plugin.
 // Implements server.GitHubEventHandler interface which contains the logic for incoming GitHub events
-type GitHubLabelsEventsHandler struct {
+type GitHubPRSanitizerEventsHandler struct {
 	Client  ghclient.Client
 	BotName string
 }
@@ -34,7 +34,7 @@ const DescriptionShortMessage = "Hey @%s! It seems that PR description is too sh
 
 // HandlePullRequestEvent is an entry point for the plugin logic. This method is invoked by the Server when
 // pull request event is dispatched from the /hook service
-func (gh *GitHubLabelsEventsHandler) HandlePullRequestEvent(log log.Logger, event *gogh.PullRequestEvent) error {
+func (gh *GitHubPRSanitizerEventsHandler) HandlePullRequestEvent(log log.Logger, event *gogh.PullRequestEvent) error {
 	if !utils.Contains(handledPrActions, *event.Action) {
 		return nil
 	}
@@ -43,7 +43,7 @@ func (gh *GitHubLabelsEventsHandler) HandlePullRequestEvent(log log.Logger, even
 
 // HandleIssueCommentEvent is an entry point for the plugin logic. This method is invoked by the Server when
 // issue comment event is dispatched from the /hook service
-func (gh *GitHubLabelsEventsHandler) HandleIssueCommentEvent(log log.Logger, comment *gogh.IssueCommentEvent) error {
+func (gh *GitHubPRSanitizerEventsHandler) HandleIssueCommentEvent(log log.Logger, comment *gogh.IssueCommentEvent) error {
 	if !utils.Contains(handledCommentActions, *comment.Action) {
 		return nil
 	}
@@ -71,7 +71,7 @@ func (gh *GitHubLabelsEventsHandler) HandleIssueCommentEvent(log log.Logger, com
 	return err
 }
 
-func (gh *GitHubLabelsEventsHandler) checkTitleDescriptionAndSetStatus(log log.Logger, pr *gogh.PullRequest) error {
+func (gh *GitHubPRSanitizerEventsHandler) checkTitleDescriptionAndSetStatus(log log.Logger, pr *gogh.PullRequest) error {
 	change := ghservice.NewRepositoryChangeForPR(pr)
 	statusService := gh.newPRTitleDescriptionStatusService(log, change)
 
@@ -110,14 +110,14 @@ func (gh *GitHubLabelsEventsHandler) checkTitleDescriptionAndSetStatus(log log.L
 }
 
 // GetDescriptionWithIssueLinkExcluded return description with excluding issue link keyword.
-func (gh *GitHubLabelsEventsHandler) GetDescriptionWithIssueLinkExcluded(d string) (string, bool) {
+func (gh *GitHubPRSanitizerEventsHandler) GetDescriptionWithIssueLinkExcluded(d string) (string, bool) {
 	desc := strings.ToLower(d)
 	var issueLink = regexp.MustCompile(`(close|closes|closed|fix|fixes|fixed|resolve|resolves|resolved)[:]?[\s]+[\w-/]*#[\d]+`)
 	return strings.TrimSpace(issueLink.ReplaceAllString(desc, "")), issueLink.MatchString(desc)
 }
 
 // HasTitleWithValidType checks if title prefix conforms with semantic message style.
-func (gh *GitHubLabelsEventsHandler) HasTitleWithValidType(config PluginConfiguration, title string) bool {
+func (gh *GitHubPRSanitizerEventsHandler) HasTitleWithValidType(config PluginConfiguration, title string) bool {
 	prefixes := defaultTypes
 	if len(config.TypePrefix) != 0 {
 		if config.Combine {

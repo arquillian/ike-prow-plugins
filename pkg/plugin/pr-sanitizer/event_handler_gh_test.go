@@ -29,7 +29,7 @@ var (
 
 var _ = Describe("PR Sanitizer Plugin features", func() {
 
-	var handler *prsanitizer.GitHubLabelsEventsHandler
+	var handler *prsanitizer.GitHubPRSanitizerEventsHandler
 
 	log := log.NewTestLogger()
 	configFilePath := ghservice.ConfigHome + prsanitizer.ProwPluginName
@@ -51,7 +51,7 @@ var _ = Describe("PR Sanitizer Plugin features", func() {
 	Context("Pull Request title change trigger", func() {
 		BeforeEach(func() {
 			defer gock.OffAll()
-			handler = &prsanitizer.GitHubLabelsEventsHandler{Client: NewDefaultGitHubClient(), BotName: botName}
+			handler = &prsanitizer.GitHubPRSanitizerEventsHandler{Client: NewDefaultGitHubClient(), BotName: botName}
 		})
 
 		AfterEach(EnsureGockRequestsHaveBeenMatched)
@@ -184,7 +184,7 @@ var _ = Describe("PR Sanitizer Plugin features", func() {
 
 		BeforeEach(func() {
 			defer gock.OffAll()
-			handler = &prsanitizer.GitHubLabelsEventsHandler{Client: NewDefaultGitHubClient(), BotName: botName}
+			handler = &prsanitizer.GitHubPRSanitizerEventsHandler{Client: NewDefaultGitHubClient(), BotName: botName}
 		})
 
 		AfterEach(EnsureGockRequestsHaveBeenMatched)
@@ -258,7 +258,7 @@ var _ = Describe("PR Sanitizer Plugin features", func() {
 	Context("Trigger pr-sanitizer plugin by triggering comment on pull request", func() {
 		BeforeEach(func() {
 			defer gock.OffAll()
-			handler = &prsanitizer.GitHubLabelsEventsHandler{Client: NewDefaultGitHubClient(), BotName: botName}
+			handler = &prsanitizer.GitHubPRSanitizerEventsHandler{Client: NewDefaultGitHubClient(), BotName: botName}
 		})
 
 		AfterEach(EnsureGockRequestsHaveBeenMatched)

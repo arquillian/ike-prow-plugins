@@ -25,7 +25,7 @@ const (
 	SuccessDetailsPageName = "pr-sanitizer-success"
 )
 
-func (gh *GitHubLabelsEventsHandler) newPRTitleDescriptionStatusService(log log.Logger, change scm.RepositoryChange) prTitleDescriptionStatusService {
+func (gh *GitHubPRSanitizerEventsHandler) newPRTitleDescriptionStatusService(log log.Logger, change scm.RepositoryChange) prTitleDescriptionStatusService {
 	statusContext := github.StatusContext{BotName: gh.BotName, PluginName: ProwPluginName}
 	statusService := status.NewStatusService(gh.Client, log, change, statusContext)
 	return prTitleDescriptionStatusService{statusService: statusService}
