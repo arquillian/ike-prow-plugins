@@ -1,6 +1,6 @@
 ==== Failure [[pr-sanitizer-failed]]
 
-===== title missing semantic commit style [[title-verification-failed]]
+===== Title missing semantic commit style [[title-verification-failed]]
 
 Your Pull Request has been rejected because the plugin detected that the PR title does not starts with any of the "type prefixes", so it seems that it does not conform with the semantic commit message style.
 
@@ -8,7 +8,7 @@ Edit the PR title to conform with the semantic commit message style by prefixing
 
 For more information see <<index#title-verification,Title Verification>> and <<index#pr-sanitizer-config,Plugin Configuration>> sections.
 
-===== description content is too short [[description-verification-failed]]
+===== Description content is too short [[description-verification-failed]]
 
 Your Pull Request has been rejected because the plugin detected that the PR description excluding issue link and it's keywords has less than 50 characters.
 
@@ -16,7 +16,7 @@ Update the PR description by adding more elaborated description more than 50 cha
 
 For more information see <<index#description-length-verification,Description - Content Length Verification>>
 
-===== issue link keyword is missing [[issue-link-failed]]
+===== Issue link keyword is missing [[issue-link-failed]]
 
 Your Pull Request has been rejected because the plugin detected that the PR description doesn't contain any issue link which you want to close after merging PR.
 
