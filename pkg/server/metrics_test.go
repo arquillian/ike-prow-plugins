@@ -71,7 +71,7 @@ var _ = Describe("Service Metrics", func() {
 			CreatePullRequestEvent("created")
 
 		// when
-		err := phony.SendHook(testServer.URL, string(github.PullRequest), mashal(event), secret)
+		err := phony.SendHook(testServer.URL, string(github.PullRequest), marshal(event), secret)
 
 		// then
 		Ω(err).ShouldNot(HaveOccurred())
@@ -90,7 +90,7 @@ var _ = Describe("Service Metrics", func() {
 			CreateCommentEvent(SentByRepoOwner, testkeeper.BypassCheckComment, "created")
 
 		// when
-		err := phony.SendHook(testServer.URL, string(github.IssueComment), mashal(event), secret)
+		err := phony.SendHook(testServer.URL, string(github.IssueComment), marshal(event), secret)
 
 		// then
 		Ω(err).ShouldNot(HaveOccurred())
@@ -109,7 +109,7 @@ var _ = Describe("Service Metrics", func() {
 			CreateCommentEvent(SentByRepoOwner, testkeeper.BypassCheckComment, "created")
 
 		// when
-		err := phony.SendHook(testServer.URL, string(github.IssueComment), mashal(event), secret)
+		err := phony.SendHook(testServer.URL, string(github.IssueComment), marshal(event), secret)
 
 		// then
 		Ω(err).ShouldNot(HaveOccurred())
@@ -126,7 +126,7 @@ var _ = Describe("Service Metrics", func() {
 	})
 })
 
-func mashal(event interface{}) []byte {
+func marshal(event interface{}) []byte {
 	payload, err := json.Marshal(event)
 	Ω(err).ShouldNot(HaveOccurred())
 	return payload
