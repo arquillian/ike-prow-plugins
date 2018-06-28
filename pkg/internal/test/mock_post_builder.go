@@ -11,7 +11,7 @@ import (
 
 var (
 	// ToBe as a wrapper for a status matcher
-	ToBe = func(status, description, detailsLink string) builderMatcher {
+	ToBe = func(status, description, detailsLink string) BuilderMatcher {
 		return func(builder *MockPrBuilder) SoftMatcher {
 			docStatusRoot := fmt.Sprintf("%s/status/%s", plugin.DocumentationURL, builder.pluginName)
 
@@ -25,20 +25,21 @@ var (
 	}
 )
 
-type builderMatcher func(builder *MockPrBuilder) SoftMatcher
+// BuilderMatcher creates a SoftMatcher for the given builder
+type BuilderMatcher func(builder *MockPrBuilder) SoftMatcher
 
-// ToHaveBodyWithWholePluginsComment verifies that the comment should contain the fixed part of plugins hint comment
-func ContainingStatusMessage(statusMessage string) builderMatcher {
+// ContainingStatusMessage verifies that the comment should contain status message with the given description
+func ContainingStatusMessage(description string) BuilderMatcher {
 	return func(builder *MockPrBuilder) SoftMatcher {
 		return SoftlySatisfyAll(
 			HaveBodyThatContains(fmt.Sprintf(message.PluginTitleTemplate, builder.pluginName)),
 			HaveBodyThatContains("@"+*builder.pullRequest.User.Login),
-			HaveBodyThatContains(statusMessage))
+			HaveBodyThatContains(description))
 	}
 }
 
-// To softly satisfies all the given matchers
-func To(matchers ...SoftMatcher) builderMatcher {
+// To softly satisfies all the given matchers and creates a BuilderMatcher from it
+func To(matchers ...SoftMatcher) BuilderMatcher {
 	return func(builder *MockPrBuilder) SoftMatcher {
 		return SoftlySatisfyAll(matchers...)
 	}
@@ -51,15 +52,16 @@ func (b *MockPrBuilder) Expecting(mockCreators ...MockCreator) *MockPrBuilder {
 }
 
 // Comment creates a gock matcher to check that there is a Post with a comment that complies with the given restrictions
-func Comment(matherForPlugin builderMatcher) MockCreator {
+func Comment(matherForPlugin BuilderMatcher) MockCreator {
 	return func(builder *MockPrBuilder) {
 		basePostCommentMock(builder)(matherForPlugin(builder))
 	}
 }
 
-func ChangedComment(commendId int, matherForPlugin builderMatcher) MockCreator {
+// ChangedComment creates a gock matcher to check that there is a Patch request for the given comment id and containing a comment that complies with the given restrictions
+func ChangedComment(commendID int, matherForPlugin BuilderMatcher) MockCreator {
 	return func(builder *MockPrBuilder) {
-		path := fmt.Sprintf("%s/issues/comments/%d", builder.baseRepoPath(), commendId)
+		path := fmt.Sprintf("%s/issues/comments/%d", builder.baseRepoPath(), commendID)
 		basePatchMock(path)(matherForPlugin(builder))
 	}
 }
@@ -102,7 +104,7 @@ func basePatchMock(path string) func(mather SoftMatcher) {
 }
 
 // Status creates a gock matcher to check that there is a Post with a status that complies with the given restrictions
-func Status(matherForPlugin builderMatcher) MockCreator {
+func Status(matherForPlugin BuilderMatcher) MockCreator {
 	return func(builder *MockPrBuilder) {
 		basePostStatusMock(builder)(matherForPlugin(builder))
 	}
@@ -135,7 +137,7 @@ func AddedLabel(labelContent string) MockCreator {
 	}
 }
 
-// AddedLabel creates a gock matcher to check that there is a Post request for the given label sent
+// ChangedTitle creates a gock matcher to check that there is a Patch request containing a new changed title
 func ChangedTitle(newTitleContent string) MockCreator {
 	return func(builder *MockPrBuilder) {
 		path := fmt.Sprintf("%s/pulls/%d", builder.baseRepoPath(), *builder.pullRequest.Number)

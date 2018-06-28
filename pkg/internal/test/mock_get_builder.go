@@ -69,7 +69,6 @@ func (b *MockPrBuilder) mockReviews(content string, options ...RequestOption) {
 
 // WithLabels sets the given payload containing list of labels to the mocked PR
 func (b *MockPrBuilder) WithLabels(labelNames ...string) *MockPrBuilder {
-	//:= make([]*gogh.Label, 0, len(labelNames))
 	for _, labelName := range labelNames {
 		b.pullRequest.Labels = append(b.pullRequest.Labels, &gogh.Label{Name: utils.String(labelName)})
 	}
@@ -78,7 +77,7 @@ func (b *MockPrBuilder) WithLabels(labelNames ...string) *MockPrBuilder {
 
 // WithoutLabels sets an empty array as a payload representing pr/issue labels
 func (b *MockPrBuilder) WithoutLabels() *MockPrBuilder {
-	b.pullRequest.Labels = make([]*gogh.Label, 0, 0)
+	b.pullRequest.Labels = make([]*gogh.Label, 0)
 	return b
 }
 
@@ -164,11 +163,12 @@ var page1 = func(request *gock.Request) {
 	request.MatchParam("page", "1")
 }
 
+// WithoutConfigFiles sets that the associated mocked PR shouldn't contain any configuration file for the before-set plugin
 func (b *MockPrBuilder) WithoutConfigFiles() *MockPrBuilder {
 	return b.WithoutConfigFilesForPlugin(b.pluginName)
 }
 
-// WithoutConfigFiles sets that the associated mocked PR shouldn't contain any configuration file
+// WithoutConfigFilesForPlugin sets that the associated mocked PR shouldn't contain any configuration file for the given plugin
 func (b *MockPrBuilder) WithoutConfigFilesForPlugin(pluginName string) *MockPrBuilder {
 	configsToMock := []string{"%s.yaml", "%s.yml"}
 
@@ -178,7 +178,7 @@ func (b *MockPrBuilder) WithoutConfigFilesForPlugin(pluginName string) *MockPrBu
 	return b
 }
 
-// WithoutConfigFiles sets that the associated mocked PR shouldn't contain any configuration file
+// WithoutMessageFiles sets that the associated mocked PR shouldn't contain status messages with the given names
 func (b *MockPrBuilder) WithoutMessageFiles(fileNames ...string) *MockPrBuilder {
 	for _, fileName := range fileNames {
 		b.WithoutRawFiles(ghservice.ConfigHome + fileName)
@@ -192,15 +192,18 @@ func (b *MockPrBuilder) WithConfigFile(configMock func(builder *MockPrBuilder)) 
 	return b
 }
 
-type keyValue func() (string, string)
+// KeyValue is a function returning key and value
+type KeyValue func() (string, string)
 
-func Param(key, value string) keyValue {
+// Param represents a key-value pair
+func Param(key, value string) KeyValue {
 	return func() (string, string) {
 		return key, value
 	}
 }
 
-func Containing(params ...keyValue) string {
+// Containing creates a json content of a config file from the given params
+func Containing(params ...KeyValue) string {
 	var content string
 	for _, param := range params {
 		key, value := param()

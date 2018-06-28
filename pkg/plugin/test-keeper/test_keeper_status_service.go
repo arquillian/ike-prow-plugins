@@ -77,6 +77,7 @@ func (ts *testStatusService) failNoTests() error {
 const (
 	paragraph = "\n\n"
 
+	// WithoutTestsMsg contains a status message related to the state when PR is pushed without any test
 	WithoutTestsMsg = "It appears that no tests have been added or updated in this PR." +
 		paragraph +
 		"Automated tests give us confidence in shipping reliable software. Please add some as part of this change." +
@@ -86,8 +87,10 @@ const (
 
 	documentationSection = "#_test_keeper_plugin"
 
+	// WithTestsMsg contains a status message related to the state when PR is updated by a commit containing a test
 	WithTestsMsg = "It seems that this PR already contains some added or changed tests. Good job!"
 
+	// OnlySkippedMsg contains a status message related to the state when PR is updated so it contains only skipped files
 	OnlySkippedMsg = "It seems that this PR doesn't need any test as all changed files in the changeset match " +
 		"patterns for which the validation should be skipped."
 )

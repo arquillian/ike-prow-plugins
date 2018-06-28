@@ -44,6 +44,7 @@ func (t MockPluginTemplate) MockPr() *MockPrBuilderLoader {
 	return &MockPrBuilderLoader{pluginName: t.pluginName}
 }
 
+// LoadedFrom loads json content representing a PR from the given place
 func (l *MockPrBuilderLoader) LoadedFrom(jsonPath string) *MockPrBuilder {
 	return l.load(LoadedFrom(jsonPath))
 }
@@ -89,6 +90,7 @@ func (l *MockPrBuilderLoader) LoadedFromDefaultStruct() *MockPrBuilder {
 	return l.load(string(pr))
 }
 
+// MockPrBuilderLoader is an endpoint used for loading a PR
 type MockPrBuilderLoader struct {
 	pluginName string
 }
@@ -99,6 +101,7 @@ func (b *MockPrBuilder) WithTitle(title string) *MockPrBuilder {
 	return b
 }
 
+// WithSize sets the given size to the mocked pull request changed files
 func (b *MockPrBuilder) WithSize(size int) *MockPrBuilder {
 	b.pullRequest.ChangedFiles = &size
 	return b
@@ -163,12 +166,6 @@ func createGhUser(name string) *gogh.User {
 	return &gogh.User{Login: utils.String(name)}
 }
 
-func marshalObject(toMarshal interface{}) []byte {
-	json, err := json.Marshal(toMarshal)
-	gomega.Ω(err).ShouldNot(gomega.HaveOccurred())
-	return json
-}
-
 // CreatePullRequestEvent based on the mocked PR information creates a PullRequestEvent
 func (pr *PrMock) CreatePullRequestEvent(action string) *gogh.PullRequestEvent {
 	return &gogh.PullRequestEvent{
@@ -185,11 +182,13 @@ func (pr *PrMock) PermissionForUser(userName string) *PermissionServiceMocker {
 	return &PermissionServiceMocker{userName: userName, pr: pr.PullRequest}
 }
 
+// PermissionServiceMocker keeps user name and pr used for mocking user permissions
 type PermissionServiceMocker struct {
 	userName string
 	pr       *gogh.PullRequest
 }
 
+// ThatIs is just a semantic sugar providing a opportunity to evaluate particular role on the mocked user permission
 func (m *PermissionServiceMocker) ThatIs() *command.PermissionService {
 	return command.NewPermissionService(NewDefaultGitHubClient(), m.userName,
 		&ghservice.PullRequestLazyLoader{

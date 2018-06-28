@@ -311,7 +311,7 @@
     "http2/hpack",
     "idna"
   ]
-  revision = "afe8f62b1d6bbd81f31868121a50b06d8188e1f9"
+  revision = "e514e69ffb8bc3c76a71ae40de0118d794855992"
 
 [[projects]]
   branch = "master"
@@ -374,7 +374,7 @@
     "go/internal/gcimporter",
     "go/types/typeutil"
   ]
-  revision = "56e9b8e653c818f46a96eb4828aba7be54271a69"
+  revision = "16699b2d33e2654d743c50b4525ab7e73e346238"
 
 [[projects]]
   name = "google.golang.org/appengine"
@@ -418,7 +418,7 @@
   branch = "master"
   name = "k8s.io/api"
   packages = ["core/v1"]
-  revision = "00c78f6603af046dfcada47ba511ddc94e7a64ce"
+  revision = "9e5ffd1f1320950b238cfce291b926411f0af722"
 
 [[projects]]
   branch = "release-1.9"

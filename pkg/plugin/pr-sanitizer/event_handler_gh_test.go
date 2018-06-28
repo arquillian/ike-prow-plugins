@@ -17,10 +17,7 @@ import (
 	"github.com/arquillian/ike-prow-plugins/pkg/plugin/work-in-progress"
 )
 
-const (
-	botName        = "alien-ike"
-	repositoryName = "bartoszmajsak/wfswarm-booster-pipeline-test"
-)
+const botName = "alien-ike"
 
 var (
 	expectedContext = strings.Join([]string{botName, prsanitizer.ProwPluginName}, "/")
