@@ -198,10 +198,10 @@ var _ = Describe("PR Sanitizer Plugin features", func() {
 				SetMatcher(ExpectPayload(toHaveFailureState, HaveDescription(prsanitizer.IssueLinkMissing))).
 				Reply(201) // This way we implicitly verify that call happened after `HandleEvent` call
 
-			statusPayload := LoadFromFile("test_fixtures/github_calls/issue_link_missing_pr_opened.json")
+			event := LoadPullRequestEvent("test_fixtures/github_calls/issue_link_missing_pr_opened.json")
 
 			// when
-			err := handler.HandleEvent(log, github.PullRequest, statusPayload)
+			err := handler.HandlePullRequestEvent(log, event)
 
 			// then - implicit verification of /statuses call occurrence with proper payload
 			Ω(err).ShouldNot(HaveOccurred())
@@ -221,10 +221,10 @@ var _ = Describe("PR Sanitizer Plugin features", func() {
 				SetMatcher(ExpectPayload(toHaveBodyWithDescriptionShortComment)).
 				Reply(201)
 
-			statusPayload := LoadFromFile("test_fixtures/github_calls/semantically_incorrect_title_missing_description_pr_opened.json")
+			event := LoadPullRequestEvent("test_fixtures/github_calls/semantically_incorrect_title_missing_description_pr_opened.json")
 
 			// when
-			err := handler.HandleEvent(log, github.PullRequest, statusPayload)
+			err := handler.HandlePullRequestEvent(log, event)
 
 			// then - implicit verification of /statuses call occurrence with proper payload
 			Ω(err).ShouldNot(HaveOccurred())
@@ -244,10 +244,10 @@ var _ = Describe("PR Sanitizer Plugin features", func() {
 				SetMatcher(ExpectPayload(toHaveBodyWithDescriptionShortComment)).
 				Reply(201)
 
-			statusPayload := LoadFromFile("test_fixtures/github_calls/semantically_incorrect_wip_short_desc_pr_opened.json")
+			event := LoadPullRequestEvent("test_fixtures/github_calls/semantically_incorrect_wip_short_desc_pr_opened.json")
 
 			// when
-			err := handler.HandleEvent(log, github.PullRequest, statusPayload)
+			err := handler.HandlePullRequestEvent(log, event)
 
 			// then - implicit verification of /statuses call occurrence with proper payload
 			Ω(err).ShouldNot(HaveOccurred())

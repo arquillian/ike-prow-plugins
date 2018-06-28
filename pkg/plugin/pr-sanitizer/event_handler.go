@@ -1,11 +1,9 @@
 package prsanitizer
 
 import (
-	"encoding/json"
 	"strings"
 
 	"github.com/arquillian/ike-prow-plugins/pkg/command"
-	"github.com/arquillian/ike-prow-plugins/pkg/github"
 	"github.com/arquillian/ike-prow-plugins/pkg/github/client"
 	"github.com/arquillian/ike-prow-plugins/pkg/github/service"
 	"github.com/arquillian/ike-prow-plugins/pkg/log"
@@ -33,40 +31,6 @@ var (
 // DescriptionShortMessage is message notification for contributor about PR short description content.
 const DescriptionShortMessage = "Hey @%s! It seems that PR description is too short. More elaborated description will be helpful to " +
 	"understand changes proposed in this PR."
-
-// HandleEvent is an entry point for the plugin logic. This method is invoked by the Server when
-// events are dispatched from the /hook service
-func (gh *GitHubLabelsEventsHandler) HandleEvent(log log.Logger, eventType github.EventType, payload []byte) error {
-	switch eventType {
-	case github.PullRequest:
-		var event gogh.PullRequestEvent
-		if err := json.Unmarshal(payload, &event); err != nil {
-			log.Errorf("Failed while parsing '%q' event with payload: %q. Cause: %q", github.PullRequest, event, err)
-			return err
-		}
-
-		if err := gh.HandlePullRequestEvent(log, &event); err != nil {
-			log.Errorf("Error handling '%q' event with payload %q. Cause: %q", github.PullRequest, event, err)
-			return err
-		}
-
-	case github.IssueComment:
-		var event gogh.IssueCommentEvent
-		if err := json.Unmarshal(payload, &event); err != nil {
-			log.Errorf("Failed while parsing '%q' event with payload: %q. Cause: %q", github.IssueComment, event, err)
-			return err
-		}
-
-		if err := gh.HandleIssueCommentEvent(log, &event); err != nil {
-			log.Errorf("Error handling '%q' event with payload %q. Cause: %q", github.IssueComment, event, err)
-			return err
-		}
-
-	default:
-		log.Warnf("received an event of type %q but didn't ask for it", eventType)
-	}
-	return nil
-}
 
 // HandlePullRequestEvent is an entry point for the plugin logic. This method is invoked by the Server when
 // pull request event is dispatched from the /hook service
