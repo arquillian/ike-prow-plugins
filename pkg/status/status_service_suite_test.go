@@ -1,4 +1,4 @@
-package message_test
+package status_test
 
 import (
 	"testing"
@@ -10,5 +10,5 @@ import (
 
 func TestConfig(t *testing.T) {
 	RegisterFailHandler(Fail)
-	RunSpecWithJUnitReporter(t, "Status Message Loader Suite")
+	RunSpecWithJUnitReporter(t, "Status Service Suite")
 }

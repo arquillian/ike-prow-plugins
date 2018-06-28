@@ -19,7 +19,7 @@ const (
 	assigneeMentionTemplate = "Thank you @%s for this contribution!"
 
 	sadIke   = `<img align="left" src="https://raw.githubusercontent.com/arquillian/ike-prow-plugins/master/docs/images/arquillian_ui_failure_64px.png">`
-	happyIke = `<img align="left" src="https://raw.githubusercontent.com/arquillian/ike-prow-plugins/master/docs/images/arquillian_ui_success_64px.svg">`
+	happyIke = `<img align="left" src="https://raw.githubusercontent.com/arquillian/ike-prow-plugins/master/docs/images/arquillian_ui_success_64px.png">`
 )
 
 // StatusMessageService is a struct managing plugin comments

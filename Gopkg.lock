@@ -373,7 +373,7 @@
     "go/gcimporter15",
     "go/types/typeutil"
   ]
-  revision = "77106db15f689a60e7d4e085d967ac557b918fb2"
+  revision = "56e9b8e653c818f46a96eb4828aba7be54271a69"
 
 [[projects]]
   name = "google.golang.org/appengine"
@@ -445,7 +445,7 @@
     "pkg/watch",
     "third_party/forked/golang/reflect"
   ]
-  revision = "21efb2924c7cf1920f76af05b1fd6a325bf46dfc"
+  revision = "fb40df2b502912cbe3a93aa61c2b2487f39cb42f"
 
 [[projects]]
   branch = "master"
