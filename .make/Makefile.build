@@ -5,12 +5,12 @@ clean: ## Removes binary, cache folder and docker images
 
 .PHONY: tools
 tools: ## Installs required go tools
-	@go get -u gopkg.in/alecthomas/gometalinter.v2 && gometalinter --install
+	@go get -u gopkg.in/alecthomas/gometalinter.v2 && gometalinter.v2 --install
 	@go get -u github.com/onsi/ginkgo/ginkgo
 	@go get -u github.com/onsi/gomega
 	@go get -u golang.org/x/tools/cmd/goimports
 	@go get -u github.com/jteeuwen/go-bindata/...
-	
+
 .PHONY: install
 install: generate ## Fetches all dependencies using dep
 	dep ensure -v
@@ -54,4 +54,4 @@ $(BINARIES): binaries-%: %
 
 .PHONY: check
 check: ## Concurrently runs a whole bunch of static analysis tools
-	gometalinter --enable=misspell --enable=gosimple --enable-gc --vendor --deadline 300s ./...
+	gometalinter.v2 --enable=misspell --enable=gosimple --enable-gc --vendor --deadline 300s ./...
