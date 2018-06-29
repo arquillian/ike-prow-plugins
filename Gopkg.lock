@@ -311,7 +311,7 @@
     "http2/hpack",
     "idna"
   ]
-  revision = "afe8f62b1d6bbd81f31868121a50b06d8188e1f9"
+  revision = "4cb1c02c05b0e749b0365f61ae859a8e0cfceed9"
 
 [[projects]]
   branch = "master"
@@ -329,7 +329,7 @@
     "unix",
     "windows"
   ]
-  revision = "c4afb3effaa53fd9a06ca61262dc7ce8df4c081b"
+  revision = "7138fd3d9dc8335c567ca206f4333fb75eb05d56"
 
 [[projects]]
   name = "golang.org/x/text"
@@ -366,14 +366,15 @@
   version = "v0.3.0"
 
 [[projects]]
+  branch = "master"
   name = "golang.org/x/tools"
   packages = [
     "go/ast/astutil",
     "go/gcexportdata",
-    "go/gcimporter15",
+    "go/internal/gcimporter",
     "go/types/typeutil"
   ]
-  revision = "56e9b8e653c818f46a96eb4828aba7be54271a69"
+  revision = "1c99e1239a0c8b0e59c34000995c4e319b7702ca"
 
 [[projects]]
   name = "google.golang.org/appengine"
@@ -417,7 +418,7 @@
   branch = "master"
   name = "k8s.io/api"
   packages = ["core/v1"]
-  revision = "00c78f6603af046dfcada47ba511ddc94e7a64ce"
+  revision = "9e5ffd1f1320950b238cfce291b926411f0af722"
 
 [[projects]]
   branch = "release-1.9"
@@ -451,7 +452,7 @@
   branch = "master"
   name = "k8s.io/kube-openapi"
   packages = ["pkg/common"]
-  revision = "4cac20de16b951c103aa40c4bafbc8cefdd18a12"
+  revision = "d83b052f768a50a309c692a9c271da3f3276ff88"
 
 [[projects]]
   name = "k8s.io/test-infra"
@@ -512,6 +513,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "9e562a00d156dd471189e7fa7f50c64547d980e58215871d59701a1f282a925d"
+  inputs-digest = "c95fc3b9913cc5a6cc3e1b4031df111f63d52000774e94c9c1d96ae59718a8cf"
   solver-name = "gps-cdcl"
   solver-version = 1

@@ -5,7 +5,11 @@ clean: ## Removes binary, cache folder and docker images
 
 .PHONY: tools
 tools: ## Installs required go tools
-	dep ensure -v
+	@go get -u gopkg.in/alecthomas/gometalinter.v2 && gometalinter --install
+	@go get -u github.com/onsi/ginkgo/ginkgo
+	@go get -u github.com/onsi/gomega
+	@go get -u golang.org/x/tools/cmd/goimports
+	@go get -u github.com/jteeuwen/go-bindata/...
 	
 .PHONY: install
 install: generate ## Fetches all dependencies using dep
