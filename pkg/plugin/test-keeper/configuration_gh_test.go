@@ -1,7 +1,6 @@
 package testkeeper_test
 
 import (
-	"github.com/arquillian/ike-prow-plugins/pkg/github/service"
 	. "github.com/arquillian/ike-prow-plugins/pkg/internal/test"
 	"github.com/arquillian/ike-prow-plugins/pkg/log"
 	"github.com/arquillian/ike-prow-plugins/pkg/plugin/test-keeper"
@@ -13,6 +12,8 @@ import (
 
 var _ = Describe("Test keeper config loader features", func() {
 
+	var mocker = NewMockPluginTemplate(testkeeper.ProwPluginName)
+
 	BeforeEach(func() {
 		defer gock.OffAll()
 	})
@@ -22,21 +23,20 @@ var _ = Describe("Test keeper config loader features", func() {
 	Context("Loading test-keeper configuration file from GitHub repository", func() {
 
 		logger := log.NewTestLogger()
-		configFilePath := ghservice.ConfigHome + testkeeper.ProwPluginName
 
 		It("should load test-keeper configuration yml file", func() {
 			// given
-			gock.New("https://raw.githubusercontent.com").
-				Get("owner/repo/46cb8fac44709e4ccaae97448c65e8f7320cfea7/" + configFilePath + ".yml").
-				Reply(200).
-				BodyString("test_patterns: ['*my', 'test.go', 'pattern.js']\n" +
-					"skip_validation_for: ['pom.xml', 'regex{{*\\.adoc}}']\n")
-
 			change := scm.RepositoryChange{
 				Owner:    "owner",
 				RepoName: "repo",
 				Hash:     "46cb8fac44709e4ccaae97448c65e8f7320cfea7",
 			}
+
+			mocker.AddConfig(
+				ConfigYml(Containing(
+					Param("test_patterns", "['*my', 'test.go', 'pattern.js']"),
+					Param("skip_validation_for", "['pom.xml', 'regex{{*\\.adoc}}']")))).
+				ToChange(change)
 
 			// when
 			configuration := testkeeper.LoadConfiguration(logger, change)
@@ -44,26 +44,6 @@ var _ = Describe("Test keeper config loader features", func() {
 			// then
 			Expect(configuration.LocationURL).To(Equal("https://github.com/owner/repo/blob/46cb8fac44709e4ccaae97448c65e8f7320cfea7/.ike-prow/test-keeper.yml"))
 			Expect(configuration.PluginName).To(Equal(testkeeper.ProwPluginName))
-		})
-
-		It("should load test-keeper configuration yml file", func() {
-			// given
-			gock.New("https://raw.githubusercontent.com").
-				Get("owner/repo/46cb8fac44709e4ccaae97448c65e8f7320cfea7/" + configFilePath + ".yml").
-				Reply(200).
-				BodyString("test_patterns: ['*my', 'test.go', 'pattern.js']\n" +
-					"skip_validation_for: ['pom.xml', 'regex{{*\\.adoc}}']\n")
-
-			change := scm.RepositoryChange{
-				Owner:    "owner",
-				RepoName: "repo",
-				Hash:     "46cb8fac44709e4ccaae97448c65e8f7320cfea7",
-			}
-
-			// when
-			configuration := testkeeper.LoadConfiguration(logger, change)
-
-			// then
 			Expect(configuration.Inclusions).To(ConsistOf("*my", "test.go", "pattern.js"))
 			Expect(configuration.Exclusions).To(ConsistOf("pom.xml", "regex{{*\\.adoc}}"))
 			Expect(configuration.Combine).To(BeTrue())
@@ -73,17 +53,17 @@ var _ = Describe("Test keeper config loader features", func() {
 			// given
 			NonExistingRawGitHubFiles(".ike-prow/test-keeper.yml")
 
-			gock.New("https://raw.githubusercontent.com").
-				Get("owner/repo/46cb8fac44709e4ccaae97448c65e8f7320cfea7/" + configFilePath + ".yaml").
-				Reply(200).
-				BodyString("test_patterns: ['*my', 'test.go', 'pattern.js']\n" +
-					"skip_validation_for: ['pom.xml', 'regex{{*\\.adoc}}']\n")
-
 			change := scm.RepositoryChange{
 				Owner:    "owner",
 				RepoName: "repo",
 				Hash:     "46cb8fac44709e4ccaae97448c65e8f7320cfea7",
 			}
+
+			mocker.AddConfig(
+				ConfigYaml(Containing(
+					Param("test_patterns", "['*my', 'test.go', 'pattern.js']"),
+					Param("skip_validation_for", "['pom.xml', 'regex{{*\\.adoc}}']")))).
+				ToChange(change)
 
 			// when
 			configuration := testkeeper.LoadConfiguration(logger, change)
