@@ -1,8 +1,6 @@
 package wip_test
 
 import (
-	"strings"
-
 	. "github.com/arquillian/ike-prow-plugins/pkg/internal/test"
 	"github.com/arquillian/ike-prow-plugins/pkg/log"
 	"github.com/arquillian/ike-prow-plugins/pkg/plugin/work-in-progress"
@@ -10,45 +8,22 @@ import (
 	. "github.com/onsi/gomega"
 	"gopkg.in/h2non/gock.v1"
 
-	"fmt"
-
 	"github.com/arquillian/ike-prow-plugins/pkg/command"
 	"github.com/arquillian/ike-prow-plugins/pkg/github"
-	"github.com/arquillian/ike-prow-plugins/pkg/github/service"
-	"github.com/arquillian/ike-prow-plugins/pkg/plugin"
 	"github.com/arquillian/ike-prow-plugins/pkg/plugin/test-keeper"
 )
 
-const (
-	botName        = "alien-ike"
-	repositoryName = "bartoszmajsak/wfswarm-booster-pipeline-test"
-)
-
-var (
-	expectedContext = strings.Join([]string{botName, wip.ProwPluginName}, "/")
-	docStatusRoot   = fmt.Sprintf("%s/status/%s", plugin.DocumentationURL, wip.ProwPluginName)
-)
+const botName = "alien-ike"
 
 var _ = Describe("Work In Progress Plugin features", func() {
 
 	var handler *wip.GitHubWIPPRHandler
+	var mocker = NewMockPluginTemplate(wip.ProwPluginName)
 
 	log := log.NewTestLogger()
-	configFilePath := ghservice.ConfigHome + wip.ProwPluginName
 
-	toHaveSuccessState := SoftlySatisfyAll(
-		HaveState(github.StatusSuccess),
-		HaveDescription(wip.ReadyForReviewMessage),
-		HaveContext(expectedContext),
-		HaveTargetURL(fmt.Sprintf("%s/%s/%s.html", docStatusRoot, "success", wip.ReadyForReviewDetailsPageName)),
-	)
-
-	toHaveFailureState := SoftlySatisfyAll(
-		HaveState(github.StatusFailure),
-		HaveDescription(wip.InProgressMessage),
-		HaveContext(expectedContext),
-		HaveTargetURL(fmt.Sprintf("%s/%s/%s.html", docStatusRoot, "failure", wip.InProgressDetailsPageName)),
-	)
+	toHaveSuccessState := ToBe(github.StatusSuccess, wip.ReadyForReviewMessage, wip.ReadyForReviewDetailsPageName)
+	toHaveFailureState := ToBe(github.StatusFailure, wip.InProgressMessage, wip.InProgressDetailsPageName)
 
 	Context("Pull Request label change trigger", func() {
 		BeforeEach(func() {
@@ -60,17 +35,15 @@ var _ = Describe("Work In Progress Plugin features", func() {
 
 		It("should mark opened PR as work-in-progress when labeled with WIP", func() {
 			// given
-			NonExistingRawGitHubFiles("work-in-progress.yml", "work-in-progress.yaml")
-
-			gock.New("https://api.github.com").
-				Post("/repos/" + repositoryName + "/statuses").
-				SetMatcher(ExpectPayload(toHaveFailureState)).
-				Reply(201) // This way we implicitly verify that call happened after `HandleEvent` call
-
-			event := LoadPullRequestEvent("test_fixtures/github_calls/pr_labeled_wip.json")
+			prMock := mocker.MockPr().LoadedFromDefaultJSON().
+				WithTitle("adds a new endpoint.").
+				WithoutConfigFiles().
+				WithLabels("work-in-progress").
+				Expecting(Status(toHaveFailureState)).
+				Create()
 
 			// when
-			err := handler.HandlePullRequestEvent(log, event)
+			err := handler.HandlePullRequestEvent(log, prMock.CreatePullRequestEvent("labeled"))
 
 			// then - implicit verification of /statuses call occurrence with proper payload
 			Ω(err).ShouldNot(HaveOccurred())
@@ -78,28 +51,17 @@ var _ = Describe("Work In Progress Plugin features", func() {
 
 		It("should mark opened PR as ready for review if WIP label removed", func() {
 			// given
-			NonExistingRawGitHubFiles("work-in-progress.yml", "work-in-progress.yaml")
-
-			expTitle := "feat: adds a new endpoint."
-
-			toHaveModifiedTitle := SoftlySatisfyAll(
-				HaveTitle(expTitle),
-			)
-
-			gock.New("https://api.github.com").
-				Patch("/repos/" + repositoryName + "/pulls/4").
-				SetMatcher(ExpectPayload(toHaveModifiedTitle)).
-				Reply(200)
-
-			gock.New("https://api.github.com").
-				Post("/repos/" + repositoryName + "/statuses").
-				SetMatcher(ExpectPayload(toHaveSuccessState)).
-				Reply(201) // This way we implicitly verify that call happened after `HandleEvent` call
-
-			event := LoadPullRequestEvent("test_fixtures/github_calls/wip_pr_unlabeled.json")
+			prMock := mocker.MockPr().LoadedFromDefaultJSON().
+				WithTitle("[WIP]: feat: adds a new endpoint.").
+				WithoutConfigFiles().
+				WithoutLabels().
+				Expecting(
+					Status(toHaveSuccessState),
+					ChangedTitle("feat: adds a new endpoint.")).
+				Create()
 
 			// when
-			err := handler.HandlePullRequestEvent(log, event)
+			err := handler.HandlePullRequestEvent(log, prMock.CreatePullRequestEvent("unlabeled"))
 
 			// then - implicit verification of /statuses call occurrence with proper payload
 			Ω(err).ShouldNot(HaveOccurred())
@@ -116,17 +78,16 @@ var _ = Describe("Work In Progress Plugin features", func() {
 
 		It("should mark opened PR as ready for review if not prefixed with WIP", func() {
 			// given
-			NonExistingRawGitHubFiles("work-in-progress.yml", "work-in-progress.yaml")
-
-			gock.New("https://api.github.com").
-				Post("/repos/" + repositoryName + "/statuses").
-				SetMatcher(ExpectPayload(toHaveSuccessState)).
-				Reply(201) // This way we implicitly verify that call happened after `HandleEvent` call
-
-			event := LoadPullRequestEvent("test_fixtures/github_calls/ready_pr_opened.json")
+			prMock := mocker.MockPr().LoadedFromDefaultJSON().
+				WithTitle("feat: introduces dummy response").
+				WithoutConfigFiles().
+				WithoutLabels().
+				Expecting(
+					Status(toHaveSuccessState)).
+				Create()
 
 			// when
-			err := handler.HandlePullRequestEvent(log, event)
+			err := handler.HandlePullRequestEvent(log, prMock.CreatePullRequestEvent("opened"))
 
 			// then - implicit verification of /statuses call occurrence with proper payload
 			Ω(err).ShouldNot(HaveOccurred())
@@ -134,23 +95,17 @@ var _ = Describe("Work In Progress Plugin features", func() {
 
 		It("should mark opened PR as work-in-progress when prefixed with WIP", func() {
 			// given
-			NonExistingRawGitHubFiles("work-in-progress.yml", "work-in-progress.yaml")
-
-			gock.New("https://api.github.com").
-				Post("/repos/" + repositoryName + "/issues/4/labels").
-				SetMatcher(ExpectPayload(To(HaveBodyThatContains("work-in-progress")))).
-				Reply(200).
-				Body(FromFile("test_fixtures/github_calls/wip_pr_created_with_label.json"))
-
-			gock.New("https://api.github.com").
-				Post("/repos/" + repositoryName + "/statuses").
-				SetMatcher(ExpectPayload(toHaveFailureState)).
-				Reply(201) // This way we implicitly verify that call happened after `HandleEvent` call
-
-			event := LoadPullRequestEvent("test_fixtures/github_calls/wip_pr_opened.json")
+			prMock := mocker.MockPr().LoadedFromDefaultJSON().
+				WithTitle("WIP feat: introduces dummy response").
+				WithoutConfigFiles().
+				WithoutLabels().
+				Expecting(
+					AddedLabel("work-in-progress"),
+					Status(toHaveFailureState)).
+				Create()
 
 			// when
-			err := handler.HandlePullRequestEvent(log, event)
+			err := handler.HandlePullRequestEvent(log, prMock.CreatePullRequestEvent("opened"))
 
 			// then - implicit verification of /statuses call occurrence with proper payload
 			Ω(err).ShouldNot(HaveOccurred())
@@ -158,26 +113,17 @@ var _ = Describe("Work In Progress Plugin features", func() {
 
 		It("should mark opened PR as work-in-progress when title starts with configured prefix", func() {
 			// given
-			gock.New("https://raw.githubusercontent.com").
-				Get(repositoryName + "/8111c2d99b596877ff8e2059409688d83487da0e/" + configFilePath + ".yml").
-				Reply(200).
-				Body(FromFile("test_fixtures/github_calls/work-in-progress.yml"))
-
-			gock.New("https://api.github.com").
-				Post("/repos/" + repositoryName + "/issues/4/labels").
-				SetMatcher(ExpectPayload(To(HaveBodyThatContains("wip")))).
-				Reply(200).
-				Body(FromFile("test_fixtures/github_calls/wip_pr_created_with_label.json"))
-
-			gock.New("https://api.github.com").
-				Post("/repos/" + repositoryName + "/statuses").
-				SetMatcher(ExpectPayload(toHaveFailureState)).
-				Reply(201) // This way we implicitly verify that call happened after `HandleEvent` call
-
-			event := LoadPullRequestEvent("test_fixtures/github_calls/custom_prefix_pr_opened.json")
+			prMock := mocker.MockPr().LoadedFromDefaultJSON().
+				WithTitle("WORK IN PROGRESS: configures plugin").
+				WithConfigFile(ConfigYml(LoadedFrom("test_fixtures/github_calls/work-in-progress.yml"))).
+				WithoutLabels().
+				Expecting(
+					AddedLabel("wip"),
+					Status(toHaveFailureState)).
+				Create()
 
 			// when
-			err := handler.HandlePullRequestEvent(log, event)
+			err := handler.HandlePullRequestEvent(log, prMock.CreatePullRequestEvent("opened"))
 
 			// then - implicit verification of /statuses call occurrence with proper payload
 			Ω(err).ShouldNot(HaveOccurred())
@@ -185,23 +131,17 @@ var _ = Describe("Work In Progress Plugin features", func() {
 
 		It("should mark status as failed (thus block PR merge) when title updated to contain WIP", func() {
 			// given
-			NonExistingRawGitHubFiles("work-in-progress.yml", "work-in-progress.yaml")
-
-			gock.New("https://api.github.com").
-				Post("/repos/" + repositoryName + "/issues/4/labels").
-				SetMatcher(ExpectPayload(To(HaveBodyThatContains("work-in-progress")))).
-				Reply(200).
-				Body(FromFile("test_fixtures/github_calls/pr_edited_with_label.json"))
-
-			gock.New("https://api.github.com").
-				Post("/repos/" + repositoryName + "/statuses").
-				SetMatcher(ExpectPayload(toHaveFailureState)).
-				Reply(201) // This way we implicitly verify that call happened after `HandleEvent` call
-
-			event := LoadPullRequestEvent("test_fixtures/github_calls/pr_edited_wip_added.json")
+			prMock := mocker.MockPr().LoadedFromDefaultJSON().
+				WithTitle("WIP feat: introduces dummy response").
+				WithoutConfigFiles().
+				WithoutLabels().
+				Expecting(
+					AddedLabel("work-in-progress"),
+					Status(toHaveFailureState)).
+				Create()
 
 			// when
-			err := handler.HandlePullRequestEvent(log, event)
+			err := handler.HandlePullRequestEvent(log, prMock.CreatePullRequestEvent("edited"))
 
 			// then - implicit verification of /statuses call occurrence with proper payload
 			Ω(err).ShouldNot(HaveOccurred())
@@ -210,22 +150,17 @@ var _ = Describe("Work In Progress Plugin features", func() {
 
 		It("should mark status as success (thus unblock PR merge) when title has WIP removed", func() {
 			// given
-			NonExistingRawGitHubFiles("work-in-progress.yml", "work-in-progress.yaml")
-
-			gock.New("https://api.github.com").
-				Delete("/repos/" + repositoryName + "/issues/4/labels/work-in-progress").
-				Reply(200).
-				Body(FromFile("test_fixtures/github_calls/pr_edited_with_unlabel.json"))
-
-			gock.New("https://api.github.com").
-				Post("/repos/" + repositoryName + "/statuses").
-				SetMatcher(ExpectPayload(toHaveSuccessState)).
-				Reply(201) // This way we implicitly verify that call happened after `HandleEvent` call
-
-			event := LoadPullRequestEvent("test_fixtures/github_calls/pr_edited_wip_removed.json")
+			prMock := mocker.MockPr().LoadedFromDefaultJSON().
+				WithTitle("feat: introduces dummy response").
+				WithoutConfigFiles().
+				WithLabels("work-in-progress").
+				Expecting(
+					RemovedLabel("work-in-progress", LoadedFrom("test_fixtures/github_calls/pr_edited_with_unlabel.json")),
+					Status(toHaveSuccessState)).
+				Create()
 
 			// when
-			err := handler.HandlePullRequestEvent(log, event)
+			err := handler.HandlePullRequestEvent(log, prMock.CreatePullRequestEvent("edited"))
 
 			// then - implicit verification of /statuses call occurrence with proper payload
 			Ω(err).ShouldNot(HaveOccurred())
@@ -243,32 +178,20 @@ var _ = Describe("Work In Progress Plugin features", func() {
 
 		It("should mark opened PR as ready for review if not prefixed with WIP when "+command.RunCommentPrefix+" "+wip.ProwPluginName+" command is triggered by pr creator", func() {
 			// given
-			NonExistingRawGitHubFiles("work-in-progress.yml", "work-in-progress.yaml")
+			prMock := mocker.MockPr().LoadedFromDefaultJSON().
+				WithTitle("PR from external user without tests should be rejected").
+				WithoutConfigFiles().
+				WithoutReviews().
+				WithoutLabels().
+				WithUsers(ExternalUser("bartoszmajsak")).
+				Expecting(
+					Status(toHaveSuccessState)).
+				Create()
 
-			gock.New("https://api.github.com").
-				Get("/repos/" + repositoryName + "/pulls/11").
-				Reply(200).
-				Body(FromFile("test_fixtures/github_calls/pr_details.json"))
-
-			gock.New("https://api.github.com").
-				Get("/repos/" + repositoryName + "/pulls/11/reviews").
-				Reply(200).
-				BodyString(`[]`)
-
-			gock.New("https://api.github.com").
-				Get("/repos/" + repositoryName + "/collaborators/bartoszmajsak-test/permission").
-				Reply(200).
-				BodyString(`{"permission": "read"}`)
-
-			gock.New("https://api.github.com").
-				Post("/repos/" + repositoryName + "/statuses").
-				SetMatcher(ExpectPayload(toHaveSuccessState)).
-				Reply(201) // This way we implicitly verify that call happened after `HandleEvent` call
-
-			event := LoadIssueCommentEvent("test_fixtures/github_calls/trigger_run_work-in-progress_on_pr_by_pr_creator.json")
+			commentEvent := prMock.CreateCommentEvent(SentByPrCreator, "/run work-in-progress", "created")
 
 			// when
-			err := handler.HandleIssueCommentEvent(log, event)
+			err := handler.HandleIssueCommentEvent(log, commentEvent)
 
 			// then - implicit verification of /statuses call occurrence with proper payload
 			Ω(err).ShouldNot(HaveOccurred())
@@ -276,38 +199,21 @@ var _ = Describe("Work In Progress Plugin features", func() {
 
 		It("should mark opened PR as work-in-progress if prefixed with WIP when "+command.RunCommentPrefix+" all command is used by admin", func() {
 			// given
-			NonExistingRawGitHubFiles("work-in-progress.yml", "work-in-progress.yaml")
+			prMock := mocker.MockPr().LoadedFromDefaultJSON().
+				WithTitle("WIP PR from external user without tests should be rejected").
+				WithoutConfigFiles().
+				WithoutReviews().
+				WithoutLabels().
+				WithUsers(Admin("bartoszmajsak-test")).
+				Expecting(
+					AddedLabel("work-in-progress"),
+					Status(toHaveFailureState)).
+				Create()
 
-			gock.New("https://api.github.com").
-				Get("/repos/" + repositoryName + "/pulls/11").
-				Reply(200).
-				Body(FromFile("test_fixtures/github_calls//pr_details_wip.json"))
-
-			gock.New("https://api.github.com").
-				Get("/repos/" + repositoryName + "/pulls/11/reviews").
-				Reply(200).
-				BodyString(`[]`)
-
-			gock.New("https://api.github.com").
-				Get("/repos/" + repositoryName + "/collaborators/bartoszmajsak/permission").
-				Reply(200).
-				BodyString(`{"permission": "admin"}`)
-
-			gock.New("https://api.github.com").
-				Post("/repos/" + repositoryName + "/issues/11/labels").
-				SetMatcher(ExpectPayload(To(HaveBodyThatContains("work-in-progress")))).
-				Reply(200).
-				BodyString("work-in-progress")
-
-			gock.New("https://api.github.com").
-				Post("/repos/" + repositoryName + "/statuses").
-				SetMatcher(ExpectPayload(toHaveFailureState)).
-				Reply(201) // This way we implicitly verify that call happened after `HandleEvent` call
-
-			event := LoadIssueCommentEvent("test_fixtures/github_calls/trigger_run_all_on_wip_pr_by_admin.json")
+			commentEvent := prMock.CreateCommentEvent(SentBy("bartoszmajsak-test"), "/run all", "created")
 
 			// when
-			err := handler.HandleIssueCommentEvent(log, event)
+			err := handler.HandleIssueCommentEvent(log, commentEvent)
 
 			// then - implicit verification of /statuses call occurrence with proper payload
 			Ω(err).ShouldNot(HaveOccurred())
@@ -315,31 +221,17 @@ var _ = Describe("Work In Progress Plugin features", func() {
 
 		It("should approve newly created pull request with tests when "+command.RunCommentPrefix+" "+testkeeper.ProwPluginName+" command is triggered by pr creator", func() {
 			// given
-			NonExistingRawGitHubFiles("work-in-progress.yml", "work-in-progress.yaml")
+			prMock := mocker.MockPr().LoadedFromDefaultJSON().
+				WithoutConfigFiles().
+				WithoutReviews().
+				WithUsers(ExternalUser("bartoszmajsak-test")).
+				Expecting(NoStatus()).
+				Create()
 
-			gock.New("https://api.github.com").
-				Get("/repos/" + repositoryName + "/pulls/11").
-				Reply(200).
-				Body(FromFile("test_fixtures/github_calls/pr_details.json"))
-
-			gock.New("https://api.github.com").
-				Get("/repos/" + repositoryName + "/pulls/11/reviews").
-				Reply(200).
-				BodyString(`[]`)
-
-			gock.New("https://api.github.com").
-				Get("/repos/" + repositoryName + "/collaborators/bartoszmajsak-test/permission").
-				Reply(200).
-				BodyString(`{"permission": "read"}`)
-
-			gock.New("https://api.github.com").
-				Post("/repos/" + repositoryName + "/statuses").
-				Times(0) // This way we implicitly verify that call not happened after `HandleEvent` call
-
-			event := LoadIssueCommentEvent("test_fixtures/github_calls/trigger_run_test-keeper_on_pr_by_pr_creator.json")
+			commentEvent := prMock.CreateCommentEvent(SentByPrCreator, "/run test-keeper", "created")
 
 			// when
-			err := handler.HandleIssueCommentEvent(log, event)
+			err := handler.HandleIssueCommentEvent(log, commentEvent)
 
 			// then
 			Ω(err).ShouldNot(HaveOccurred())

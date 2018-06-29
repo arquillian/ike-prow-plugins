@@ -1,7 +1,7 @@
 package utils
 
 import (
-	"errors"
+	"fmt"
 	"io/ioutil"
 	"net/http"
 )
@@ -13,7 +13,7 @@ func GetFileFromURL(url string) ([]byte, error) {
 		return nil, err
 	}
 	if resp.StatusCode >= 400 {
-		return make([]byte, 0), errors.New("Server responded with error " + string(resp.StatusCode))
+		return make([]byte, 0), fmt.Errorf("server responded with error %d", resp.StatusCode)
 	}
 
 	defer func() {
