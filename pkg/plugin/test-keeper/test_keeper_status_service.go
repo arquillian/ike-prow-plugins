@@ -127,7 +127,7 @@ func (ts *testStatusServiceWithMessages) onlySkippedMessage() {
 }
 
 func (ts *testStatusServiceWithMessages) logError(err error) {
-	if err  != nil {
+	if err != nil {
 		ts.log.Errorf("failed to comment on PR, caused by: %s", err)
 	}
 }

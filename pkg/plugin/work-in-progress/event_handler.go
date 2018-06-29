@@ -131,7 +131,7 @@ func (gh *GitHubWIPPRHandler) hasWorkInProgressLabel(labels []*gogh.Label, wipLa
 	return false
 }
 
-// GetWorkInProgressPrefix checks if title is marked as Work In Progress
+// GetWorkInProgressPrefix separates a prefix matching any of the "work in progress" patterns - if it is present
 func GetWorkInProgressPrefix(title string, config PluginConfiguration) (string, bool) {
 	prefixes := defaultPrefixes
 	if len(config.Prefix) != 0 {
@@ -141,13 +141,16 @@ func GetWorkInProgressPrefix(title string, config PluginConfiguration) (string, 
 			prefixes = config.Prefix
 		}
 	}
-	return hasPrefix(title, prefixes)
+	return getPrefix(title, prefixes)
 }
 
-func hasPrefix(title string, prefixes []string) (string, bool) {
+func getPrefix(title string, prefixes []string) (string, bool) {
 	for _, prefix := range prefixes {
-		pattern := `(?mi)^(\[|\()?` + prefix + `(\]|\))?(:| )+`
-		r, _ := regexp.Compile(pattern)
+		pattern := `(?mi)^(\[|\(|\{|\<|\>|\*|#|!|\"|-|_| )*` + prefix + `(\]|\)|\}|\>|\<|\*|#|!|\"|-|_| )*(:| )+`
+		r, err := regexp.Compile(pattern)
+		if err != nil {
+			continue
+		}
 		if match := r.FindString(title); match != "" {
 			return strings.TrimSpace(match), true
 		}
