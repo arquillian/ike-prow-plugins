@@ -1,6 +1,6 @@
 == PR Sanitizer Plugin
 
-This plugin enforces writing effective pull requests that confirm with proper naming conventions and description to clearly convey its purpose and provide better collaboration, tracebility and maintainabilty by giving a clear and concise context to the reviewer of what’s being solved at a high level, taking off an extra step for the reviewer.
+This plugin enforces writing effective pull requests that confirm with proper naming conventions and description to clearly convey its purpose and provide better collaboration, traceability and maintainability by giving a clear and concise context to the reviewer of what’s being solved at a high level, taking off an extra step for the reviewer.
 
 === Title Verification [[title-verification]]
 
