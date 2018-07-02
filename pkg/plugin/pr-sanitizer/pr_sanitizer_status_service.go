@@ -7,7 +7,7 @@ import (
 	"github.com/arquillian/ike-prow-plugins/pkg/status"
 )
 
-type prTitleDescriptionStatusService struct {
+type prSanitizerStatusService struct {
 	statusService scm.StatusService
 }
 
@@ -25,16 +25,16 @@ const (
 	SuccessDetailsPageName = "pr-sanitizer-success"
 )
 
-func (gh *GitHubPRSanitizerEventsHandler) newPRTitleDescriptionStatusService(log log.Logger, change scm.RepositoryChange) prTitleDescriptionStatusService {
+func (gh *GitHubPRSanitizerEventsHandler) newPRTitleDescriptionStatusService(log log.Logger, change scm.RepositoryChange) prSanitizerStatusService {
 	statusContext := github.StatusContext{BotName: gh.BotName, PluginName: ProwPluginName}
 	statusService := status.NewStatusService(gh.Client, log, change, statusContext)
-	return prTitleDescriptionStatusService{statusService: statusService}
+	return prSanitizerStatusService{statusService: statusService}
 }
 
-func (ss *prTitleDescriptionStatusService) titleAndDescriptionOk() error {
+func (ss *prSanitizerStatusService) titleAndDescriptionOk() error {
 	return ss.statusService.Success(SuccessMessage, SuccessDetailsPageName)
 }
 
-func (ss *prTitleDescriptionStatusService) fail(fm FailureMessage) error {
+func (ss *prSanitizerStatusService) fail(fm FailureMessage) error {
 	return ss.statusService.Failure(string(fm), FailureDetailsPageName)
 }
