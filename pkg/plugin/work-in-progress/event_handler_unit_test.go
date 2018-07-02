@@ -30,6 +30,12 @@ var _ = Describe("Work-in-progress Plugin features", func() {
 			},
 			Entry("Uppercase WIP prefix", "WIP fix(#1): off-by one bug", "WIP"),
 			Entry("Lowercase WIP prefix", "wip fix(#1): off-by one bug", "wip"),
+			Entry("With stars WIP prefix", "*WIP* fix(#1): off-by one bug", "*WIP*"),
+			Entry("With multiple stars WIP prefix", "**WIP** fix(#1): off-by one bug", "**WIP**"),
+			Entry("Similar to xml comment WIP prefix", "<!--wip--!> fix(#1): off-by one bug", "<!--wip--!>"),
+			Entry("With arrows WIP prefix", "--> WIP <-- fix(#1): off-by one bug", "--> WIP <--"),
+			Entry("With underscore WIP prefix", "_wip_ fix(#1): off-by one bug", "_wip_"),
+
 			Entry("Wip prefix", "Wip fix(#1): off-by one bug", "Wip"),
 			Entry("Wip prefix within square brackets", "[WIP] fix(#1): off-by one bug", "[WIP]"),
 			Entry("Wip prefix within brackets", "(WIP) fix(#1): off-by one bug", "(WIP)"),

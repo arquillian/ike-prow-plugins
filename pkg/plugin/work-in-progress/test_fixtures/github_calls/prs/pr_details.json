@@ -1,14 +1,14 @@
 {
-  "url": "https://api.github.com/repos/bartoszmajsak/wfswarm-booster-pipeline-test/pulls/2",
-  "id": 170854539,
-  "html_url": "https://github.com/bartoszmajsak/wfswarm-booster-pipeline-test/pull/2",
-  "diff_url": "https://github.com/bartoszmajsak/wfswarm-booster-pipeline-test/pull/2.diff",
-  "patch_url": "https://github.com/bartoszmajsak/wfswarm-booster-pipeline-test/pull/2.patch",
-  "issue_url": "https://api.github.com/repos/bartoszmajsak/wfswarm-booster-pipeline-test/issues/2",
-  "number": 2,
+  "url": "https://api.github.com/repos/bartoszmajsak/wfswarm-booster-pipeline-test/pulls/4",
+  "id": 173165295,
+  "html_url": "https://github.com/bartoszmajsak/wfswarm-booster-pipeline-test/pull/4",
+  "diff_url": "https://github.com/bartoszmajsak/wfswarm-booster-pipeline-test/pull/4.diff",
+  "patch_url": "https://github.com/bartoszmajsak/wfswarm-booster-pipeline-test/pull/4.patch",
+  "issue_url": "https://api.github.com/repos/bartoszmajsak/wfswarm-booster-pipeline-test/issues/4",
+  "number": 4,
   "state": "open",
   "locked": false,
-  "title": "feat: some new fancy feature with tests",
+  "title": "feat: introduces dummy response",
   "user": {
     "login": "bartoszmajsak",
     "id": 719616,
@@ -28,59 +28,35 @@
     "type": "User",
     "site_admin": false
   },
-  "body": "This should be accepted",
-  "created_at": "2018-02-22T20:15:54Z",
-  "updated_at": "2018-03-23T11:35:22Z",
+  "body": "",
+  "created_at": "2018-03-06T13:58:18Z",
+  "updated_at": "2018-03-06T13:58:18Z",
   "closed_at": null,
   "merged_at": null,
-  "merge_commit_sha": "a16085150832b5d62e54580b5e9b092766e32694",
+  "merge_commit_sha": null,
   "assignee": null,
   "assignees": [
 
   ],
   "requested_reviewers": [
-    {
-      "login": "bartoszmajsak-test",
-      "id": 34574692,
-      "avatar_url": "https://avatars3.githubusercontent.com/u/34574692?v=4",
-      "gravatar_id": "",
-      "url": "https://api.github.com/users/bartoszmajsak-test",
-      "html_url": "https://github.com/bartoszmajsak-test",
-      "followers_url": "https://api.github.com/users/bartoszmajsak-test/followers",
-      "following_url": "https://api.github.com/users/bartoszmajsak-test/following{/other_user}",
-      "gists_url": "https://api.github.com/users/bartoszmajsak-test/gists{/gist_id}",
-      "starred_url": "https://api.github.com/users/bartoszmajsak-test/starred{/owner}{/repo}",
-      "subscriptions_url": "https://api.github.com/users/bartoszmajsak-test/subscriptions",
-      "organizations_url": "https://api.github.com/users/bartoszmajsak-test/orgs",
-      "repos_url": "https://api.github.com/users/bartoszmajsak-test/repos",
-      "events_url": "https://api.github.com/users/bartoszmajsak-test/events{/privacy}",
-      "received_events_url": "https://api.github.com/users/bartoszmajsak-test/received_events",
-      "type": "User",
-      "site_admin": false
-    }
+
   ],
   "requested_teams": [
 
   ],
   "labels": [
-    {
-      "id": 845375007,
-      "url": "https://api.github.com/repos/bartoszmajsak/wfswarm-booster-pipeline-test/labels/size/M",
-      "name": "size/M",
-      "color": "ededed",
-      "default": false
-    }
+
   ],
   "milestone": null,
-  "commits_url": "https://api.github.com/repos/bartoszmajsak/wfswarm-booster-pipeline-test/pulls/2/commits",
-  "review_comments_url": "https://api.github.com/repos/bartoszmajsak/wfswarm-booster-pipeline-test/pulls/2/comments",
+  "commits_url": "https://api.github.com/repos/bartoszmajsak/wfswarm-booster-pipeline-test/pulls/4/commits",
+  "review_comments_url": "https://api.github.com/repos/bartoszmajsak/wfswarm-booster-pipeline-test/pulls/4/comments",
   "review_comment_url": "https://api.github.com/repos/bartoszmajsak/wfswarm-booster-pipeline-test/pulls/comments{/number}",
-  "comments_url": "https://api.github.com/repos/bartoszmajsak/wfswarm-booster-pipeline-test/issues/2/comments",
-  "statuses_url": "https://api.github.com/repos/bartoszmajsak/wfswarm-booster-pipeline-test/statuses/6c27474573dac946aab9e9c40255be93fbf23c7e",
+  "comments_url": "https://api.github.com/repos/bartoszmajsak/wfswarm-booster-pipeline-test/issues/4/comments",
+  "statuses_url": "https://api.github.com/repos/bartoszmajsak/wfswarm-booster-pipeline-test/statuses/6582335bd87edd6b1fa32e32d566fbdf6c2fa579",
   "head": {
-    "label": "bartoszmajsak:new-pr",
-    "ref": "new-pr",
-    "sha": "6c27474573dac946aab9e9c40255be93fbf23c7e",
+    "label": "bartoszmajsak:bartoszmajsak-demo",
+    "ref": "bartoszmajsak-demo",
+    "sha": "6582335bd87edd6b1fa32e32d566fbdf6c2fa579",
     "user": {
       "login": "bartoszmajsak",
       "id": 719616,
@@ -166,13 +142,13 @@
       "deployments_url": "https://api.github.com/repos/bartoszmajsak/wfswarm-booster-pipeline-test/deployments",
       "created_at": "2018-02-16T10:19:37Z",
       "updated_at": "2018-02-16T10:19:42Z",
-      "pushed_at": "2018-04-11T09:03:28Z",
+      "pushed_at": "2018-03-06T13:14:58Z",
       "git_url": "git://github.com/bartoszmajsak/wfswarm-booster-pipeline-test.git",
       "ssh_url": "git@github.com:bartoszmajsak/wfswarm-booster-pipeline-test.git",
       "clone_url": "https://github.com/bartoszmajsak/wfswarm-booster-pipeline-test.git",
       "svn_url": "https://github.com/bartoszmajsak/wfswarm-booster-pipeline-test",
       "homepage": "",
-      "size": 40,
+      "size": 28,
       "stargazers_count": 0,
       "watchers_count": 0,
       "language": "Java",
@@ -181,18 +157,18 @@
       "has_downloads": false,
       "has_wiki": false,
       "has_pages": false,
-      "forks_count": 1,
+      "forks_count": 0,
       "mirror_url": null,
       "archived": false,
-      "open_issues_count": 11,
+      "open_issues_count": 4,
       "license": {
         "key": "apache-2.0",
         "name": "Apache License 2.0",
         "spdx_id": "Apache-2.0",
         "url": "https://api.github.com/licenses/apache-2.0"
       },
-      "forks": 1,
-      "open_issues": 11,
+      "forks": 0,
+      "open_issues": 4,
       "watchers": 0,
       "default_branch": "master"
     }
@@ -286,13 +262,13 @@
       "deployments_url": "https://api.github.com/repos/bartoszmajsak/wfswarm-booster-pipeline-test/deployments",
       "created_at": "2018-02-16T10:19:37Z",
       "updated_at": "2018-02-16T10:19:42Z",
-      "pushed_at": "2018-04-11T09:03:28Z",
+      "pushed_at": "2018-03-06T13:14:58Z",
       "git_url": "git://github.com/bartoszmajsak/wfswarm-booster-pipeline-test.git",
       "ssh_url": "git@github.com:bartoszmajsak/wfswarm-booster-pipeline-test.git",
       "clone_url": "https://github.com/bartoszmajsak/wfswarm-booster-pipeline-test.git",
       "svn_url": "https://github.com/bartoszmajsak/wfswarm-booster-pipeline-test",
       "homepage": "",
-      "size": 40,
+      "size": 28,
       "stargazers_count": 0,
       "watchers_count": 0,
       "language": "Java",
@@ -301,59 +277,59 @@
       "has_downloads": false,
       "has_wiki": false,
       "has_pages": false,
-      "forks_count": 1,
+      "forks_count": 0,
       "mirror_url": null,
       "archived": false,
-      "open_issues_count": 11,
+      "open_issues_count": 4,
       "license": {
         "key": "apache-2.0",
         "name": "Apache License 2.0",
         "spdx_id": "Apache-2.0",
         "url": "https://api.github.com/licenses/apache-2.0"
       },
-      "forks": 1,
-      "open_issues": 11,
+      "forks": 0,
+      "open_issues": 4,
       "watchers": 0,
       "default_branch": "master"
     }
   },
   "_links": {
     "self": {
-      "href": "https://api.github.com/repos/bartoszmajsak/wfswarm-booster-pipeline-test/pulls/2"
+      "href": "https://api.github.com/repos/bartoszmajsak/wfswarm-booster-pipeline-test/pulls/4"
     },
     "html": {
-      "href": "https://github.com/bartoszmajsak/wfswarm-booster-pipeline-test/pull/2"
+      "href": "https://github.com/bartoszmajsak/wfswarm-booster-pipeline-test/pull/4"
     },
     "issue": {
-      "href": "https://api.github.com/repos/bartoszmajsak/wfswarm-booster-pipeline-test/issues/2"
+      "href": "https://api.github.com/repos/bartoszmajsak/wfswarm-booster-pipeline-test/issues/4"
     },
     "comments": {
-      "href": "https://api.github.com/repos/bartoszmajsak/wfswarm-booster-pipeline-test/issues/2/comments"
+      "href": "https://api.github.com/repos/bartoszmajsak/wfswarm-booster-pipeline-test/issues/4/comments"
     },
     "review_comments": {
-      "href": "https://api.github.com/repos/bartoszmajsak/wfswarm-booster-pipeline-test/pulls/2/comments"
+      "href": "https://api.github.com/repos/bartoszmajsak/wfswarm-booster-pipeline-test/pulls/4/comments"
     },
     "review_comment": {
       "href": "https://api.github.com/repos/bartoszmajsak/wfswarm-booster-pipeline-test/pulls/comments{/number}"
     },
     "commits": {
-      "href": "https://api.github.com/repos/bartoszmajsak/wfswarm-booster-pipeline-test/pulls/2/commits"
+      "href": "https://api.github.com/repos/bartoszmajsak/wfswarm-booster-pipeline-test/pulls/4/commits"
     },
     "statuses": {
-      "href": "https://api.github.com/repos/bartoszmajsak/wfswarm-booster-pipeline-test/statuses/6c27474573dac946aab9e9c40255be93fbf23c7e"
+      "href": "https://api.github.com/repos/bartoszmajsak/wfswarm-booster-pipeline-test/statuses/6582335bd87edd6b1fa32e32d566fbdf6c2fa579"
     }
   },
   "author_association": "OWNER",
   "merged": false,
-  "mergeable": true,
-  "rebaseable": true,
-  "mergeable_state": "clean",
+  "mergeable": null,
+  "rebaseable": null,
+  "mergeable_state": "unknown",
   "merged_by": null,
   "comments": 0,
   "review_comments": 0,
   "maintainer_can_modify": false,
-  "commits": 3,
-  "additions": 71,
-  "deletions": 5,
-  "changed_files": 3
+  "commits": 1,
+  "additions": 4,
+  "deletions": 0,
+  "changed_files": 1
 }
