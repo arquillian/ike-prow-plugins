@@ -110,8 +110,8 @@ func (gh *GitHubPRSanitizerEventsHandler) validatePullRequestTitleAndDescription
 }
 
 // GetDescriptionWithIssueLinkExcluded return description with excluding issue link keyword.
-func (gh *GitHubPRSanitizerEventsHandler) GetDescriptionWithIssueLinkExcluded(d string) (string, bool) {
-	desc := strings.ToLower(d)
+func (gh *GitHubPRSanitizerEventsHandler) GetDescriptionWithIssueLinkExcluded(description string) (string, bool) {
+	desc := strings.ToLower(description)
 	var issueLink = regexp.MustCompile(`(close|closes|closed|fix|fixes|fixed|resolve|resolves|resolved)[:]?[\s]+[\w-/]*#[\d]+`)
 	return strings.TrimSpace(issueLink.ReplaceAllString(desc, "")), issueLink.MatchString(desc)
 }
