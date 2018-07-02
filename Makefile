@@ -8,7 +8,7 @@ BINARY_DIR:=${PWD}/bin
 CLUSTER_DIR?=${PWD}/cluster
 PLUGIN_DEPLOYMENTS_DIR?=$(CLUSTER_DIR)/generated
 
-REGISTRY?=docker.io
+REGISTRY?=quay.io
 DOCKER_REPO?=ike-prow-plugins
 BUILD_IMAGES:=$(patsubst %,build-%, $(PLUGINS))
 PUSH_IMAGES:=$(patsubst %,push-%, $(PLUGINS))
