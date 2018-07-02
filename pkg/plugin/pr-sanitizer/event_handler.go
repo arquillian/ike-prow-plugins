@@ -94,7 +94,7 @@ func (gh *GitHubPRSanitizerEventsHandler) validatePullRequestTitleAndDescription
 			Number:   *pr.Number,
 		}, &message)
 		if err != nil {
-			log.Errorf("failed to comment on PR [%q]. cause: %s", *pr, err)
+			log.Errorf("failed to comment on PR, caused by: %s", err)
 			return err
 		}
 	}
