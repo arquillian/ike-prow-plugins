@@ -3,7 +3,7 @@
 eval $(minishift docker-env)
 docker login -u $(oc whoami) -p $(oc whoami -t) $(minishift openshift registry)
 export REGISTRY=$(minishift openshift registry)
-export DOCKER_REPO=$(oc project -q)
+export IMG_REPO=$(oc project -q)
 # end::local_docker_registry[]
 
 # tag::seeding_secrets[]
