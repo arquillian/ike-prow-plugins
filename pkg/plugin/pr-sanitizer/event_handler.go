@@ -70,7 +70,6 @@ func (gh *GitHubPRSanitizerEventsHandler) HandleIssueCommentEvent(log log.Logger
 func (gh *GitHubPRSanitizerEventsHandler) validatePullRequestTitleAndDescription(log log.Logger, pr *gogh.PullRequest) error {
 	change := ghservice.NewRepositoryChangeForPR(pr)
 	statusService := gh.newPRTitleDescriptionStatusService(log, change)
-
 	config := LoadConfiguration(log, change)
 	isTitleWithValidType := gh.HasTitleWithValidType(config, *pr.Title)
 	if !isTitleWithValidType {
@@ -80,7 +79,6 @@ func (gh *GitHubPRSanitizerEventsHandler) validatePullRequestTitleAndDescription
 		}
 	}
 
-
 	description, isIssueLinked := gh.GetDescriptionWithIssueLinkExcluded(pr.GetBody())
 
 	failureMessageBuilder := NewFailureMessageBuilder()
@@ -88,11 +86,8 @@ func (gh *GitHubPRSanitizerEventsHandler) validatePullRequestTitleAndDescription
 
 	if len(hintMessage) > 0 {
 		message := fmt.Sprintf("Hey @%s! "+string(hintMessage), *pr.User.Login)
-		err := gh.Client.CreateIssueComment(scm.RepositoryIssue{
-			Owner:    *pr.Base.Repo.Owner.Login,
-			RepoName: *pr.Base.Repo.Name,
-			Number:   *pr.Number,
-		}, &message)
+		issue := scm.NewRepositoryIssue(*pr.Base.Repo.Owner.Login, *pr.Base.Repo.Name, *pr.Number)
+		err := gh.Client.CreateIssueComment(*issue, &message)
 
 		if err != nil {
 			log.Errorf("failed to comment on PR, caused by: %s", err)
