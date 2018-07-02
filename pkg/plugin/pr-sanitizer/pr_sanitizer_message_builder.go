@@ -1,6 +1,9 @@
 package prsanitizer
 
-import "strings"
+import (
+	"strings"
+	"fmt"
+)
 
 type failureHintMessageBuilder struct {
 	hint []string
@@ -12,7 +15,7 @@ type HintMessage string
 // FailureHintMessageBuilder is builder to build failure message for description.
 type FailureHintMessageBuilder interface {
 	Title(isValid bool) FailureHintMessageBuilder
-	Description(desc string) FailureHintMessageBuilder
+	Description(desc string, contentLength int) FailureHintMessageBuilder
 	IssueLink(isIssueLinked bool) FailureHintMessageBuilder
 	Build() HintMessage
 }
@@ -22,7 +25,7 @@ const (
 	TitleFailureMessage = "PR title does not conform with semantic commit message style. Conformance with the semantic commit message style makes your changelog and git history clean."
 
 	// DescriptionLengthShortMessage is message notification for contributor about short PR description content.
-	DescriptionLengthShortMessage = "PR description is too short, expecting more than 50 characters. More elaborated description will be helpful to understand changes proposed in this PR."
+	DescriptionLengthShortMessage = "PR description is too short, expecting more than %d characters. More elaborated description will be helpful to understand changes proposed in this PR."
 
 	// IssueLinkMissingMessage is message notification for contributor about missing issue link.
 	IssueLinkMissingMessage = "Issue link is missing in this PR description. Issue link with keywords in the PR description is helpful to close issues automatically after merging PR."
@@ -35,9 +38,13 @@ func (mb *failureHintMessageBuilder) Title(isValid bool) FailureHintMessageBuild
 	return mb
 }
 
-func (mb *failureHintMessageBuilder) Description(desc string) FailureHintMessageBuilder {
-	if len(desc) <= 50 {
-		mb.hint = append(mb.hint, DescriptionLengthShortMessage)
+func (mb *failureHintMessageBuilder) Description(desc string, descriptionContentLength int) FailureHintMessageBuilder {
+	contentLength := 50
+	if descriptionContentLength != 0 {
+		contentLength = descriptionContentLength
+	}
+	if len(desc) <= contentLength {
+		mb.hint = append(mb.hint, fmt.Sprintf(DescriptionLengthShortMessage, contentLength))
 	}
 	return mb
 }

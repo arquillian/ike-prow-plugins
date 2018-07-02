@@ -29,7 +29,8 @@ var _ = Describe("PR Sanitizer config loader features", func() {
 			gock.New("https://raw.githubusercontent.com").
 				Get("owner/repo/46cb8fac44709e4ccaae97448c65e8f7320cfea7/" + configFilePath + ".yml").
 				Reply(200).
-				BodyString("type_prefixes: [':star:', ':package:', ':hammer_and_wrench:']")
+				BodyString("type_prefixes: [':star:', ':package:', ':hammer_and_wrench:']\n" +
+				"description_content_length: 40")
 
 			change := scm.RepositoryChange{
 				Owner:    "owner",
@@ -43,6 +44,7 @@ var _ = Describe("PR Sanitizer config loader features", func() {
 			// then
 			Expect(configuration.TypePrefix).To(ConsistOf(":star:", ":package:", ":hammer_and_wrench:"))
 			Expect(configuration.Combine).To(Equal(true))
+			Expect(configuration.DescriptionContentLength).To(Equal(40))
 		})
 
 		It("should not load pr-sanitizer configuration yaml file and return empty url when config is not accessible", func() {

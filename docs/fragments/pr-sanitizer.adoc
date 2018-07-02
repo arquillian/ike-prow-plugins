@@ -32,6 +32,7 @@ include::../../pkg/plugin/pr-sanitizer/test_fixtures/github_calls/pr-sanitizer.y
 
 <1> Defines set of custom types which will be used to match titles prefixes in changeset and determine if Pull Requests Title conforms with the semantic message style. (Eg. above code snippet configures link:https://medium.com/walmartlabs/semantic-commit-messages-with-emojis-dba2541cea9a[emoji style] semantic commit message.)
 <2> Allows you to decide if you want to combine your patterns with the list (`feat`, `fix`, `refactor`, `docs`, `test`, `chore`, `style`) of predefined default types (`true` by default).
+<3> Set Number of characters to be verified in PR description content.
 
 
 === Description - Content Length Verification [[description-content-length-verification]]
@@ -41,6 +42,8 @@ This ensures that the PR description has more than 50 characters to have more el
 All issue link keywords(e.g. `close #1`) added to close an issue are not taken into consideration while measuring description length.
 
 If it won't find Pull Request description more than 50 characters, it adds a comment with a hint message and marks its check as **Failure**, or as **Success** otherwise.
+
+You can overwrite default `50` characters by setting `description_content_length` property in `pr-sanitizer.yml`
 
 === Description - Issue Link Verification [[description-issue-link-verification]]
 

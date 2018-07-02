@@ -80,10 +80,11 @@ func (gh *GitHubPRSanitizerEventsHandler) validatePullRequestTitleAndDescription
 		}
 	}
 
+
 	description, isIssueLinked := gh.GetDescriptionWithIssueLinkExcluded(pr.GetBody())
 
 	failureMessageBuilder := NewFailureMessageBuilder()
-	hintMessage := failureMessageBuilder.Title(isTitleWithValidType).Description(description).IssueLink(isIssueLinked).Build()
+	hintMessage := failureMessageBuilder.Title(isTitleWithValidType).Description(description, config.DescriptionContentLength).IssueLink(isIssueLinked).Build()
 
 	if len(hintMessage) > 0 {
 		message := fmt.Sprintf("Hey @%s! "+string(hintMessage), *pr.User.Login)

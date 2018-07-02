@@ -188,6 +188,8 @@ var _ = Describe("PR Sanitizer Plugin features", func() {
 			HaveTargetURL(fmt.Sprintf("%s/%s/%s.html", docStatusRoot, "failure", prsanitizer.FailureDetailsPageName)),
 		)
 
+		descriptionContentLengthMessage := fmt.Sprintf(prsanitizer.DescriptionLengthShortMessage, 50)
+
 		BeforeEach(func() {
 			defer gock.OffAll()
 			handler = &prsanitizer.GitHubPRSanitizerEventsHandler{Client: NewDefaultGitHubClient(), BotName: botName}
@@ -229,10 +231,36 @@ var _ = Describe("PR Sanitizer Plugin features", func() {
 
 			gock.New("https://api.github.com").
 				Post("/repos/" + repositoryName + "/issues/4/comments").
-				SetMatcher(ExpectPayload(HaveBodyThatContains(fmt.Sprintf("Hey @%s! %s %s", "bartoszmajsak", prsanitizer.TitleFailureMessage, prsanitizer.DescriptionLengthShortMessage)))).
+				SetMatcher(ExpectPayload(HaveBodyThatContains(fmt.Sprintf("Hey @%s! %s %s", "bartoszmajsak", prsanitizer.TitleFailureMessage, descriptionContentLengthMessage)))).
 				Reply(201)
 
 			event := LoadPullRequestEvent("test_fixtures/github_calls/semantically_incorrect_title_missing_description_pr_opened.json")
+
+			// when
+			err := handler.HandlePullRequestEvent(log, event)
+
+			// then - implicit verification of /statuses call occurrence with proper payload
+			Ω(err).ShouldNot(HaveOccurred())
+		})
+
+		It("should mark status as failed (thus block PR merge) when PR doesn't have description length as per configuration", func() {
+			// given
+			gock.New("https://raw.githubusercontent.com").
+				Get(repositoryName + "/6582335bd87edd6b1fa32e32d566fbdf6c2fa579/" + configFilePath + ".yml").
+				Reply(200).
+				BodyString("description_content_length: 100")
+
+			gock.New("https://api.github.com").
+				Post("/repos/" + repositoryName + "/statuses").
+				SetMatcher(ExpectPayload(toHaveFailureState)).
+				Reply(201) // This way we implicitly verify that call happened after `HandleEvent` call
+
+			gock.New("https://api.github.com").
+				Post("/repos/" + repositoryName + "/issues/4/comments").
+				SetMatcher(ExpectPayload(HaveBodyThatContains(fmt.Sprintf("Hey @%s! %s", "bartoszmajsak", fmt.Sprintf(prsanitizer.DescriptionLengthShortMessage, 100))))).
+				Reply(201)
+
+			event := LoadPullRequestEvent("test_fixtures/github_calls/short_description_as_per_config_pr_opened.json")
 
 			// when
 			err := handler.HandlePullRequestEvent(log, event)
@@ -252,7 +280,7 @@ var _ = Describe("PR Sanitizer Plugin features", func() {
 
 			gock.New("https://api.github.com").
 				Post("/repos/" + repositoryName + "/issues/4/comments").
-				SetMatcher(ExpectPayload(HaveBodyThatContains(fmt.Sprintf("Hey @%s! %s %s", "bartoszmajsak", prsanitizer.TitleFailureMessage, prsanitizer.DescriptionLengthShortMessage)))).
+				SetMatcher(ExpectPayload(HaveBodyThatContains(fmt.Sprintf("Hey @%s! %s %s", "bartoszmajsak", prsanitizer.TitleFailureMessage, descriptionContentLengthMessage)))).
 				Reply(201)
 
 			event := LoadPullRequestEvent("test_fixtures/github_calls/semantically_incorrect_wip_short_desc_pr_opened.json")
