@@ -18,8 +18,11 @@ const (
 	// FailureDetailsPageName is a name of a documentation page that contains additional status details for title verification failure.
 	FailureDetailsPageName = "pr-sanitizer-failed"
 
-	// SuccessMessage is a message used in GH Status as description when the PR title conforms to the semantic commit message style
-	SuccessMessage = "PR title conforms with semantic commit message style and description has enough characters with issue link."
+	// FailureMessage is a message used in GH Status as description when the PR title and description does not conform to the PR sanitizer checks.
+	FailureMessage = "Meh! Some PR Sanitizer Standard Check failed. :("
+
+	// SuccessMessage is a message used in GH Status as description when the PR title and description conforms to the PR sanitizer checks.
+	SuccessMessage = "Yay! All PR Sanitizer title and description checks passed. :)"
 
 	// SuccessDetailsPageName is a name of a documentation page that contains additional status details for success state
 	SuccessDetailsPageName = "pr-sanitizer-success"
@@ -35,6 +38,6 @@ func (ss *prSanitizerStatusService) titleAndDescriptionOk() error {
 	return ss.statusService.Success(SuccessMessage, SuccessDetailsPageName)
 }
 
-func (ss *prSanitizerStatusService) fail(fm FailureMessage) error {
-	return ss.statusService.Failure(string(fm), FailureDetailsPageName)
+func (ss *prSanitizerStatusService) fail() error {
+	return ss.statusService.Failure(FailureMessage, FailureDetailsPageName)
 }

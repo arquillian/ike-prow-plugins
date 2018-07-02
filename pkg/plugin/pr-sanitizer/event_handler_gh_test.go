@@ -43,7 +43,7 @@ var _ = Describe("PR Sanitizer Plugin features", func() {
 
 	toHaveFailureState := SoftlySatisfyAll(
 		HaveState(github.StatusFailure),
-		HaveDescription(prsanitizer.TitleFailure),
+		HaveDescription(prsanitizer.FailureMessage),
 		HaveContext(expectedContext),
 		HaveTargetURL(fmt.Sprintf("%s/%s/%s.html", docStatusRoot, "failure", prsanitizer.FailureDetailsPageName)),
 	)
@@ -82,6 +82,11 @@ var _ = Describe("PR Sanitizer Plugin features", func() {
 				Post("/repos/" + repositoryName + "/statuses").
 				SetMatcher(ExpectPayload(toHaveFailureState)).
 				Reply(201) // This way we implicitly verify that call happened after `HandleEvent` call
+
+			gock.New("https://api.github.com").
+				Post("/repos/" + repositoryName + "/issues/4/comments").
+				SetMatcher(ExpectPayload(HaveBodyThatContains(fmt.Sprintf("Hey @%s! %s", "bartoszmajsak", prsanitizer.TitleFailureMessage)))).
+				Reply(201)
 
 			event := LoadPullRequestEvent("test_fixtures/github_calls/semantically_incorrect_pr_opened.json")
 
@@ -159,6 +164,11 @@ var _ = Describe("PR Sanitizer Plugin features", func() {
 				SetMatcher(ExpectPayload(toHaveFailureState)).
 				Reply(201) // This way we implicitly verify that call happened after `HandleEvent` call
 
+			gock.New("https://api.github.com").
+				Post("/repos/" + repositoryName + "/issues/4/comments").
+				SetMatcher(ExpectPayload(HaveBodyThatContains(fmt.Sprintf("Hey @%s! %s", "bartoszmajsak", prsanitizer.TitleFailureMessage)))).
+				Reply(201)
+
 			event := LoadPullRequestEvent("test_fixtures/github_calls/semantically_incorrect_wip_pr_opened.json")
 
 			// when
@@ -178,10 +188,6 @@ var _ = Describe("PR Sanitizer Plugin features", func() {
 			HaveTargetURL(fmt.Sprintf("%s/%s/%s.html", docStatusRoot, "failure", prsanitizer.FailureDetailsPageName)),
 		)
 
-		toHaveBodyWithDescriptionShortComment := SoftlySatisfyAll(
-			HaveBodyThatContains(fmt.Sprintf(prsanitizer.DescriptionShortMessage, "bartoszmajsak")),
-		)
-
 		BeforeEach(func() {
 			defer gock.OffAll()
 			handler = &prsanitizer.GitHubPRSanitizerEventsHandler{Client: NewDefaultGitHubClient(), BotName: botName}
@@ -194,8 +200,13 @@ var _ = Describe("PR Sanitizer Plugin features", func() {
 			NonExistingRawGitHubFiles("pr-sanitizer.yml", "pr-sanitizer.yaml")
 
 			gock.New("https://api.github.com").
+				Post("/repos/" + repositoryName + "/issues/4/comments").
+				SetMatcher(ExpectPayload(HaveBodyThatContains(fmt.Sprintf("Hey @%s! %s", "bartoszmajsak", prsanitizer.IssueLinkMissingMessage)))).
+				Reply(201)
+
+			gock.New("https://api.github.com").
 				Post("/repos/" + repositoryName + "/statuses").
-				SetMatcher(ExpectPayload(toHaveFailureState, HaveDescription(prsanitizer.IssueLinkMissing))).
+				SetMatcher(ExpectPayload(toHaveFailureState)).
 				Reply(201) // This way we implicitly verify that call happened after `HandleEvent` call
 
 			event := LoadPullRequestEvent("test_fixtures/github_calls/issue_link_missing_pr_opened.json")
@@ -213,12 +224,12 @@ var _ = Describe("PR Sanitizer Plugin features", func() {
 
 			gock.New("https://api.github.com").
 				Post("/repos/" + repositoryName + "/statuses").
-				SetMatcher(ExpectPayload(toHaveFailureState, HaveDescription(prsanitizer.TitleFailure+" "+prsanitizer.DescriptionLengthShort))).
+				SetMatcher(ExpectPayload(toHaveFailureState)).
 				Reply(201) // This way we implicitly verify that call happened after `HandleEvent` call
 
 			gock.New("https://api.github.com").
 				Post("/repos/" + repositoryName + "/issues/4/comments").
-				SetMatcher(ExpectPayload(toHaveBodyWithDescriptionShortComment)).
+				SetMatcher(ExpectPayload(HaveBodyThatContains(fmt.Sprintf("Hey @%s! %s %s", "bartoszmajsak", prsanitizer.TitleFailureMessage, prsanitizer.DescriptionLengthShortMessage)))).
 				Reply(201)
 
 			event := LoadPullRequestEvent("test_fixtures/github_calls/semantically_incorrect_title_missing_description_pr_opened.json")
@@ -236,12 +247,12 @@ var _ = Describe("PR Sanitizer Plugin features", func() {
 
 			gock.New("https://api.github.com").
 				Post("/repos/" + repositoryName + "/statuses").
-				SetMatcher(ExpectPayload(toHaveFailureState, HaveDescription(prsanitizer.TitleFailure+" "+prsanitizer.DescriptionLengthShort+" "+prsanitizer.IssueLinkMissing))).
+				SetMatcher(ExpectPayload(toHaveFailureState)).
 				Reply(201) // This way we implicitly verify that call happened after `HandleEvent` call
 
 			gock.New("https://api.github.com").
 				Post("/repos/" + repositoryName + "/issues/4/comments").
-				SetMatcher(ExpectPayload(toHaveBodyWithDescriptionShortComment)).
+				SetMatcher(ExpectPayload(HaveBodyThatContains(fmt.Sprintf("Hey @%s! %s %s", "bartoszmajsak", prsanitizer.TitleFailureMessage, prsanitizer.DescriptionLengthShortMessage)))).
 				Reply(201)
 
 			event := LoadPullRequestEvent("test_fixtures/github_calls/semantically_incorrect_wip_short_desc_pr_opened.json")
@@ -319,6 +330,11 @@ var _ = Describe("PR Sanitizer Plugin features", func() {
 				Post("/repos/" + repositoryName + "/statuses").
 				SetMatcher(ExpectPayload(toHaveFailureState)).
 				Reply(201) // This way we implicitly verify that call happened after `HandleEvent` call
+
+			gock.New("https://api.github.com").
+				Post("/repos/" + repositoryName + "/issues/11/comments").
+				SetMatcher(ExpectPayload(HaveBodyThatContains(fmt.Sprintf("Hey @%s! %s", "bartoszmajsak-test", prsanitizer.TitleFailureMessage)))).
+				Reply(201)
 
 			event := LoadIssueCommentEvent("test_fixtures/github_calls/trigger_run_all_on_pr_by_admin.json")
 

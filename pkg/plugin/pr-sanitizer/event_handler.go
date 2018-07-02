@@ -28,10 +28,6 @@ var (
 	defaultTypes          = []string{"chore", "docs", "feat", "fix", "refactor", "style", "test"}
 )
 
-// DescriptionShortMessage is message notification for contributor about PR short description content.
-const DescriptionShortMessage = "Hey @%s! It seems that PR description is too short. More elaborated description will be helpful to " +
-	"understand changes proposed in this PR."
-
 // HandlePullRequestEvent is an entry point for the plugin logic. This method is invoked by the Server when
 // pull request event is dispatched from the /hook service
 func (gh *GitHubPRSanitizerEventsHandler) HandlePullRequestEvent(log log.Logger, event *gogh.PullRequestEvent) error {
@@ -86,24 +82,22 @@ func (gh *GitHubPRSanitizerEventsHandler) validatePullRequestTitleAndDescription
 
 	description, isIssueLinked := gh.GetDescriptionWithIssueLinkExcluded(pr.GetBody())
 
-	if len(description) < 50 {
-		message := fmt.Sprintf(DescriptionShortMessage, *pr.User.Login)
+	failureMessageBuilder := NewFailureMessageBuilder()
+	hintMessage := failureMessageBuilder.Title(isTitleWithValidType).Description(description).IssueLink(isIssueLinked).Build()
+
+	if len(hintMessage) > 0 {
+		message := fmt.Sprintf("Hey @%s! "+string(hintMessage), *pr.User.Login)
 		err := gh.Client.CreateIssueComment(scm.RepositoryIssue{
 			Owner:    *pr.Base.Repo.Owner.Login,
 			RepoName: *pr.Base.Repo.Name,
 			Number:   *pr.Number,
 		}, &message)
+
 		if err != nil {
 			log.Errorf("failed to comment on PR, caused by: %s", err)
 			return err
 		}
-	}
-
-	failureMessageBuilder := NewFailureMessageBuilder()
-	failureMessage := failureMessageBuilder.Title(isTitleWithValidType).Description(description).IssueLink(isIssueLinked).Build()
-
-	if len(failureMessage) > 0 {
-		return statusService.fail(failureMessage)
+		return statusService.fail()
 	}
 
 	return statusService.titleAndDescriptionOk()

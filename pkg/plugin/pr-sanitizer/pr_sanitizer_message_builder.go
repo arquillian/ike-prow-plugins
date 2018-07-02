@@ -2,58 +2,58 @@ package prsanitizer
 
 import "strings"
 
-type failureMessageBuilder struct {
-	description []string
+type failureHintMessageBuilder struct {
+	hint []string
 }
 
-// FailureMessage is message containing failure reasons of pr-sanitizer.
-type FailureMessage string
+// HintMessage is message containing failure reasons of pr-sanitizer and why is it important.
+type HintMessage string
 
-// FailureMessageBuilder is builder to build failure message for description.
-type FailureMessageBuilder interface {
-	Title(isValid bool) FailureMessageBuilder
-	Description(desc string) FailureMessageBuilder
-	IssueLink(isIssueLinked bool) FailureMessageBuilder
-	Build() FailureMessage
+// FailureHintMessageBuilder is builder to build failure message for description.
+type FailureHintMessageBuilder interface {
+	Title(isValid bool) FailureHintMessageBuilder
+	Description(desc string) FailureHintMessageBuilder
+	IssueLink(isIssueLinked bool) FailureHintMessageBuilder
+	Build() HintMessage
 }
 
 const (
-	// TitleFailure is a message used in GH Status as description when the PR title does not follow semantic message style
-	TitleFailure = "PR title does not conform with semantic commit message style."
+	// TitleFailureMessage is a message used in GH Status as description when the PR title does not follow semantic message style
+	TitleFailureMessage = "PR title does not conform with semantic commit message style. Conformance with the semantic commit message style makes your changelog and git history clean."
 
-	// IssueLinkMissing is a message used in GH Status as description when no tests shipped with the PR
-	IssueLinkMissing = "Issue link is missing in this PR description."
+	// DescriptionLengthShortMessage is message notification for contributor about short PR description content.
+	DescriptionLengthShortMessage = "PR description is too short, expecting more than 50 characters. More elaborated description will be helpful to understand changes proposed in this PR."
 
-	// DescriptionLengthShort is a message used in GH Status as description when the PR description does not have minimum required characters.
-	DescriptionLengthShort = "PR description is too short, expecting more than 50 characters."
+	// IssueLinkMissingMessage is message notification for contributor about missing issue link.
+	IssueLinkMissingMessage = "Issue link is missing in this PR description. Issue link with keywords in the PR description is helpful to close issues automatically after merging PR."
 )
 
-func (mb *failureMessageBuilder) Title(isValid bool) FailureMessageBuilder {
+func (mb *failureHintMessageBuilder) Title(isValid bool) FailureHintMessageBuilder {
 	if !isValid {
-		mb.description = append(mb.description, TitleFailure)
+		mb.hint = append(mb.hint, TitleFailureMessage)
 	}
 	return mb
 }
 
-func (mb *failureMessageBuilder) Description(desc string) FailureMessageBuilder {
+func (mb *failureHintMessageBuilder) Description(desc string) FailureHintMessageBuilder {
 	if len(desc) <= 50 {
-		mb.description = append(mb.description, DescriptionLengthShort)
+		mb.hint = append(mb.hint, DescriptionLengthShortMessage)
 	}
 	return mb
 }
 
-func (mb *failureMessageBuilder) IssueLink(isIssueLinked bool) FailureMessageBuilder {
+func (mb *failureHintMessageBuilder) IssueLink(isIssueLinked bool) FailureHintMessageBuilder {
 	if !isIssueLinked {
-		mb.description = append(mb.description, IssueLinkMissing)
+		mb.hint = append(mb.hint, IssueLinkMissingMessage)
 	}
 	return mb
 }
 
-func (mb *failureMessageBuilder) Build() FailureMessage {
-	return FailureMessage(strings.Join(mb.description, " "))
+func (mb *failureHintMessageBuilder) Build() (HintMessage) {
+	return HintMessage(strings.Join(mb.hint, " "))
 }
 
-// NewFailureMessageBuilder creates failureMessageBuilder with empty message.
-func NewFailureMessageBuilder() FailureMessageBuilder {
-	return &failureMessageBuilder{}
+// NewFailureMessageBuilder creates failureHintMessageBuilder with empty message.
+func NewFailureMessageBuilder() FailureHintMessageBuilder {
+	return &failureHintMessageBuilder{}
 }
