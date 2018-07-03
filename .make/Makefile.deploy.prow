@@ -23,7 +23,7 @@ build-hook: update
 .PHONY: build-hook-image
 build-hook-image:
 	$(DOCKER) build --build-arg BINARY=hook -t $(REGISTRY)/$(IMG_REPO)/$(OC_PROJECT_NAME)-hook -f $(DEPLOY_DOCKERFILE) .
-	$(DOCKER) tag $(REGISTRY)/$(IMG_REPO)-hook $(REGISTRY)/$(IMG_REPO)/$(OC_PROJECT_NAME)-hook:$(TAG)
+	$(DOCKER) tag $(REGISTRY)/$(IMG_REPO)/$(OC_PROJECT_NAME)-hook $(REGISTRY)/$(IMG_REPO)/$(OC_PROJECT_NAME)-hook:$(TAG)
 
 .PHONY: push-hook-image
 push-hook-image: build-hook-image
@@ -57,7 +57,7 @@ deploy-plugins: build-plugin-images push-plugin-images
 build-plugin-images: $(BUILD_IMAGES)
 $(BUILD_IMAGES): build-%: %
 	$(DOCKER) build --build-arg BINARY=$< -t $(REGISTRY)/$(IMG_REPO)/$(OC_PROJECT_NAME)-$< -f $(DEPLOY_DOCKERFILE) .
-	$(DOCKER) tag $(REGISTRY)/$(IMG_REPO)/$< $(REGISTRY)/$(IMG_REPO)/$(OC_PROJECT_NAME)-$<:$(TAG)
+	$(DOCKER) tag $(REGISTRY)/$(IMG_REPO)/$(OC_PROJECT_NAME)-$< $(REGISTRY)/$(IMG_REPO)/$(OC_PROJECT_NAME)-$<:$(TAG)
 
 
 .PHONY: clean-plugin-images

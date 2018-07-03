@@ -9,12 +9,19 @@ set -e
 # Source environment variables of the jenkins slave
 # that might interest this worker.
 function load_jenkins_vars() {
-  if [ -e "jenkins-env" ]; then
-    cat jenkins-env \
-      | grep -E "(IMG_REPO_TAG_LEN|IMG_REPO_USERNAME|IMG_REPO_PASSWORD|JENKINS_URL|GIT_BRANCH|GIT_COMMIT|BUILD_NUMBER|ghprbSourceBranch|ghprbActualCommit|BUILD_URL|ghprbPullId)=" \
-      | sed 's/^/export /g' \
-      > ~/.jenkins-env
-    source ~/.jenkins-env
+  if [ -e "jenkins-env.json" ]; then
+    eval "$(./env-toolkit load -f jenkins-env.json \
+        DEVSHIFT_TAG_LEN \
+        QUAY_USERNAME \
+        QUAY_PASSWORD \
+        JENKINS_URL \
+        GIT_BRANCH \
+        GIT_COMMIT \
+        BUILD_NUMBER \
+        ghprbSourceBranch \
+        ghprbActualCommit \
+        BUILD_URL \
+        ghprbPullId)"
   fi
 }
 
@@ -58,8 +65,8 @@ function deploy() {
   fi
 
   # Login first
-  if [ -n "${IMG_REPO_USERNAME}" -a -n "${IMG_REPO_PASSWORD}" ]; then
-    docker login -u ${IMG_REPO_USERNAME} -p ${IMG_REPO_PASSWORD} ${REGISTRY}
+  if [ -n "${QUAY_USERNAME}" -a -n "${QUAY_PASSWORD}" ]; then
+    docker login -u ${QUAY_USERNAME} -p ${QUAY_PASSWORD} ${REGISTRY}
   else
     echo "Could not login, missing credentials for the registry"
   fi

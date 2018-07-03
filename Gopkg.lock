@@ -103,7 +103,7 @@
   branch = "master"
   name = "github.com/golang/lint"
   packages = ["."]
-  revision = "470b6b0bb3005eda157f0275e2e4895055396a81"
+  revision = "06c8688daad7faa9da5a0c2f163a3d14aac986ca"
 
 [[projects]]
   name = "github.com/golang/protobuf"
@@ -329,7 +329,7 @@
     "http2/hpack",
     "idna"
   ]
-  revision = "4cb1c02c05b0e749b0365f61ae859a8e0cfceed9"
+  revision = "ed29d75add3d7c4bf7ca65aac0c6df3d1420216f"
 
 [[projects]]
   branch = "master"
@@ -392,7 +392,7 @@
     "go/internal/gcimporter",
     "go/types/typeutil"
   ]
-  revision = "1c99e1239a0c8b0e59c34000995c4e319b7702ca"
+  revision = "ffe88906718454e356e61776b54256e873fc133b"
 
 [[projects]]
   name = "google.golang.org/appengine"
@@ -436,7 +436,7 @@
   branch = "master"
   name = "k8s.io/api"
   packages = ["core/v1"]
-  revision = "655e4e87cb5a855657ad325d1a615cf870870c9d"
+  revision = "5f0d8f067e3bc465077d0333e891450326a577a3"
 
 [[projects]]
   branch = "release-1.9"
