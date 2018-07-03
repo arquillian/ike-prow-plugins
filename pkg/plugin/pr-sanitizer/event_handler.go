@@ -89,7 +89,10 @@ func (gh *GitHubPRSanitizerEventsHandler) validatePullRequestTitleAndDescription
 		commentsLoader := ghservice.NewIssueCommentsLazyLoader(gh.Client, pr)
 		msgContext := message.NewStatusMessageContext(ProwPluginName, documentationSection, pr, config.PluginConfiguration)
 		msgService := message.NewStatusMessageService(gh.Client, log, commentsLoader, msgContext)
-		msgService.SadStatusMessageForPRSanitizer(string(hintMessage), true)
+		e := msgService.SadStatusMessageForPRSanitizer(string(hintMessage), true)
+		if e != nil {
+			log.Errorf("failed to comment on PR, caused by: %s", e)
+		}
 
 		return statusService.fail()
 	}
