@@ -11,8 +11,7 @@ import (
 	"github.com/arquillian/ike-prow-plugins/pkg/utils"
 	gogh "github.com/google/go-github/github"
 	"regexp"
-	"github.com/arquillian/ike-prow-plugins/pkg/scm"
-	"fmt"
+	"github.com/arquillian/ike-prow-plugins/pkg/status/message"
 )
 
 // GitHubPRSanitizerEventsHandler is the event handler for the plugin.
@@ -27,6 +26,8 @@ var (
 	handledPrActions      = []string{"opened", "reopened", "edited", "synchronize"}
 	defaultTypes          = []string{"chore", "docs", "feat", "fix", "refactor", "style", "test"}
 )
+
+const documentationSection = "#_pr_sanitizer_plugin"
 
 // HandlePullRequestEvent is an entry point for the plugin logic. This method is invoked by the Server when
 // pull request event is dispatched from the /hook service
@@ -85,14 +86,11 @@ func (gh *GitHubPRSanitizerEventsHandler) validatePullRequestTitleAndDescription
 	hintMessage := failureMessageBuilder.Title(isTitleWithValidType).Description(description, config.DescriptionContentLength).IssueLink(isIssueLinked).Build()
 
 	if len(hintMessage) > 0 {
-		message := fmt.Sprintf("Hey @%s! "+string(hintMessage), *pr.User.Login)
-		issue := scm.NewRepositoryIssue(*pr.Base.Repo.Owner.Login, *pr.Base.Repo.Name, *pr.Number)
-		err := gh.Client.CreateIssueComment(*issue, &message)
+		commentsLoader := ghservice.NewIssueCommentsLazyLoader(gh.Client, pr)
+		msgContext := message.NewStatusMessageContext(ProwPluginName, documentationSection, pr, config.PluginConfiguration)
+		msgService := message.NewStatusMessageService(gh.Client, log, commentsLoader, msgContext)
+		msgService.SadStatusMessageForPRSanitizer(string(hintMessage), true)
 
-		if err != nil {
-			log.Errorf("failed to comment on PR, caused by: %s", err)
-			return err
-		}
 		return statusService.fail()
 	}
 

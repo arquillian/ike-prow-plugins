@@ -2,7 +2,6 @@ package command_test
 
 import (
 	is "github.com/arquillian/ike-prow-plugins/pkg/command"
-	"github.com/arquillian/ike-prow-plugins/pkg/github/service"
 	. "github.com/arquillian/ike-prow-plugins/pkg/internal/test"
 	"github.com/arquillian/ike-prow-plugins/pkg/log"
 	"github.com/arquillian/ike-prow-plugins/pkg/utils"
@@ -166,30 +165,21 @@ var _ = Describe("Command executor features", func() {
 
 			It("should not execute command when command name is not matching", func() {
 				// given
+				mock := MockPr().LoadedFromDefaultStruct().
+					WithUsers(ExternalUser("sender")).
+					Expecting(Comment(To(
+						HaveBodyThatContains("Hey @sender! It seems you tried to trigger `/command` command"),
+						HaveBodyThatContains("You have to be admin")))).
+					Create()
 
-				triggeredCommand.Sender = &gogh.User{Login: utils.String("sender")}
-
-				user := is.NewPermissionService(client, "sender", ghservice.NewPullRequestLazyLoaderFromComment(client, triggeredCommand))
-
+				triggeredCommand.Repo = mock.PullRequest.Base.Repo
+				userThatIs := mock.PermissionForUser("sender").ThatIs()
 				executed := false
 				command := is.CmdExecutor{Command: "/command"}
-				command.When(is.Triggered).By(user.Admin).Then(func() error {
+				command.When(is.Triggered).By(userThatIs.Admin).Then(func() error {
 					executed = true
 					return nil
 				})
-
-				gock.New("https://api.github.com").
-					Get("/repos/owner/repo/collaborators/sender/permission").
-					Reply(200).
-					BodyString("{\"permission\": \"read\"}")
-
-				gock.New("https://api.github.com").
-					Post("/repos/owner/repo/issues/1/comments").
-					SetMatcher(
-						ExpectPayload(To(
-								HaveBodyThatContains("Hey @sender! It seems you tried to trigger `/command` command"),
-								HaveBodyThatContains("You have to be admin")))).
-					Reply(201) // This way we implicitly verify that call happened after `HandleEvent` call
 
 				// when
 				err := command.Execute(client, log, triggeredCommand)

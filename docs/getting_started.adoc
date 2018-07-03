@@ -133,3 +133,4 @@ include::../local.sh[tag=handy_aliases]
 ----
 
 include::{asciidoctor-source}/fragments/sentry.adoc[leveloffset=1]
+include::{asciidoctor-source}/fragments/test-suite.adoc[leveloffset=1]

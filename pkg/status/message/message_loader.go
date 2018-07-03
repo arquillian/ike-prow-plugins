@@ -28,6 +28,18 @@ type Message struct {
 	MessageFileURL string
 }
 
+// LoadPRSanitizerMessage loads a status message from the template files for PR sanitizer plugin
+func (l *Loader) LoadPRSanitizerMessage() string {
+	var msg string
+
+	if l.Message.ConfigFile == "" {
+		msg = l.loadMessageTemplate("message-with-no-config.txt")
+	} else {
+		msg = l.loadMessageTemplate("message-with-config.txt")
+	}
+	return l.getMsgFromTemplate(msg)
+}
+
 // LoadMessage loads a status message from the template files
 func (l *Loader) LoadMessage(change scm.RepositoryChange, statusFileSpec string) string {
 	var msg string

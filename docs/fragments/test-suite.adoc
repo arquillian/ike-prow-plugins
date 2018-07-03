@@ -1,0 +1,79 @@
+== Test suite API
+
+Since the plugins require a lot of communication with GitHub we use Gock for mocking the necessary requests in our tests. However, some cases require more complex communication that has to be mock and this can lead to very cluttered lengthy code with several code duplication.
+To avoid this, we have a complex fluent API that creates the mocks instead of you.
+
+The API has two main entry points:
+
+  * `MockPr` that creates an instance of the `MockPrBuilder` which is then responsible for collecting all information that is necessary for the mock creation. By calling the next method that follows this one you specify the way the PR information should be loaded from - there are possible these options:
+  ** `LoadedFrom(jsonPath string)`
+  ** `LoadedFromDefaultJSON()`
+  ** `LoadedFromDefaultStruct()`
+ * `NewMockPluginTemplate` that takes a plugins name and then provides the same method `MockPr` as mentioned above. This is for test cases when it is necessary to know which plugin is used - eg. for mocking status calls
+
+=== MockPrBuilder
+
+`MockPrBuilder` is the main building block of the whole API - it offers a set of methods - eg:
+
+   * `WithTitle`
+   * `WithBody`
+   * `WithFiles`
+   * `WithoutFiles`
+   * `WithComments`
+   * `WithoutComments`
+   * `WithReviews`
+   * `WithLabels`
+   * `WithUsers`
+   * ...etc...
+
+These methods set the required information to the builder and when the method `Create()` is called, then based on the provided data it sets the necessary Gock mocks.
+
+=== Expectation
+
+For checking any of the `POST`, `PATCH` and `DELETE` requests, the `MockPrBuilder` offers method `Expecting` where you can define the required matcher for the sent payload. The methods responsible for this are:
+
+  * `Comment`
+  * `ChangedComment`
+  * `Status`
+  * `RemovedLabel`
+  * `AddedLabel`
+  * `ChangedTitle`
+
+=== PrMock
+
+The method `Create` returns an instance of `PrMock` that offers additional methods such as:
+
+  * `CreateCommentEvent`
+  * `CreatePullRequestEvent`
+  * `PermissionForUser`
+
+The values returned from these methods can be used for triggering/calling the plugin's logic.
+
+
+The overall usage can look like:
+```go
+// given
+prMock := mocker.MockPr().LoadedFromDefaultJSON().
+  WithFiles(LoadedFrom("test_fixtures/github_calls/prs/without_tests/changes.json")).
+  WithoutConfigFiles().
+  WithoutMessageFiles("test-keeper_without_tests_message.md").
+  WithoutComments().
+  Expecting(
+    Status(ToBe(gh.StatusFailure, keeper.NoTestsMessage, keeper.NoTestsDetailsPageName)),
+    Comment(ContainingStatusMessage(keeper.WithoutTestsMsg))).
+  Create()
+
+// when
+err := handler.HandlePullRequestEvent(log, prMock.CreatePullRequestEvent("opened"))
+```
+
+=== Config mock API
+
+There is also a possibility to not use the whole `MockPrBuilder` but only part of it (with the usage of `SubMockBuilder`). An example of such a usage is mock for config files:
+```go
+mocker.AddConfig(
+  ConfigYaml(Containing(
+    Param("test_patterns", "['*my', 'test.go', 'pattern.js']"),
+    Param("skip_validation_for", "['pom.xml', 'regex{{*\\.adoc}}']")))).
+  ToChange(change)
+```

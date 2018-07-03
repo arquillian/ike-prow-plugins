@@ -22,7 +22,7 @@ The plugin checks the PR for the presence of "work in progress" prefix in title 
 * The PR status is changed to **Success** and the "work in progress" prefix is removed automatically.
 ****
 
-where the PR title's "work in progress" prefix can have any of the default prefixes (`WIP`, `DO NOT MERGE`, `DON'T MERGE`, `WORK-IN-PROGRESS` with combinations of `( )`, `[ ]`, `:` ) or any of the user configured prefixes as described below (non-case sensitive) and the "work in progress" GitHub label can have the default value (`const:pkg/plugin/work-in-progress/configuration.go[name="DefaultLabel"]`) or any other user configured value as described below as valid values. 
+where the PR title's "work in progress" prefix can have any of the default prefixes (`WIP`, `DO NOT MERGE`, `DON'T MERGE`, `WORK-IN-PROGRESS` with any combinations of the flavors such as `( )`, `[ ]`, `{ }`, `! !`,`* *`, etc...) or any of the user configured prefixes as described below (non-case sensitive) and the "work in progress" GitHub label can have the default value (`const:pkg/plugin/work-in-progress/configuration.go[name="DefaultLabel"]`) or any other user configured value as described below as valid values.
 
 === Plugin Configuration [[work-in-progress-config]]
 

@@ -57,7 +57,7 @@ func (mb *failureHintMessageBuilder) IssueLink(isIssueLinked bool) FailureHintMe
 }
 
 func (mb *failureHintMessageBuilder) Build() (HintMessage) {
-	return HintMessage(strings.Join(mb.hint, " "))
+	return HintMessage(strings.Join(mb.hint, "\n\n"))
 }
 
 // NewFailureMessageBuilder creates failureHintMessageBuilder with empty message.

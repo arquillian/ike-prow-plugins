@@ -21,13 +21,12 @@ var _ = Describe("Permission service with permission checks features", func() {
 
 		It("should not approve the user when the permission is read", func() {
 			// given
-			gock.New("https://api.github.com").
-				Get("/repos/owner/repo/collaborators/user/permission").
-				Reply(200).
-				BodyString(`{"permission": "read"}`)
+			mock := MockPr().LoadedFromDefaultStruct().
+				WithUsers(ExternalUser("user")).
+				Create()
 
 			// when
-			status, err := user().Admin(true)
+			status, err := mock.PermissionForUser("user").ThatIs().Admin(true)
 
 			// then
 			Ω(err).ShouldNot(HaveOccurred())
@@ -39,13 +38,12 @@ var _ = Describe("Permission service with permission checks features", func() {
 
 		It("should approve the user when the permission is admin", func() {
 			// given
-			gock.New("https://api.github.com").
-				Get("/repos/owner/repo/collaborators/user/permission").
-				Reply(200).
-				BodyString(`{"permission": "admin"}`)
+			mock := MockPr().LoadedFromDefaultStruct().
+				WithUsers(Admin("user")).
+				Create()
 
 			// when
-			status, err := user().Admin(true)
+			status, err := mock.PermissionForUser("user").ThatIs().Admin(true)
 
 			// then
 			Ω(err).ShouldNot(HaveOccurred())
@@ -57,13 +55,12 @@ var _ = Describe("Permission service with permission checks features", func() {
 
 		It("should not approve the user that is not the PR creator", func() {
 			// given
-			gock.New("https://api.github.com").
-				Get("/repos/owner/repo/pulls/1").
-				Reply(200).
-				BodyString(`{"user": {"login": "creator"}}`)
+			mock := MockPr().LoadedFromDefaultStruct().
+				WithUsers(PrCreator("creator")).
+				Create()
 
 			// when
-			status, err := user().PRCreator(true)
+			status, err := mock.PermissionForUser("user").ThatIs().PRCreator(true)
 
 			// then
 			Ω(err).ShouldNot(HaveOccurred())
@@ -75,13 +72,12 @@ var _ = Describe("Permission service with permission checks features", func() {
 
 		It("should approve the user that is the PR creator", func() {
 			// given
-			gock.New("https://api.github.com").
-				Get("/repos/owner/repo/pulls/1").
-				Reply(200).
-				BodyString(`{"user": {"login": "user"}}`)
+			mock := MockPr().LoadedFromDefaultStruct().
+				WithUsers(PrCreator("user")).
+				Create()
 
 			// when
-			status, err := user().PRCreator(true)
+			status, err := mock.PermissionForUser("user").ThatIs().PRCreator(true)
 
 			// then
 			Ω(err).ShouldNot(HaveOccurred())
@@ -93,13 +89,12 @@ var _ = Describe("Permission service with permission checks features", func() {
 
 		It("should not approve the user that is not the requested PR reviewer", func() {
 			// given
-			gock.New("https://api.github.com").
-				Get("/repos/owner/repo/pulls/1").
-				Reply(200).
-				BodyString(`{"requested_reviewers": [{"login": "reviewer1"}, {"login": "reviewer2"}]}`)
+			mock := MockPr().LoadedFromDefaultStruct().
+				WithUsers(RequestedReviewer("reviewer1"), RequestedReviewer("reviewer2")).
+				Create()
 
 			// when
-			status, err := user().PRReviewer(true)
+			status, err := mock.PermissionForUser("user").ThatIs().PRReviewer(true)
 
 			// then
 			Ω(err).ShouldNot(HaveOccurred())
@@ -111,13 +106,12 @@ var _ = Describe("Permission service with permission checks features", func() {
 
 		It("should approve the user that is one of the requested PR reviewers", func() {
 			// given
-			gock.New("https://api.github.com").
-				Get("/repos/owner/repo/pulls/1").
-				Reply(200).
-				BodyString(`{"requested_reviewers": [{"login": "reviewer1"}, {"login": "user"}]}`)
+			mock := MockPr().LoadedFromDefaultStruct().
+				WithUsers(RequestedReviewer("reviewer1"), RequestedReviewer("user")).
+				Create()
 
 			// when
-			status, err := user().PRReviewer(true)
+			status, err := mock.PermissionForUser("user").ThatIs().PRReviewer(true)
 
 			// then
 			Ω(err).ShouldNot(HaveOccurred())
@@ -129,14 +123,13 @@ var _ = Describe("Permission service with permission checks features", func() {
 
 		It("should not approve the user that is not the PR approver", func() {
 			// given
-			gock.New("https://api.github.com").
-				Get("/repos/owner/repo/pulls/1/reviews").
-				Reply(200).
-				BodyString(`[{"user": {"login": "user"}, "state": "CHANGES_REQUESTED"},` +
-					`{"user": {"login": "user"}, "state": "COMMENTED"}]`)
+			mock := MockPr().LoadedFromDefaultStruct().
+				WithReviews(`[{"user": {"login": "user"}, "state": "CHANGES_REQUESTED"},` +
+					`{"user": {"login": "user"}, "state": "COMMENTED"}]`).
+				Create()
 
 			// when
-			status, err := user().PRApprover(true)
+			status, err := mock.PermissionForUser("user").ThatIs().PRApprover(true)
 
 			// then
 			Ω(err).ShouldNot(HaveOccurred())
@@ -148,13 +141,12 @@ var _ = Describe("Permission service with permission checks features", func() {
 
 		It("should approve the user that is a PR approver", func() {
 			// given
-			gock.New("https://api.github.com").
-				Get("/repos/owner/repo/pulls/1/reviews").
-				Reply(200).
-				BodyString(`[{"user": {"login": "user"}, "state": "APPROVED"}]`)
+			mock := MockPr().LoadedFromDefaultStruct().
+				WithReviews(`[{"user": {"login": "user"}, "state": "APPROVED"}]`).
+				Create()
 
 			// when
-			status, err := user().PRApprover(true)
+			status, err := mock.PermissionForUser("user").ThatIs().PRApprover(true)
 
 			// then
 			Ω(err).ShouldNot(HaveOccurred())

@@ -71,6 +71,14 @@ func (s *StatusMessageService) SadStatusMessage(description, statusFileSpec stri
 	}, addIfMissing)
 }
 
+// SadStatusMessageForPRSanitizer creates a message with the sad Ike image for PR sanitizer
+func (s *StatusMessageService) SadStatusMessageForPRSanitizer(description string, addIfMissing bool) error {
+	return s.StatusMessage(func() string {
+		messageLoader := s.newMessageLoader(sadIke, description)
+		return messageLoader.LoadPRSanitizerMessage()
+	}, addIfMissing)
+}
+
 // HappyStatusMessage creates a message with the happy Ike image
 func (s *StatusMessageService) HappyStatusMessage(description, statusFileSpec string, addIfMissing bool) error {
 	return s.StatusMessage(func() string {
