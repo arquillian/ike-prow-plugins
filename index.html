@@ -947,6 +947,9 @@ To avoid this, we have a complex fluent API that creates the mocks instead of yo
 <p><code>WithTitle</code></p>
 </li>
 <li>
+<p><code>WithBody</code></p>
+</li>
+<li>
 <p><code>WithFiles</code></p>
 </li>
 <li>
@@ -1577,7 +1580,7 @@ If you need to reconfigure the plugin then read the section <a href="index.html#
 <div class="sect2">
 <h3 id="_pr_sanitizer_plugin"><a class="anchor" href="#_pr_sanitizer_plugin"></a>3.4. PR Sanitizer Plugin</h3>
 <div class="paragraph">
-<p>This plugin enforces writing effective pull requests that confirm with proper naming conventions and description to clearly convey its purpose and provide better collaboration, tracebility and maintainabilty by giving a clear and concise context to the reviewer of what’s being solved at a high level, taking off an extra step for the reviewer.</p>
+<p>This plugin enforces writing effective pull requests that confirm with proper naming conventions and description to clearly convey its purpose and provide better collaboration, traceability and maintainability by giving a clear and concise context to the reviewer of what’s being solved at a high level, taking off an extra step for the reviewer.</p>
 </div>
 <div class="sect3">
 <h4 id="title-verification"><a class="anchor" href="#title-verification"></a>3.4.1. Title Verification</h4>
@@ -1619,7 +1622,8 @@ If you need to reconfigure the plugin then read the section <a href="index.html#
 <div class="content">
 <pre class="CodeRay highlight"><code data-lang="yml"><span class="key">type_prefixes</span>:            <i class="conum" data-value="1"></i><b>(1)</b>
   - <span class="string"><span class="content">':star:'</span></span>
-<span class="key">combine_defaults</span>: <span class="string"><span class="content">true   </span></span> <i class="conum" data-value="2"></i><b>(2)</b></code></pre>
+<span class="key">combine_defaults</span>: <span class="string"><span class="content">true   </span></span><i class="conum" data-value="2"></i><b>(2)</b>
+<span class="key">description_content_length</span>: <span class="string"><span class="content">40 </span></span> <i class="conum" data-value="3"></i><b>(3)</b></code></pre>
 </div>
 </div>
 <div class="colist arabic">
@@ -1632,11 +1636,40 @@ If you need to reconfigure the plugin then read the section <a href="index.html#
 <td><i class="conum" data-value="2"></i><b>2</b></td>
 <td>Allows you to decide if you want to combine your patterns with the list (<code>feat</code>, <code>fix</code>, <code>refactor</code>, <code>docs</code>, <code>test</code>, <code>chore</code>, <code>style</code>) of predefined default types (<code>true</code> by default).</td>
 </tr>
+<tr>
+<td><i class="conum" data-value="3"></i><b>3</b></td>
+<td>Set Number of characters to be verified in PR description content.</td>
+</tr>
 </table>
 </div>
 </div>
 <div class="sect3">
-<h4 id="_status_details_3"><a class="anchor" href="#_status_details_3"></a>3.4.3. Status details</h4>
+<h4 id="description-content-length-verification"><a class="anchor" href="#description-content-length-verification"></a>3.4.3. Description - Content Length Verification</h4>
+<div class="paragraph">
+<p>This ensures that the PR description has more than 50 characters to have more elaborated description from which anyone can understand all changes proposed in this PR.</p>
+</div>
+<div class="paragraph">
+<p>All issue link keywords(e.g. <code>close #1</code>) added to close an issue are not taken into consideration while measuring description length.</p>
+</div>
+<div class="paragraph">
+<p>If it won&#8217;t find Pull Request description more than 50 characters, it adds a comment with a hint message and marks its check as <strong>Failure</strong>, or as <strong>Success</strong> otherwise.</p>
+</div>
+<div class="paragraph">
+<p>You can overwrite default <code>50</code> characters by setting <code>description_content_length</code> property in <code>pr-sanitizer.yml</code></p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="description-issue-link-verification"><a class="anchor" href="#description-issue-link-verification"></a>3.4.4. Description - Issue Link Verification</h4>
+<div class="paragraph">
+<p>This ensures that the PR description has issue link using keywords to close issue after merging pull request. Supported keywords for issue links are <code>closes</code>, <code>closed</code>, <code>fix</code>, <code>fixes</code>, <code>fixed</code>, <code>resolve</code>, <code>resolves</code>, <code>resolved</code>.
+For More info about how can you close issues using keywords can be found <a href="https://help.github.com/articles/closing-issues-using-keywords">here</a>.</p>
+</div>
+<div class="paragraph">
+<p>If it won&#8217;t find issue link with keywords in Pull Request description, it marks its check as <strong>Failure</strong>, or as <strong>success</strong> otherwise.</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_status_details_3"><a class="anchor" href="#_status_details_3"></a>3.4.5. Status details</h4>
 <div class="paragraph">
 <p>In this section, you can find status details description applicable for each state of the <code>pr-sanitizer</code> plugin.</p>
 </div>
@@ -1647,15 +1680,42 @@ If you need to reconfigure the plugin then read the section <a href="index.html#
 </div>
 </div>
 <div class="sect4">
-<h5 id="title-verification-failed"><a class="anchor" href="#title-verification-failed"></a>Failure - title missing semantic commit style</h5>
+<h5 id="pr-sanitizer-failed"><a class="anchor" href="#pr-sanitizer-failed"></a>Failure</h5>
+<div class="sect5">
+<h6 id="title-verification-failed"><a class="anchor" href="#title-verification-failed"></a>Title missing semantic commit style</h6>
 <div class="paragraph">
-<p>Your Pull Request has been rejected because the plugin detected that the PR title does not starts with any of the "type prefixes", so it seems that it does not conform with the sematic commit message style.</p>
+<p>Your Pull Request has been rejected because the plugin detected that the PR title does not starts with any of the "type prefixes", so it seems that it does not conform with the semantic commit message style.</p>
 </div>
 <div class="paragraph">
 <p>Edit the PR title to conform with the semantic commit message style by prefixing it with one of the "type prefixes" to make the status green.</p>
 </div>
 <div class="paragraph">
 <p>For more information see <a href="index.html#title-verification">Title Verification</a> and <a href="index.html#pr-sanitizer-config">Plugin Configuration</a> sections.</p>
+</div>
+</div>
+<div class="sect5">
+<h6 id="description-verification-failed"><a class="anchor" href="#description-verification-failed"></a>Description content is too short</h6>
+<div class="paragraph">
+<p>Your Pull Request has been rejected because the plugin detected that the PR description excluding issue link and it&#8217;s keywords has less than 50 characters.</p>
+</div>
+<div class="paragraph">
+<p>Update the PR description by adding more elaborated description more than 50 characters to make status green.</p>
+</div>
+<div class="paragraph">
+<p>For more information see <a href="index.html#description-length-verification">Description - Content Length Verification</a></p>
+</div>
+</div>
+<div class="sect5">
+<h6 id="issue-link-failed"><a class="anchor" href="#issue-link-failed"></a>Issue link keyword is missing</h6>
+<div class="paragraph">
+<p>Your Pull Request has been rejected because the plugin detected that the PR description doesn&#8217;t contain any issue link which you want to close after merging PR.</p>
+</div>
+<div class="paragraph">
+<p>Update the PR description by linking issue to make status green.</p>
+</div>
+<div class="paragraph">
+<p>For more information see <a href="index.html#description-issue-link-verification">Description - Issue Link Verification</a></p>
+</div>
 </div>
 </div>
 </div>
@@ -1672,7 +1732,7 @@ However if you want to run all plugins configured for your repository, just add 
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2018-06-29 14:06:53 UTC
+Last updated 2018-07-09 13:24:04 UTC
 </div>
 </div>
 <script>
