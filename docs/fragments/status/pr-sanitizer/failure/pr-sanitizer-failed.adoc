@@ -1,0 +1,29 @@
+==== Failure [[pr-sanitizer-failed]]
+
+===== Title missing semantic commit style [[title-verification-failed]]
+
+Your Pull Request has been rejected because the plugin detected that the PR title does not starts with any of the "type prefixes", so it seems that it does not conform with the semantic commit message style.
+
+Edit the PR title to conform with the semantic commit message style by prefixing it with one of the "type prefixes" to make the status green.
+
+For more information see <<index#title-verification,Title Verification>> and <<index#pr-sanitizer-config,Plugin Configuration>> sections.
+
+===== Description content is too short [[description-verification-failed]]
+
+Your Pull Request has been rejected because the plugin detected that the PR description excluding issue link and it's keywords has less than 50 characters.
+
+Update the PR description by adding more elaborated description more than 50 characters to make status green.
+
+For more information see <<index#description-length-verification,Description - Content Length Verification>>
+
+===== Issue link keyword is missing [[issue-link-failed]]
+
+Your Pull Request has been rejected because the plugin detected that the PR description doesn't contain any issue link which you want to close after merging PR.
+
+Update the PR description by linking issue to make status green.
+
+For more information see <<index#description-issue-link-verification,Description - Issue Link Verification>>
+
+ifdef::only-status-details[]
+The complete documentation can be found at http://arquillian.org/ike-prow-plugins.
+endif::only-status-details[]

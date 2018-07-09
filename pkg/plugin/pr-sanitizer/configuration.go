@@ -10,9 +10,10 @@ import (
 // PluginConfiguration defines prefix patterns set against which PR titles will be matched
 // It's unmarshaled from pr-sanitizer.yml configuration file
 type PluginConfiguration struct {
-	config.PluginConfiguration `yaml:",inline,omitempty"`
-	TypePrefix                 []string `yaml:"type_prefixes,omitempty"`
-	Combine                    bool     `yaml:"combine_defaults,omitempty"`
+	config.PluginConfiguration        `yaml:",inline,omitempty"`
+	TypePrefix               []string `yaml:"type_prefixes,omitempty"`
+	Combine                  bool     `yaml:"combine_defaults,omitempty"`
+	DescriptionContentLength int      `yaml:"description_content_length,omitempty"`
 }
 
 // LoadConfiguration loads a PluginConfiguration for the given change

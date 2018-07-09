@@ -101,6 +101,12 @@ func (b *MockPrBuilder) WithTitle(title string) *MockPrBuilder {
 	return b
 }
 
+// WithBody sets the given description to the mocked pull request
+func (b *MockPrBuilder) WithBody(body string) *MockPrBuilder {
+	b.pullRequest.Body = &body
+	return b
+}
+
 // WithSize sets the given size to the mocked pull request changed files
 func (b *MockPrBuilder) WithSize(size int) *MockPrBuilder {
 	b.pullRequest.ChangedFiles = &size

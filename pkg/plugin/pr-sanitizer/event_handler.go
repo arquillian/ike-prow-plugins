@@ -4,35 +4,19 @@ import (
 	"strings"
 
 	"github.com/arquillian/ike-prow-plugins/pkg/command"
-	"github.com/arquillian/ike-prow-plugins/pkg/github"
 	"github.com/arquillian/ike-prow-plugins/pkg/github/client"
 	"github.com/arquillian/ike-prow-plugins/pkg/github/service"
 	"github.com/arquillian/ike-prow-plugins/pkg/log"
 	"github.com/arquillian/ike-prow-plugins/pkg/plugin/work-in-progress"
-	"github.com/arquillian/ike-prow-plugins/pkg/status"
 	"github.com/arquillian/ike-prow-plugins/pkg/utils"
 	gogh "github.com/google/go-github/github"
+	"regexp"
+	"github.com/arquillian/ike-prow-plugins/pkg/status/message"
 )
 
-const (
-	// ProwPluginName is an external prow plugin name used to register this service
-	ProwPluginName = "pr-sanitizer"
-
-	// TitleVerificationFailureMessage is a message used in GH Status as description when the PR title does not follow semantic message style
-	TitleVerificationFailureMessage = "PR title does not conform with semantic commit message style."
-
-	// TitleVerificationFailureDetailsPageName is a name of a documentation page that contains additional status details for title verification failure.
-	TitleVerificationFailureDetailsPageName = "title-verification-failed"
-
-	// SuccessMessage is a message used in GH Status as description when the PR title conforms to the semantic commit message style
-	SuccessMessage = "PR title conforms with semantic commit message style."
-	// SuccessDetailsPageName is a name of a documentation page that contains additional status details for success state
-	SuccessDetailsPageName = "pr-sanitizer-success"
-)
-
-// GitHubLabelsEventsHandler is the event handler for the plugin.
+// GitHubPRSanitizerEventsHandler is the event handler for the plugin.
 // Implements server.GitHubEventHandler interface which contains the logic for incoming GitHub events
-type GitHubLabelsEventsHandler struct {
+type GitHubPRSanitizerEventsHandler struct {
 	Client  ghclient.Client
 	BotName string
 }
@@ -43,18 +27,20 @@ var (
 	defaultTypes          = []string{"chore", "docs", "feat", "fix", "refactor", "style", "test"}
 )
 
+const documentationSection = "#_pr_sanitizer_plugin"
+
 // HandlePullRequestEvent is an entry point for the plugin logic. This method is invoked by the Server when
 // pull request event is dispatched from the /hook service
-func (gh *GitHubLabelsEventsHandler) HandlePullRequestEvent(log log.Logger, event *gogh.PullRequestEvent) error {
+func (gh *GitHubPRSanitizerEventsHandler) HandlePullRequestEvent(log log.Logger, event *gogh.PullRequestEvent) error {
 	if !utils.Contains(handledPrActions, *event.Action) {
 		return nil
 	}
-	return gh.checkTitleAndSetStatus(log, event.PullRequest)
+	return gh.validatePullRequestTitleAndDescription(log, event.PullRequest)
 }
 
 // HandleIssueCommentEvent is an entry point for the plugin logic. This method is invoked by the Server when
 // issue comment event is dispatched from the /hook service
-func (gh *GitHubLabelsEventsHandler) HandleIssueCommentEvent(log log.Logger, comment *gogh.IssueCommentEvent) error {
+func (gh *GitHubPRSanitizerEventsHandler) HandleIssueCommentEvent(log log.Logger, comment *gogh.IssueCommentEvent) error {
 	if !utils.Contains(handledCommentActions, *comment.Action) {
 		return nil
 	}
@@ -72,7 +58,7 @@ func (gh *GitHubLabelsEventsHandler) HandleIssueCommentEvent(log log.Logger, com
 				return err
 			}
 
-			return gh.checkTitleAndSetStatus(log, pullRequest)
+			return gh.validatePullRequestTitleAndDescription(log, pullRequest)
 		}})
 
 	err := cmdHandler.Handle(log, comment)
@@ -82,25 +68,47 @@ func (gh *GitHubLabelsEventsHandler) HandleIssueCommentEvent(log log.Logger, com
 	return err
 }
 
-func (gh *GitHubLabelsEventsHandler) checkTitleAndSetStatus(log log.Logger, pullRequest *gogh.PullRequest) error {
-	change := ghservice.NewRepositoryChangeForPR(pullRequest)
-	statusContext := github.StatusContext{BotName: gh.BotName, PluginName: ProwPluginName}
-	statusService := status.NewStatusService(gh.Client, log, change, statusContext)
-
+func (gh *GitHubPRSanitizerEventsHandler) validatePullRequestTitleAndDescription(log log.Logger, pr *gogh.PullRequest) error {
+	change := ghservice.NewRepositoryChangeForPR(pr)
+	statusService := gh.newPRTitleDescriptionStatusService(log, change)
 	config := LoadConfiguration(log, change)
-	if gh.HasTitleWithValidType(config, *pullRequest.Title) {
-		return statusService.Success(SuccessMessage, SuccessDetailsPageName)
-	} else if prefix, ok := wip.GetWorkInProgressPrefix(*pullRequest.Title, wip.LoadConfiguration(log, change)); ok {
-		trimmedTitle := strings.TrimPrefix(*pullRequest.Title, prefix)
-		if gh.HasTitleWithValidType(config, trimmedTitle) {
-			return statusService.Success(SuccessMessage, SuccessDetailsPageName)
+	isTitleWithValidType := gh.HasTitleWithValidType(config, *pr.Title)
+	if !isTitleWithValidType {
+		if prefix, ok := wip.GetWorkInProgressPrefix(*pr.Title, wip.LoadConfiguration(log, change)); ok {
+			trimmedTitle := strings.TrimPrefix(*pr.Title, prefix)
+			isTitleWithValidType = gh.HasTitleWithValidType(config, trimmedTitle)
 		}
 	}
-	return statusService.Failure(TitleVerificationFailureMessage, TitleVerificationFailureDetailsPageName)
+
+	description, isIssueLinked := gh.GetDescriptionWithIssueLinkExcluded(pr.GetBody())
+
+	failureMessageBuilder := NewFailureMessageBuilder()
+	hintMessage := failureMessageBuilder.Title(isTitleWithValidType).Description(description, config.DescriptionContentLength).IssueLink(isIssueLinked).Build()
+
+	if len(hintMessage) > 0 {
+		commentsLoader := ghservice.NewIssueCommentsLazyLoader(gh.Client, pr)
+		msgContext := message.NewStatusMessageContext(ProwPluginName, documentationSection, pr, config.PluginConfiguration)
+		msgService := message.NewStatusMessageService(gh.Client, log, commentsLoader, msgContext)
+		e := msgService.SadStatusMessageForPRSanitizer(string(hintMessage), true)
+		if e != nil {
+			log.Errorf("failed to comment on PR, caused by: %s", e)
+		}
+
+		return statusService.fail()
+	}
+
+	return statusService.titleAndDescriptionOk()
 }
 
-// HasTitleWithValidType checks if title prefix conforms with semantic message style
-func (gh *GitHubLabelsEventsHandler) HasTitleWithValidType(config PluginConfiguration, title string) bool {
+// GetDescriptionWithIssueLinkExcluded return description with excluding issue link keyword.
+func (gh *GitHubPRSanitizerEventsHandler) GetDescriptionWithIssueLinkExcluded(description string) (string, bool) {
+	desc := strings.ToLower(description)
+	var issueLink = regexp.MustCompile(`(close|closes|closed|fix|fixes|fixed|resolve|resolves|resolved)[:]?[\s]+[\w-/]*#[\d]+`)
+	return strings.TrimSpace(issueLink.ReplaceAllString(desc, "")), issueLink.MatchString(desc)
+}
+
+// HasTitleWithValidType checks if title prefix conforms with semantic message style.
+func (gh *GitHubPRSanitizerEventsHandler) HasTitleWithValidType(config PluginConfiguration, title string) bool {
 	prefixes := defaultTypes
 	if len(config.TypePrefix) != 0 {
 		if config.Combine {
