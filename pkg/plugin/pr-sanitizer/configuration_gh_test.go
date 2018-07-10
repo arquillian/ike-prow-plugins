@@ -26,7 +26,6 @@ var _ = Describe("PR Sanitizer config loader features", func() {
 
 		It("should load pr-sanitizer configuration yml file", func() {
 			// given
-
 			change := scm.RepositoryChange{
 				Owner:    "owner",
 				RepoName: "repo",
