@@ -44,6 +44,10 @@ external_plugins:
       events:
         - pull_request
         - issue_comment
+    - name: pr-sanitizer
+      events:
+        - pull_request
+        - issue_comment
   fabric8-services/fabric8-tenant:
     - name: test-keeper
       events:
