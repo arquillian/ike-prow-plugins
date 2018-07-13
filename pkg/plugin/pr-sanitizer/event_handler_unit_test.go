@@ -49,9 +49,11 @@ var _ = Describe("PR-Sanitizer Plugin features", func() {
 				Expect(msg).To(BeEmpty())
 			},
 			Entry("fixes keyword with surrounded text", "PR\r\n\r\nfixes: #1 issue"),
+			Entry("Fixes keyword with capital F", "PR description\r\n\r\nFixes: #1"),
 			Entry("closed keyword inline", "PR closed: org/repo#1 issue"),
 			Entry("resolve keyword with other repo path", "PR\r\nresolve: org/my-repo#1"),
 			Entry("only fixed keyword with link", "fixed :  #1"),
+			Entry("CLOSES uppercase", "CLOSES: #1"),
 			Entry("closes keyword with other repo path inline", "PR closes org/repo#1 issue"),
 			Entry("two links", "pr resolves org/my-repo#1 and fixes: #1"),
 		)
@@ -62,7 +64,7 @@ var _ = Describe("PR-Sanitizer Plugin features", func() {
 				msg := prsanitizer.CheckIssueLinkPresence(pr, prsanitizer.PluginConfiguration{}, log.NewTestLogger())
 				Expect(msg).NotTo(BeEmpty())
 			},
-			Entry("missing hash sign", "PR\r\n\r\nfixes: 1 issue"),
+			Entry("missing hash sign", "PR\r\n\r\nFixes: 1 issue"),
 			Entry("space after other repo path", "PR closed: org/repo #1 issue"),
 			Entry("missing number of the issue", "PR\r\nresolve: org/my-repo#"),
 			Entry("missing whole link", "this PR fixes issues"),
