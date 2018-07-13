@@ -14,7 +14,7 @@ func main() {
 }
 
 func handlerCreator(githubClient ghclient.Client, botName string) server.GitHubEventHandler {
-	return &prsanitizer.GitHubLabelsEventsHandler{Client: githubClient, BotName: botName}
+	return &prsanitizer.GitHubPRSanitizerEventsHandler{Client: githubClient, BotName: botName}
 }
 
 func serverCreator(webhookSecret []byte, eventHandler server.GitHubEventHandler) (*server.Server, []error) {

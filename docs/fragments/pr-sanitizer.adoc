@@ -1,6 +1,6 @@
 == PR Sanitizer Plugin
 
-This plugin enforces writing effective pull requests that confirm with proper naming conventions and description to clearly convey its purpose and provide better collaboration, tracebility and maintainabilty by giving a clear and concise context to the reviewer of what’s being solved at a high level, taking off an extra step for the reviewer.
+This plugin enforces writing effective pull requests that confirm with proper naming conventions and description to clearly convey its purpose and provide better collaboration, traceability and maintainability by giving a clear and concise context to the reviewer of what’s being solved at a high level, taking off an extra step for the reviewer.
 
 === Title Verification [[title-verification]]
 
@@ -32,10 +32,29 @@ include::../../pkg/plugin/pr-sanitizer/test_fixtures/github_calls/pr-sanitizer.y
 
 <1> Defines set of custom types which will be used to match titles prefixes in changeset and determine if Pull Requests Title conforms with the semantic message style. (Eg. above code snippet configures link:https://medium.com/walmartlabs/semantic-commit-messages-with-emojis-dba2541cea9a[emoji style] semantic commit message.)
 <2> Allows you to decide if you want to combine your patterns with the list (`feat`, `fix`, `refactor`, `docs`, `test`, `chore`, `style`) of predefined default types (`true` by default).
+<3> Set Number of characters to be verified in PR description content.
+
+
+=== Description - Content Length Verification [[description-content-length-verification]]
+
+This ensures that the PR description has more than 50 characters to have more elaborated description from which anyone can understand all changes proposed in this PR.
+
+All issue link keywords(e.g. `close #1`) added to close an issue are not taken into consideration while measuring description length.
+
+If it won't find Pull Request description more than 50 characters, it adds a comment with a hint message and marks its check as **Failure**, or as **Success** otherwise.
+
+You can overwrite default `50` characters by setting `description_content_length` property in `pr-sanitizer.yml`
+
+=== Description - Issue Link Verification [[description-issue-link-verification]]
+
+This ensures that the PR description has issue link using keywords to close issue after merging pull request. Supported keywords for issue links are `closes`, `closed`, `fix`, `fixes`, `fixed`, `resolve`, `resolves`, `resolved`.
+For More info about how can you close issues using keywords can be found link:https://help.github.com/articles/closing-issues-using-keywords[here].
+
+If it won't find issue link with keywords in Pull Request description, it marks its check as **Failure**, or as **success** otherwise.
 
 === Status details
 
 In this section, you can find status details description applicable for each state of the `pr-sanitizer` plugin.
 
 include::{asciidoctor-source}/fragments/status/pr-sanitizer/success/pr-sanitizer-success.adoc[leveloffset=1]
-include::{asciidoctor-source}/fragments/status/pr-sanitizer/failure/title-verification-failed.adoc[leveloffset=1]
+include::{asciidoctor-source}/fragments/status/pr-sanitizer/failure/pr-sanitizer-failed.adoc[leveloffset=1]
