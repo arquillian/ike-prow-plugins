@@ -6,7 +6,7 @@ If any of the `pr-sanitizer` checks finds out that the pull request doesn't comp
 
 === Title Verification [[title-verification]]
 
-This ensures that the PR title conforms with the semantic commit message style. Conformance with the semantic commit message style not only makes your changelog and git history clean and easy to navigate but also encourages making atomic pull requests that address only a single concern, better reflect the change within and are more clearly understood.
+This ensures that the PR title conforms with the link:https://seesparkbox.com/foundry/semantic_commit_messages[semantic commit message] style. Conformance with the semantic commit message style not only makes your changelog and git history clean and easy to navigate but also encourages making atomic pull requests that address only a single concern, better reflect the change within and are more clearly understood.
 
 The format below shows a rigid semantic commit message style.
 
@@ -17,8 +17,6 @@ The format below shows a rigid semantic commit message style.
 
 * where `<scope>` is optional.
 * and each of `<type>` categorizes the PR according to the change introduced (such as `feat` for introducing a new feature and `fix` for patching a bug in codebase). The default types are `feat`, `fix`, `docs`, `style`, `refactor`, `test`, and `chore`.
-
-For more explanation regarding the semantic style commit message style see link:https://seesparkbox.com/foundry/semantic_commit_messages[this].
 
 === Description Verification [[description-verification]]
 

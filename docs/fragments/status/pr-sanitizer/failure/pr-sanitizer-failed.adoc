@@ -5,7 +5,7 @@ The possible causes of the check failure are following:
 
 ===== Title missing semantic prefix [[title-verification-failed]]
 
-The pull request title does not start with any of the "type prefixes", so it seems that it does not conform with the semantic commit message style.
+The pull request title does not start with any of the "type prefixes", so it seems that it does not conform with the link:https://seesparkbox.com/foundry/semantic_commit_messages[semantic commit message] style.
 
 Edit the PR title so it conforms with the semantic commit message style by prefixing it with one of the "type prefixes".
 
