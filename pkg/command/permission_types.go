@@ -58,16 +58,20 @@ func (s *PermissionStatus) constructMessage(operation, command string) string {
 		s.User, operation, command))
 
 	if len(s.ApprovedRoles) > 0 {
-		msg.WriteString(strings.Join(s.ApprovedRoles, " or "))
+		// err is always nil
+		msg.WriteString(strings.Join(s.ApprovedRoles, " or ")) // nolint: errcheck, gosec
 		if len(s.RejectedRoles) > 0 {
-			msg.WriteString(", but ")
+			// err is always nil
+			msg.WriteString(", but ") // nolint: errcheck, gosec
 		}
 	}
 
 	if len(s.RejectedRoles) > 0 {
-		msg.WriteString("not " + strings.Join(s.RejectedRoles, " nor "))
+		// err is always nil
+		msg.WriteString("not " + strings.Join(s.RejectedRoles, " nor ")) // nolint: errcheck, gosec
 	}
 
-	msg.WriteString(" for this command to take an effect. ")
+	// err is always nil
+	msg.WriteString(" for this command to take an effect. ") // nolint: errcheck, gosec
 	return msg.String()
 }
