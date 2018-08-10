@@ -76,13 +76,13 @@
   branch = "master"
   name = "github.com/go-openapi/spec"
   packages = ["."]
-  revision = "bcff419492eeeb01f76e77d2ebc714dc97b607f5"
+  revision = "90cb6221326a6e7a2ae375729b6f724c7ae66899"
 
 [[projects]]
   branch = "master"
   name = "github.com/go-openapi/swag"
   packages = ["."]
-  revision = "811b1089cde9dad18d4d0c2d09fbdbf28dbd27a5"
+  revision = "2b0bd4f193d011c203529df626a65d63cb8a79e8"
 
 [[projects]]
   name = "github.com/gogo/protobuf"
@@ -265,7 +265,7 @@
     "nfs",
     "xfs"
   ]
-  revision = "40f013a808ec4fa79def444a1a56de4d1727efcb"
+  revision = "ae68e2d4c00fed4943b5f6698d504a5fe083da8a"
 
 [[projects]]
   name = "github.com/satori/go.uuid"
@@ -329,7 +329,7 @@
     "http2/hpack",
     "idna"
   ]
-  revision = "ed29d75add3d7c4bf7ca65aac0c6df3d1420216f"
+  revision = "292b43bbf7cb8d35ddf40f8d5100ef3837cced3f"
 
 [[projects]]
   branch = "master"
@@ -347,7 +347,7 @@
     "unix",
     "windows"
   ]
-  revision = "7138fd3d9dc8335c567ca206f4333fb75eb05d56"
+  revision = "1b2967e3c290b7c545b3db0deeda16e9be4f98a2"
 
 [[projects]]
   name = "golang.org/x/text"
@@ -392,7 +392,7 @@
     "go/internal/gcimporter",
     "go/types/typeutil"
   ]
-  revision = "ffe88906718454e356e61776b54256e873fc133b"
+  revision = "18f0b668f1069d7f55ac25b6f2670e30cd6499c0"
 
 [[projects]]
   name = "google.golang.org/appengine"
@@ -436,7 +436,7 @@
   branch = "master"
   name = "k8s.io/api"
   packages = ["core/v1"]
-  revision = "5f0d8f067e3bc465077d0333e891450326a577a3"
+  revision = "8be2a0b24ed0dac9cfc1ac2d987ea16cfcdbecb6"
 
 [[projects]]
   branch = "release-1.9"

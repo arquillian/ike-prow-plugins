@@ -2,12 +2,10 @@ package prsanitizer_test
 
 import (
 	"fmt"
-	"strings"
 
 	"github.com/arquillian/ike-prow-plugins/pkg/command"
 	. "github.com/arquillian/ike-prow-plugins/pkg/internal/test"
 	"github.com/arquillian/ike-prow-plugins/pkg/log"
-	"github.com/arquillian/ike-prow-plugins/pkg/plugin"
 	"github.com/arquillian/ike-prow-plugins/pkg/plugin/pr-sanitizer"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -19,31 +17,12 @@ import (
 
 const botName = "alien-ike"
 
-var (
-	expectedContext = strings.Join([]string{botName, prsanitizer.ProwPluginName}, "/")
-	docStatusRoot   = fmt.Sprintf("%s/status/%s", plugin.DocumentationURL, prsanitizer.ProwPluginName)
-)
-
 var _ = Describe("PR Sanitizer Plugin features", func() {
 
 	var handler *prsanitizer.GitHubPRSanitizerEventsHandler
 	var mocker = NewMockPluginTemplate(prsanitizer.ProwPluginName)
 
 	log := log.NewTestLogger()
-
-	haveSuccessState := SoftlySatisfyAll(
-		HaveState(github.StatusSuccess),
-		HaveDescription(prsanitizer.SuccessMessage),
-		HaveContext(expectedContext),
-		HaveTargetURL(fmt.Sprintf("%s/%s/%s.html", docStatusRoot, "success", prsanitizer.SuccessDetailsPageName)),
-	)
-
-	haveFailureState := SoftlySatisfyAll(
-		HaveState(github.StatusFailure),
-		HaveDescription(prsanitizer.FailureMessage),
-		HaveContext(expectedContext),
-		HaveTargetURL(fmt.Sprintf("%s/%s/%s.html", docStatusRoot, "failure", prsanitizer.FailureDetailsPageName)),
-	)
 
 	Context("Pull Request title change trigger", func() {
 		BeforeEach(func() {
@@ -57,9 +36,10 @@ var _ = Describe("PR Sanitizer Plugin features", func() {
 			// given
 			prMock := mocker.MockPr().LoadedFromDefaultJSON().
 				WithTitle("feat: introduces dummy response").
-				WithBody("This pr introduces dummy response which is adding new method.\r\n\r\n fixes: #2").
+				WithDescription("This pr introduces dummy response which is adding new method.\r\n\r\n fixes: #2").
 				WithoutConfigFiles().
-				Expecting(Status(To(haveSuccessState))).
+				WithoutComments().
+				Expecting(Status(ToBe(github.StatusSuccess, prsanitizer.SuccessMessage, prsanitizer.SuccessDetailsPageName))).
 				Create()
 
 			// when
@@ -71,13 +51,17 @@ var _ = Describe("PR Sanitizer Plugin features", func() {
 
 		It("should mark status as failed (thus block PR merge) when not prefixed with semantic commit message type", func() {
 			// given
+			title := "introduces dummy response"
 			prMock := mocker.MockPr().LoadedFromDefaultJSON().
-				WithTitle("introduces dummy response").
-				WithBody("This pr introduces dummy response which is adding new method.\r\n\r\n fixes: #2").
+				WithTitle(title).
+				WithDescription("This pr introduces dummy response which is adding new method.\r\n\r\n fixes: #2").
 				WithoutComments().
 				WithoutConfigFiles().
+				WithoutMessageFiles("pr-sanitizer_failed_message.md").
 				WithoutConfigFilesForPlugin(wip.ProwPluginName).
-				Expecting(Status(To(haveFailureState)), Comment(ContainingStatusMessage(prsanitizer.TitleFailureMessage))).
+				Expecting(
+					Status(ToBe(github.StatusFailure, prsanitizer.FailureMessage, prsanitizer.FailureDetailsPageName)),
+					Comment(ContainingStatusMessage(title))).
 				Create()
 
 			// when
@@ -91,9 +75,10 @@ var _ = Describe("PR Sanitizer Plugin features", func() {
 			// given
 			prMock := mocker.MockPr().LoadedFromDefaultJSON().
 				WithTitle(":star: configures plugin").
-				WithBody("This pr introduces dummy response which is adding new method.\r\n\r\n fixes: #2").
+				WithDescription("This pr introduces dummy response which is adding new method.\r\n\r\n fixes: #2").
 				WithConfigFile(ConfigYml(LoadedFrom("test_fixtures/github_calls/pr-sanitizer.yml"))).
-				Expecting(Status(To(haveSuccessState))).
+				WithoutComments().
+				Expecting(Status(ToBe(github.StatusSuccess, prsanitizer.SuccessMessage, prsanitizer.SuccessDetailsPageName))).
 				Create()
 
 			// when
@@ -107,9 +92,10 @@ var _ = Describe("PR Sanitizer Plugin features", func() {
 			// given
 			prMock := mocker.MockPr().LoadedFromDefaultJSON().
 				WithTitle("feat: introduces dummy response").
-				WithBody("This pr introduces dummy response which is adding new method.\r\n\r\n fixes: #2").
+				WithDescription("This pr introduces dummy response which is adding new method.\r\n\r\n fixes: #2").
 				WithoutConfigFiles().
-				Expecting(Status(To(haveSuccessState))).
+				WithoutComments().
+				Expecting(Status(ToBe(github.StatusSuccess, prsanitizer.SuccessMessage, prsanitizer.SuccessDetailsPageName))).
 				Create()
 
 			// when
@@ -124,10 +110,11 @@ var _ = Describe("PR Sanitizer Plugin features", func() {
 			// given
 			prMock := mocker.MockPr().LoadedFromDefaultJSON().
 				WithTitle("WIP feat: introduces dummy response").
-				WithBody("This pr introduces dummy response which is adding new method.\r\n\r\n fixes: #2").
+				WithDescription("This pr introduces dummy response which is adding new method.\r\n\r\n fixes: #2").
 				WithoutConfigFiles().
+				WithoutComments().
 				WithoutConfigFilesForPlugin(wip.ProwPluginName).
-				Expecting(Status(To(haveSuccessState))).
+				Expecting(Status(ToBe(github.StatusSuccess, prsanitizer.SuccessMessage, prsanitizer.SuccessDetailsPageName))).
 				Create()
 
 			// when
@@ -139,13 +126,17 @@ var _ = Describe("PR Sanitizer Plugin features", func() {
 
 		It("should mark status as failed (thus block PR merge) when prefixed with wip and does not conform with semantic commit message type", func() {
 			// given
+			title := "WIP introduces dummy response"
 			prMock := mocker.MockPr().LoadedFromDefaultJSON().
-				WithTitle("WIP introduces dummy response").
-				WithBody("This pr introduces dummy response which is adding new method.\r\n\r\n fixes: #2").
+				WithTitle(title).
+				WithDescription("This pr introduces dummy response which is adding new method.\r\n\r\n fixes: #2").
 				WithoutComments().
 				WithoutConfigFiles().
+				WithoutMessageFiles("pr-sanitizer_failed_message.md").
 				WithoutConfigFilesForPlugin(wip.ProwPluginName).
-				Expecting(Status(To(haveFailureState)), Comment(ContainingStatusMessage(prsanitizer.TitleFailureMessage))).
+				Expecting(
+					Status(ToBe(github.StatusFailure, prsanitizer.FailureMessage, prsanitizer.FailureDetailsPageName)),
+					Comment(ContainingStatusMessage(title))).
 				Create()
 
 			// when
@@ -169,10 +160,10 @@ var _ = Describe("PR Sanitizer Plugin features", func() {
 			// given
 			prMock := mocker.MockPr().LoadedFromDefaultJSON().
 				WithTitle("feat: PR from external user without tests should be rejected").
-				WithBody("This pr introduces dummy response which is adding new method.\r\n\r\n fixes: #2").
+				WithDescription("This pr introduces dummy response which is adding new method.\r\n\r\n fixes: #2").
 				WithoutReviews().
 				WithoutConfigFiles().
-				Expecting(Status(To(haveSuccessState))).
+				Expecting(Status(ToBe(github.StatusSuccess, prsanitizer.SuccessMessage, prsanitizer.SuccessDetailsPageName))).
 				Create()
 
 			// when
@@ -184,15 +175,19 @@ var _ = Describe("PR Sanitizer Plugin features", func() {
 
 		It("should mark status as failed (thus block PR merge) when not prefixed with semantic commit message type when "+command.RunCommentPrefix+" all command is used by admin", func() {
 			// given
+			title := "PR from external user without tests should be rejected"
 			prMock := mocker.MockPr().LoadedFromDefaultJSON().
-				WithTitle("PR from external user without tests should be rejected").
-				WithBody("This pr introduces dummy response which is adding new method.\r\n\r\n fixes: #2").
+				WithTitle(title).
+				WithDescription("This pr introduces dummy response which is adding new method.\r\n\r\n fixes: #2").
 				WithoutComments().
 				WithoutConfigFiles().
 				WithoutConfigFilesForPlugin(wip.ProwPluginName).
+				WithoutMessageFiles("pr-sanitizer_failed_message.md").
 				WithoutReviews().
 				WithUsers(Admin("admin")).
-				Expecting(Status(To(haveFailureState)), Comment(ContainingStatusMessage(prsanitizer.TitleFailureMessage))).
+				Expecting(
+					Status(ToBe(github.StatusFailure, prsanitizer.FailureMessage, prsanitizer.FailureDetailsPageName)),
+					Comment(ContainingStatusMessage(title))).
 				Create()
 
 			// when
@@ -205,8 +200,6 @@ var _ = Describe("PR Sanitizer Plugin features", func() {
 
 	Context("Pull Request Description verifier", func() {
 
-		descriptionContentLengthMessage := fmt.Sprintf(prsanitizer.DescriptionLengthShortMessage, 50)
-
 		BeforeEach(func() {
 			defer gock.OffAll()
 			handler = &prsanitizer.GitHubPRSanitizerEventsHandler{Client: NewDefaultGitHubClient(), BotName: botName}
@@ -218,11 +211,13 @@ var _ = Describe("PR Sanitizer Plugin features", func() {
 			// given
 			prMock := mocker.MockPr().LoadedFromDefaultJSON().
 				WithTitle("feat: introduces dummy response").
-				WithBody("This pr introduces dummy response which is adding new method.").
+				WithDescription("This pr introduces dummy response which is adding new method.").
 				WithoutComments().
 				WithoutConfigFiles().
-				WithoutConfigFilesForPlugin(prsanitizer.ProwPluginName).
-				Expecting(Status(To(haveFailureState)), Comment(ContainingStatusMessage(prsanitizer.IssueLinkMissingMessage))).
+				WithoutMessageFiles("pr-sanitizer_failed_message.md").
+				Expecting(
+					Status(ToBe(github.StatusFailure, prsanitizer.FailureMessage, prsanitizer.FailureDetailsPageName)),
+					Comment(ContainingStatusMessage(prsanitizer.IssueLinkMissingMessage))).
 				Create()
 
 			// when
@@ -235,12 +230,14 @@ var _ = Describe("PR Sanitizer Plugin features", func() {
 		It("should mark status as failed (thus block PR merge) when PR doesn't have description", func() {
 			// given
 			prMock := mocker.MockPr().LoadedFromDefaultJSON().
-				WithTitle("introduces dummy response").
-				WithBody("fixes: #3").
+				WithTitle("fix: introduces dummy response").
+				WithDescription("this pr fixes: #3").
 				WithoutComments().
 				WithoutConfigFiles().
-				WithoutConfigFilesForPlugin(wip.ProwPluginName).
-				Expecting(Status(To(haveFailureState)), Comment(ContainingStatusMessage(fmt.Sprintf("%s\n\n%s", prsanitizer.TitleFailureMessage, descriptionContentLengthMessage)))).
+				WithoutMessageFiles("pr-sanitizer_failed_message.md").
+				Expecting(
+					Status(ToBe(github.StatusFailure, prsanitizer.FailureMessage, prsanitizer.FailureDetailsPageName)),
+					Comment(ContainingStatusMessage(fmt.Sprintf(prsanitizer.DescriptionLengthShortMessage, 50, 7)))).
 				Create()
 
 			// when
@@ -254,15 +251,16 @@ var _ = Describe("PR Sanitizer Plugin features", func() {
 			// given
 			prMock := mocker.MockPr().LoadedFromDefaultJSON().
 				WithTitle("feat: introduces dummy response").
-				WithBody("This pr introduces dummy response which is adding new method.\r\n\r\n fixes: #3").
+				WithDescription("This pr introduces dummy response which is adding new method.\r\n\r\n fixes: #3").
 				WithConfigFile(
-				ConfigYml(Containing(
-					Param("description_content_length", "100")))).
+					ConfigYml(Containing(
+						Param("description_content_length", "100")))).
 				WithoutComments().
 				WithoutConfigFiles().
-				WithoutConfigFilesForPlugin(wip.ProwPluginName).
-				WithoutConfigFilesForPlugin(prsanitizer.ProwPluginName).
-				Expecting(Status(To(haveFailureState)), Comment(ContainingStatusMessage(fmt.Sprintf(prsanitizer.DescriptionLengthShortMessage, 100)))).
+				WithoutMessageFiles("pr-sanitizer_failed_message.md").
+				Expecting(
+					Status(ToBe(github.StatusFailure, prsanitizer.FailureMessage, prsanitizer.FailureDetailsPageName)),
+					Comment(ContainingStatusMessage(fmt.Sprintf(prsanitizer.DescriptionLengthShortMessage, 100, 61)))).
 				Create()
 
 			// when
@@ -271,24 +269,5 @@ var _ = Describe("PR Sanitizer Plugin features", func() {
 			// then - implicit verification of /statuses call occurrence with proper payload
 			Ω(err).ShouldNot(HaveOccurred())
 		})
-
-		It("should mark status as failed (thus block PR merge) when prefixed with wip and does not conform with semantic commit message type and short description", func() {
-			// given
-			prMock := mocker.MockPr().LoadedFromDefaultJSON().
-				WithTitle("WIP introduces dummy response").
-				WithoutComments().
-				WithoutConfigFiles().
-				WithoutConfigFilesForPlugin(wip.ProwPluginName).
-				WithoutConfigFilesForPlugin(prsanitizer.ProwPluginName).
-				Expecting(Status(To(haveFailureState)), Comment(ContainingStatusMessage(fmt.Sprintf("%s\n\n%s", prsanitizer.TitleFailureMessage, descriptionContentLengthMessage)))).
-				Create()
-
-			// when
-			err := handler.HandlePullRequestEvent(log, prMock.CreatePullRequestEvent("opened"))
-
-			// then - implicit verification of /statuses call occurrence with proper payload
-			Ω(err).ShouldNot(HaveOccurred())
-		})
-
 	})
 })

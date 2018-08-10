@@ -101,8 +101,8 @@ func (b *MockPrBuilder) WithTitle(title string) *MockPrBuilder {
 	return b
 }
 
-// WithBody sets the given description to the mocked pull request
-func (b *MockPrBuilder) WithBody(body string) *MockPrBuilder {
+// WithDescription sets the given description to the mocked pull request
+func (b *MockPrBuilder) WithDescription(body string) *MockPrBuilder {
 	b.pullRequest.Body = &body
 	return b
 }
