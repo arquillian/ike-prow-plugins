@@ -424,13 +424,17 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 <div id="content">
 <div class="sect3">
 <h4 id="pr-sanitizer-failed">Failure</h4>
-<div class="sect4">
-<h5 id="title-verification-failed">Title missing semantic commit style</h5>
 <div class="paragraph">
-<p>Your Pull Request has been rejected because the plugin detected that the PR title does not starts with any of the "type prefixes", so it seems that it does not conform with the semantic commit message style.</p>
+<p>Your Pull Request has been rejected because the plugin detected that your pull request doesn&#8217;t comply with the predefined PR conventions. For more information see the status message that should have been added to the PR as a comment.
+The possible causes of the check failure are following:</p>
+</div>
+<div class="sect4">
+<h5 id="title-verification-failed">Title missing semantic prefix</h5>
+<div class="paragraph">
+<p>The pull request title does not start with any of the "type prefixes", so it seems that it does not conform with the <a href="https://seesparkbox.com/foundry/semantic_commit_messages">semantic commit message</a> style.</p>
 </div>
 <div class="paragraph">
-<p>Edit the PR title to conform with the semantic commit message style by prefixing it with one of the "type prefixes" to make the status green.</p>
+<p>Edit the PR title so it conforms with the semantic commit message style by prefixing it with one of the "type prefixes".</p>
 </div>
 <div class="paragraph">
 <p>For more information see <a href="../../../index.html#title-verification">Title Verification</a> and <a href="../../../index.html#pr-sanitizer-config">Plugin Configuration</a> sections.</p>
@@ -439,25 +443,25 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 <div class="sect4">
 <h5 id="description-verification-failed">Description content is too short</h5>
 <div class="paragraph">
-<p>Your Pull Request has been rejected because the plugin detected that the PR description excluding issue link and it&#8217;s keywords has less than 50 characters.</p>
+<p>The pull request description (excluding issue link and it&#8217;s keywords) has less than the minimal number of characters (50 by default).</p>
 </div>
 <div class="paragraph">
-<p>Update the PR description by adding more elaborated description more than 50 characters to make status green.</p>
+<p>Update the PR description by adding more information so it contains at least the minimal number of characters.</p>
 </div>
 <div class="paragraph">
-<p>For more information see <a href="../../../index.html#description-length-verification">Description - Content Length Verification</a></p>
+<p>For more information see <a href="../../../index.html#description-content-length-check">Description - Content Length Verification</a></p>
 </div>
 </div>
 <div class="sect4">
 <h5 id="issue-link-failed">Issue link keyword is missing</h5>
 <div class="paragraph">
-<p>Your Pull Request has been rejected because the plugin detected that the PR description doesn&#8217;t contain any issue link which you want to close after merging PR.</p>
+<p>The pull request description doesn&#8217;t contain any issue link used in a combination with any of the <a href="https://help.github.com/articles/closing-issues-using-keywords/">GitHub keywords</a> that are able to automatically close the related issue.</p>
 </div>
 <div class="paragraph">
-<p>Update the PR description by linking issue to make status green.</p>
+<p>Update the PR description by linking a issue.</p>
 </div>
 <div class="paragraph">
-<p>For more information see <a href="../../../index.html#description-issue-link-verification">Description - Issue Link Verification</a></p>
+<p>For more information see <a href="../../../index.html#description-issue-link-check">Description - Issue Link Verification</a></p>
 </div>
 <div class="paragraph">
 <p>The complete documentation can be found at <a href="http://arquillian.org/ike-prow-plugins" class="bare">http://arquillian.org/ike-prow-plugins</a>.</p>

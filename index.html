@@ -947,7 +947,7 @@ To avoid this, we have a complex fluent API that creates the mocks instead of yo
 <p><code>WithTitle</code></p>
 </li>
 <li>
-<p><code>WithBody</code></p>
+<p><code>WithDescription</code></p>
 </li>
 <li>
 <p><code>WithFiles</code></p>
@@ -1582,10 +1582,13 @@ If you need to reconfigure the plugin then read the section <a href="index.html#
 <div class="paragraph">
 <p>This plugin enforces writing effective pull requests that confirm with proper naming conventions and description to clearly convey its purpose and provide better collaboration, traceability and maintainability by giving a clear and concise context to the reviewer of what’s being solved at a high level, taking off an extra step for the reviewer.</p>
 </div>
+<div class="paragraph">
+<p>If any of the <code>pr-sanitizer</code> checks finds out that the pull request doesn&#8217;t comply with any of the predefined conventions then it marks the plugin&#8217;s check as <strong>Failure</strong>, or as <strong>success</strong> otherwise.</p>
+</div>
 <div class="sect3">
 <h4 id="title-verification"><a class="anchor" href="#title-verification"></a>3.4.1. Title Verification</h4>
 <div class="paragraph">
-<p>This ensures that the PR title comforms with the semantic commit message style. Conformance with the semantic commit message style not only makes your changelog and git history clean and easy to navigate but also encourages making atomic pull requests that address only a single concern, better reflect the change within and are more clearly understood.</p>
+<p>This ensures that the PR title conforms with the <a href="https://seesparkbox.com/foundry/semantic_commit_messages">semantic commit message</a> style. Conformance with the semantic commit message style not only makes your changelog and git history clean and easy to navigate but also encourages making atomic pull requests that address only a single concern, better reflect the change within and are more clearly understood.</p>
 </div>
 <div class="paragraph">
 <p>The format below shows a rigid semantic commit message style.</p>
@@ -1601,19 +1604,54 @@ If you need to reconfigure the plugin then read the section <a href="index.html#
 <p>where <code>&lt;scope&gt;</code> is optional.</p>
 </li>
 <li>
-<p>and each of <code>&lt;type&gt;</code> categorizes the PR according to the change introduced (such as <code>feat</code> for introducing a new feature and <code>fix</code> for patching a bug in codebase)</p>
+<p>and each of <code>&lt;type&gt;</code> categorizes the PR according to the change introduced (such as <code>feat</code> for introducing a new feature and <code>fix</code> for patching a bug in codebase). The default types are <code>feat</code>, <code>fix</code>, <code>docs</code>, <code>style</code>, <code>refactor</code>, <code>test</code>, and <code>chore</code>.</p>
 </li>
 </ul>
 </div>
-<div class="paragraph">
-<p>If the PR title is prefixed with any of the default types (<code>feat</code>, <code>fix</code>, <code>docs</code>, <code>style</code>, <code>refactor</code>, <code>test</code>, <code>chore</code>) or any of the user configured types as described below (non-case sensitive) then the plugin marks its check as <strong>Success</strong>, or as <strong>Failure</strong> otherwise.</p>
 </div>
+<div class="sect3">
+<h4 id="description-verification"><a class="anchor" href="#description-verification"></a>3.4.2. Description Verification</h4>
 <div class="paragraph">
-<p>For more explanation regarding the semantic style commit message style check <a href="https://seesparkbox.com/foundry/semantic_commit_messages">here</a>.</p>
+<p>The description verification validates two things:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>link to an issue the pull request is related to</p>
+</li>
+<li>
+<p>the length of the description</p>
+</li>
+</ul>
+</div>
+<div class="sect4">
+<h5 id="description-issue-link-check"><a class="anchor" href="#description-issue-link-check"></a>Issue Link Check</h5>
+<div class="paragraph">
+<p>Issue link check verifies that the PR description contains an issue link used with any of the GitHub keywords that ensure closing the issue when the pull request is merged. The supported keywords are <code>closes</code>, <code>closed</code>, <code>fix</code>, <code>fixes</code>, <code>fixed</code>, <code>resolve</code>, <code>resolves</code>, <code>resolved</code>.
+More information about closing issues using keywords can be found <a href="https://help.github.com/articles/closing-issues-using-keywords">here</a>.</p>
+</div>
+</div>
+<div class="sect4">
+<h5 id="description-content-length-check"><a class="anchor" href="#description-content-length-check"></a>Content Length Check</h5>
+<div class="paragraph">
+<p>Content length check verifies that the PR description has a minimal number of characters (50 by default). With this check, it is possible to verify (to some degree) that the description contains more elaborate information about the changes proposed in the PR.</p>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+If the description contains an issue link used with any of the <a href="https://help.github.com/articles/closing-issues-using-keywords">GitHub keywords</a> (e.g. <code>close #1</code>) then this part is not taken into consideration when the length of the description is being measured.
+</td>
+</tr>
+</table>
+</div>
 </div>
 </div>
 <div class="sect3">
-<h4 id="pr-sanitizer-config"><a class="anchor" href="#pr-sanitizer-config"></a>3.4.2. Plugin Configuration</h4>
+<h4 id="pr-sanitizer-config"><a class="anchor" href="#pr-sanitizer-config"></a>3.4.3. Plugin Configuration</h4>
 <div class="paragraph">
 <p>To configure PR Sanitizer plugin place <code>pr-sanitizer.yml</code> (or <code>pr-sanitizer.yaml</code>) file inside of the directory <code>.ike-prow/</code> in your project and use properties described below.</p>
 </div>
@@ -1644,28 +1682,38 @@ If you need to reconfigure the plugin then read the section <a href="index.html#
 </div>
 </div>
 <div class="sect3">
-<h4 id="description-content-length-verification"><a class="anchor" href="#description-content-length-verification"></a>3.4.3. Description - Content Length Verification</h4>
+<h4 id="_status_message_2"><a class="anchor" href="#_status_message_2"></a>3.4.4. Status message</h4>
 <div class="paragraph">
-<p>This ensures that the PR description has more than 50 characters to have more elaborated description from which anyone can understand all changes proposed in this PR.</p>
+<p>When there is a PR that doesn&#8217;t conform with the conventions, then plugin (apart form setting the failure status) adds a comment explaining what is wrong and what the developer should do.
+If the PR is modified then the status message in the comment is updated respectively to reflect the latest state of the PR.</p>
 </div>
+<div class="sect4">
+<h5 id="_custom_status_message_2"><a class="anchor" href="#_custom_status_message_2"></a>Custom status message</h5>
 <div class="paragraph">
-<p>All issue link keywords(e.g. <code>close #1</code>) added to close an issue are not taken into consideration while measuring description length.</p>
+<p>Any of the status messages can be changed by putting the required custom message to any of the following files:</p>
 </div>
-<div class="paragraph">
-<p>If it won&#8217;t find Pull Request description more than 50 characters, it adds a comment with a hint message and marks its check as <strong>Failure</strong>, or as <strong>Success</strong> otherwise.</p>
+<div class="ulist">
+<ul>
+<li>
+<p><code>pr-sanitizer_failed_message.md</code> for the case when the PR doesn&#8217;t conform with the conventions</p>
+</li>
+<li>
+<p><code>pr-sanitizer_success_message.md</code> for the case when the PR is modified so it conforms with the conventions</p>
+</li>
+</ul>
 </div>
-<div class="paragraph">
-<p>You can overwrite default <code>50</code> characters by setting <code>description_content_length</code> property in <code>pr-sanitizer.yml</code></p>
+<div class="admonitionblock important">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-important" title="Important"></i>
+</td>
+<td class="content">
+Both of them has to be located in the directory <code>.ike-prow/</code>
+</td>
+</tr>
+</table>
 </div>
-</div>
-<div class="sect3">
-<h4 id="description-issue-link-verification"><a class="anchor" href="#description-issue-link-verification"></a>3.4.4. Description - Issue Link Verification</h4>
-<div class="paragraph">
-<p>This ensures that the PR description has issue link using keywords to close issue after merging pull request. Supported keywords for issue links are <code>closes</code>, <code>closed</code>, <code>fix</code>, <code>fixes</code>, <code>fixed</code>, <code>resolve</code>, <code>resolves</code>, <code>resolved</code>.
-For More info about how can you close issues using keywords can be found <a href="https://help.github.com/articles/closing-issues-using-keywords">here</a>.</p>
-</div>
-<div class="paragraph">
-<p>If it won&#8217;t find issue link with keywords in Pull Request description, it marks its check as <strong>Failure</strong>, or as <strong>success</strong> otherwise.</p>
 </div>
 </div>
 <div class="sect3">
@@ -1681,13 +1729,17 @@ For More info about how can you close issues using keywords can be found <a href
 </div>
 <div class="sect4">
 <h5 id="pr-sanitizer-failed"><a class="anchor" href="#pr-sanitizer-failed"></a>Failure</h5>
-<div class="sect5">
-<h6 id="title-verification-failed"><a class="anchor" href="#title-verification-failed"></a>Title missing semantic commit style</h6>
 <div class="paragraph">
-<p>Your Pull Request has been rejected because the plugin detected that the PR title does not starts with any of the "type prefixes", so it seems that it does not conform with the semantic commit message style.</p>
+<p>Your Pull Request has been rejected because the plugin detected that your pull request doesn&#8217;t comply with the predefined PR conventions. For more information see the status message that should have been added to the PR as a comment.
+The possible causes of the check failure are following:</p>
+</div>
+<div class="sect5">
+<h6 id="title-verification-failed"><a class="anchor" href="#title-verification-failed"></a>Title missing semantic prefix</h6>
+<div class="paragraph">
+<p>The pull request title does not start with any of the "type prefixes", so it seems that it does not conform with the <a href="https://seesparkbox.com/foundry/semantic_commit_messages">semantic commit message</a> style.</p>
 </div>
 <div class="paragraph">
-<p>Edit the PR title to conform with the semantic commit message style by prefixing it with one of the "type prefixes" to make the status green.</p>
+<p>Edit the PR title so it conforms with the semantic commit message style by prefixing it with one of the "type prefixes".</p>
 </div>
 <div class="paragraph">
 <p>For more information see <a href="index.html#title-verification">Title Verification</a> and <a href="index.html#pr-sanitizer-config">Plugin Configuration</a> sections.</p>
@@ -1696,25 +1748,25 @@ For More info about how can you close issues using keywords can be found <a href
 <div class="sect5">
 <h6 id="description-verification-failed"><a class="anchor" href="#description-verification-failed"></a>Description content is too short</h6>
 <div class="paragraph">
-<p>Your Pull Request has been rejected because the plugin detected that the PR description excluding issue link and it&#8217;s keywords has less than 50 characters.</p>
+<p>The pull request description (excluding issue link and it&#8217;s keywords) has less than the minimal number of characters (50 by default).</p>
 </div>
 <div class="paragraph">
-<p>Update the PR description by adding more elaborated description more than 50 characters to make status green.</p>
+<p>Update the PR description by adding more information so it contains at least the minimal number of characters.</p>
 </div>
 <div class="paragraph">
-<p>For more information see <a href="index.html#description-length-verification">Description - Content Length Verification</a></p>
+<p>For more information see <a href="index.html#description-content-length-check">Description - Content Length Verification</a></p>
 </div>
 </div>
 <div class="sect5">
 <h6 id="issue-link-failed"><a class="anchor" href="#issue-link-failed"></a>Issue link keyword is missing</h6>
 <div class="paragraph">
-<p>Your Pull Request has been rejected because the plugin detected that the PR description doesn&#8217;t contain any issue link which you want to close after merging PR.</p>
+<p>The pull request description doesn&#8217;t contain any issue link used in a combination with any of the <a href="https://help.github.com/articles/closing-issues-using-keywords/">GitHub keywords</a> that are able to automatically close the related issue.</p>
 </div>
 <div class="paragraph">
-<p>Update the PR description by linking issue to make status green.</p>
+<p>Update the PR description by linking a issue.</p>
 </div>
 <div class="paragraph">
-<p>For more information see <a href="index.html#description-issue-link-verification">Description - Issue Link Verification</a></p>
+<p>For more information see <a href="index.html#description-issue-link-check">Description - Issue Link Verification</a></p>
 </div>
 </div>
 </div>
@@ -1732,7 +1784,7 @@ However if you want to run all plugins configured for your repository, just add 
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2018-07-09 13:24:04 UTC
+Last updated 2018-08-10 08:30:09 UTC
 </div>
 </div>
 <script>
