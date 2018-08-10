@@ -7,7 +7,8 @@ import (
 
 // LoadSecret reads bytes from the file
 func LoadSecret(secretFilename string) ([]byte, error) {
-	rawSecret, err := ioutil.ReadFile(secretFilename)
+	// This is only executed from within a container while starting up the process
+	rawSecret, err := ioutil.ReadFile(secretFilename) // nolint
 	if err != nil {
 		return nil, err
 	}
