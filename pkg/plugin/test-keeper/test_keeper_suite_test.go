@@ -10,5 +10,5 @@ import (
 
 func TestSuiteTestKeeperPlugin(t *testing.T) {
 	RegisterFailHandler(Fail)
-	RunSpecWithJUnitReporter(t, "Test Keeper Prow Plugin Suite")
+	RunSpecWithJUnitReporter(t, "Test Keeper Prow Plugin Test Suite")
 }
