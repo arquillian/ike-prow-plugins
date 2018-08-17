@@ -28,7 +28,7 @@ In addition, if a PR contains only "non-production" changeset, it won't be check
 
 Of course, all of it is configurable.
 
-We have few reasonable defaults, which you can check link:https://github.com/arquillian/ike-prow-plugins/blob/master/pkg/plugin/test-keeper/test-keeper.yaml[here].
+We have few reasonable defaults, which you can check link:https://github.com/arquillian/ike-prow-plugins/blob/master/pkg/assets/config/test-keeper.yaml[here].
 
 NOTE: If we missed some important patterns feel free to open an link:https://github.com/arquillian/ike-prow-plugins/issues/new[issue] or better yet - a link:https://github.com/arquillian/ike-prow-plugins/pulls/new[Pull request]!
 
