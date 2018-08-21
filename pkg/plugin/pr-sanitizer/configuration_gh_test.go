@@ -33,7 +33,8 @@ var _ = Describe("PR Sanitizer config loader features", func() {
 			}
 			mocker.AddConfig(
 				ConfigYml(Containing(
-					Param("type_prefixes", "[':star:', ':package:', ':hammer_and_wrench:']")))).
+					Param("type_prefixes", "[':star:', ':package:', ':hammer_and_wrench:']"),
+					Param("description_content_length", "40")))).
 				ToChange(change)
 
 			// when
@@ -42,6 +43,7 @@ var _ = Describe("PR Sanitizer config loader features", func() {
 			// then
 			Expect(configuration.TypePrefix).To(ConsistOf(":star:", ":package:", ":hammer_and_wrench:"))
 			Expect(configuration.Combine).To(Equal(true))
+			Expect(configuration.DescriptionContentLength).To(Equal(40))
 		})
 
 		It("should not load pr-sanitizer configuration yaml file and return empty url when config is not accessible", func() {

@@ -13,13 +13,21 @@ type PluginConfiguration struct {
 	config.PluginConfiguration `yaml:",inline,omitempty"`
 	TypePrefix                 []string `yaml:"type_prefixes,omitempty"`
 	Combine                    bool     `yaml:"combine_defaults,omitempty"`
+	DescriptionContentLength   int      `yaml:"description_content_length,omitempty"`
 }
 
 // LoadConfiguration loads a PluginConfiguration for the given change
 func LoadConfiguration(log log.Logger, change scm.RepositoryChange) PluginConfiguration {
 
-	configuration := PluginConfiguration{Combine: true}
-	loadableConfig := &ghservice.LoadableConfig{PluginName: ProwPluginName, Change: change, BaseConfig: &configuration.PluginConfiguration}
+	configuration := PluginConfiguration{
+		Combine:                  true,
+		DescriptionContentLength: 50,
+	}
+	loadableConfig := &ghservice.LoadableConfig{
+		PluginName: ProwPluginName,
+		Change:     change,
+		BaseConfig: &configuration.PluginConfiguration,
+	}
 
 	err := config.Load(&configuration, loadableConfig)
 

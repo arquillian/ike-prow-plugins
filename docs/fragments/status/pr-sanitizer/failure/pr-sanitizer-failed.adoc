@@ -1,0 +1,32 @@
+==== Failure [[pr-sanitizer-failed]]
+
+Your Pull Request has been rejected because the plugin detected that your pull request doesn't comply with the predefined PR conventions. For more information see the status message that should have been added to the PR as a comment.
+The possible causes of the check failure are following:
+
+===== Title missing semantic prefix [[title-verification-failed]]
+
+The pull request title does not start with any of the "type prefixes", so it seems that it does not conform with the link:https://seesparkbox.com/foundry/semantic_commit_messages[semantic commit message] style.
+
+Edit the PR title so it conforms with the semantic commit message style by prefixing it with one of the "type prefixes".
+
+For more information see <<index#title-verification,Title Verification>> and <<index#pr-sanitizer-config,Plugin Configuration>> sections.
+
+===== Description content is too short [[description-verification-failed]]
+
+The pull request description (excluding issue link and it's keywords) has less than the minimal number of characters (50 by default).
+
+Update the PR description by adding more information so it contains at least the minimal number of characters.
+
+For more information see <<index#description-content-length-check,Description - Content Length Verification>>
+
+===== Issue link keyword is missing [[issue-link-failed]]
+
+The pull request description doesn't contain any issue link used in a combination with any of the link:https://help.github.com/articles/closing-issues-using-keywords/[GitHub keywords] that are able to automatically close the related issue.
+
+Update the PR description by linking a issue.
+
+For more information see <<index#description-issue-link-check,Description - Issue Link Verification>>
+
+ifdef::only-status-details[]
+The complete documentation can be found at http://arquillian.org/ike-prow-plugins.
+endif::only-status-details[]

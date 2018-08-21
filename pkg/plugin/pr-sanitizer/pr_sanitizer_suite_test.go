@@ -8,7 +8,7 @@ import (
 	. "github.com/onsi/gomega"
 )
 
-func TestSuitePRSantizerPlugin(t *testing.T) {
+func TestSuitePRSanitizerPlugin(t *testing.T) {
 	RegisterFailHandler(Fail)
 	RunSpecWithJUnitReporter(t, "Prow Event Handler PR-Sanitizer Plugin Suite")
 }

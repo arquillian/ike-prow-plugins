@@ -1,10 +1,12 @@
 == PR Sanitizer Plugin
 
-This plugin enforces writing effective pull requests that confirm with proper naming conventions and description to clearly convey its purpose and provide better collaboration, tracebility and maintainabilty by giving a clear and concise context to the reviewer of what’s being solved at a high level, taking off an extra step for the reviewer.
+This plugin enforces writing effective pull requests that confirm with proper naming conventions and description to clearly convey its purpose and provide better collaboration, traceability and maintainability by giving a clear and concise context to the reviewer of what’s being solved at a high level, taking off an extra step for the reviewer.
+
+If any of the `pr-sanitizer` checks finds out that the pull request doesn't comply with any of the predefined conventions then it marks the plugin's check as **Failure**, or as **success** otherwise.
 
 === Title Verification [[title-verification]]
 
-This ensures that the PR title comforms with the semantic commit message style. Conformance with the semantic commit message style not only makes your changelog and git history clean and easy to navigate but also encourages making atomic pull requests that address only a single concern, better reflect the change within and are more clearly understood.
+This ensures that the PR title conforms with the link:https://seesparkbox.com/foundry/semantic_commit_messages[semantic commit message] style. Conformance with the semantic commit message style not only makes your changelog and git history clean and easy to navigate but also encourages making atomic pull requests that address only a single concern, better reflect the change within and are more clearly understood.
 
 The format below shows a rigid semantic commit message style.
 
@@ -14,11 +16,25 @@ The format below shows a rigid semantic commit message style.
 ----
 
 * where `<scope>` is optional.
-* and each of `<type>` categorizes the PR according to the change introduced (such as `feat` for introducing a new feature and `fix` for patching a bug in codebase)
- 
-If the PR title is prefixed with any of the default types (`feat`, `fix`, `docs`, `style`, `refactor`, `test`, `chore`) or any of the user configured types as described below (non-case sensitive) then the plugin marks its check as **Success**, or as **Failure** otherwise.
+* and each of `<type>` categorizes the PR according to the change introduced (such as `feat` for introducing a new feature and `fix` for patching a bug in codebase). The default types are `feat`, `fix`, `docs`, `style`, `refactor`, `test`, and `chore`.
 
-For more explanation regarding the semantic style commit message style check link:https://seesparkbox.com/foundry/semantic_commit_messages[here].
+=== Description Verification [[description-verification]]
+
+The description verification validates two things:
+
+* link to an issue the pull request is related to
+* the length of the description
+
+==== Issue Link Check [[description-issue-link-check]]
+
+Issue link check verifies that the PR description contains an issue link used with any of the GitHub keywords that ensure closing the issue when the pull request is merged. The supported keywords are `closes`, `closed`, `fix`, `fixes`, `fixed`, `resolve`, `resolves`, `resolved`.
+More information about closing issues using keywords can be found link:https://help.github.com/articles/closing-issues-using-keywords[here].
+
+==== Content Length Check [[description-content-length-check]]
+
+Content length check verifies that the PR description has a minimal number of characters (50 by default). With this check, it is possible to verify (to some degree) that the description contains more elaborate information about the changes proposed in the PR.
+
+NOTE: If the description contains an issue link used with any of the link:https://help.github.com/articles/closing-issues-using-keywords[GitHub keywords] (e.g. `close #1`) then this part is not taken into consideration when the length of the description is being measured.
 
 === Plugin Configuration [[pr-sanitizer-config]]
 
@@ -32,10 +48,25 @@ include::../../pkg/plugin/pr-sanitizer/test_fixtures/github_calls/pr-sanitizer.y
 
 <1> Defines set of custom types which will be used to match titles prefixes in changeset and determine if Pull Requests Title conforms with the semantic message style. (Eg. above code snippet configures link:https://medium.com/walmartlabs/semantic-commit-messages-with-emojis-dba2541cea9a[emoji style] semantic commit message.)
 <2> Allows you to decide if you want to combine your patterns with the list (`feat`, `fix`, `refactor`, `docs`, `test`, `chore`, `style`) of predefined default types (`true` by default).
+<3> Set Number of characters to be verified in PR description content.
+
+=== Status message
+
+When there is a PR that doesn't conform with the conventions, then plugin (apart form setting the failure status) adds a comment explaining what is wrong and what the developer should do.
+If the PR is modified then the status message in the comment is updated respectively to reflect the latest state of the PR.
+
+==== Custom status message
+
+Any of the status messages can be changed by putting the required custom message to any of the following files:
+
+ * `pr-sanitizer_failed_message.md` for the case when the PR doesn't conform with the conventions
+ * `pr-sanitizer_success_message.md` for the case when the PR is modified so it conforms with the conventions
+
+IMPORTANT: Both of them has to be located in the directory `.ike-prow/`
 
 === Status details
 
 In this section, you can find status details description applicable for each state of the `pr-sanitizer` plugin.
 
 include::{asciidoctor-source}/fragments/status/pr-sanitizer/success/pr-sanitizer-success.adoc[leveloffset=1]
-include::{asciidoctor-source}/fragments/status/pr-sanitizer/failure/title-verification-failed.adoc[leveloffset=1]
+include::{asciidoctor-source}/fragments/status/pr-sanitizer/failure/pr-sanitizer-failed.adoc[leveloffset=1]

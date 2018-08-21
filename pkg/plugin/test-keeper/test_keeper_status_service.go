@@ -116,21 +116,15 @@ func (gh *GitHubTestEventsHandler) newTestStatusServiceWithMessages(log log.Logg
 
 // CreateWithoutTestsMessage creates a status message for the test-keeper plugin. If the status message is set in config then it takes that one, the default otherwise.
 func (ts *testStatusServiceWithMessages) withoutTestsMessage() {
-	ts.logError(ts.statusMsgService.SadStatusMessage(WithoutTestsMsg, "without_tests", true))
+	ts.statusMsgService.SadStatusMessage(WithoutTestsMsg, "without_tests", true)
 }
 
 // CreateWithTestsMessage creates a status message for the test-keeper plugin. If the status message is set in config then it takes that one, the default otherwise.
 func (ts *testStatusServiceWithMessages) withTestsMessage() {
-	ts.logError(ts.statusMsgService.HappyStatusMessage(WithTestsMsg, "with_tests", false))
+	ts.statusMsgService.HappyStatusMessage(WithTestsMsg, "with_tests", false)
 }
 
 // CreateOnlySkippedMessage creates a status message for the test-keeper plugin. If the status message is set in config then it takes that one, the default otherwise.
 func (ts *testStatusServiceWithMessages) onlySkippedMessage() {
-	ts.logError(ts.statusMsgService.HappyStatusMessage(OnlySkippedMsg, "only_skipped", false))
-}
-
-func (ts *testStatusServiceWithMessages) logError(err error) {
-	if err != nil {
-		ts.log.Errorf("failed to comment on PR, caused by: %s", err)
-	}
+	ts.statusMsgService.HappyStatusMessage(OnlySkippedMsg, "only_skipped", false)
 }
