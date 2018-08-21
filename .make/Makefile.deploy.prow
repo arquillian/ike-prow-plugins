@@ -9,7 +9,6 @@ oc-deploy-hook: build-hook deploy-hook ## Deploys hook service only
 	@oc process -f $(CLUSTER_DIR)/hook-template.yaml \
 		-p REGISTRY=$(REGISTRY) \
 		-p IMG_REPO=$(IMG_REPO) \
-		-p PROJECT_NAME=$(OC_PROJECT_NAME) \
 		-p IMAGE_TAG=$(TAG) \
 		-o yaml | oc apply -f -
 
@@ -22,16 +21,16 @@ build-hook: update
 
 .PHONY: build-hook-image
 build-hook-image:
-	$(DOCKER) build --build-arg BINARY=hook -t $(REGISTRY)/$(IMG_REPO)/$(OC_PROJECT_NAME)-hook -f $(DEPLOY_DOCKERFILE) .
-	$(DOCKER) tag $(REGISTRY)/$(IMG_REPO)/$(OC_PROJECT_NAME)-hook $(REGISTRY)/$(IMG_REPO)/$(OC_PROJECT_NAME)-hook:$(TAG)
+	$(DOCKER) build --build-arg BINARY=hook -t $(REGISTRY)/$(IMG_REPO)-hook -f $(DEPLOY_DOCKERFILE) .
+	$(DOCKER) tag $(REGISTRY)/$(IMG_REPO)-hook $(REGISTRY)/$(IMG_REPO)-hook:$(TAG)
 
 .PHONY: push-hook-image
 push-hook-image: build-hook-image
-	$(DOCKER) push $(REGISTRY)/$(IMG_REPO)/$(OC_PROJECT_NAME)-hook
+	$(DOCKER) push $(REGISTRY)/$(IMG_REPO)-hook
 
 .PHONY: clean-hook-image
 clean-hook-image:
-	$(DOCKER) rmi -f $(REGISTRY)/$(IMG_REPO)/$(OC_PROJECT_NAME)-hook
+	$(DOCKER) rmi -f $(REGISTRY)/$(IMG_REPO)-hook
 
 .PHONY: oc-deploy-plugins ## Builds plugin images, updates configuration and deploys new version of ike-plugins
 oc-deploy-plugins: oc-init-project compile deploy-plugins oc-generate-deployments
@@ -43,7 +42,6 @@ $(OC_DEPLOYMENTS): oc-%: %
 	@oc process -f $(CLUSTER_DIR)/ike-prow-template.yaml \
 		-p REGISTRY=$(REGISTRY) \
 		-p IMG_REPO=$(IMG_REPO) \
-		-p PROJECT_NAME=$(OC_PROJECT_NAME) \
 		-p PLUGIN_NAME=$< \
 		-p IMAGE_TAG=$(TAG) \
 		-o yaml > $(PLUGIN_DEPLOYMENTS_DIR)/$<.yaml
@@ -56,16 +54,16 @@ deploy-plugins: build-plugin-images push-plugin-images
 .PHONY: build-plugin-images $(PLUGINS)
 build-plugin-images: $(BUILD_IMAGES)
 $(BUILD_IMAGES): build-%: %
-	$(DOCKER) build --build-arg BINARY=$< -t $(REGISTRY)/$(IMG_REPO)/$(OC_PROJECT_NAME)-$< -f $(DEPLOY_DOCKERFILE) .
-	$(DOCKER) tag $(REGISTRY)/$(IMG_REPO)/$(OC_PROJECT_NAME)-$< $(REGISTRY)/$(IMG_REPO)/$(OC_PROJECT_NAME)-$<:$(TAG)
+	$(DOCKER) build --build-arg BINARY=$< -t $(REGISTRY)/$(IMG_REPO)-$< -f $(DEPLOY_DOCKERFILE) .
+	$(DOCKER) tag $(REGISTRY)/$(IMG_REPO)-$< $(REGISTRY)/$(IMG_REPO)-$<:$(TAG)
 
 
 .PHONY: clean-plugin-images
 clean-plugin-images: $(CLEAN_IMAGES)
 $(CLEAN_IMAGES): clean-%: %
-	$(DOCKER) rmi -f $(REGISTRY)/$(IMG_REPO)/$(OC_PROJECT_NAME)-$<
+	$(DOCKER) rmi -f $(REGISTRY)/$(IMG_REPO)-$<
 
 .PHONY: push-plugin-images
 push-plugin-images: build-plugin-images $(PUSH_IMAGES)
 $(PUSH_IMAGES): push-%: %
-	$(DOCKER) push $(REGISTRY)/$(IMG_REPO)/$(OC_PROJECT_NAME)-$<
+	$(DOCKER) push $(REGISTRY)/$(IMG_REPO)-$<

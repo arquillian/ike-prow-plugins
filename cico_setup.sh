@@ -61,7 +61,7 @@ function deploy() {
 
   if [ "${TARGET}" = "rhel" ]; then
     export DEPLOY_DOCKERFILE='Dockerfile.deploy.rhel'
-    export IMG_REPO="openshiftio/rhel-"
+    export IMG_REPO="openshiftio/rhel-ike-prow-plugins"
   fi
 
   # Login first

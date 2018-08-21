@@ -6,10 +6,7 @@ parameters:
   value: quay.io
 - name: IMG_REPO
   required: true
-  value: openshiftio
-- name: PROJECT_NAME
-  required: true
-  value: ike-prow-plugins
+  value: openshiftio/ike-prow-plugins
 - name: PLUGIN_NAME
   required: true
 - name: IMAGE_TAG
@@ -45,7 +42,7 @@ objects:
           terminationGracePeriodSeconds: 180
           containers:
           - name: ${PLUGIN_NAME}
-            image: ${REGISTRY}/${IMG_REPO}/${PROJECT_NAME}-${PLUGIN_NAME}:${IMAGE_TAG}
+            image: ${REGISTRY}/${IMG_REPO}-${PLUGIN_NAME}:${IMAGE_TAG}
             imagePullPolicy: Always
             resources:
               requests:
