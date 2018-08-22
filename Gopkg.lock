@@ -350,7 +350,7 @@
     ".",
     "internal"
   ]
-  revision = "f720f1faee02c1fb456408c22886169405f239aa"
+  revision = "d2e6202438beef2727060aa7cabdd924d92ebfd9"
 
 [[projects]]
   branch = "master"
@@ -404,7 +404,7 @@
     "go/internal/gcimporter",
     "go/types/typeutil"
   ]
-  revision = "5fad05c81888302518e9dfb20b55b3e1790c7a11"
+  revision = "ef27ca3af5e1f1424fdf755673c150c59c9fbe9d"
 
 [[projects]]
   name = "google.golang.org/appengine"
@@ -461,7 +461,7 @@
   branch = "master"
   name = "k8s.io/api"
   packages = ["core/v1"]
-  revision = "2315b41a07e851014d77070954fc391a9b2d9aa9"
+  revision = "167b5831ed2b510b117579b94ed5302f2b6736c4"
 
 [[projects]]
   branch = "release-1.9"
