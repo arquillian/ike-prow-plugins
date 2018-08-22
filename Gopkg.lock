@@ -64,25 +64,25 @@
   name = "github.com/go-openapi/jsonpointer"
   packages = ["."]
   revision = "3a0015ad55fa9873f41605d3e8f28cd279c32ab2"
-  version = "0.15.0"
+  version = "0.16.0"
 
 [[projects]]
   name = "github.com/go-openapi/jsonreference"
   packages = ["."]
   revision = "3fb327e6747da3043567ee86abd02bb6376b6be2"
-  version = "0.15.0"
+  version = "0.16.0"
 
 [[projects]]
   name = "github.com/go-openapi/spec"
   packages = ["."]
-  revision = "bce47c9386f9ecd6b86f450478a80103c3fe1402"
-  version = "0.15.0"
+  revision = "384415f06ee238aae1df5caad877de6ceac3a5c4"
+  version = "0.16.0"
 
 [[projects]]
   name = "github.com/go-openapi/swag"
   packages = ["."]
-  revision = "2b0bd4f193d011c203529df626a65d63cb8a79e8"
-  version = "0.15.0"
+  revision = "becd2f08beafcca035645a8a101e0e3e18140458"
+  version = "0.16.0"
 
 [[projects]]
   name = "github.com/gogo/protobuf"
@@ -108,8 +108,8 @@
 [[projects]]
   name = "github.com/golang/protobuf"
   packages = ["proto"]
-  revision = "b4deda0973fb4c70b50d226b1af49f3da59f5265"
-  version = "v1.1.0"
+  revision = "aa810b61a9c79d51363740d207bb46cf8e620ed5"
+  version = "v1.2.0"
 
 [[projects]]
   name = "github.com/google/go-github"
@@ -325,7 +325,7 @@
   branch = "master"
   name = "golang.org/x/crypto"
   packages = ["ssh/terminal"]
-  revision = "de0752318171da717af4ce24d0a2e8626afaeb11"
+  revision = "614d502a4dac94afa3a6ce146bd1736da82514c6"
 
 [[projects]]
   branch = "master"
@@ -341,7 +341,7 @@
     "http2/hpack",
     "idna"
   ]
-  revision = "f9ce57c11b242f0f1599cf25c89d8cb02c45295a"
+  revision = "922f4815f713f213882e8ef45e0d315b164d705c"
 
 [[projects]]
   branch = "master"
@@ -350,7 +350,7 @@
     ".",
     "internal"
   ]
-  revision = "3d292e4d0cdc3a0113e6d207bb137145ef1de42f"
+  revision = "d2e6202438beef2727060aa7cabdd924d92ebfd9"
 
 [[projects]]
   branch = "master"
@@ -359,7 +359,7 @@
     "unix",
     "windows"
   ]
-  revision = "57f5ac02873b2752783ca8c3c763a20f911e4d89"
+  revision = "3b58ed4ad3395d483fc92d5d14123ce2c3581fec"
 
 [[projects]]
   name = "golang.org/x/text"
@@ -404,7 +404,7 @@
     "go/internal/gcimporter",
     "go/types/typeutil"
   ]
-  revision = "4432cd1c27c82c87fe2507a05a1a940f794b617f"
+  revision = "ef27ca3af5e1f1424fdf755673c150c59c9fbe9d"
 
 [[projects]]
   name = "google.golang.org/appengine"
@@ -461,7 +461,7 @@
   branch = "master"
   name = "k8s.io/api"
   packages = ["core/v1"]
-  revision = "91bfdbcf0c2cab32ec1236cee4c300793abea68a"
+  revision = "167b5831ed2b510b117579b94ed5302f2b6736c4"
 
 [[projects]]
   branch = "release-1.9"

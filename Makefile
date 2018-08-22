@@ -8,8 +8,8 @@ BINARY_DIR:=${PWD}/bin
 CLUSTER_DIR?=${PWD}/cluster
 PLUGIN_DEPLOYMENTS_DIR?=$(CLUSTER_DIR)/generated
 
-REGISTRY?=docker.io
-DOCKER_REPO?=ike-prow-plugins
+REGISTRY?=quay.io
+IMG_REPO?=openshiftio/ike-prow-plugins
 BUILD_IMAGES:=$(patsubst %,build-%, $(PLUGINS))
 PUSH_IMAGES:=$(patsubst %,push-%, $(PLUGINS))
 CLEAN_IMAGES:=$(patsubst %,clean-%, $(PLUGINS))
