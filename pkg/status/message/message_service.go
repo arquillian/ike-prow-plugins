@@ -64,27 +64,25 @@ func NewStatusMessageService(client ghclient.Client, log log.Logger, commentsLoa
 }
 
 // SadStatusMessage creates a message with the sad Ike image
-func (s *StatusMessageService) SadStatusMessage(description, statusFileSpec string, addIfMissing bool) error {
-	return s.StatusMessage(func() string {
+func (s *StatusMessageService) SadStatusMessage(description, statusFileSpec string, addIfMissing bool) {
+	s.logError(s.StatusMessage(func() string {
 		messageLoader := s.newMessageLoader(sadIke, description)
 		return messageLoader.LoadMessage(s.change, statusFileSpec)
-	}, addIfMissing)
-}
-
-// SadStatusMessageForPRSanitizer creates a message with the sad Ike image for PR sanitizer
-func (s *StatusMessageService) SadStatusMessageForPRSanitizer(description string, addIfMissing bool) error {
-	return s.StatusMessage(func() string {
-		messageLoader := s.newMessageLoader(sadIke, description)
-		return messageLoader.LoadPRSanitizerMessage()
-	}, addIfMissing)
+	}, addIfMissing))
 }
 
 // HappyStatusMessage creates a message with the happy Ike image
-func (s *StatusMessageService) HappyStatusMessage(description, statusFileSpec string, addIfMissing bool) error {
-	return s.StatusMessage(func() string {
+func (s *StatusMessageService) HappyStatusMessage(description, statusFileSpec string, addIfMissing bool) {
+	s.logError(s.StatusMessage(func() string {
 		messageLoader := s.newMessageLoader(happyIke, description)
 		return messageLoader.LoadMessage(s.change, statusFileSpec)
-	}, addIfMissing)
+	}, addIfMissing))
+}
+
+func (s *StatusMessageService) logError(err error) {
+	if err != nil {
+		s.log.Errorf("failed to comment on PR, caused by: %s", err)
+	}
 }
 
 func (s *StatusMessageService) newMessageLoader(image, msg string) *Loader {

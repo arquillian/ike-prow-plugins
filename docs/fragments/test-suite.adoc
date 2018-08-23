@@ -16,7 +16,7 @@ The API has two main entry points:
 `MockPrBuilder` is the main building block of the whole API - it offers a set of methods - eg:
 
    * `WithTitle`
-   * `WithBody`
+   * `WithDescription`
    * `WithFiles`
    * `WithoutFiles`
    * `WithComments`
