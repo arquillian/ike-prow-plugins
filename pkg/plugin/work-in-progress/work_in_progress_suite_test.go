@@ -10,5 +10,5 @@ import (
 
 func TestSuiteWorkInProgressPlugin(t *testing.T) {
 	RegisterFailHandler(Fail)
-	RunSpecWithJUnitReporter(t, "Prow Event Handler Work-in-progress Plugin Suite")
+	RunSpecWithJUnitReporter(t, "Work-in-progress Plugin Test Suite")
 }

@@ -10,5 +10,5 @@ import (
 
 func TestSuitePRSanitizerPlugin(t *testing.T) {
 	RegisterFailHandler(Fail)
-	RunSpecWithJUnitReporter(t, "Prow Event Handler PR-Sanitizer Plugin Suite")
+	RunSpecWithJUnitReporter(t, "PR-Sanitizer Plugin Test Suite")
 }
