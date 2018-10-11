@@ -4,11 +4,15 @@ import (
 	"fmt"
 	"io/ioutil"
 	"net/http"
+	"time"
 )
 
 // GetFileFromURL retrieves the content of the file on the given url
 func GetFileFromURL(url string) ([]byte, error) {
-	resp, err := http.Get(url)
+	client := &http.Client{
+		Timeout: time.Second * 10,
+	}
+	resp, err := client.Get(url)
 	if err != nil {
 		return nil, err
 	}
