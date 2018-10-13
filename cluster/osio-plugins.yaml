@@ -102,6 +102,15 @@ external_plugins:
       events:
         - pull_request
         - issue_comment
+  fabric8-services/fabric8-build-service:
+    - name: test-keeper
+      events:
+        - pull_request
+        - issue_comment
+    - name: work-in-progress
+      events:
+        - pull_request
+        - issue_comment
   fabric8-launcher/launcher-backend:
     - name: test-keeper
       events:
