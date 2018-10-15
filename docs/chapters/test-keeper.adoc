@@ -107,7 +107,7 @@ IMPORTANT: All of them has to be located in the directory `.ike-prow/`
 
 In this section, you can find status details description applicable for each state of the `test-keeper` plugin.
 
-include::{asciidoctor-source}/fragments/status/test-keeper/success/tests-exist.adoc[leveloffset=1]
-include::{asciidoctor-source}/fragments/status/test-keeper/success/only-skipped.adoc[leveloffset=1]
-include::{asciidoctor-source}/fragments/status/test-keeper/success/keeper-approved-by.adoc[leveloffset=1]
-include::{asciidoctor-source}/fragments/status/test-keeper/failure/no-tests.adoc[leveloffset=1]
+include::{asciidoctor-source}/chapters/status/test-keeper/success/tests-exist.adoc[leveloffset=1]
+include::{asciidoctor-source}/chapters/status/test-keeper/success/only-skipped.adoc[leveloffset=1]
+include::{asciidoctor-source}/chapters/status/test-keeper/success/keeper-approved-by.adoc[leveloffset=1]
+include::{asciidoctor-source}/chapters/status/test-keeper/failure/no-tests.adoc[leveloffset=1]

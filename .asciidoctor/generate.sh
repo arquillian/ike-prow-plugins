@@ -62,10 +62,10 @@ SOURCE="/docs/README.adoc"
 TARGET="/docs/gh-pages/${TARGET_FOLDER}/index.html"
 generateDoc;
 
-for STATUS_FILE in `find docs/fragments/status/ -type f`
+for STATUS_FILE in `find docs/chapters/status/ -type f`
 do
-    FILE_PATH=${STATUS_FILE#*docs\/fragments\/status\/}
-    SOURCE="/docs/docs/fragments/status/${FILE_PATH}"
+    FILE_PATH=${STATUS_FILE#*docs\/chapters\/status\/}
+    SOURCE="/docs/docs/chapters/status/${FILE_PATH}"
     TARGET="/docs/gh-pages/${TARGET_FOLDER}/status/${FILE_PATH%.*}.html"
     ASCIIDOC_ARGS="-a nofooter=true -a relfileprefix=../../../ -a only-status-details=true"
     generateDoc;

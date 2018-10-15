@@ -132,5 +132,5 @@ link:https://direnv.net/[direnv] to automate this setup every time you access pr
 include::../local.sh[tag=handy_aliases]
 ----
 
-include::{asciidoctor-source}/fragments/sentry.adoc[leveloffset=1]
-include::{asciidoctor-source}/fragments/test-suite.adoc[leveloffset=1]
+include::{asciidoctor-source}/chapters/sentry.adoc[leveloffset=1]
+include::{asciidoctor-source}/chapters/test-suite.adoc[leveloffset=1]

@@ -39,9 +39,9 @@ For hints how to test web hook against your local setup head over to <<testing-h
 
 NOTE: More details about GitHub hooks can be found in the link:https://developer.github.com/webhooks/[official developer documentation].
 
-include::{asciidoctor-source}/fragments/test-keeper.adoc[leveloffset=1]
-include::{asciidoctor-source}/fragments/work-in-progress.adoc[leveloffset=1]
-include::{asciidoctor-source}/fragments/pr-sanitizer.adoc[leveloffset=1]
+include::{asciidoctor-source}/chapters/test-keeper.adoc[leveloffset=1]
+include::{asciidoctor-source}/chapters/work-in-progress.adoc[leveloffset=1]
+include::{asciidoctor-source}/chapters/pr-sanitizer.adoc[leveloffset=1]
 
 === Trigger Plugins on Demand
 In order to trigger plugin on demand, just add `/run plugin-name`(e.g. `/run test-keeper`) comment on pull request. If you want to trigger only specific set of plugins, you can trigger it by adding comment `/run plugin-A plugin-B`(e.g. `/run test-keeper work-in-progress`).
