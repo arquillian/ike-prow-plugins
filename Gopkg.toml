@@ -58,7 +58,7 @@ required = [
 
 [[override]]
   name = "github.com/prometheus/client_golang"
-  revision = "faf4ec335fe01ae5a6a0eaa34a5a9333bfbd1a30"
+  version = "^0.9.0"
 
 [[constraint]]
   name = "github.com/onsi/gomega"
