@@ -5,7 +5,7 @@ import (
 
 	"strings"
 
-	github_type "github.com/arquillian/ike-prow-plugins/pkg/github"
+	githubType "github.com/arquillian/ike-prow-plugins/pkg/github"
 	"github.com/arquillian/ike-prow-plugins/pkg/github/client"
 	"github.com/arquillian/ike-prow-plugins/pkg/log"
 	"github.com/arquillian/ike-prow-plugins/pkg/plugin"
@@ -18,12 +18,12 @@ import (
 type Service struct {
 	client        ghclient.Client
 	log           log.Logger
-	statusContext github_type.StatusContext
+	statusContext githubType.StatusContext
 	change        scm.RepositoryChange
 }
 
 // NewStatusService creates an instance of Service necessary for setting status
-func NewStatusService(client ghclient.Client, log log.Logger, change scm.RepositoryChange, context github_type.StatusContext) scm.StatusService {
+func NewStatusService(client ghclient.Client, log log.Logger, change scm.RepositoryChange, context githubType.StatusContext) scm.StatusService {
 	return &Service{
 		client:        client,
 		log:           log,
@@ -34,22 +34,22 @@ func NewStatusService(client ghclient.Client, log log.Logger, change scm.Reposit
 
 // Success marks given change as a success.
 func (s *Service) Success(reason, detailsPageName string) error {
-	return s.setStatus(github_type.StatusSuccess, reason, s.generateDetailsLink(detailsPageName, github_type.StatusSuccess))
+	return s.setStatus(githubType.StatusSuccess, reason, s.generateDetailsLink(detailsPageName, githubType.StatusSuccess))
 }
 
 // Failure marks given change as a failure.
 func (s *Service) Failure(reason, detailsPageName string) error {
-	return s.setStatus(github_type.StatusFailure, reason, s.generateDetailsLink(detailsPageName, github_type.StatusFailure))
+	return s.setStatus(githubType.StatusFailure, reason, s.generateDetailsLink(detailsPageName, githubType.StatusFailure))
 }
 
 // Pending marks given change as a pending.
 func (s *Service) Pending(reason string) error {
-	return s.setStatus(github_type.StatusPending, reason, "")
+	return s.setStatus(githubType.StatusPending, reason, "")
 }
 
 // Error marks given change as a error.
 func (s *Service) Error(reason string) error {
-	return s.setStatus(github_type.StatusError, reason, "")
+	return s.setStatus(githubType.StatusError, reason, "")
 }
 
 // setStatus sets the given status with the given reason to the related commit
