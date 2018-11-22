@@ -62,7 +62,7 @@ required = [
 
 [[constraint]]
   name = "github.com/onsi/gomega"
-  version = "1.4.1"
+  version = "1.4.3"
 
 [[constraint]]
   name = "github.com/onsi/ginkgo"
