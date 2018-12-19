@@ -65,7 +65,7 @@ func LoadIssueCommentEvent(filePath string) *gogh.IssueCommentEvent {
 	var event gogh.IssueCommentEvent
 	payload := LoadFromFile(filePath)
 	if err := json.Unmarshal(payload, &event); err != nil {
-		ginkgo.Fail(fmt.Sprintf("Failed while parsing '%q' event with payload: %q cause %q.", github.IssueComment, event, err))
+		ginkgo.Fail(fmt.Sprintf("Failed while parsing '%q' event with payload: %+v cause %q.", github.IssueComment, event, err))
 	}
 	return &event
 }
@@ -75,7 +75,7 @@ func LoadPullRequestEvent(filePath string) *gogh.PullRequestEvent {
 	var event gogh.PullRequestEvent
 	payload := LoadFromFile(filePath)
 	if err := json.Unmarshal(payload, &event); err != nil {
-		ginkgo.Fail(fmt.Sprintf("Failed while parsing '%q' event with payload: %q cause %q.", github.PullRequest, event, err))
+		ginkgo.Fail(fmt.Sprintf("Failed while parsing '%q' event with payload: %+v cause %q.", github.PullRequest, event, err))
 	}
 	return &event
 }

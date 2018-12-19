@@ -52,7 +52,8 @@ func (s *PermissionStatus) allow() *PermissionStatus {
 func (s *PermissionStatus) constructMessage(operation, command string) string {
 	var msg bytes.Buffer
 
-	msg.WriteString(fmt.Sprintf(
+	// err is always nil
+	msg.WriteString(fmt.Sprintf( // nolint: errcheck, gosec
 		"Hey @%s! It seems you tried to %s `%s` command, but this will not have any effect due to insufficient permission. "+
 			"You have to be ",
 		s.User, operation, command))
