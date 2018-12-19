@@ -73,7 +73,7 @@ func (l *MockPrBuilderLoader) LoadedFromDefaultJSON() *MockPrBuilder {
 
 // LoadedFromDefaultStruct loads a marshaled instance of default pull request
 func (l *MockPrBuilderLoader) LoadedFromDefaultStruct() *MockPrBuilder {
-	pr, _ := json.Marshal(&gogh.PullRequest{
+	pr, _ := json.Marshal(&gogh.PullRequest{  // nolint: errcheck, gosec
 		Number: utils.Int(1),
 		User:   createGhUser("bartoszmajsak-test"),
 		Base: &gogh.PullRequestBranch{

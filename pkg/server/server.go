@@ -69,19 +69,19 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	case github.PullRequest:
 		var event gogh.PullRequestEvent
 		if err := json.Unmarshal(payload, &event); err != nil {
-			l.WithError(err).Errorf("failed while parsing '%q' event with payload: %q.", github.PullRequest, event)
+			l.WithError(err).Errorf("failed while parsing '%q' event with payload: %+v.", github.PullRequest, event)
 		}
 		if err := s.GitHubEventHandler.HandlePullRequestEvent(l, &event); err != nil {
-			l.WithError(err).Errorf("error handling '%q' event with payload %q.", github.PullRequest, event)
+			l.WithError(err).Errorf("error handling '%q' event with payload %+v.", github.PullRequest, event)
 			return
 		}
 	case github.IssueComment:
 		var event gogh.IssueCommentEvent
 		if err := json.Unmarshal(payload, &event); err != nil {
-			l.WithError(err).Errorf("failed while parsing '%q' event with payload: %q.", github.IssueComment, event)
+			l.WithError(err).Errorf("failed while parsing '%q' event with payload: %+v.", github.IssueComment, event)
 		}
 		if err := s.GitHubEventHandler.HandleIssueCommentEvent(l, &event); err != nil {
-			l.WithError(err).Errorf("error handling '%q' event with payload %q.", github.IssueComment, event)
+			l.WithError(err).Errorf("error handling '%q' event with payload %+v.", github.IssueComment, event)
 			return
 		}
 	default:
