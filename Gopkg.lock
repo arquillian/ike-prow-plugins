@@ -503,7 +503,7 @@
     "go/types/typeutil",
   ]
   pruneopts = "NUT"
-  revision = "88e3b261f28032aa04435fc7aeae5d27d26bf777"
+  revision = "92cdcd90bf52150d9c63b7a8432ab7b10fc92385"
 
 [[projects]]
   digest = "1:655acbef8faad33db29b6a35655341fb4a594e87e56635f05a3e70ed0bd7bd95"
