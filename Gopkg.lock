@@ -55,12 +55,12 @@
   version = "v2.8.0"
 
 [[projects]]
-  digest = "1:a754fb0f7c86fb20e34ea3c0d770c0437a5dae1b9e88edb3d63c665eb1718198"
+  digest = "1:174f5657ba13fc5601c50acd83958c99dbf6bd1728b656cb359e1981b57a7bd3"
   name = "github.com/evalphobia/logrus_sentry"
   packages = ["."]
   pruneopts = "NUT"
-  revision = "c4625095391026ac2b35e57d5c302390dd20e6d9"
-  version = "v0.5.0"
+  revision = "af66214c4581304f089b55dcf23b1f3741365d70"
+  version = "v0.5.1"
 
 [[projects]]
   digest = "1:b96091e0b0ef04e3c2a4fbcce53d3866edc0ed4295f1264e122f8ca34175a11e"
