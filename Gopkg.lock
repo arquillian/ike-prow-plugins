@@ -60,7 +60,7 @@
   packages = ["."]
   pruneopts = "NUT"
   revision = "af66214c4581304f089b55dcf23b1f3741365d70"
-  version = "v0.5.1"
+  version = "v0.6.0"
 
 [[projects]]
   digest = "1:b96091e0b0ef04e3c2a4fbcce53d3866edc0ed4295f1264e122f8ca34175a11e"
