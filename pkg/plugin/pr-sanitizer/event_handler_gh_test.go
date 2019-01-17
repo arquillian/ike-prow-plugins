@@ -124,8 +124,8 @@ var _ = Describe("PR Sanitizer Plugin features", func() {
 			Ω(err).ShouldNot(HaveOccurred())
 		})
 
-		It("should mark status as failed (thus block PR merge) when prefixed with wip and does not conform with semantic commit message type",
-			func() {
+		It("should mark status as failed (thus block PR merge) when prefixed with "+
+			"wip and does not conform with semantic commit message type", func() {
 			// given
 			title := "WIP introduces dummy response"
 			prMock := mocker.MockPr().LoadedFromDefaultJSON().
