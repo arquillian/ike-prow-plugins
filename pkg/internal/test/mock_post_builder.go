@@ -58,7 +58,8 @@ func Comment(matherForPlugin BuilderMatcher) MockCreator {
 	}
 }
 
-// ChangedComment creates a gock matcher to check that there is a Patch request for the given comment id and containing a comment that complies with the given restrictions
+// ChangedComment creates a gock matcher to check that there is a Patch request for the given comment id
+// and containing a comment that complies with the given restrictions
 func ChangedComment(commendID int, matherForPlugin BuilderMatcher) MockCreator {
 	return func(builder *MockPrBuilder) {
 		path := fmt.Sprintf("%s/issues/comments/%d", builder.baseRepoPath(), commendID)

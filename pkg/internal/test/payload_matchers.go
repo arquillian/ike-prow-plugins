@@ -89,7 +89,8 @@ func HaveBody(expectedBody string) SoftMatcher {
 		"body")
 }
 
-// HaveBodyThatContains gets "body" key from map[string]interface{} or first element from []interface{} and checks if its value contains the given string
+// HaveBodyThatContains gets "body" key from map[string]interface{} or first element from []interface{} and checks
+// if its value contains the given string.
 // This matcher is used to verify body content sent in request to GitHub API
 func HaveBodyThatContains(content string) SoftMatcher {
 	return TransformWithName(

@@ -50,7 +50,8 @@ func NewStatusMessageContext(pluginName, documentationSection string, pr *gogh.P
 }
 
 // NewStatusMessageService creates an instance of GitHub StatusMessageService for the given StatusMessageContext
-func NewStatusMessageService(client ghclient.Client, logger log.Logger, commentsLoader *ghservice.IssueCommentsLazyLoader, commentContext StatusMessageContext) *StatusMessageService {
+func NewStatusMessageService(client ghclient.Client, logger log.Logger, commentsLoader *ghservice.IssueCommentsLazyLoader,
+	commentContext StatusMessageContext) *StatusMessageService {
 	return &StatusMessageService{
 		commentService: &ghservice.CommentService{
 			Client: client,

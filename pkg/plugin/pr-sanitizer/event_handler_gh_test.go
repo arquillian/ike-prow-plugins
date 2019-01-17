@@ -175,7 +175,8 @@ var _ = Describe("PR Sanitizer Plugin features", func() {
 			Ω(err).ShouldNot(HaveOccurred())
 		})
 
-		It("should mark status as failed (thus block PR merge) when not prefixed with semantic commit message type when "+command.RunCommentPrefix+" all command is used by admin", func() {
+		It("should mark status as failed (thus block PR merge) when not prefixed with semantic commit message type and "+
+			""+command.RunCommentPrefix+" all command is used by admin", func() {
 			// given
 			title := "PR from external user without tests should be rejected"
 			prMock := mocker.MockPr().LoadedFromDefaultJSON().

@@ -19,7 +19,7 @@ linters-settings:
   misspell:
     locale: US
   lll:
-    line-length: 150
+    line-length: 180
   goimports:
     local-prefixes: github.com/golangci/golangci-lint
   gocritic:

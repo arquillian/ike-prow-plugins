@@ -39,6 +39,7 @@ func (r rateLimitWatcher) logRateLimits() {
 	}
 	core := limits.GetCore()
 	if core.Remaining < r.threshold {
-		r.logger.Warnf("reaching limit for GH API calls. %d/%d left. resetting at [%s]", core.Remaining, core.Limit, core.Reset.Format("2006-01-01 15:15:15"))
+		r.logger.Warnf("reaching limit for GH API calls. %d/%d left. resetting at [%s]",
+			core.Remaining, core.Limit, core.Reset.Format("2006-01-01 15:15:15"))
 	}
 }

@@ -20,13 +20,16 @@ var (
 
 const (
 	// TitleFailureMessage is a message used in GH Status as description when the PR title does not follow semantic message style
-	TitleFailureMessage = "#### Semantic title\nThe PR title `%s` does not conform with the [semantic message](https://seesparkbox.com/foundry/semantic_commit_messages) style. " +
+	TitleFailureMessage = "#### Semantic title\nThe PR title `%s` does not conform with the " +
+		"[semantic message](https://seesparkbox.com/foundry/semantic_commit_messages) style. " +
 		"The semantic message makes your changelog and git history clean. " +
 		"Please, edit the PR by prefixing it with one of the type prefixes that are valid for your repository: %s."
 
 	// DescriptionLengthShortMessage is a status message that is used in case of short PR description.
-	DescriptionLengthShortMessage = "#### PR description length\nThe PR description is too short - it is expected that the description should have more than %d characters, but it has %d. " +
-		"More elaborated description is helpful for understanding the changes proposed in this PR. (Any issue links and it's keywords are excluded when the description length is being measured)"
+	DescriptionLengthShortMessage = "#### PR description length\nThe PR description is too short - it is expected that " +
+		"the description should have more than %d characters, but it has %d. " +
+		"More elaborated description is helpful for understanding the changes proposed " +
+		"in this PR. (Any issue links and it's keywords are excluded when the description length is being measured)"
 
 	// IssueLinkMissingMessage is a status message that is used in case of missing issue link.
 	IssueLinkMissingMessage = "#### Issue link\nThe PR description is missing any issue link that would be used with any of the " +

@@ -75,7 +75,8 @@ func (gh *GitHubTestEventsHandler) HandleIssueCommentEvent(logger log.Logger, co
 	return err
 }
 
-func (gh *GitHubTestEventsHandler) checkIfBypassed(logger log.Logger, commentsLoader *ghservice.IssueCommentsLazyLoader, pr *gogh.PullRequest) (bool, string) {
+func (gh *GitHubTestEventsHandler) checkIfBypassed(logger log.Logger, commentsLoader *ghservice.IssueCommentsLazyLoader,
+	pr *gogh.PullRequest) (found bool, comment string) {
 	comments, err := commentsLoader.Load()
 	if err != nil {
 		logger.Errorf("Getting all comments failed with an error: %s", err)
@@ -135,7 +136,8 @@ func (gh *GitHubTestEventsHandler) checkTestsAndSetStatus(logger log.Logger, prL
 	return err
 }
 
-func (gh *GitHubTestEventsHandler) checkTests(logger log.Logger, change scm.RepositoryChange, config *PluginConfiguration, prNumber int) (FileCategories, error) {
+func (gh *GitHubTestEventsHandler) checkTests(logger log.Logger, change scm.RepositoryChange,
+	config *PluginConfiguration, prNumber int) (FileCategories, error) {
 	matcher, err := LoadMatcher(config)
 	if err != nil {
 		logger.Error(err)
