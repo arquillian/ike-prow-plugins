@@ -229,6 +229,7 @@ func ConfigYml(content string) func(builder *MockPrBuilder) {
 // WithoutRawFiles sets that the associated mocked PR should not contain the given files
 func (b *MockPrBuilder) WithoutRawFiles(fileNames ...string) *MockPrBuilder {
 	for _, path := range fileNames {
+		path := path
 		b.addMockCreator(func(builder *MockPrBuilder) {
 			builder.getBaseRawFilesMock(path).
 				Reply(404)

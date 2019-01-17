@@ -88,6 +88,7 @@ func (p *DoFunctionProvider) Then(doFunction DoFunction) {
 
 func (p *DoFunctionProvider) getMatchingAction(comment *gogh.IssueCommentEvent) *commentAction {
 	for _, action := range p.actions {
+		action := action
 		if action.isMatching(comment) {
 			return &action
 		}
