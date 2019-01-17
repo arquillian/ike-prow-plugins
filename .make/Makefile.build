@@ -21,8 +21,8 @@ compile: deps compile-only ## Compiles all plugins and puts them in the bin/ fol
 .PHONY: compile-only
 compile-only: generate $(BINARIES)
 
-.PHONY: generate ## Generates any necessary assets using go-bindata library
-generate:
+.PHONY: generate
+generate: ## Generates any necessary assets using go-bindata library
 	go generate ./pkg/assets/...
 
 .PHONY: test
@@ -32,8 +32,8 @@ test:
 .PHONY: build
 build: compile test
 
-.PHONY: format ## Removes unneeded imports and formats source code
-format:
+.PHONY: format
+format: ## Removes unneeded imports and formats source code
 	@goimports -l -w pkg
 
 # Build configuration

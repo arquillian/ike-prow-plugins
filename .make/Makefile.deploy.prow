@@ -32,8 +32,8 @@ push-hook-image: build-hook-image
 clean-hook-image:
 	$(DOCKER) rmi -f $(REGISTRY)/$(DOCKER_REPO)/hook
 
-.PHONY: oc-deploy-plugins ## Builds plugin images, updates configuration and deploys new version of ike-plugins
-oc-deploy-plugins: oc-init-project compile deploy-plugins oc-generate-deployments
+.PHONY: oc-deploy-plugins
+oc-deploy-plugins: oc-init-project compile deploy-plugins oc-generate-deployments ## Builds plugin images, updates configuration and deploys new version of ike-plugins
 	@echo "Updating cluster configuration for '$(OC_PROJECT_NAME)'..."
 
 $(OC_DEPLOYMENTS): oc-%: %

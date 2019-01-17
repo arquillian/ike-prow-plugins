@@ -19,8 +19,7 @@ GOPATH_IN_CONTAINER=${HOME_IN_CONTAINER}/go-workspace
 PACKAGE_PATH=$(GOPATH_IN_CONTAINER)/src/$(PACKAGE_NAME)
 
 .PHONY: docker-image-builder
-## Builds the docker image used to build the software.
-docker-image-builder:
+docker-image-builder: ## Builds the docker image used to build the software.
 	@echo "Building docker image $(DOCKER_IMAGE_CORE)"
 	$(DOCKER) build \
 		--build-arg HOME=$(HOME_IN_CONTAINER) \
@@ -30,12 +29,12 @@ docker-image-builder:
 		-f $(CUR_DIR)/Dockerfile.builder $(CUR_DIR)
 
 .PHONY: docker-start
-## Starts the docker build container in the background (detached mode).
-## After calling this command you can invoke all the make targets from the
-## normal Makefile (e.g. update, compile, build) inside the build container
-## by prefixing them with "docker-". For example to execute "make compile"
-## inside the build container, just run "make docker-compile".
-## To remove the container when no longer needed, call "make docker-rm".
+# Starts the docker build container in the background (detached mode).
+# After calling this command you can invoke all the make targets from the
+# normal Makefile (e.g. update, compile, build) inside the build container
+# by prefixing them with "docker-". For example to execute "make compile"
+# inside the build container, just run "make docker-compile".
+# To remove the container when no longer needed, call "make docker-rm".
 docker-start: docker-image-builder
 ifneq ($(strip $(shell docker ps -qa --filter "name=$(DOCKER_CONTAINER_NAME)" 2>/dev/null)),)
 	@echo "Docker container \"$(DOCKER_CONTAINER_NAME)\" already exists. To recreate, run \"make docker-rm\"."
@@ -53,8 +52,7 @@ else
 endif
 
 .PHONY: docker-rm
-## Removes the docker build container, if any (see "make docker-start").
-docker-rm:
+docker-rm: ## Removes the docker build container, if any (see "make docker-start").
 ifneq ($(strip $(shell docker ps -qa --filter "name=$(DOCKER_CONTAINER_NAME)" 2>/dev/null)),)
 	$(DOCKER) rm -f "$(DOCKER_CONTAINER_NAME)"
 else

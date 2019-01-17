@@ -26,14 +26,14 @@ oc-init-project: ## Initializes new project with config maps and secrets
 	$(call populate_secret,hmac.token,ike-prow-plugins-hmac-token,hmac)
 	$(call populate_secret,sentry.dsn,ike-prow-plugins-sentry-dsn,sentry)
 
-.PHONY: oc-restart-all ## Restarts all deploymentconfigs by patching it
-oc-restart-all: oc-restart-hook oc-restart-plugins
+.PHONY: oc-restart-all
+oc-restart-all: oc-restart-hook oc-restart-plugins ## Restarts all deploymentconfigs by patching it
 
-.PHONY: oc-restart-hook ## Restarts hook deploymentconfig by patching it
-oc-restart-hook:
+.PHONY: oc-restart-hook
+oc-restart-hook: ## Restarts hook deploymentconfig by patching it
 	$(call restart_dc,hook)
 
-.PHONY: oc-restart-plugins ## Restarts plugin deploymentconfigs by patching it
-oc-restart-plugins: $(OC_RESTART)
+.PHONY: oc-restart-plugins
+oc-restart-plugins: $(OC_RESTART) ## Restarts plugin deploymentconfigs by patching it
 $(OC_RESTART): dc-%: %
 	$(call restart_dc,$<)
