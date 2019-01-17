@@ -12,15 +12,11 @@ tools: ## Installs required go tools
 	@go get -u github.com/jteeuwen/go-bindata/...
 
 .PHONY: install
-install: generate ## Fetches all dependencies using dep
+deps: generate ## Fetches all dependencies using dep
 	dep ensure -v
 
-.PHONY: update
-update: generate ## Updates all dependencies defined for dep
-	dep ensure -update -v
-
 .PHONY: compile
-compile: install compile-only ## Compiles all plugins and puts them in the bin/ folder (calls up target)
+compile: deps compile-only ## Compiles all plugins and puts them in the bin/ folder (calls up target)
 
 .PHONY: compile-only
 compile-only: generate $(BINARIES)

@@ -41,8 +41,4 @@ linters:
 service:
   project-path: github.com/arquillian/ike-prow-plugins
   prepare:
-    - make generate install
-
-run:
-  skip-dirs:
-    - pkg/assets/generated
+    - make deps generate
