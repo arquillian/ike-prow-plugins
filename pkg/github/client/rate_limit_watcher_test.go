@@ -1,13 +1,13 @@
 package ghclient_test
 
 import (
-	"github.com/arquillian/ike-prow-plugins/pkg/github/client"
+	ghclient "github.com/arquillian/ike-prow-plugins/pkg/github/client"
 	. "github.com/arquillian/ike-prow-plugins/pkg/internal/test"
 	gogh "github.com/google/go-github/github"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
-	"github.com/sirupsen/logrus/hooks/test"
-	"gopkg.in/h2non/gock.v1"
+	"github.com/sirupsen/logrus/hooks/test" //nolint:depguard
+	gock "gopkg.in/h2non/gock.v1"
 )
 
 var _ = Describe("Rate limit watcher", func() {
@@ -26,7 +26,7 @@ var _ = Describe("Rate limit watcher", func() {
 
 	AfterEach(EnsureGockRequestsHaveBeenMatched)
 
-	It("should not log rate limit when within the threshold", func() {
+	It("should not logger rate limit when within the threshold", func() {
 		// given
 		mockHighRateLimit()
 
@@ -43,7 +43,7 @@ var _ = Describe("Rate limit watcher", func() {
 		Expect(hook.Entries).To(BeEmpty())
 	})
 
-	It("should log rate limit when within the threshold", func() {
+	It("should logger rate limit when within the threshold", func() {
 		// given
 		gock.New("https://api.github.com").
 			Get("/rate_limit").

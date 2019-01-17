@@ -1,11 +1,11 @@
 package ghservice_test
 
 import (
-	"github.com/arquillian/ike-prow-plugins/pkg/github/service"
+	ghservice "github.com/arquillian/ike-prow-plugins/pkg/github/service"
 	. "github.com/arquillian/ike-prow-plugins/pkg/internal/test"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
-	"gopkg.in/h2non/gock.v1"
+	gock "gopkg.in/h2non/gock.v1"
 )
 
 var _ = Describe("Pull Request lazy loading", func() {
@@ -48,7 +48,8 @@ var _ = Describe("Pull Request lazy loading", func() {
 			Reply(200).
 			BodyString(`{"title":"Loaded PR"}`)
 		loader := &ghservice.PullRequestLazyLoader{Client: client, RepoOwner: "owner", RepoName: "repo", Number: 123}
-		loader.Load()
+
+		_, _ = loader.Load()
 
 		// when
 		pullRequest, err := loader.Load()

@@ -1,9 +1,9 @@
 package main
 
 import (
-	"github.com/arquillian/ike-prow-plugins/pkg/github/client"
+	ghclient "github.com/arquillian/ike-prow-plugins/pkg/github/client"
 	pluginBootstrap "github.com/arquillian/ike-prow-plugins/pkg/plugin"
-	"github.com/arquillian/ike-prow-plugins/pkg/plugin/work-in-progress"
+	wip "github.com/arquillian/ike-prow-plugins/pkg/plugin/work-in-progress"
 	"github.com/arquillian/ike-prow-plugins/pkg/server"
 	"k8s.io/test-infra/prow/pluginhelp"
 )
@@ -23,7 +23,7 @@ func serverCreator(webhookSecret []byte, eventHandler server.GitHubEventHandler)
 	}, nil
 }
 
-func helpProvider(enabledRepos []string) (*pluginhelp.PluginHelp, error) {
+func helpProvider(_ []string) (*pluginhelp.PluginHelp, error) { // nolint:unparam
 	return &pluginhelp.PluginHelp{
 		Description: `Work-in-progress plugin`,
 	}, nil

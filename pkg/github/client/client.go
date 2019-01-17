@@ -12,7 +12,7 @@ import (
 )
 
 type client struct {
-	log       log.Logger
+	logger    log.Logger
 	gh        *gogh.Client
 	allAround aroundFunction
 }
@@ -37,15 +37,15 @@ type Client interface {
 
 // NewOauthClient creates a Client instance with the given oauth secret used as a access token. Underneath
 // it creates go-github client which is used as delegate
-func NewOauthClient(oauthSecret []byte, log log.Logger) Client {
+func NewOauthClient(oauthSecret []byte, logger log.Logger) Client {
 	token := oauth2.StaticTokenSource(&oauth2.Token{AccessToken: string(oauthSecret)})
 	oauthClient := gogh.NewClient(oauth2.NewClient(context.Background(), token))
-	return NewClient(oauthClient, log)
+	return NewClient(oauthClient, logger)
 }
 
 // NewClient creates a Client instance with the given instance of go-github client which will be used as a delegate
-func NewClient(c *gogh.Client, log log.Logger) Client {
-	return &client{gh: c, log: log, allAround: emptyAround}
+func NewClient(c *gogh.Client, logger log.Logger) Client {
+	return &client{gh: c, logger: logger, allAround: emptyAround}
 }
 
 // AroundFunctionCreator creates function that does operations around nested inner function

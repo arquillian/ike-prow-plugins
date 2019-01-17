@@ -5,8 +5,8 @@ import (
 	"strings"
 
 	"github.com/arquillian/ike-prow-plugins/pkg/config"
-	"github.com/arquillian/ike-prow-plugins/pkg/github/client"
-	"github.com/arquillian/ike-prow-plugins/pkg/github/service"
+	ghclient "github.com/arquillian/ike-prow-plugins/pkg/github/client"
+	ghservice "github.com/arquillian/ike-prow-plugins/pkg/github/service"
 	"github.com/arquillian/ike-prow-plugins/pkg/log"
 	"github.com/arquillian/ike-prow-plugins/pkg/scm"
 	"github.com/arquillian/ike-prow-plugins/pkg/utils"
@@ -25,7 +25,7 @@ const (
 // StatusMessageService is a struct managing plugin comments
 type StatusMessageService struct {
 	commentService *ghservice.CommentService
-	log            log.Logger
+	logger         log.Logger
 	commentContext StatusMessageContext
 	commentsLoader *ghservice.IssueCommentsLazyLoader
 	change         scm.RepositoryChange
@@ -36,27 +36,28 @@ type StatusMessageContext struct {
 	pluginName           string
 	documentationSection string
 	pullRequest          *gogh.PullRequest
-	config               config.PluginConfiguration
+	config               *config.PluginConfiguration
 }
 
 // NewStatusMessageContext creates an instance of StatusMessageContext with the given values
-func NewStatusMessageContext(pluginName, documentationSection string, pr *gogh.PullRequest, config config.PluginConfiguration) StatusMessageContext {
+func NewStatusMessageContext(pluginName, documentationSection string, pr *gogh.PullRequest, c *config.PluginConfiguration) StatusMessageContext {
 	return StatusMessageContext{
 		pluginName:           pluginName,
 		documentationSection: documentationSection,
 		pullRequest:          pr,
-		config:               config,
+		config:               c,
 	}
 }
 
 // NewStatusMessageService creates an instance of GitHub StatusMessageService for the given StatusMessageContext
-func NewStatusMessageService(client ghclient.Client, log log.Logger, commentsLoader *ghservice.IssueCommentsLazyLoader, commentContext StatusMessageContext) *StatusMessageService {
+func NewStatusMessageService(client ghclient.Client, logger log.Logger, commentsLoader *ghservice.IssueCommentsLazyLoader,
+	commentContext StatusMessageContext) *StatusMessageService {
 	return &StatusMessageService{
 		commentService: &ghservice.CommentService{
 			Client: client,
 			Issue:  commentsLoader.Issue,
 		},
-		log:            log,
+		logger:         logger,
 		commentContext: commentContext,
 		commentsLoader: commentsLoader,
 		change:         ghservice.NewRepositoryChangeForPR(commentContext.pullRequest),
@@ -81,13 +82,13 @@ func (s *StatusMessageService) HappyStatusMessage(description, statusFileSpec st
 
 func (s *StatusMessageService) logError(err error) {
 	if err != nil {
-		s.log.Errorf("failed to comment on PR, caused by: %s", err)
+		s.logger.Errorf("failed to comment on PR, caused by: %s", err)
 	}
 }
 
 func (s *StatusMessageService) newMessageLoader(image, msg string) *Loader {
 	return &Loader{
-		Log:        s.log,
+		Log:        s.logger,
 		PluginName: s.commentContext.pluginName,
 		Message: &Message{
 			Thumbnail:     image,
@@ -104,7 +105,7 @@ func (s *StatusMessageService) newMessageLoader(image, msg string) *Loader {
 func (s *StatusMessageService) StatusMessage(commentMsgCreator func() string, addIfMissing bool) error {
 	comments, err := s.commentsLoader.Load()
 	if err != nil {
-		s.log.Errorf("Getting all comments failed with an error: %s", err)
+		s.logger.Errorf("Getting all comments failed with an error: %s", err)
 	}
 	statusMsg := utils.String("")
 

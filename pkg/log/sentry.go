@@ -4,7 +4,7 @@ import (
 	"time"
 
 	"github.com/evalphobia/logrus_sentry"
-	"github.com/sirupsen/logrus"
+	"github.com/sirupsen/logrus" //nolint:depguard
 )
 
 // SentryTags encapsulate map of tags where both key and values are strings. Those tags are used by Sentry

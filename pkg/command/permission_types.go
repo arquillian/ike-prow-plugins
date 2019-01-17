@@ -30,7 +30,7 @@ type PermissionStatus struct {
 }
 
 // NewPermissionStatus creates a new instance of PermissionStatus with the given values
-func NewPermissionStatus(user string, userIsApproved bool, approvedRoles []string, rejectedRoles []string) *PermissionStatus {
+func NewPermissionStatus(user string, userIsApproved bool, approvedRoles, rejectedRoles []string) *PermissionStatus {
 	return &PermissionStatus{
 		User:           user,
 		UserIsApproved: userIsApproved,

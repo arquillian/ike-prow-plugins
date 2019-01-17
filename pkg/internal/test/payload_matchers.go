@@ -6,7 +6,7 @@ import (
 	"net/http"
 
 	"github.com/onsi/gomega"
-	"gopkg.in/h2non/gock.v1"
+	gock "gopkg.in/h2non/gock.v1"
 )
 
 // ExpectPayload creates a gock.Matcher with the given SoftMatchers that asserts a retrieved payload
@@ -89,7 +89,8 @@ func HaveBody(expectedBody string) SoftMatcher {
 		"body")
 }
 
-// HaveBodyThatContains gets "body" key from map[string]interface{} or first element from []interface{} and checks if its value contains the given string
+// HaveBodyThatContains gets "body" key from map[string]interface{} or first element from []interface{} and checks
+// if its value contains the given string.
 // This matcher is used to verify body content sent in request to GitHub API
 func HaveBodyThatContains(content string) SoftMatcher {
 	return TransformWithName(

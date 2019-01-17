@@ -4,7 +4,7 @@ import (
 	"strings"
 
 	"github.com/arquillian/ike-prow-plugins/pkg/github"
-	"github.com/arquillian/ike-prow-plugins/pkg/github/service"
+	ghservice "github.com/arquillian/ike-prow-plugins/pkg/github/service"
 	"github.com/arquillian/ike-prow-plugins/pkg/log"
 	"github.com/arquillian/ike-prow-plugins/pkg/scm"
 	"github.com/arquillian/ike-prow-plugins/pkg/status"
@@ -15,7 +15,7 @@ import (
 type prSanitizerStatusService struct {
 	statusService    scm.StatusService
 	statusMsgService *message.StatusMessageService
-	log              log.Logger
+	logger           log.Logger
 }
 
 const (
@@ -42,20 +42,20 @@ const (
 	SuccessStatusMessage = "This pull request complies with the PR conventions given by the `pr-sanitizer` plugin. :)"
 )
 
-func (gh *GitHubPRSanitizerEventsHandler) newPrSanitizerStatusService(log log.Logger, pr *gogh.PullRequest, config PluginConfiguration) prSanitizerStatusService {
+func (gh *GitHubPRSanitizerEventsHandler) newPrSanitizerStatusService(logger log.Logger, pr *gogh.PullRequest, config PluginConfiguration) prSanitizerStatusService {
 	statusContext := github.StatusContext{BotName: gh.BotName, PluginName: ProwPluginName}
 
 	change := ghservice.NewRepositoryChangeForPR(pr)
-	statusService := status.NewStatusService(gh.Client, log, change, statusContext)
+	statusService := status.NewStatusService(gh.Client, logger, change, statusContext)
 
 	commentsLoader := ghservice.NewIssueCommentsLazyLoader(gh.Client, pr)
-	msgContext := message.NewStatusMessageContext(ProwPluginName, documentationSection, pr, config.PluginConfiguration)
-	msgService := message.NewStatusMessageService(gh.Client, log, commentsLoader, msgContext)
+	msgContext := message.NewStatusMessageContext(ProwPluginName, documentationSection, pr, &config.PluginConfiguration)
+	msgService := message.NewStatusMessageService(gh.Client, logger, commentsLoader, msgContext)
 
 	return prSanitizerStatusService{
 		statusService:    statusService,
 		statusMsgService: msgService,
-		log:              log,
+		logger:           logger,
 	}
 }
 

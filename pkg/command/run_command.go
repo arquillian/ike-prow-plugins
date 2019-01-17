@@ -3,7 +3,7 @@ package command
 import (
 	"strings"
 
-	"github.com/arquillian/ike-prow-plugins/pkg/github/client"
+	ghclient "github.com/arquillian/ike-prow-plugins/pkg/github/client"
 	"github.com/arquillian/ike-prow-plugins/pkg/log"
 	"github.com/arquillian/ike-prow-plugins/pkg/utils"
 	gogh "github.com/google/go-github/github"
@@ -20,7 +20,7 @@ type RunCmd struct {
 }
 
 // Perform executes the set DoFunctions for the given IssueCommentEvent (when all conditions are fulfilled)
-func (c *RunCmd) Perform(client ghclient.Client, log log.Logger, comment *gogh.IssueCommentEvent) error {
+func (c *RunCmd) Perform(client ghclient.Client, logger log.Logger, comment *gogh.IssueCommentEvent) error {
 	user := c.UserPermissionService
 	var RunCommand = &CmdExecutor{Command: RunCommentPrefix}
 
@@ -29,7 +29,7 @@ func (c *RunCmd) Perform(client ghclient.Client, log log.Logger, comment *gogh.I
 		By(AnyOf(user.Admin, user.PRReviewer, user.PRApprover, user.PRCreator)).
 		Then(c.WhenAddedOrEdited)
 
-	return RunCommand.Execute(client, log, comment)
+	return RunCommand.Execute(client, logger, comment)
 }
 
 // Matches returns true when the given IssueCommentEvent content prefix is "/run"

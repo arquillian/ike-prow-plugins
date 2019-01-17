@@ -2,15 +2,15 @@ package message_test
 
 import (
 	"github.com/arquillian/ike-prow-plugins/pkg/config"
-	"github.com/arquillian/ike-prow-plugins/pkg/github/client"
-	"github.com/arquillian/ike-prow-plugins/pkg/github/service"
+	ghclient "github.com/arquillian/ike-prow-plugins/pkg/github/client"
+	ghservice "github.com/arquillian/ike-prow-plugins/pkg/github/service"
 	. "github.com/arquillian/ike-prow-plugins/pkg/internal/test"
 	"github.com/arquillian/ike-prow-plugins/pkg/log"
 	"github.com/arquillian/ike-prow-plugins/pkg/scm"
 	"github.com/arquillian/ike-prow-plugins/pkg/status/message"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
-	"gopkg.in/h2non/gock.v1"
+	gock "gopkg.in/h2non/gock.v1"
 )
 
 var _ = Describe("Config loader features", func() {
@@ -39,7 +39,7 @@ var _ = Describe("Config loader features", func() {
 				Issue:  *scm.NewRepositoryIssue("owner", "repo", 2),
 			}
 			messageContext := message.NewStatusMessageContext("my-plugin-name", "docSection",
-				NewPullRequest("owner", "repo", "1a2b", "toAssign"), config.PluginConfiguration{})
+				NewPullRequest("owner", "repo", "1a2b", "toAssign"), &config.PluginConfiguration{})
 			msgService := message.NewStatusMessageService(client, log.NewTestLogger(), commentsLoader, messageContext)
 
 			toHaveBodyWithWholePluginsComment := SoftlySatisfyAll(
@@ -72,7 +72,7 @@ var _ = Describe("Config loader features", func() {
 				Issue:  *scm.NewRepositoryIssue("owner", "repo", 2),
 			}
 			messageContext := message.NewStatusMessageContext("test-keeper", "docSection",
-				NewPullRequest("owner", "repo", "1a2b", "toAssign"), config.PluginConfiguration{})
+				NewPullRequest("owner", "repo", "1a2b", "toAssign"), &config.PluginConfiguration{})
 
 			msgService := message.NewStatusMessageService(client, log.NewTestLogger(), commentsLoader, messageContext)
 
@@ -95,7 +95,7 @@ var _ = Describe("Config loader features", func() {
 				Issue:  *scm.NewRepositoryIssue("owner", "repo", 2),
 			}
 			messageContext := message.NewStatusMessageContext("another-plugin", "docSection",
-				NewPullRequest("owner", "repo", "1a2b", "toAssign"), config.PluginConfiguration{})
+				NewPullRequest("owner", "repo", "1a2b", "toAssign"), &config.PluginConfiguration{})
 
 			expContent := "### Ike Plugins (another-plugin)\n\nThank you @toAssign for this contribution!" +
 				"\n\nNew comment"
@@ -130,7 +130,7 @@ var _ = Describe("Config loader features", func() {
 				Issue:  *scm.NewRepositoryIssue("owner", "repo", 2),
 			}
 			messageContext := message.NewStatusMessageContext("test-keeper", "docSection",
-				NewPullRequest("owner", "repo", "1a2b", "toAssign"), config.PluginConfiguration{})
+				NewPullRequest("owner", "repo", "1a2b", "toAssign"), &config.PluginConfiguration{})
 
 			toHaveBodyWithWholePluginsComment := SoftlySatisfyAll(
 				HaveBodyThatContains("### Ike Plugins (test-keeper)"),

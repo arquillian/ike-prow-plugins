@@ -5,12 +5,12 @@ import (
 	"fmt"
 
 	"github.com/arquillian/ike-prow-plugins/pkg/command"
-	"github.com/arquillian/ike-prow-plugins/pkg/github/service"
+	ghservice "github.com/arquillian/ike-prow-plugins/pkg/github/service"
 	"github.com/arquillian/ike-prow-plugins/pkg/scm"
 	"github.com/arquillian/ike-prow-plugins/pkg/utils"
 	gogh "github.com/google/go-github/github"
 	"github.com/onsi/gomega"
-	"gopkg.in/h2non/gock.v1"
+	gock "gopkg.in/h2non/gock.v1"
 )
 
 // MockPluginTemplate keeps plugin name information
@@ -73,7 +73,7 @@ func (l *MockPrBuilderLoader) LoadedFromDefaultJSON() *MockPrBuilder {
 
 // LoadedFromDefaultStruct loads a marshaled instance of default pull request
 func (l *MockPrBuilderLoader) LoadedFromDefaultStruct() *MockPrBuilder {
-	pr, _ := json.Marshal(&gogh.PullRequest{  // nolint: errcheck, gosec
+	pr, _ := json.Marshal(&gogh.PullRequest{ // nolint: errcheck, gosec
 		Number: utils.Int(1),
 		User:   createGhUser("bartoszmajsak-test"),
 		Base: &gogh.PullRequestBranch{

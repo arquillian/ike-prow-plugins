@@ -8,15 +8,15 @@ import (
 	"github.com/arquillian/ike-prow-plugins/pkg/github"
 	"github.com/arquillian/ike-prow-plugins/pkg/log"
 	gogh "github.com/google/go-github/github"
-	"github.com/sirupsen/logrus"
+	"github.com/sirupsen/logrus" //nolint:depguard
 	"k8s.io/test-infra/prow/hook"
 )
 
 // GitHubEventHandler is a type which keeps the logic of handling GitHub events for the given plugin implementation.
 // It is used by Server implementation to handle incoming events.
 type GitHubEventHandler interface {
-	HandlePullRequestEvent(log log.Logger, event *gogh.PullRequestEvent) error
-	HandleIssueCommentEvent(log log.Logger, event *gogh.IssueCommentEvent) error
+	HandlePullRequestEvent(logger log.Logger, event *gogh.PullRequestEvent) error
+	HandleIssueCommentEvent(logger log.Logger, event *gogh.IssueCommentEvent) error
 }
 
 // Server implements http.Handler. It validates incoming GitHub webhooks and

@@ -9,7 +9,7 @@ import (
 	"github.com/arquillian/ike-prow-plugins/pkg/status"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
-	"gopkg.in/h2non/gock.v1"
+	gock "gopkg.in/h2non/gock.v1"
 )
 
 var _ = Describe("GitHub Status Service", func() {
@@ -38,12 +38,12 @@ var _ = Describe("GitHub Status Service", func() {
 
 		It("should report success with context having bot name and plugin name", func() {
 			// given
-			dummySuccessUrl := plugin.DocumentationURL + "/status/test-keeper/success/dummy-success.html"
+			dummySuccessURL := plugin.DocumentationURL + "/status/test-keeper/success/dummy-success.html"
 
 			gock.New("https://api.github.com").
 				Post("/repos/alien-ike/test-repo/statuses/1232asdasd").
 				SetMatcher(ExpectPayload(
-						toBe(github.StatusSuccess, "All good, we have tests", "alien-ike/test-keeper", dummySuccessUrl))).
+						toBe(github.StatusSuccess, "All good, we have tests", "alien-ike/test-keeper", dummySuccessURL))).
 				Reply(201) // This way we implicitly verify that call happened after `HandleEvent` call
 
 			// when
@@ -55,12 +55,12 @@ var _ = Describe("GitHub Status Service", func() {
 
 		It("should report failure with context and description", func() {
 			// given
-			dummyFailureUrl := plugin.DocumentationURL + "/status/test-keeper/failure/dummy-failure.html"
+			dummyFailureURL := plugin.DocumentationURL + "/status/test-keeper/failure/dummy-failure.html"
 
 			gock.New("https://api.github.com").
 				Post("/repos/alien-ike/test-repo/statuses/1232asdasd").
 				SetMatcher(ExpectPayload(
-						toBe(github.StatusFailure, "We don't have tests", "alien-ike/test-keeper", dummyFailureUrl))).
+						toBe(github.StatusFailure, "We don't have tests", "alien-ike/test-keeper", dummyFailureURL))).
 				Reply(201) // This way we implicitly verify that call happened after `HandleEvent` call
 
 			// when

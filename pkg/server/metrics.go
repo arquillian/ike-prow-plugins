@@ -1,7 +1,7 @@
 package server
 
 import (
-	"github.com/arquillian/ike-prow-plugins/pkg/github/client"
+	ghclient "github.com/arquillian/ike-prow-plugins/pkg/github/client"
 	"github.com/arquillian/ike-prow-plugins/pkg/log"
 	"github.com/prometheus/client_golang/prometheus"
 )

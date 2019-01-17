@@ -5,7 +5,7 @@ import (
 	"strings"
 
 	"github.com/onsi/gomega"
-	"gopkg.in/h2non/gock.v1"
+	gock "gopkg.in/h2non/gock.v1"
 )
 
 // EnsureGockRequestsHaveBeenMatched checks if all requests have been matched in the test
@@ -24,7 +24,7 @@ func NonExistingRawGitHubFiles(pathSuffixes ...string) {
 
 func fileRequested(pathSuffix string) gock.Matcher {
 	matcher := gock.NewBasicMatcher()
-	matcher.Add(func(req *http.Request, _ *gock.Request) (bool, error) {
+	matcher.Add(func(req *http.Request, _ *gock.Request) (bool, error) { // nolint:unparam
 		return strings.HasSuffix(req.URL.Path, pathSuffix), nil
 	})
 	return matcher
@@ -33,7 +33,7 @@ func fileRequested(pathSuffix string) gock.Matcher {
 // SpyOnCalls checks the number of calls
 func SpyOnCalls(counter *int) gock.Matcher {
 	matcher := gock.NewBasicMatcher()
-	matcher.Add(func(_ *http.Request, _ *gock.Request) (bool, error) {
+	matcher.Add(func(_ *http.Request, _ *gock.Request) (bool, error) { // nolint:unparam
 		*counter++
 		return true, nil
 	})

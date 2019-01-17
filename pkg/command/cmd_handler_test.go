@@ -4,7 +4,7 @@ import (
 	"errors"
 
 	is "github.com/arquillian/ike-prow-plugins/pkg/command"
-	"github.com/arquillian/ike-prow-plugins/pkg/github/client"
+	ghclient "github.com/arquillian/ike-prow-plugins/pkg/github/client"
 	. "github.com/arquillian/ike-prow-plugins/pkg/internal/test"
 	"github.com/arquillian/ike-prow-plugins/pkg/log"
 	"github.com/arquillian/ike-prow-plugins/pkg/utils"
@@ -19,7 +19,7 @@ type configurableCommentCommand struct {
 	triggered         *bool
 }
 
-func (c *configurableCommentCommand) Perform(client ghclient.Client, log log.Logger, comment *gogh.IssueCommentEvent) error {
+func (c *configurableCommentCommand) Perform(client ghclient.Client, logger log.Logger, comment *gogh.IssueCommentEvent) error {
 	*c.triggered = true
 	if c.shouldReturnError {
 		return errors.New("error")

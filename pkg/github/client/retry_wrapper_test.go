@@ -3,13 +3,13 @@ package ghclient_test
 import (
 	"net/http"
 
-	"github.com/arquillian/ike-prow-plugins/pkg/github/client"
+	ghclient "github.com/arquillian/ike-prow-plugins/pkg/github/client"
 	. "github.com/arquillian/ike-prow-plugins/pkg/internal/test"
 	"github.com/arquillian/ike-prow-plugins/pkg/log"
 	gogh "github.com/google/go-github/github"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
-	"gopkg.in/h2non/gock.v1"
+	gock "gopkg.in/h2non/gock.v1"
 )
 
 var _ = Describe("Retry client features", func() {
@@ -76,7 +76,7 @@ var _ = Describe("Retry client features", func() {
 
 func spyOnCalls(counter *int) gock.Matcher {
 	matcher := gock.NewBasicMatcher()
-	matcher.Add(func(_ *http.Request, _ *gock.Request) (bool, error) {
+	matcher.Add(func(_ *http.Request, _ *gock.Request) (bool, error) { // nolint:unparam
 		*counter++
 		return true, nil
 	})

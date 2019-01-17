@@ -2,7 +2,7 @@ package prsanitizer
 
 import (
 	"github.com/arquillian/ike-prow-plugins/pkg/config"
-	"github.com/arquillian/ike-prow-plugins/pkg/github/service"
+	ghservice "github.com/arquillian/ike-prow-plugins/pkg/github/service"
 	"github.com/arquillian/ike-prow-plugins/pkg/log"
 	"github.com/arquillian/ike-prow-plugins/pkg/scm"
 )
@@ -17,7 +17,7 @@ type PluginConfiguration struct {
 }
 
 // LoadConfiguration loads a PluginConfiguration for the given change
-func LoadConfiguration(log log.Logger, change scm.RepositoryChange) PluginConfiguration {
+func LoadConfiguration(logger log.Logger, change scm.RepositoryChange) PluginConfiguration {
 
 	configuration := PluginConfiguration{
 		Combine:                  true,
@@ -32,7 +32,7 @@ func LoadConfiguration(log log.Logger, change scm.RepositoryChange) PluginConfig
 	err := config.Load(&configuration, loadableConfig)
 
 	if err != nil {
-		log.Errorf("Config file was not loaded. Cause: %s", err)
+		logger.Errorf("Config file was not loaded. Cause: %s", err)
 		return configuration
 	}
 

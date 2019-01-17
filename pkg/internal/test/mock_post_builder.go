@@ -6,7 +6,7 @@ import (
 
 	"github.com/arquillian/ike-prow-plugins/pkg/plugin"
 	"github.com/arquillian/ike-prow-plugins/pkg/status/message"
-	"gopkg.in/h2non/gock.v1"
+	gock "gopkg.in/h2non/gock.v1"
 )
 
 var (
@@ -58,7 +58,8 @@ func Comment(matherForPlugin BuilderMatcher) MockCreator {
 	}
 }
 
-// ChangedComment creates a gock matcher to check that there is a Patch request for the given comment id and containing a comment that complies with the given restrictions
+// ChangedComment creates a gock matcher to check that there is a Patch request for the given comment id
+// and containing a comment that complies with the given restrictions
 func ChangedComment(commendID int, matherForPlugin BuilderMatcher) MockCreator {
 	return func(builder *MockPrBuilder) {
 		path := fmt.Sprintf("%s/issues/comments/%d", builder.baseRepoPath(), commendID)
@@ -122,7 +123,7 @@ func basePostStatusMock(builder *MockPrBuilder) func(mather SoftMatcher) {
 }
 
 // RemovedLabel creates a gock matcher to check that there is a Delete request for the given label sent
-func RemovedLabel(labelName string, response string) MockCreator {
+func RemovedLabel(labelName, response string) MockCreator {
 	return func(builder *MockPrBuilder) {
 		path := fmt.Sprintf("%s/issues/%d/labels/%s", builder.baseRepoPath(), *builder.pullRequest.Number, labelName)
 		baseDeleteMock(path, response)

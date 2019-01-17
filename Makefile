@@ -34,7 +34,7 @@ include ./.make/Makefile.deploy.prow
 include ./.make/Makefile.docker.build
 
 .PHONY: all
-all: clean generate install build oc-deploy-hook oc-deploy-plugins ## (default) Performs clean build  and container packaging
+all: clean generate install lint build oc-deploy-hook oc-deploy-plugins ## (default) Performs clean build and container packaging
 
 help: ## Hey! That's me!
 	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-10s\033[0m %s\n", $$1, $$2}'

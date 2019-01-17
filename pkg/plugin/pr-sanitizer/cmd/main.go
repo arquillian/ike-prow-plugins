@@ -3,9 +3,9 @@ package main
 import (
 	"k8s.io/test-infra/prow/pluginhelp"
 
-	"github.com/arquillian/ike-prow-plugins/pkg/github/client"
+	ghclient "github.com/arquillian/ike-prow-plugins/pkg/github/client"
 	pluginBootstrap "github.com/arquillian/ike-prow-plugins/pkg/plugin"
-	"github.com/arquillian/ike-prow-plugins/pkg/plugin/pr-sanitizer"
+	prsanitizer "github.com/arquillian/ike-prow-plugins/pkg/plugin/pr-sanitizer"
 	"github.com/arquillian/ike-prow-plugins/pkg/server"
 )
 
@@ -24,7 +24,7 @@ func serverCreator(webhookSecret []byte, eventHandler server.GitHubEventHandler)
 	}, nil
 }
 
-func helpProvider(enabledRepos []string) (*pluginhelp.PluginHelp, error) {
+func helpProvider(_ []string) (*pluginhelp.PluginHelp, error) { // nolint:unparam
 	return &pluginhelp.PluginHelp{
 		Description: `PR Sanitizer plugin`,
 	}, nil

@@ -4,10 +4,10 @@ import (
 	"encoding/json"
 	"fmt"
 
-	"github.com/arquillian/ike-prow-plugins/pkg/github/service"
+	ghservice "github.com/arquillian/ike-prow-plugins/pkg/github/service"
 	"github.com/arquillian/ike-prow-plugins/pkg/utils"
 	gogh "github.com/google/go-github/github"
-	"gopkg.in/h2non/gock.v1"
+	gock "gopkg.in/h2non/gock.v1"
 )
 
 // WithFiles sets the given payload containing changed files to the mocked PR
@@ -81,7 +81,7 @@ func (b *MockPrBuilder) WithoutLabels() *MockPrBuilder {
 	return b
 }
 
-func (b *MockPrBuilder) mockGetForPR(targetType, suffix string, body string, options ...RequestOption) MockCreator {
+func (b *MockPrBuilder) mockGetForPR(targetType, suffix, body string, options ...RequestOption) MockCreator {
 	return func(builder *MockPrBuilder) {
 		b.baseGetMock(fmt.Sprintf("%s/%s/%d", b.baseRepoPath(), targetType, *b.pullRequest.Number)+suffix, body, options...)
 	}
@@ -149,8 +149,8 @@ func (b *MockPrBuilder) mockUser(user *GhUser) {
 		})
 }
 
-func (b *MockPrBuilder) mockGetForCollaborators(user, suffix string, body string, options ...RequestOption) {
-	b.baseGetMock(fmt.Sprintf("%s/collaborators/%s", b.baseRepoPath(), user)+suffix, body)
+func (b *MockPrBuilder) mockGetForCollaborators(user, suffix, body string, options ...RequestOption) {
+	b.baseGetMock(fmt.Sprintf("%s/collaborators/%s", b.baseRepoPath(), user)+suffix, body, options...)
 }
 
 // RequestOption add a option to a associated request
@@ -229,6 +229,7 @@ func ConfigYml(content string) func(builder *MockPrBuilder) {
 // WithoutRawFiles sets that the associated mocked PR should not contain the given files
 func (b *MockPrBuilder) WithoutRawFiles(fileNames ...string) *MockPrBuilder {
 	for _, path := range fileNames {
+		path := path
 		b.addMockCreator(func(builder *MockPrBuilder) {
 			builder.getBaseRawFilesMock(path).
 				Reply(404)

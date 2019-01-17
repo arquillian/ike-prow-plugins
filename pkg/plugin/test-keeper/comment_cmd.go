@@ -4,8 +4,8 @@ import (
 	"strings"
 
 	is "github.com/arquillian/ike-prow-plugins/pkg/command"
-	"github.com/arquillian/ike-prow-plugins/pkg/github/client"
-	"github.com/arquillian/ike-prow-plugins/pkg/github/service"
+	ghclient "github.com/arquillian/ike-prow-plugins/pkg/github/client"
+	ghservice "github.com/arquillian/ike-prow-plugins/pkg/github/service"
 	"github.com/arquillian/ike-prow-plugins/pkg/log"
 	gogh "github.com/google/go-github/github"
 )
@@ -21,7 +21,7 @@ type BypassCmd struct {
 }
 
 // Perform executes the set DoFunctions for the given IssueCommentEvent (when all conditions are fulfilled)
-func (c *BypassCmd) Perform(client ghclient.Client, log log.Logger, comment *gogh.IssueCommentEvent) error {
+func (c *BypassCmd) Perform(client ghclient.Client, logger log.Logger, comment *gogh.IssueCommentEvent) error {
 	user := c.userPermissionService
 	var BypassCommand = &is.CmdExecutor{Command: BypassCheckComment}
 
@@ -32,7 +32,7 @@ func (c *BypassCmd) Perform(client ghclient.Client, log log.Logger, comment *gog
 		By(whoCanTrigger(user)...).
 		Then(c.whenAddedOrEdited)
 
-	return BypassCommand.Execute(client, log, comment)
+	return BypassCommand.Execute(client, logger, comment)
 }
 
 // Matches returns true when the given IssueCommentEvent content is same as "/ok-without-tests"

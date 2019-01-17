@@ -7,9 +7,9 @@ import (
 
 	"fmt"
 
-	"github.com/arquillian/ike-prow-plugins/pkg/github/service"
+	ghservice "github.com/arquillian/ike-prow-plugins/pkg/github/service"
 	"github.com/arquillian/ike-prow-plugins/pkg/log"
-	"github.com/arquillian/ike-prow-plugins/pkg/plugin/work-in-progress"
+	wip "github.com/arquillian/ike-prow-plugins/pkg/plugin/work-in-progress"
 	gogh "github.com/google/go-github/github"
 )
 
@@ -20,13 +20,16 @@ var (
 
 const (
 	// TitleFailureMessage is a message used in GH Status as description when the PR title does not follow semantic message style
-	TitleFailureMessage = "#### Semantic title\nThe PR title `%s` does not conform with the [semantic message](https://seesparkbox.com/foundry/semantic_commit_messages) style. " +
+	TitleFailureMessage = "#### Semantic title\nThe PR title `%s` does not conform with the " +
+		"[semantic message](https://seesparkbox.com/foundry/semantic_commit_messages) style. " +
 		"The semantic message makes your changelog and git history clean. " +
 		"Please, edit the PR by prefixing it with one of the type prefixes that are valid for your repository: %s."
 
 	// DescriptionLengthShortMessage is a status message that is used in case of short PR description.
-	DescriptionLengthShortMessage = "#### PR description length\nThe PR description is too short - it is expected that the description should have more than %d characters, but it has %d. " +
-		"More elaborated description is helpful for understanding the changes proposed in this PR. (Any issue links and it's keywords are excluded when the description length is being measured)"
+	DescriptionLengthShortMessage = "#### PR description length\nThe PR description is too short - it is expected that " +
+		"the description should have more than %d characters, but it has %d. " +
+		"More elaborated description is helpful for understanding the changes proposed " +
+		"in this PR. (Any issue links and it's keywords are excluded when the description length is being measured)"
 
 	// IssueLinkMissingMessage is a status message that is used in case of missing issue link.
 	IssueLinkMissingMessage = "#### Issue link\nThe PR description is missing any issue link that would be used with any of the " +
@@ -34,13 +37,13 @@ const (
 		"Having it in the PR description ensures that the issue is automatically closed when the PR is merged."
 )
 
-type check func(pr *gogh.PullRequest, config PluginConfiguration, log log.Logger) string
+type check func(pr *gogh.PullRequest, config PluginConfiguration, logger log.Logger) string
 
-func executeChecks(pr *gogh.PullRequest, config PluginConfiguration, log log.Logger) []string {
+func executeChecks(pr *gogh.PullRequest, config PluginConfiguration, logger log.Logger) []string {
 	checks := []check{CheckSemanticTitle, CheckDescriptionLength, CheckIssueLinkPresence}
 	var messages []string
 	for _, check := range checks {
-		msg := check(pr, config, log)
+		msg := check(pr, config, logger)
 		if msg != "" {
 			messages = append(messages, msg)
 		}
@@ -49,13 +52,13 @@ func executeChecks(pr *gogh.PullRequest, config PluginConfiguration, log log.Log
 }
 
 // CheckSemanticTitle checks if the given PR contains semantic title
-func CheckSemanticTitle(pr *gogh.PullRequest, config PluginConfiguration, log log.Logger) string {
+func CheckSemanticTitle(pr *gogh.PullRequest, config PluginConfiguration, logger log.Logger) string {
 	change := ghservice.NewRepositoryChangeForPR(pr)
 	prefixes := GetValidTitlePrefixes(config)
 	isTitleWithValidType := HasTitleWithValidType(prefixes, *pr.Title)
 
 	if !isTitleWithValidType {
-		if prefix, ok := wip.GetWorkInProgressPrefix(*pr.Title, wip.LoadConfiguration(log, change)); ok {
+		if prefix, ok := wip.GetWorkInProgressPrefix(*pr.Title, wip.LoadConfiguration(logger, change)); ok {
 			trimmedTitle := strings.TrimPrefix(*pr.Title, prefix)
 			isTitleWithValidType = HasTitleWithValidType(prefixes, trimmedTitle)
 		}
@@ -68,7 +71,7 @@ func CheckSemanticTitle(pr *gogh.PullRequest, config PluginConfiguration, log lo
 }
 
 // CheckDescriptionLength  checks if the given PR's description contains enough number of arguments
-func CheckDescriptionLength(pr *gogh.PullRequest, config PluginConfiguration, log log.Logger) string {
+func CheckDescriptionLength(pr *gogh.PullRequest, config PluginConfiguration, logger log.Logger) string {
 	actualLength := len(strings.TrimSpace(issueLinkRegexp.ReplaceAllString(pr.GetBody(), "")))
 	if actualLength < config.DescriptionContentLength {
 		return fmt.Sprintf(DescriptionLengthShortMessage, config.DescriptionContentLength, actualLength)
@@ -77,7 +80,7 @@ func CheckDescriptionLength(pr *gogh.PullRequest, config PluginConfiguration, lo
 }
 
 // CheckIssueLinkPresence checks if the given PR's description contains an issue link
-func CheckIssueLinkPresence(pr *gogh.PullRequest, config PluginConfiguration, log log.Logger) string {
+func CheckIssueLinkPresence(pr *gogh.PullRequest, config PluginConfiguration, logger log.Logger) string {
 	if !issueLinkRegexp.MatchString(pr.GetBody()) {
 		return IssueLinkMissingMessage
 	}

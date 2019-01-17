@@ -5,8 +5,8 @@ import (
 	"fmt"
 	"text/template"
 
-	"github.com/arquillian/ike-prow-plugins/pkg/assets/generated"
-	"github.com/arquillian/ike-prow-plugins/pkg/github/service"
+	assets "github.com/arquillian/ike-prow-plugins/pkg/assets/generated"
+	ghservice "github.com/arquillian/ike-prow-plugins/pkg/github/service"
 	"github.com/arquillian/ike-prow-plugins/pkg/log"
 	"github.com/arquillian/ike-prow-plugins/pkg/scm"
 	"github.com/arquillian/ike-prow-plugins/pkg/utils"
@@ -32,7 +32,7 @@ type Message struct {
 func (l *Loader) LoadMessage(change scm.RepositoryChange, statusFileSpec string) string {
 	var msg string
 
-	if content := l.defaultFileContent(l.PluginName, change, statusFileSpec); content != "" {
+	if content := l.defaultFileContent(l.PluginName, change, statusFileSpec); content != "" { // nolint:gocritic
 		msg = content
 	} else if l.Message.ConfigFile == "" {
 		msg = l.loadMessageTemplate("message-with-no-config.txt")
