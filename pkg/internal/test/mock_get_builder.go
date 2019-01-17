@@ -150,7 +150,7 @@ func (b *MockPrBuilder) mockUser(user *GhUser) {
 }
 
 func (b *MockPrBuilder) mockGetForCollaborators(user, suffix string, body string, options ...RequestOption) {
-	b.baseGetMock(fmt.Sprintf("%s/collaborators/%s", b.baseRepoPath(), user)+suffix, body)
+	b.baseGetMock(fmt.Sprintf("%s/collaborators/%s", b.baseRepoPath(), user)+suffix, body, options...)
 }
 
 // RequestOption add a option to a associated request
