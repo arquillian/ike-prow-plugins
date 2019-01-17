@@ -76,7 +76,7 @@ var _ = Describe("Retry client features", func() {
 
 func spyOnCalls(counter *int) gock.Matcher {
 	matcher := gock.NewBasicMatcher()
-	matcher.Add(func(_ *http.Request, _ *gock.Request) (bool, error) {
+	matcher.Add(func(_ *http.Request, _ *gock.Request) (bool, error) { // nolint:unparam
 		*counter++
 		return true, nil
 	})
