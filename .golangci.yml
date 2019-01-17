@@ -40,4 +40,4 @@ linters:
 
 run:
   skip-dirs:
-    - test/testdata_etc
+    - pkg/assets/generated
