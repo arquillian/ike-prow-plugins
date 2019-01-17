@@ -1,7 +1,7 @@
 package assets
 
 import (
-	"github.com/arquillian/ike-prow-plugins/pkg/assets/generated"
+	assets "github.com/arquillian/ike-prow-plugins/pkg/assets/generated"
 	"github.com/arquillian/ike-prow-plugins/pkg/config"
 )
 

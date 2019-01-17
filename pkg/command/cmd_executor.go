@@ -3,8 +3,8 @@ package command
 import (
 	"strings"
 
-	"github.com/arquillian/ike-prow-plugins/pkg/github/client"
-	"github.com/arquillian/ike-prow-plugins/pkg/github/service"
+	ghclient "github.com/arquillian/ike-prow-plugins/pkg/github/client"
+	ghservice "github.com/arquillian/ike-prow-plugins/pkg/github/service"
 	"github.com/arquillian/ike-prow-plugins/pkg/log"
 	"github.com/arquillian/ike-prow-plugins/pkg/utils"
 	gogh "github.com/google/go-github/github"

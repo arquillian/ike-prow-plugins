@@ -1,7 +1,7 @@
 package testkeeper_test
 
 import (
-	"github.com/arquillian/ike-prow-plugins/pkg/plugin/test-keeper"
+	testkeeper "github.com/arquillian/ike-prow-plugins/pkg/plugin/test-keeper"
 	"github.com/arquillian/ike-prow-plugins/pkg/scm"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"

@@ -5,7 +5,7 @@ import (
 
 	"io/ioutil"
 
-	"github.com/sirupsen/logrus"
+	"github.com/sirupsen/logrus" //nolint:depguard
 )
 
 // Logger is a facade interface compatible with logrus.Logger but with limited scope of logging.

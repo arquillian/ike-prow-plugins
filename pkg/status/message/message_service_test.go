@@ -2,15 +2,15 @@ package message_test
 
 import (
 	"github.com/arquillian/ike-prow-plugins/pkg/config"
-	"github.com/arquillian/ike-prow-plugins/pkg/github/client"
-	"github.com/arquillian/ike-prow-plugins/pkg/github/service"
+	ghclient "github.com/arquillian/ike-prow-plugins/pkg/github/client"
+	ghservice "github.com/arquillian/ike-prow-plugins/pkg/github/service"
 	. "github.com/arquillian/ike-prow-plugins/pkg/internal/test"
 	"github.com/arquillian/ike-prow-plugins/pkg/log"
 	"github.com/arquillian/ike-prow-plugins/pkg/scm"
 	"github.com/arquillian/ike-prow-plugins/pkg/status/message"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
-	"gopkg.in/h2non/gock.v1"
+	gock "gopkg.in/h2non/gock.v1"
 )
 
 var _ = Describe("Config loader features", func() {

@@ -5,7 +5,7 @@ import (
 	"strings"
 
 	"github.com/onsi/gomega"
-	"gopkg.in/h2non/gock.v1"
+	gock "gopkg.in/h2non/gock.v1"
 )
 
 // EnsureGockRequestsHaveBeenMatched checks if all requests have been matched in the test

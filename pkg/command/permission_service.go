@@ -1,8 +1,8 @@
 package command
 
 import (
-	"github.com/arquillian/ike-prow-plugins/pkg/github/client"
-	"github.com/arquillian/ike-prow-plugins/pkg/github/service"
+	ghclient "github.com/arquillian/ike-prow-plugins/pkg/github/client"
+	ghservice "github.com/arquillian/ike-prow-plugins/pkg/github/service"
 )
 
 // PermissionService keeps user name and PR loader and provides information about the user's permissions

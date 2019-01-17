@@ -5,8 +5,8 @@ import (
 	"strings"
 
 	"github.com/arquillian/ike-prow-plugins/pkg/config"
-	"github.com/arquillian/ike-prow-plugins/pkg/github/client"
-	"github.com/arquillian/ike-prow-plugins/pkg/github/service"
+	ghclient "github.com/arquillian/ike-prow-plugins/pkg/github/client"
+	ghservice "github.com/arquillian/ike-prow-plugins/pkg/github/service"
 	"github.com/arquillian/ike-prow-plugins/pkg/log"
 	"github.com/arquillian/ike-prow-plugins/pkg/scm"
 	"github.com/arquillian/ike-prow-plugins/pkg/utils"

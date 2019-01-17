@@ -1,9 +1,9 @@
 package main
 
 import (
-	"github.com/arquillian/ike-prow-plugins/pkg/github/client"
+	ghclient "github.com/arquillian/ike-prow-plugins/pkg/github/client"
 	pluginBootstrap "github.com/arquillian/ike-prow-plugins/pkg/plugin"
-	"github.com/arquillian/ike-prow-plugins/pkg/plugin/work-in-progress"
+	wip "github.com/arquillian/ike-prow-plugins/pkg/plugin/work-in-progress"
 	"github.com/arquillian/ike-prow-plugins/pkg/server"
 	"k8s.io/test-infra/prow/pluginhelp"
 )

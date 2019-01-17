@@ -1,13 +1,13 @@
 package ghclient_test
 
 import (
-	"github.com/arquillian/ike-prow-plugins/pkg/github/client"
+	ghclient "github.com/arquillian/ike-prow-plugins/pkg/github/client"
 	. "github.com/arquillian/ike-prow-plugins/pkg/internal/test"
 	gogh "github.com/google/go-github/github"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	"github.com/sirupsen/logrus/hooks/test"
-	"gopkg.in/h2non/gock.v1"
+	gock "gopkg.in/h2non/gock.v1"
 )
 
 var _ = Describe("Rate limit watcher", func() {

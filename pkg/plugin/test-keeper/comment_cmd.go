@@ -4,8 +4,8 @@ import (
 	"strings"
 
 	is "github.com/arquillian/ike-prow-plugins/pkg/command"
-	"github.com/arquillian/ike-prow-plugins/pkg/github/client"
-	"github.com/arquillian/ike-prow-plugins/pkg/github/service"
+	ghclient "github.com/arquillian/ike-prow-plugins/pkg/github/client"
+	ghservice "github.com/arquillian/ike-prow-plugins/pkg/github/service"
 	"github.com/arquillian/ike-prow-plugins/pkg/log"
 	gogh "github.com/google/go-github/github"
 )

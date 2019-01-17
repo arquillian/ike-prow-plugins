@@ -6,7 +6,7 @@ import (
 	"net/http"
 
 	"github.com/onsi/gomega"
-	"gopkg.in/h2non/gock.v1"
+	gock "gopkg.in/h2non/gock.v1"
 )
 
 // ExpectPayload creates a gock.Matcher with the given SoftMatchers that asserts a retrieved payload
