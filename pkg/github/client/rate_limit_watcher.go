@@ -8,13 +8,13 @@ import (
 
 type rateLimitWatcher struct {
 	client    Client
-	log       log.Logger
+	logger    log.Logger
 	threshold int
 }
 
 // NewRateLimitWatcher creates an instance of rateLimitWatcher that watches GH API rate limits
-func NewRateLimitWatcher(c Client, log log.Logger, threshold int) AroundFunctionCreator {
-	return &rateLimitWatcher{client: c, log: log, threshold: threshold}
+func NewRateLimitWatcher(c Client, logger log.Logger, threshold int) AroundFunctionCreator {
+	return &rateLimitWatcher{client: c, logger: logger, threshold: threshold}
 }
 
 func (r rateLimitWatcher) createAroundFunction(earlierAround aroundFunction) aroundFunction {
@@ -34,11 +34,11 @@ func (r rateLimitWatcher) logRateLimitsAfter(f doFunction, aroundContext aroundC
 func (r rateLimitWatcher) logRateLimits() {
 	limits, e := r.client.GetRateLimit()
 	if e != nil {
-		r.log.Errorf("failed to load rate limits %s", e)
+		r.logger.Errorf("failed to load rate limits %s", e)
 		return
 	}
 	core := limits.GetCore()
 	if core.Remaining < r.threshold {
-		r.log.Warnf("reaching limit for GH API calls. %d/%d left. resetting at [%s]", core.Remaining, core.Limit, core.Reset.Format("2006-01-01 15:15:15"))
+		r.logger.Warnf("reaching limit for GH API calls. %d/%d left. resetting at [%s]", core.Remaining, core.Limit, core.Reset.Format("2006-01-01 15:15:15"))
 	}
 }

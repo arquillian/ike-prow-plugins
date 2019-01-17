@@ -57,7 +57,7 @@ var _ = Describe("Issue comments lazy loading", func() {
 			BodyString(`[{"user":{"login":"commenter"}, "body":"cool comment"}]`)
 		issue := scm.NewRepositoryIssue("owner", "name", 123)
 		loader := &ghservice.IssueCommentsLazyLoader{Client: client, Issue: *issue}
-		loader.Load()
+		_, _ = loader.Load()
 
 		// when
 		comments, err := loader.Load()

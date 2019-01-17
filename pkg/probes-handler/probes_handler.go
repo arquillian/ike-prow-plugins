@@ -14,13 +14,13 @@ type Probe struct {
 	Version string
 }
 
-// NewProbesHandler registers liveliness and readinesss probes for /version endpoint
-func NewProbesHandler(log log.Logger) http.Handler {
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+// NewProbesHandler registers liveliness and readiness probes for /version endpoint
+func NewProbesHandler(logger log.Logger) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, _ *http.Request) {
 
 		serverError := func(action string, err error) {
 			msg := fmt.Sprintf("Probe handler failed while %s: %v.", action, err)
-			log.Errorf(msg)
+			logger.Errorf(msg)
 			msg = fmt.Sprintf("%d %s:\n%s",
 				http.StatusInternalServerError, http.StatusText(http.StatusInternalServerError), msg)
 			http.Error(w, msg, http.StatusInternalServerError)
@@ -44,9 +44,9 @@ func getJSONContent() ([]byte, error) {
 	if !found {
 		version = "UNKNOWN"
 	}
-	js, err := json.Marshal(Probe{Version: version})
+	result, err := json.Marshal(Probe{Version: version})
 	if err != nil {
 		return nil, err
 	}
-	return js, nil
+	return result, nil
 }

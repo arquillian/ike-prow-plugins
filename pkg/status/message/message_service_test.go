@@ -39,7 +39,7 @@ var _ = Describe("Config loader features", func() {
 				Issue:  *scm.NewRepositoryIssue("owner", "repo", 2),
 			}
 			messageContext := message.NewStatusMessageContext("my-plugin-name", "docSection",
-				NewPullRequest("owner", "repo", "1a2b", "toAssign"), config.PluginConfiguration{})
+				NewPullRequest("owner", "repo", "1a2b", "toAssign"), &config.PluginConfiguration{})
 			msgService := message.NewStatusMessageService(client, log.NewTestLogger(), commentsLoader, messageContext)
 
 			toHaveBodyWithWholePluginsComment := SoftlySatisfyAll(
@@ -72,7 +72,7 @@ var _ = Describe("Config loader features", func() {
 				Issue:  *scm.NewRepositoryIssue("owner", "repo", 2),
 			}
 			messageContext := message.NewStatusMessageContext("test-keeper", "docSection",
-				NewPullRequest("owner", "repo", "1a2b", "toAssign"), config.PluginConfiguration{})
+				NewPullRequest("owner", "repo", "1a2b", "toAssign"), &config.PluginConfiguration{})
 
 			msgService := message.NewStatusMessageService(client, log.NewTestLogger(), commentsLoader, messageContext)
 
@@ -95,7 +95,7 @@ var _ = Describe("Config loader features", func() {
 				Issue:  *scm.NewRepositoryIssue("owner", "repo", 2),
 			}
 			messageContext := message.NewStatusMessageContext("another-plugin", "docSection",
-				NewPullRequest("owner", "repo", "1a2b", "toAssign"), config.PluginConfiguration{})
+				NewPullRequest("owner", "repo", "1a2b", "toAssign"), &config.PluginConfiguration{})
 
 			expContent := "### Ike Plugins (another-plugin)\n\nThank you @toAssign for this contribution!" +
 				"\n\nNew comment"
@@ -130,7 +130,7 @@ var _ = Describe("Config loader features", func() {
 				Issue:  *scm.NewRepositoryIssue("owner", "repo", 2),
 			}
 			messageContext := message.NewStatusMessageContext("test-keeper", "docSection",
-				NewPullRequest("owner", "repo", "1a2b", "toAssign"), config.PluginConfiguration{})
+				NewPullRequest("owner", "repo", "1a2b", "toAssign"), &config.PluginConfiguration{})
 
 			toHaveBodyWithWholePluginsComment := SoftlySatisfyAll(
 				HaveBodyThatContains("### Ike Plugins (test-keeper)"),

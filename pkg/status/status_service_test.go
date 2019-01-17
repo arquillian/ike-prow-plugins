@@ -55,12 +55,12 @@ var _ = Describe("GitHub Status Service", func() {
 
 		It("should report failure with context and description", func() {
 			// given
-			dummyFailureUrl := plugin.DocumentationURL + "/status/test-keeper/failure/dummy-failure.html"
+			dummyFailureURL := plugin.DocumentationURL + "/status/test-keeper/failure/dummy-failure.html"
 
 			gock.New("https://api.github.com").
 				Post("/repos/alien-ike/test-repo/statuses/1232asdasd").
 				SetMatcher(ExpectPayload(
-						toBe(github.StatusFailure, "We don't have tests", "alien-ike/test-keeper", dummyFailureUrl))).
+						toBe(github.StatusFailure, "We don't have tests", "alien-ike/test-keeper", dummyFailureURL))).
 				Reply(201) // This way we implicitly verify that call happened after `HandleEvent` call
 
 			// when

@@ -12,7 +12,7 @@ import (
 
 // DoFunction is used for performing operations related to command actions
 type DoFunction func() error
-type doFunctionExecutor func(client ghclient.Client, log log.Logger, comment *gogh.IssueCommentEvent) error
+type doFunctionExecutor func(client ghclient.Client, logger log.Logger, comment *gogh.IssueCommentEvent) error
 
 // CmdExecutor takes care of executing a command triggered by IssueCommentEvent.
 // The execution is set by specifying actions/events and with given restrictions the command should be triggered for.
@@ -64,7 +64,7 @@ func (s *RestrictionSetter) By(permissionChecks ...PermissionCheck) *DoFunctionP
 
 // Then take a DoFunction that performs the required operations (when all checks are fulfilled)
 func (p *DoFunctionProvider) Then(doFunction DoFunction) {
-	doExecutor := func(client ghclient.Client, log log.Logger, comment *gogh.IssueCommentEvent) error {
+	doExecutor := func(client ghclient.Client, logger log.Logger, comment *gogh.IssueCommentEvent) error {
 		matchingAction := p.getMatchingAction(comment)
 		if matchingAction == nil {
 			return nil
@@ -75,7 +75,7 @@ func (p *DoFunctionProvider) Then(doFunction DoFunction) {
 			return doFunction()
 		}
 		message := status.constructMessage(matchingAction.description, p.commandExecutor.Command)
-		log.Warn(message)
+		logger.Warn(message)
 		if err == nil && matchingAction.log && !p.commandExecutor.Quiet {
 			commentService := ghservice.NewCommentService(client, comment)
 			return commentService.AddComment(&message)
@@ -97,13 +97,13 @@ func (p *DoFunctionProvider) getMatchingAction(comment *gogh.IssueCommentEvent) 
 }
 
 // Execute triggers the given DoFunctions (when all checks are fulfilled) for the given pr comment
-func (e *CmdExecutor) Execute(client ghclient.Client, log log.Logger, comment *gogh.IssueCommentEvent) error {
+func (e *CmdExecutor) Execute(client ghclient.Client, logger log.Logger, comment *gogh.IssueCommentEvent) error {
 	body := strings.TrimSpace(*comment.Comment.Body)
 	if prefix := strings.Split(body, " ")[0]; e.Command != body && prefix != e.Command {
 		return nil
 	}
 	for _, doExecutor := range e.executors {
-		err := doExecutor(client, log, comment)
+		err := doExecutor(client, logger, comment)
 		if err != nil {
 			return err
 		}

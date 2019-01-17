@@ -24,7 +24,7 @@ func serverCreator(webhookSecret []byte, eventHandler server.GitHubEventHandler)
 	}, nil
 }
 
-func helpProvider(enabledRepos []string) (*pluginhelp.PluginHelp, error) {
+func helpProvider(_ []string) (*pluginhelp.PluginHelp, error) { // nolint:unparam
 	return &pluginhelp.PluginHelp{
 		Description: `PR Sanitizer plugin`,
 	}, nil

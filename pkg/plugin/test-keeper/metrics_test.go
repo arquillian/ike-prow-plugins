@@ -150,6 +150,6 @@ func toMetric(counter prometheus.Observer) (*dto.Metric, error) {
 	if !ok {
 		return nil, errors.New("failed to convert prometheus.Observer to prometheus.Histogram")
 	}
-	histogram.Write(metric)
+	_ = histogram.Write(metric)
 	return metric, nil
 }

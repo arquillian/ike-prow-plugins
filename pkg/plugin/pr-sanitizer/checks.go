@@ -34,13 +34,13 @@ const (
 		"Having it in the PR description ensures that the issue is automatically closed when the PR is merged."
 )
 
-type check func(pr *gogh.PullRequest, config PluginConfiguration, log log.Logger) string
+type check func(pr *gogh.PullRequest, config PluginConfiguration, logger log.Logger) string
 
-func executeChecks(pr *gogh.PullRequest, config PluginConfiguration, log log.Logger) []string {
+func executeChecks(pr *gogh.PullRequest, config PluginConfiguration, logger log.Logger) []string {
 	checks := []check{CheckSemanticTitle, CheckDescriptionLength, CheckIssueLinkPresence}
 	var messages []string
 	for _, check := range checks {
-		msg := check(pr, config, log)
+		msg := check(pr, config, logger)
 		if msg != "" {
 			messages = append(messages, msg)
 		}
@@ -49,13 +49,13 @@ func executeChecks(pr *gogh.PullRequest, config PluginConfiguration, log log.Log
 }
 
 // CheckSemanticTitle checks if the given PR contains semantic title
-func CheckSemanticTitle(pr *gogh.PullRequest, config PluginConfiguration, log log.Logger) string {
+func CheckSemanticTitle(pr *gogh.PullRequest, config PluginConfiguration, logger log.Logger) string {
 	change := ghservice.NewRepositoryChangeForPR(pr)
 	prefixes := GetValidTitlePrefixes(config)
 	isTitleWithValidType := HasTitleWithValidType(prefixes, *pr.Title)
 
 	if !isTitleWithValidType {
-		if prefix, ok := wip.GetWorkInProgressPrefix(*pr.Title, wip.LoadConfiguration(log, change)); ok {
+		if prefix, ok := wip.GetWorkInProgressPrefix(*pr.Title, wip.LoadConfiguration(logger, change)); ok {
 			trimmedTitle := strings.TrimPrefix(*pr.Title, prefix)
 			isTitleWithValidType = HasTitleWithValidType(prefixes, trimmedTitle)
 		}
@@ -68,7 +68,7 @@ func CheckSemanticTitle(pr *gogh.PullRequest, config PluginConfiguration, log lo
 }
 
 // CheckDescriptionLength  checks if the given PR's description contains enough number of arguments
-func CheckDescriptionLength(pr *gogh.PullRequest, config PluginConfiguration, log log.Logger) string {
+func CheckDescriptionLength(pr *gogh.PullRequest, config PluginConfiguration, logger log.Logger) string {
 	actualLength := len(strings.TrimSpace(issueLinkRegexp.ReplaceAllString(pr.GetBody(), "")))
 	if actualLength < config.DescriptionContentLength {
 		return fmt.Sprintf(DescriptionLengthShortMessage, config.DescriptionContentLength, actualLength)
@@ -77,7 +77,7 @@ func CheckDescriptionLength(pr *gogh.PullRequest, config PluginConfiguration, lo
 }
 
 // CheckIssueLinkPresence checks if the given PR's description contains an issue link
-func CheckIssueLinkPresence(pr *gogh.PullRequest, config PluginConfiguration, log log.Logger) string {
+func CheckIssueLinkPresence(pr *gogh.PullRequest, config PluginConfiguration, logger log.Logger) string {
 	if !issueLinkRegexp.MatchString(pr.GetBody()) {
 		return IssueLinkMissingMessage
 	}

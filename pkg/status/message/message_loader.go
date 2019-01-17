@@ -32,7 +32,7 @@ type Message struct {
 func (l *Loader) LoadMessage(change scm.RepositoryChange, statusFileSpec string) string {
 	var msg string
 
-	if content := l.defaultFileContent(l.PluginName, change, statusFileSpec); content != "" {
+	if content := l.defaultFileContent(l.PluginName, change, statusFileSpec); content != "" { // nolint:gocritic
 		msg = content
 	} else if l.Message.ConfigFile == "" {
 		msg = l.loadMessageTemplate("message-with-no-config.txt")

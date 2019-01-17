@@ -22,11 +22,11 @@ import (
 type DummyGHEventHandler struct {
 }
 
-func (gh *DummyGHEventHandler) HandlePullRequestEvent(log log.Logger, event *gogh.PullRequestEvent) error {
+func (gh *DummyGHEventHandler) HandlePullRequestEvent(logger log.Logger, event *gogh.PullRequestEvent) error {
 	return nil
 }
 
-func (gh *DummyGHEventHandler) HandleIssueCommentEvent(log log.Logger, event *gogh.IssueCommentEvent) error {
+func (gh *DummyGHEventHandler) HandleIssueCommentEvent(logger log.Logger, event *gogh.IssueCommentEvent) error {
 	return nil
 }
 

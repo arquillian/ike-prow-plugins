@@ -118,7 +118,7 @@ var _ = Describe("Test fileCategoryCounter features", func() {
 
 		It("should accept changeset based on configured inclusion", func() {
 			// given
-			matcher, loaderErr := testkeeper.LoadMatcher(testkeeper.PluginConfiguration{
+			matcher, loaderErr := testkeeper.LoadMatcher(&testkeeper.PluginConfiguration{
 				Inclusions: []string{`regex{{_test\.rb$}}`},
 			})
 
@@ -139,7 +139,7 @@ var _ = Describe("Test fileCategoryCounter features", func() {
 
 		It("should accept changeset using inclusion in the configuration", func() {
 			// given
-			matcher, loaderErr := testkeeper.LoadMatcher(testkeeper.PluginConfiguration{
+			matcher, loaderErr := testkeeper.LoadMatcher(&testkeeper.PluginConfiguration{
 				Inclusions: []string{`regex{{(Test\.java|TestCase\.java|_test\.go)$}}`},
 			})
 
@@ -179,7 +179,7 @@ var _ = Describe("Test fileCategoryCounter features", func() {
 
 		It("should accept changeset containing configured exclusion and one test matched by default inclusion", func() {
 			// given
-			matcher, loaderErr := testkeeper.LoadMatcher(testkeeper.PluginConfiguration{
+			matcher, loaderErr := testkeeper.LoadMatcher(&testkeeper.PluginConfiguration{
 				Exclusions: []string{"*.txt", "*.svg", "*.png"},
 			})
 
@@ -202,7 +202,7 @@ var _ = Describe("Test fileCategoryCounter features", func() {
 
 		It("should accept changeset containing configured exclusion", func() {
 			// given
-			matcher, loaderErr := testkeeper.LoadMatcher(testkeeper.PluginConfiguration{
+			matcher, loaderErr := testkeeper.LoadMatcher(&testkeeper.PluginConfiguration{
 				Exclusions: []string{"*.txt", "*.svg", "*.png"},
 			})
 
@@ -224,7 +224,7 @@ var _ = Describe("Test fileCategoryCounter features", func() {
 
 		It("should accept changeset containing configured overlapping exclusion and inclusion", func() {
 			// given
-			matcher, loaderErr := testkeeper.LoadMatcher(testkeeper.PluginConfiguration{
+			matcher, loaderErr := testkeeper.LoadMatcher(&testkeeper.PluginConfiguration{
 				Inclusions: []string{`**/*_test.txt`},
 				Exclusions: []string{`regex{{(\.txt|\.svg|\.png)$}}`},
 			})
@@ -248,7 +248,7 @@ var _ = Describe("Test fileCategoryCounter features", func() {
 
 		It("should accept changeset containing exclusion combined with default excluded files", func() {
 			// given
-			matcher, loaderErr := testkeeper.LoadMatcher(testkeeper.PluginConfiguration{
+			matcher, loaderErr := testkeeper.LoadMatcher(&testkeeper.PluginConfiguration{
 				Exclusions: []string{"**/*.heif"},
 				Combine:    true,
 			})
@@ -273,7 +273,7 @@ var _ = Describe("Test fileCategoryCounter features", func() {
 
 		It("should accept changeset containing inclusion not combined with default excluded files", func() {
 			// given
-			matcher, loaderErr := testkeeper.LoadMatcher(testkeeper.PluginConfiguration{
+			matcher, loaderErr := testkeeper.LoadMatcher(&testkeeper.PluginConfiguration{
 				Inclusions: []string{`src/**/*FunctionalTest.java$`},
 				Combine:    false,
 			})

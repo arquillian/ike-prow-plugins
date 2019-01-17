@@ -25,16 +25,16 @@ const documentationSection = "#_pr_sanitizer_plugin"
 
 // HandlePullRequestEvent is an entry point for the plugin logic. This method is invoked by the Server when
 // pull request event is dispatched from the /hook service
-func (gh *GitHubPRSanitizerEventsHandler) HandlePullRequestEvent(log log.Logger, event *gogh.PullRequestEvent) error {
+func (gh *GitHubPRSanitizerEventsHandler) HandlePullRequestEvent(logger log.Logger, event *gogh.PullRequestEvent) error {
 	if !utils.Contains(handledPrActions, *event.Action) {
 		return nil
 	}
-	return gh.validatePullRequestTitleAndDescription(log, event.PullRequest)
+	return gh.validatePullRequestTitleAndDescription(logger, event.PullRequest)
 }
 
 // HandleIssueCommentEvent is an entry point for the plugin logic. This method is invoked by the Server when
 // issue comment event is dispatched from the /hook service
-func (gh *GitHubPRSanitizerEventsHandler) HandleIssueCommentEvent(log log.Logger, comment *gogh.IssueCommentEvent) error {
+func (gh *GitHubPRSanitizerEventsHandler) HandleIssueCommentEvent(logger log.Logger, comment *gogh.IssueCommentEvent) error {
 	if !utils.Contains(handledCommentActions, *comment.Action) {
 		return nil
 	}
@@ -52,22 +52,22 @@ func (gh *GitHubPRSanitizerEventsHandler) HandleIssueCommentEvent(log log.Logger
 				return err
 			}
 
-			return gh.validatePullRequestTitleAndDescription(log, pullRequest)
+			return gh.validatePullRequestTitleAndDescription(logger, pullRequest)
 		}})
 
-	err := cmdHandler.Handle(log, comment)
+	err := cmdHandler.Handle(logger, comment)
 	if err != nil {
-		log.Error(err)
+		logger.Error(err)
 	}
 	return err
 }
 
-func (gh *GitHubPRSanitizerEventsHandler) validatePullRequestTitleAndDescription(log log.Logger, pr *gogh.PullRequest) error {
+func (gh *GitHubPRSanitizerEventsHandler) validatePullRequestTitleAndDescription(logger log.Logger, pr *gogh.PullRequest) error {
 	change := ghservice.NewRepositoryChangeForPR(pr)
-	config := LoadConfiguration(log, change)
-	statusService := gh.newPrSanitizerStatusService(log, pr, config)
+	config := LoadConfiguration(logger, change)
+	statusService := gh.newPrSanitizerStatusService(logger, pr, config)
 
-	messages := executeChecks(pr, config, log)
+	messages := executeChecks(pr, config, logger)
 
 	if len(messages) > 0 {
 		return statusService.fail(messages)

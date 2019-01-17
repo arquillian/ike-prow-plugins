@@ -81,7 +81,7 @@ func (b *MockPrBuilder) WithoutLabels() *MockPrBuilder {
 	return b
 }
 
-func (b *MockPrBuilder) mockGetForPR(targetType, suffix string, body string, options ...RequestOption) MockCreator {
+func (b *MockPrBuilder) mockGetForPR(targetType, suffix, body string, options ...RequestOption) MockCreator {
 	return func(builder *MockPrBuilder) {
 		b.baseGetMock(fmt.Sprintf("%s/%s/%d", b.baseRepoPath(), targetType, *b.pullRequest.Number)+suffix, body, options...)
 	}
@@ -149,7 +149,7 @@ func (b *MockPrBuilder) mockUser(user *GhUser) {
 		})
 }
 
-func (b *MockPrBuilder) mockGetForCollaborators(user, suffix string, body string, options ...RequestOption) {
+func (b *MockPrBuilder) mockGetForCollaborators(user, suffix, body string, options ...RequestOption) {
 	b.baseGetMock(fmt.Sprintf("%s/collaborators/%s", b.baseRepoPath(), user)+suffix, body, options...)
 }
 

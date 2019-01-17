@@ -48,7 +48,8 @@ var _ = Describe("Pull Request lazy loading", func() {
 			Reply(200).
 			BodyString(`{"title":"Loaded PR"}`)
 		loader := &ghservice.PullRequestLazyLoader{Client: client, RepoOwner: "owner", RepoName: "repo", Number: 123}
-		loader.Load()
+
+		_, _ = loader.Load()
 
 		// when
 		pullRequest, err := loader.Load()

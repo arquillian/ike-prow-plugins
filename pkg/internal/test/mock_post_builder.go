@@ -122,7 +122,7 @@ func basePostStatusMock(builder *MockPrBuilder) func(mather SoftMatcher) {
 }
 
 // RemovedLabel creates a gock matcher to check that there is a Delete request for the given label sent
-func RemovedLabel(labelName string, response string) MockCreator {
+func RemovedLabel(labelName, response string) MockCreator {
 	return func(builder *MockPrBuilder) {
 		path := fmt.Sprintf("%s/issues/%d/labels/%s", builder.baseRepoPath(), *builder.pullRequest.Number, labelName)
 		baseDeleteMock(path, response)

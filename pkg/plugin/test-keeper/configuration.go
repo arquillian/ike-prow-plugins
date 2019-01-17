@@ -17,7 +17,7 @@ type PluginConfiguration struct {
 }
 
 // LoadConfiguration loads a PluginConfiguration for the given change
-func LoadConfiguration(log log.Logger, change scm.RepositoryChange) PluginConfiguration {
+func LoadConfiguration(logger log.Logger, change scm.RepositoryChange) *PluginConfiguration {
 
 	configuration := PluginConfiguration{Combine: true}
 	loadableConfig := &ghservice.LoadableConfig{PluginName: ProwPluginName, Change: change, BaseConfig: &configuration.PluginConfiguration}
@@ -25,9 +25,9 @@ func LoadConfiguration(log log.Logger, change scm.RepositoryChange) PluginConfig
 	err := config.Load(&configuration, loadableConfig)
 
 	if err != nil {
-		log.Errorf("Config file was not loaded. Cause: %s", err)
-		return configuration
+		logger.Errorf("Config file was not loaded. Cause: %s", err)
+		return &configuration
 	}
 
-	return configuration
+	return &configuration
 }

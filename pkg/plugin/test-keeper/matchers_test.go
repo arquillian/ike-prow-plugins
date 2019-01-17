@@ -91,7 +91,7 @@ var _ = Describe("Test Matcher features", func() {
 
 		It("should load default matchers when no pattern is defined", func() {
 			// given
-			emptyConfiguration := PluginConfiguration{}
+			emptyConfiguration := &PluginConfiguration{}
 
 			// when
 			matchers, err := LoadMatcher(emptyConfiguration)
@@ -103,7 +103,7 @@ var _ = Describe("Test Matcher features", func() {
 
 		It("should load defined inclusion pattern without default language specific matchers", func() {
 			// given
-			configurationWithInclusionPattern := PluginConfiguration{
+			configurationWithInclusionPattern := &PluginConfiguration{
 				Inclusions: []string{`regex{{*IT.java|*TestCase.java}}`},
 			}
 			firstRegexp := func(matcher TestMatcher) string {

@@ -44,22 +44,22 @@ var (
 
 // HandlePullRequestEvent is an entry point for the plugin logic. This method is invoked by the Server when
 // pull request vent is dispatched from the /hook service
-func (gh *GitHubWIPPRHandler) HandlePullRequestEvent(log log.Logger, event *gogh.PullRequestEvent) error {
+func (gh *GitHubWIPPRHandler) HandlePullRequestEvent(logger log.Logger, event *gogh.PullRequestEvent) error {
 	if !utils.Contains(handledPrActions, *event.Action) {
 		return nil
 	}
 
 	switch *event.Action {
 	case github.ActionLabeled, github.ActionUnlabeled:
-		return gh.checkComponentsAndSetStatus(log, event.PullRequest, true)
+		return gh.checkComponentsAndSetStatus(logger, event.PullRequest, true)
 	default:
-		return gh.checkComponentsAndSetStatus(log, event.PullRequest, false)
+		return gh.checkComponentsAndSetStatus(logger, event.PullRequest, false)
 	}
 }
 
 // HandleIssueCommentEvent is an entry point for the plugin logic. This method is invoked by the Server when
 // issue comment event is dispatched from the /hook service
-func (gh *GitHubWIPPRHandler) HandleIssueCommentEvent(log log.Logger, comment *gogh.IssueCommentEvent) error {
+func (gh *GitHubWIPPRHandler) HandleIssueCommentEvent(logger log.Logger, comment *gogh.IssueCommentEvent) error {
 	if !utils.Contains(handledCommentActions, *comment.Action) {
 		return nil
 	}
@@ -77,23 +77,23 @@ func (gh *GitHubWIPPRHandler) HandleIssueCommentEvent(log log.Logger, comment *g
 				return err
 			}
 
-			return gh.checkComponentsAndSetStatus(log, pullRequest, false)
+			return gh.checkComponentsAndSetStatus(logger, pullRequest, false)
 
 		}})
 
-	err := cmdHandler.Handle(log, comment)
+	err := cmdHandler.Handle(logger, comment)
 	if err != nil {
-		log.Error(err)
+		logger.Error(err)
 	}
 	return err
 }
 
-func (gh *GitHubWIPPRHandler) checkComponentsAndSetStatus(log log.Logger, pullRequest *gogh.PullRequest, labelUpdated bool) error {
+func (gh *GitHubWIPPRHandler) checkComponentsAndSetStatus(logger log.Logger, pullRequest *gogh.PullRequest, labelUpdated bool) error {
 	change := ghservice.NewRepositoryChangeForPR(pullRequest)
 	statusContext := github.StatusContext{BotName: gh.BotName, PluginName: ProwPluginName}
-	statusService := status.NewStatusService(gh.Client, log, change, statusContext)
+	statusService := status.NewStatusService(gh.Client, logger, change, statusContext)
 
-	configuration := LoadConfiguration(log, change)
+	configuration := LoadConfiguration(logger, change)
 	labelExists := gh.hasWorkInProgressLabel(pullRequest.Labels, configuration.Label)
 	prefix, prefixExists := GetWorkInProgressPrefix(*pullRequest.Title, configuration)
 
@@ -106,14 +106,14 @@ func (gh *GitHubWIPPRHandler) checkComponentsAndSetStatus(log log.Logger, pullRe
 			return statusService.Success(ReadyForReviewMessage, ReadyForReviewDetailsPageName)
 		}
 		if err := gh.Client.AddPullRequestLabel(change, *pullRequest.Number, []string{configuration.Label}); err != nil {
-			log.Errorf("failed to add label on PR [%q]. cause: %s", *pullRequest, err)
+			logger.Errorf("failed to add label on PR [%q]. cause: %s", *pullRequest, err)
 		}
 		return statusService.Failure(InProgressMessage, InProgressDetailsPageName)
 	}
 	if labelExists {
 		if !prefixExists && !labelUpdated {
 			if err := gh.Client.RemovePullRequestLabel(change, *pullRequest.Number, configuration.Label); err != nil {
-				log.Errorf("failed to remove label on PR [%q]. cause: %s", *pullRequest, err)
+				logger.Errorf("failed to remove label on PR [%q]. cause: %s", *pullRequest, err)
 			}
 			return statusService.Success(ReadyForReviewMessage, ReadyForReviewDetailsPageName)
 		}

@@ -9,7 +9,7 @@ func String(v string) *string { return &v }
 func Int(v int) *int { return &v }
 
 // Contains checks if a slice contains an element
-func Contains(s interface{}, e interface{}) bool {
+func Contains(s, e interface{}) bool {
 	slice := convertSliceToInterface(s)
 
 	for _, a := range slice {

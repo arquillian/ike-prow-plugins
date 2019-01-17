@@ -42,7 +42,7 @@ func (r retryWrapper) retry(toRetry doFunction, aroundContext aroundContext) (fu
 	if len(errs) == r.retries {
 		msg := fmt.Sprintf("all %d attempts of sending a request failed. See the errors:", r.retries)
 		for index, e := range errs {
-			msg = msg + fmt.Sprintf("\n%d. [%s]", index+1, e.Error())
+			msg += fmt.Sprintf("\n%d. [%s]", index+1, e.Error())
 		}
 		return setValueFunc, response, errors.New(msg)
 	}

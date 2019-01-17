@@ -13,7 +13,7 @@ import (
 )
 
 type testStatusService struct {
-	log           log.Logger
+	logger        log.Logger
 	change        scm.RepositoryChange
 	statusService scm.StatusService
 }
@@ -43,12 +43,12 @@ const (
 	ApprovedByDetailsPageName = "keeper-approved-by"
 )
 
-func (gh *GitHubTestEventsHandler) newTestStatusService(log log.Logger, pullRequest *gogh.PullRequest) *testStatusService {
+func (gh *GitHubTestEventsHandler) newTestStatusService(logger log.Logger, pullRequest *gogh.PullRequest) *testStatusService {
 	change := ghservice.NewRepositoryChangeForPR(pullRequest)
 	statusContext := github.StatusContext{BotName: gh.BotName, PluginName: ProwPluginName}
-	statusService := status.NewStatusService(gh.Client, log, change, statusContext)
+	statusService := status.NewStatusService(gh.Client, logger, change, statusContext)
 	return &testStatusService{
-		log:           log,
+		logger:        logger,
 		change:        change,
 		statusService: statusService,
 	}
@@ -98,17 +98,17 @@ const (
 type testStatusServiceWithMessages struct {
 	*testStatusService
 	statusMsgService *message.StatusMessageService
-	config           PluginConfiguration
+	config           *PluginConfiguration
 }
 
-func (gh *GitHubTestEventsHandler) newTestStatusServiceWithMessages(log log.Logger, pullRequest *gogh.PullRequest,
-	commentsLoader *ghservice.IssueCommentsLazyLoader, config PluginConfiguration) testStatusServiceWithMessages {
+func (gh *GitHubTestEventsHandler) newTestStatusServiceWithMessages(logger log.Logger, pullRequest *gogh.PullRequest,
+	commentsLoader *ghservice.IssueCommentsLazyLoader, config *PluginConfiguration) testStatusServiceWithMessages {
 
-	msgContext := message.NewStatusMessageContext(ProwPluginName, documentationSection, pullRequest, config.PluginConfiguration)
-	msgService := message.NewStatusMessageService(gh.Client, log, commentsLoader, msgContext)
+	msgContext := message.NewStatusMessageContext(ProwPluginName, documentationSection, pullRequest, &config.PluginConfiguration)
+	msgService := message.NewStatusMessageService(gh.Client, logger, commentsLoader, msgContext)
 
 	return testStatusServiceWithMessages{
-		testStatusService: gh.newTestStatusService(log, pullRequest),
+		testStatusService: gh.newTestStatusService(logger, pullRequest),
 		statusMsgService:  msgService,
 		config:            config,
 	}

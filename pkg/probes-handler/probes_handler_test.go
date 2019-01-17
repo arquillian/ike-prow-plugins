@@ -24,12 +24,12 @@ var _ = Describe("Test liveliness and readiness probes.", func() {
 	var _ = BeforeSuite(func() {
 		var found bool
 		if versionEnv, found = os.LookupEnv("VERSION"); !found {
-			os.Setenv("VERSION", defaultVersion)
+			_ = os.Setenv("VERSION", defaultVersion)
 		}
 	})
 
 	var _ = AfterSuite(func() {
-		os.Setenv("VERSION", versionEnv)
+		_ = os.Setenv("VERSION", versionEnv)
 	})
 
 	Context("When in healthy state", func() {
@@ -46,7 +46,7 @@ var _ = Describe("Test liveliness and readiness probes.", func() {
 
 			// then
 			actualBody := probeshandler.Probe{}
-			json.Unmarshal(response.Body.Bytes(), &actualBody)
+			_ = json.Unmarshal(response.Body.Bytes(), &actualBody)
 			Expect(actualBody).To(Equal(expectedBody))
 		})
 	})

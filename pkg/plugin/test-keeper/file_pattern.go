@@ -24,11 +24,11 @@ type FilePattern struct {
 
 // Matches checks if the given string (representing path to a file) contains a substring that matches Regexp stored in this matcher
 func (matcher *FilePattern) Matches(filename string) bool {
-	regexp, err := regexp.Compile(matcher.Regexp)
+	exp, err := regexp.Compile(matcher.Regexp)
 	if err != nil {
 		return false
 	}
-	return regexp.MatchString(filename)
+	return exp.MatchString(filename)
 }
 
 // FilePatterns is an alias type representing slice of FilePattern
@@ -91,7 +91,7 @@ func transformPathPatternToRegexp(path string) string {
 	return strings.Replace(path, twoStarsReplacement, anythingRegexp, -1)
 }
 
-func transformFilenamePatternToRegexp(fileName string, path string) string {
+func transformFilenamePatternToRegexp(fileName, path string) string {
 	fileName = escapeDots(fileName)
 
 	if strings.HasPrefix(fileName, anyNameWildcard) {

@@ -26,7 +26,7 @@ func eventServer(webhookSecret []byte, eventHandler server.GitHubEventHandler) (
 	}, errors
 }
 
-func helpProvider(enabledRepos []string) (*pluginhelp.PluginHelp, error) {
+func helpProvider(_ []string) (*pluginhelp.PluginHelp, error) { // nolint:unparam
 	return &pluginhelp.PluginHelp{
 		Description: `Test Keeper plugin`,
 	}, nil

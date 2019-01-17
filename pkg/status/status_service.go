@@ -17,16 +17,16 @@ import (
 // Service is a struct containing information necessary for status setting
 type Service struct {
 	client        ghclient.Client
-	log           log.Logger
+	logger        log.Logger
 	statusContext githubType.StatusContext
 	change        scm.RepositoryChange
 }
 
 // NewStatusService creates an instance of Service necessary for setting status
-func NewStatusService(client ghclient.Client, log log.Logger, change scm.RepositoryChange, context githubType.StatusContext) scm.StatusService {
+func NewStatusService(client ghclient.Client, logger log.Logger, change scm.RepositoryChange, context githubType.StatusContext) scm.StatusService {
 	return &Service{
 		client:        client,
-		log:           log,
+		logger:        logger,
 		statusContext: context,
 		change:        change,
 	}
@@ -65,12 +65,12 @@ func (s *Service) setStatus(status, reason, detailsLink string) error {
 	err := s.client.CreateStatus(s.change, &repoStatus)
 
 	if err != nil {
-		s.log.Errorf("error trying to send status. %q. cause: %q", repoStatus, err)
+		s.logger.Errorf("error trying to send status. %q. cause: %q", repoStatus, err)
 	}
 
 	return err
 }
 
-func (s Service) generateDetailsLink(filename, status string) string {
+func (s *Service) generateDetailsLink(filename, status string) string {
 	return fmt.Sprintf("%s/status/%s/%s/%s.html", plugin.DocumentationURL, s.statusContext.PluginName, strings.ToLower(status), filename)
 }
