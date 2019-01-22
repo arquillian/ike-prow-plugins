@@ -63,5 +63,5 @@ if [[ $1 != "--only-go-bins" ]]; then
   echo -e "${CLEAR}${LIGHT_GREEN}Installing required go packages${CLEAR}"
   make tools
   echo -e "${CLEAR}${LIGHT_GREEN}Installing project dependencies${CLEAR}"
-  make install
+  make deps
 fi
