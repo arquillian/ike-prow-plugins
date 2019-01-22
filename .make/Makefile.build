@@ -11,7 +11,7 @@ tools: ## Installs required go tools
 	@go get -u golang.org/x/tools/cmd/goimports
 	@go get -u github.com/jteeuwen/go-bindata/...
 
-.PHONY: install
+.PHONY: deps
 deps: generate ## Fetches all dependencies using dep
 	dep ensure -v
 

@@ -34,7 +34,7 @@ include ./.make/Makefile.deploy.prow
 include ./.make/Makefile.docker.build
 
 .PHONY: all
-all: clean generate install lint build oc-deploy-hook oc-deploy-plugins ## (default) Performs clean build and deploys all services
+all: clean generate deps lint build oc-deploy-hook oc-deploy-plugins ## (default) Performs clean build and deploys all services
 
 help: ## Hey! That's me!
 	 @echo -e "$$(grep -hE '^\S+:.*##' $(MAKEFILE_LIST) | sort | sed -e 's/:.*##\s*/:/' -e 's/^\(.\+\):\(.*\)/\\x1b[36m\1\\x1b[m:\2/' | column -c2 -t -s :)"
