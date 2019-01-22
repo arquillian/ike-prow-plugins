@@ -38,7 +38,7 @@ function run_build() {
 function prepare() {
   make docker-start
   make docker-tools
-  make docker-install
+  make docker-deps
 }
 
 function cleanup_env {
