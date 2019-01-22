@@ -40,9 +40,9 @@ You need to have following packages in place:
 
 * `git`
 * `make`
-* `go` (`>= v1.10.2`)
+* `go` (`>= v1.11.4`)
 * link:https://golang.github.io/dep/[`dep`] for dependency management
-* link:https://github.com/alecthomas/gometalinter[`gometalinter`]
+* link:https://github.com/golangci/golangci-lint[`golangci-lint`]
 
 Assuming that you have all the link:https://golang.org/doc/install[Golang prerequisites] in place (such as `$GOPATH`), clone the repository first:
 
