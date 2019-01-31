@@ -44,6 +44,14 @@
   version = "2018.01.18"
 
 [[projects]]
+  digest = "1:7313d6b9095eb86581402557bbf3871620cf82adf41853c5b9bee04b894290c7"
+  name = "github.com/codemodus/parth"
+  packages = ["."]
+  pruneopts = "NUT"
+  revision = "a170cf4ecfc2e277866d2a4fac7922b66e9f5176"
+  version = "v2.0.0"
+
+[[projects]]
   digest = "1:3537d33c077a9666720dc987fddfecb07270606ac0a58f67abd08e3b252c0a45"
   name = "github.com/emicklei/go-restful"
   packages = [
@@ -531,12 +539,12 @@
   version = "v1.4.7"
 
 [[projects]]
-  digest = "1:bb2c2c02e1590e09803ee81a646855e6235b1aaf94d3bdb8b3b0d17632b90cb3"
+  digest = "1:148d6b94c267245db0e278e9ea4c5ea8b8ad1b07e1f5c41daa4b89642d26ee3a"
   name = "gopkg.in/h2non/gock.v1"
   packages = ["."]
   pruneopts = "NUT"
-  revision = "a6029d17e101ac1594adafea9e63fd8c988a8701"
-  version = "v1.0.12"
+  revision = "1390fb4792c1564b03d31c57b2175fb32e5319f3"
+  version = "v1.0.13"
 
 [[projects]]
   digest = "1:2d1fbdc6777e5408cabeb02bf336305e724b925ff4546ded0fa8715a7267922a"
