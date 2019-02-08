@@ -102,7 +102,16 @@ external_plugins:
       events:
         - pull_request
         - issue_comment
-  fabric8-services/fabric8-build-service:
+  fabric8-services/fabric8-build:
+    - name: test-keeper
+      events:
+        - pull_request
+        - issue_comment
+    - name: work-in-progress
+      events:
+        - pull_request
+        - issue_comment
+  fabric8-services/fabric8-webhook:
     - name: test-keeper
       events:
         - pull_request
