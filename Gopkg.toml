@@ -37,7 +37,7 @@ required = [
 # commit cc3c003dafcc1261f914368c8bae8c7be1a6e2dc is released (so if anything newer than v15.0.0 is out)
 [[constraint]]
   name = "github.com/google/go-github"
-  version = "25.1.1"
+  version = "25.1.2"
 
 [[constraint]]
   name = "k8s.io/test-infra"
