@@ -146,12 +146,12 @@
   version = "v1.2.0"
 
 [[projects]]
-  digest = "1:b5e4e76135437bd049dff58c36701779314105cba911425bde691b6e01cca546"
+  digest = "1:567882dc5a07937c97d8060e404eface82dfafc325dcb20314ae5521d04300e5"
   name = "github.com/google/go-github"
   packages = ["github"]
   pruneopts = "NUT"
-  revision = "6c7910aba3541e857ee0e9ad7a8fa6e5a9353e30"
-  version = "v26.0.4"
+  revision = "0573e88402f1db392537e0cbb2c79f1c03d1c6a0"
+  version = "v26.0.6"
 
 [[projects]]
   digest = "1:a63cff6b5d8b95638bfe300385d93b2a6d9d687734b863da8e09dc834510a690"
