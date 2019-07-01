@@ -146,12 +146,12 @@
   version = "v1.2.0"
 
 [[projects]]
-  digest = "1:567882dc5a07937c97d8060e404eface82dfafc325dcb20314ae5521d04300e5"
+  digest = "1:bfb6d8aee23cd9b2db8fa3760ca11d7a934d9a05993d5233406f1e6042e4c110"
   name = "github.com/google/go-github"
   packages = ["github"]
   pruneopts = "NUT"
-  revision = "0573e88402f1db392537e0cbb2c79f1c03d1c6a0"
-  version = "v26.0.6"
+  revision = "ababee01b03f69965d0ec370e65b61ec7967be34"
+  version = "v26.0.9"
 
 [[projects]]
   digest = "1:a63cff6b5d8b95638bfe300385d93b2a6d9d687734b863da8e09dc834510a690"
@@ -415,6 +415,22 @@
   pruneopts = "NUT"
   revision = "298182f68c66c05229eb03ac171abe6e309ee79a"
   version = "v1.0.3"
+
+[[projects]]
+  branch = "master"
+  digest = "1:50804d40964a0c59170e827824e79bbf810cc10ae57603d8facce8a1f48f9a83"
+  name = "golang.org/x/crypto"
+  packages = [
+    "cast5",
+    "openpgp",
+    "openpgp/armor",
+    "openpgp/elgamal",
+    "openpgp/errors",
+    "openpgp/packet",
+    "openpgp/s2k",
+  ]
+  pruneopts = "NUT"
+  revision = "cc06ce4a13d484c0101a9e92913248488a75786d"
 
 [[projects]]
   branch = "master"
