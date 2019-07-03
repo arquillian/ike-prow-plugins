@@ -544,12 +544,12 @@
   version = "v1.4.7"
 
 [[projects]]
-  digest = "1:fe9eb931d7b59027c4a3467f7edc16cc8552dac5328039bec05045143c18e1ce"
+  digest = "1:88bae7be6fdb50f60533209b4213cb5748275aa15d54aa178ebbf7e38e54f897"
   name = "gopkg.in/h2non/gock.v1"
   packages = ["."]
   pruneopts = "NUT"
-  revision = "ba88c4862a27596539531ce469478a91bc5a0511"
-  version = "v1.0.14"
+  revision = "3ffff9b1aa8200275a5eb219c5f9c62bd27acb31"
+  version = "v1.0.15"
 
 [[projects]]
   digest = "1:2d1fbdc6777e5408cabeb02bf336305e724b925ff4546ded0fa8715a7267922a"
