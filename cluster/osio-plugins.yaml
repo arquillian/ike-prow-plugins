@@ -120,7 +120,7 @@ external_plugins:
       events:
         - pull_request
         - issue_comment
-  fabric8-launcher/launcher-backend:
+  fabric8-launcher/launcher-application:
     - name: test-keeper
       events:
         - pull_request
