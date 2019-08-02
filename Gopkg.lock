@@ -325,7 +325,7 @@
   version = "v0.8.1"
 
 [[projects]]
-  digest = "1:09bae280f3f4e54354fdbaf39b3dc37301f2c5b8196385c6a0be09c52cb7a2ae"
+  digest = "1:3396b67e4d6d69f1178b5589988143b99c73d79f0a43571f1c6f5d98bedea5be"
   name = "github.com/prometheus/client_golang"
   packages = [
     "prometheus",
@@ -334,8 +334,8 @@
     "prometheus/push",
   ]
   pruneopts = "NUT"
-  revision = "50c4339db732beb2165735d2cde0bff78eb3c5a5"
-  version = "v0.9.3"
+  revision = "170205fb58decfd011f1550d4cfb737230d7ae4f"
+  version = "v1.1.0"
 
 [[projects]]
   branch = "master"
@@ -463,9 +463,12 @@
 
 [[projects]]
   branch = "master"
-  digest = "1:ca8ea53e5cb30d38277ad63ca4e92fd574ca370b44f0b149c2fc2dd524cbf05f"
+  digest = "1:abc6c776da4fb3b71392ec4f4edafbbf981ef39bf6e6af06cc424f28c4a4ccc7"
   name = "golang.org/x/sys"
-  packages = ["unix"]
+  packages = [
+    "unix",
+    "windows",
+  ]
   pruneopts = "NUT"
   revision = "11f53e03133963fb11ae0588e08b5e0b85be8be5"
 
