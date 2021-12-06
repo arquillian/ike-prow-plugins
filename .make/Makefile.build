@@ -15,7 +15,7 @@ $(PROJECT_DIR)/bin/go-bindata:
 
 $(PROJECT_DIR)/bin/ginkgo:
 	$(call header,"Installing ginkgo")
-	GOBIN=$(PROJECT_DIR)/bin go install -mod=readonly github.com/onsi/ginkgo/ginkgo@latest
+	GOBIN=$(PROJECT_DIR)/bin go install -mod=readonly github.com/onsi/ginkgo/ginkgo@v1.16.4
 
 $(PROJECT_DIR)/bin/goimports:
 	$(call header,"Installing goimports")
