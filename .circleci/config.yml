@@ -1,0 +1,97 @@
+version: 2.1
+
+defaults:
+  env-vars: &env-vars
+    GOPATH: /home/circleci/.go_workspace
+    GOLANG_SNAP_VERSION: "1.17/stable"
+  merge-junit-reports: &merge-junit-reports
+    name: "Merges ginkgo junit test results"
+    command: |
+      sudo npm install -g junit-report-merger
+      mkdir -p ./test-results/
+      jrm ./test-results/junit-report-combined.xml $(find . -type f -name ginkgo-test-results.xml)
+  docker:
+    - image: &golang-img cimg/go:1.17.3-node
+  skip-for-non-code-changes: &skip-for-non-code-changes
+    name: "Skip job for non-code changes"
+    command: |
+      if git diff -s --exit-code HEAD~..HEAD -- . ':!docs' ':!.github' ':!.circleci' ':!scripts'; then
+        echo "This commit has only non-code related changes."
+        circleci step halt
+      fi
+  skip-build-check: &skip-build-check
+    name: "Check for /skip-build directive"
+    command: |
+      COMMIT_MSG=$(git log --format=%B -n 1 $CIRCLE_SHA1)
+      if [[ $COMMIT_MSG == *"/skip-build"* ]]; then
+        echo "/skip-build directive detected. Explictly stopping build."
+        circleci step halt
+      fi
+  check-if-build-executed: &check-if-build-executed
+    name: "Check if build with this content was already executed"
+    command: |
+      if [[ -f ${BUILD_CACHE_FOLDER}/${CIRCLE_JOB}.githash ]]; then
+        echo "This exact code base has been successfully built"
+        circleci step halt
+      else
+        echo "New build - if succeeds build git hash will be cached"
+        echo "${TREE_SHA1}" > ${BUILD_CACHE_FOLDER}/${CIRCLE_JOB}.githash
+      fi
+  obtain-tree-hash: &obtain-tree-hash
+    name: "Obtain git tree hash"
+    command: |
+      mkdir -p ${BUILD_CACHE_FOLDER}
+      export TREE_SHA1=$(git rev-parse HEAD:)
+      echo "export TREE_SHA1=${TREE_SHA1}" >> $BASH_ENV
+      echo ${TREE_SHA1} > /tmp/tree.sha1
+  restore-tree-hash: &restore-tree-hash
+      keys:
+        - job-{{ .Environment.CIRCLE_JOB }}-cache-{{ checksum "/tmp/tree.sha1" }} # workaround for https://discuss.circleci.com/t/cannot-use-circle-yml-environment-variables-in-cache-keys/10994/20
+  save-tree-hash: &save-tree-hash
+    key: job-{{ .Environment.CIRCLE_JOB }}-cache-{{ checksum "/tmp/tree.sha1" }}
+    paths:
+    - ./.circleci/cache # Can't use env variable here - needs to be explicit value
+
+jobs:
+
+  ## Regular build running tests
+  build:
+    docker:
+      - image: *golang-img
+    environment:
+      BUILD_CACHE_FOLDER: ".circleci/cache"
+    steps:
+      - checkout
+      - run:
+          <<: *skip-build-check
+      - run:
+          <<: *skip-for-non-code-changes
+      - run:
+          << : *obtain-tree-hash
+      - restore_cache:
+          << : *restore-tree-hash
+      - run:
+          << : *check-if-build-executed
+      - restore_cache:
+          keys:
+            - golang-deps-{{ .Environment.CIRCLE_JOB }}-cache-{{ checksum "go.sum" }}
+      - run:
+          name: "Run the build"
+          command: make build-ci
+      - run:
+          when: always
+          <<: *merge-junit-reports
+      - store_test_results:
+          path: ./test-results
+      - save_cache:
+          key: golang-deps-{{ .Environment.CIRCLE_JOB }}-cache-{{ checksum "go.sum" }}
+          paths:
+            - ./vendor
+      - save_cache:
+          << : *save-tree-hash
+
+workflows:
+  version: 2.1
+  circleci_build:
+    jobs:
+      - build
