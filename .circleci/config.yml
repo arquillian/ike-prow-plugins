@@ -77,7 +77,7 @@ jobs:
             - golang-deps-{{ .Environment.CIRCLE_JOB }}-cache-{{ checksum "go.sum" }}
       - run:
           name: "Run the build"
-          command: make build-ci
+          command: make
       - run:
           when: always
           <<: *merge-junit-reports
