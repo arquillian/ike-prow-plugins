@@ -42,7 +42,8 @@ generate: ## Generates any necessary assets using go-bindata library
 
 .PHONY: test
 test:
-	ginkgo -r
+	$(call header,"Running tests")
+	ginkgo -r -v -progress -vet=off -trace ${args}
 
 .PHONY: build
 build: test compile

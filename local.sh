@@ -1,9 +1,9 @@
 #!/usr/bin/env bash
 # tag::local_docker_registry[]
-eval $(minishift docker-env)
-docker login -u $(oc whoami) -p $(oc whoami -t) $(minishift openshift registry)
-export REGISTRY=$(minishift openshift registry)
-export DOCKER_REPO=$(oc project -q)
+# eval $(minishift docker-env)
+# docker login -u $(oc whoami) -p $(oc whoami -t) $(minishift openshift registry)
+# export REGISTRY=$(minishift openshift registry)
+# export DOCKER_REPO=$(oc project -q)
 # end::local_docker_registry[]
 
 # tag::seeding_secrets[]
@@ -13,7 +13,7 @@ echo "${SENTRY_DSN}" > config/sentry.dsn # <3>
 # end::seeding_secrets[]
 
 # tag::handy_aliases[]
-alias oc-console='xdg-open https://$(minishift ip):8443/console &>/dev/null'
-alias uh="ultrahook github http://$(oc get route/hook --no-headers=true -o=custom-columns=HOST:spec.host)/hook"
+#alias oc-console='xdg-open https://$(minishift ip):8443/console &>/dev/null'
+# alias uh="ultrahook github http://$(oc get route/hook --no-headers=true -o=custom-columns=HOST:spec.host)/hook"
 alias gdoc="./.asciidoctor/generate.sh && xdg-open gh-pages/index.html &>/dev/null"
 # end::handy_aliases[]
