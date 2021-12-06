@@ -1,6 +1,7 @@
 package main
 
 import (
+	"k8s.io/test-infra/prow/config"
 	"k8s.io/test-infra/prow/pluginhelp"
 
 	ghclient "github.com/arquillian/ike-prow-plugins/pkg/github/client"
@@ -24,7 +25,7 @@ func serverCreator(webhookSecret []byte, eventHandler server.GitHubEventHandler)
 	}, nil
 }
 
-func helpProvider(_ []string) (*pluginhelp.PluginHelp, error) { // nolint:unparam
+func helpProvider(_ []config.OrgRepo) (*pluginhelp.PluginHelp, error) { // nolint:unparam
 	return &pluginhelp.PluginHelp{
 		Description: `PR Sanitizer plugin`,
 	}, nil

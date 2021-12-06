@@ -3,6 +3,7 @@ package main
 import (
 	testkeeper "github.com/arquillian/ike-prow-plugins/pkg/plugin/test-keeper"
 	"github.com/arquillian/ike-prow-plugins/pkg/server"
+	"k8s.io/test-infra/prow/config"
 	"k8s.io/test-infra/prow/pluginhelp"
 
 	ghclient "github.com/arquillian/ike-prow-plugins/pkg/github/client"
@@ -26,7 +27,7 @@ func eventServer(webhookSecret []byte, eventHandler server.GitHubEventHandler) (
 	}, errors
 }
 
-func helpProvider(_ []string) (*pluginhelp.PluginHelp, error) { // nolint:unparam
+func helpProvider(_ []config.OrgRepo) (*pluginhelp.PluginHelp, error) { // nolint:unparam
 	return &pluginhelp.PluginHelp{
 		Description: `Test Keeper plugin`,
 	}, nil

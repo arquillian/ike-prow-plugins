@@ -9,7 +9,7 @@ import (
 	"github.com/arquillian/ike-prow-plugins/pkg/log"
 	gogh "github.com/google/go-github/github"
 	"github.com/sirupsen/logrus" //nolint:depguard
-	"k8s.io/test-infra/prow/hook"
+	prowgh "k8s.io/test-infra/prow/github"
 )
 
 // GitHubEventHandler is a type which keeps the logic of handling GitHub events for the given plugin implementation.
@@ -36,8 +36,10 @@ type repoEvent struct {
 
 // ServeHTTP validates an incoming webhook and puts it into the event channel.
 func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	// TODO(k8s-prow): Move webhook handling logic out of hook binary so that we don't have to import all
-	eventType, eventGUID, payload, ok := hook.ValidateWebhook(w, r, s.HmacSecret)
+	eventType, eventGUID, payload, ok, _ := prowgh.ValidateWebhook(w, r, func() []byte {
+		return s.HmacSecret
+	})
+
 	if !ok {
 		return
 	}

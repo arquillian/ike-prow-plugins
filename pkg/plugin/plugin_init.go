@@ -11,7 +11,7 @@ import (
 	probeshandler "github.com/arquillian/ike-prow-plugins/pkg/probes-handler"
 	"github.com/arquillian/ike-prow-plugins/pkg/utils"
 	"k8s.io/test-infra/prow/pluginhelp/externalplugins"
-	"k8s.io/test-infra/prow/plugins"
+
 
 	"net/http"
 
@@ -80,10 +80,10 @@ func InitPlugin(pluginName string, newEventHandler EventHandlerCreator, newServe
 		logger.WithError(err).Fatalf("Must specify a valid --github-endpoint URL.")
 	}
 
-	pa := &plugins.PluginAgent{}
+	/*pa := &pluginsflagutil.PluginOptions.PluginAgent{}
 	if err := pa.Start(*pluginConfig); err != nil {
 		logger.WithError(err).Fatalf("Error loading ike-plugins config from %q.", *pluginConfig)
-	}
+	}*/ // only for validation
 
 	githubClient := ghclient.NewOauthClient(oauthSecret, logger)
 	githubClient.RegisterAroundFunctions(

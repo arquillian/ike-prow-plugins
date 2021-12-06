@@ -8,7 +8,7 @@ import (
 )
 
 // PluginConfiguration defines prefix patterns set of PR titles will be matched against
-// It's unmarshaled from work-in-progress.yml configuration file
+// It is unmarshalled from work-in-progress.yml configuration file.
 type PluginConfiguration struct {
 	config.PluginConfiguration `yaml:",inline,omitempty"`
 	Prefix                     []string `yaml:"title_prefixes,omitempty"`

@@ -11,9 +11,9 @@
 *.out
 *.coverprofile
 
-.glide/
 vendor/
 bin/
+dist/
 _cache
 
 ### Golang / IDEA ###

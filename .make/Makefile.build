@@ -2,27 +2,42 @@
 clean: ## Removes binary, cache folder and docker images
 	@rm -rf ${BINARY_DIR}
 	@rm -rf $(PLUGIN_DEPLOYMENTS_DIR)
+	@rm -rf ./vendor
+	@rm -rf ./bin
 
 .PHONY: tools
-tools: ## Installs required go tools
-	@go get -u github.com/golangci/golangci-lint/cmd/golangci-lint
-	@go get -u github.com/onsi/ginkgo/ginkgo
-	@go get -u github.com/onsi/gomega
-	@go get -u golang.org/x/tools/cmd/goimports
-	@go get -u github.com/jteeuwen/go-bindata/...
+tools: $(PROJECT_DIR)/bin/go-bindata $(PROJECT_DIR)/bin/ginkgo ## Installs required go tools
+tools: $(PROJECT_DIR)/bin/goimports $(PROJECT_DIR)/bin/golangci-lint
+
+$(PROJECT_DIR)/bin/go-bindata:
+	$(call header,"Installing go-bindata")
+	GOBIN=$(PROJECT_DIR)/bin go install -mod=readonly github.com/go-bindata/go-bindata/v3/...@latest
+
+$(PROJECT_DIR)/bin/ginkgo:
+	$(call header,"Installing ginkgo")
+	GOBIN=$(PROJECT_DIR)/bin go install -mod=readonly github.com/onsi/ginkgo/ginkgo@latest
+
+$(PROJECT_DIR)/bin/goimports:
+	$(call header,"Installing goimports")
+	GOBIN=$(PROJECT_DIR)/bin go install -mod=readonly golang.org/x/tools/cmd/goimports@latest
+
+$(PROJECT_DIR)/bin/golangci-lint:
+	$(call header,"Installing golangci-lint")
+	curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b $(PROJECT_DIR)/bin v1.41.1
 
 .PHONY: deps
-deps: generate ## Fetches all dependencies using dep
-	dep ensure -v
+deps:  ## Fetches all dependencies
+	$(call header,"Fetching dependencies")
+	@go mod download
+	@go mod vendor
+	@go mod tidy
 
 .PHONY: compile
-compile: deps compile-only ## Compiles all plugins and puts them in the bin/ folder (calls up target)
-
-.PHONY: compile-only
-compile-only: generate $(BINARIES)
+compile: $(BINARIES) ## Compiles all plugins and puts them in the dist folder (calls up target)
 
 .PHONY: generate
 generate: ## Generates any necessary assets using go-bindata library
+	$(call header,"Generating assets")
 	go generate ./pkg/assets/...
 
 .PHONY: test
@@ -30,7 +45,7 @@ test:
 	ginkgo -r
 
 .PHONY: build
-build: compile test
+build: test compile
 
 .PHONY: format
 format: ## Removes unneeded imports and formats source code
@@ -45,7 +60,7 @@ endif
 LDFLAGS="-X main.Commit=${COMMIT} -X main.BuildTime=${BUILD_TIME}"
 
 $(BINARIES): binaries-%: %
-	@echo "Building $< binary"
+	$(call header,"Building $< binary")
 	@cd ./pkg/plugin/$</cmd && CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -ldflags ${LDFLAGS} -o ${BINARY_DIR}/$<
 
 .PHONY: lint
