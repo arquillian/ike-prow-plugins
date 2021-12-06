@@ -80,11 +80,6 @@ func InitPlugin(pluginName string, newEventHandler EventHandlerCreator, newServe
 		logger.WithError(err).Fatalf("Must specify a valid --github-endpoint URL.")
 	}
 
-	/*pa := &pluginsflagutil.PluginOptions.PluginAgent{}
-	if err := pa.Start(*pluginConfig); err != nil {
-		logger.WithError(err).Fatalf("Error loading ike-plugins config from %q.", *pluginConfig)
-	}*/ // only for validation
-
 	githubClient := ghclient.NewOauthClient(oauthSecret, logger)
 	githubClient.RegisterAroundFunctions(
 		ghclient.NewRateLimitWatcher(githubClient, logger, 100),
