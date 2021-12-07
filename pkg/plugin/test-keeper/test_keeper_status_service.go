@@ -9,7 +9,7 @@ import (
 	"github.com/arquillian/ike-prow-plugins/pkg/scm"
 	"github.com/arquillian/ike-prow-plugins/pkg/status"
 	"github.com/arquillian/ike-prow-plugins/pkg/status/message"
-	gogh "github.com/google/go-github/github"
+	gogh "github.com/google/go-github/v41/github"
 )
 
 type testStatusService struct {

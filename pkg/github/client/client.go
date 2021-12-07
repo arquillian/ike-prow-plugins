@@ -7,7 +7,7 @@ import (
 
 	"github.com/arquillian/ike-prow-plugins/pkg/log"
 	"github.com/arquillian/ike-prow-plugins/pkg/scm"
-	gogh "github.com/google/go-github/github"
+	gogh "github.com/google/go-github/v41/github"
 	"golang.org/x/oauth2"
 )
 

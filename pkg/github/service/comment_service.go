@@ -3,7 +3,7 @@ package ghservice
 import (
 	ghclient "github.com/arquillian/ike-prow-plugins/pkg/github/client"
 	"github.com/arquillian/ike-prow-plugins/pkg/scm"
-	gogh "github.com/google/go-github/github"
+	gogh "github.com/google/go-github/v41/github"
 )
 
 // CommentService is a struct managing issue or pull request comments

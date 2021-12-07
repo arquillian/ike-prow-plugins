@@ -9,7 +9,7 @@ replace (
 
 require (
 	github.com/evalphobia/logrus_sentry v0.8.2
-	github.com/google/go-github v17.0.0+incompatible
+	github.com/google/go-github/v41 v41.0.0
 	github.com/onsi/ginkgo v1.16.4
 	github.com/onsi/gomega v1.14.0
 	github.com/pkg/errors v0.9.1
@@ -19,7 +19,7 @@ require (
 	golang.org/x/oauth2 v0.0.0-20210402161424-2e8d93401602
 	gopkg.in/h2non/gock.v1 v1.0.15
 	gopkg.in/yaml.v2 v2.4.0
-	k8s.io/test-infra v0.0.0-20211202233144-56b576a0007f
+	k8s.io/test-infra v0.0.0-20211207181645-7011bcd3dbf3
 )
 
 // Taken from go.mod of k8s/test-infra

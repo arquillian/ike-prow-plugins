@@ -1,6 +1,6 @@
 package scm
 
-import gogh "github.com/google/go-github/github"
+import gogh "github.com/google/go-github/v41/github"
 
 // RepositoryIssue holds owner name, repository name and an issue number
 type RepositoryIssue struct {

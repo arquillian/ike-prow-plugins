@@ -7,7 +7,7 @@ import (
 
 	"github.com/arquillian/ike-prow-plugins/pkg/github"
 	"github.com/arquillian/ike-prow-plugins/pkg/log"
-	gogh "github.com/google/go-github/github"
+	gogh "github.com/google/go-github/v41/github"
 	"github.com/sirupsen/logrus" //nolint:depguard
 	prowgh "k8s.io/test-infra/prow/github"
 )

@@ -1,7 +1,7 @@
 package ghclient
 
 import (
-	gogh "github.com/google/go-github/github"
+	gogh "github.com/google/go-github/v41/github"
 )
 
 type paginationChecker struct {

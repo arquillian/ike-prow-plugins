@@ -8,7 +8,7 @@ import (
 	ghservice "github.com/arquillian/ike-prow-plugins/pkg/github/service"
 	"github.com/arquillian/ike-prow-plugins/pkg/scm"
 	"github.com/arquillian/ike-prow-plugins/pkg/utils"
-	gogh "github.com/google/go-github/github"
+	gogh "github.com/google/go-github/v41/github"
 	"github.com/onsi/gomega"
 	gock "gopkg.in/h2non/gock.v1"
 )

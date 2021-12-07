@@ -3,7 +3,7 @@ package ghclient
 import (
 	"github.com/arquillian/ike-prow-plugins/pkg/log"
 
-	gogh "github.com/google/go-github/github"
+	gogh "github.com/google/go-github/v41/github"
 )
 
 type rateLimitWatcher struct {

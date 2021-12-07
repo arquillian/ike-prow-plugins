@@ -2,7 +2,7 @@ package ghservice
 
 import (
 	"github.com/arquillian/ike-prow-plugins/pkg/scm"
-	gogh "github.com/google/go-github/github"
+	gogh "github.com/google/go-github/v41/github"
 )
 
 // NewRepositoryChangeForPR creates a RepositoryChange instance for hte given pull request

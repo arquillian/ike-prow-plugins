@@ -3,7 +3,7 @@ package command
 import (
 	ghclient "github.com/arquillian/ike-prow-plugins/pkg/github/client"
 	"github.com/arquillian/ike-prow-plugins/pkg/log"
-	gogh "github.com/google/go-github/github"
+	gogh "github.com/google/go-github/v41/github"
 )
 
 // CommentCmdHandler keeps list of CommentCmd implementations to be handled when an IssueCommentEvent occurs

@@ -4,7 +4,7 @@ import (
 	"github.com/arquillian/ike-prow-plugins/pkg/log"
 	prsanitizer "github.com/arquillian/ike-prow-plugins/pkg/plugin/pr-sanitizer"
 	"github.com/arquillian/ike-prow-plugins/pkg/utils"
-	"github.com/google/go-github/github"
+	"github.com/google/go-github/v41/github"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/ginkgo/extensions/table"
 	. "github.com/onsi/gomega"

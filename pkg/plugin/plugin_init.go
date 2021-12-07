@@ -12,7 +12,6 @@ import (
 	"github.com/arquillian/ike-prow-plugins/pkg/utils"
 	"k8s.io/test-infra/prow/pluginhelp/externalplugins"
 
-
 	"net/http"
 
 	"os"

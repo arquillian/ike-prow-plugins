@@ -2,7 +2,7 @@ package ghservice
 
 import (
 	ghclient "github.com/arquillian/ike-prow-plugins/pkg/github/client"
-	gogh "github.com/google/go-github/github"
+	gogh "github.com/google/go-github/v41/github"
 )
 
 // PullRequestLazyLoader represents a lazy loader of pull request information - is loaded when needed and only once

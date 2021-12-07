@@ -6,7 +6,7 @@ import (
 	"time"
 
 	"github.com/arquillian/ike-prow-plugins/pkg/retry"
-	gogh "github.com/google/go-github/github"
+	gogh "github.com/google/go-github/v41/github"
 )
 
 type retryWrapper struct {

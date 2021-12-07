@@ -3,7 +3,7 @@ package testkeeper
 import (
 	"github.com/arquillian/ike-prow-plugins/pkg/log"
 	"github.com/arquillian/ike-prow-plugins/pkg/server"
-	gogh "github.com/google/go-github/github"
+	gogh "github.com/google/go-github/v41/github"
 	"github.com/prometheus/client_golang/prometheus"
 )
 
