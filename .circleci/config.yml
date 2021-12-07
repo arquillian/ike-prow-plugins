@@ -4,12 +4,6 @@ defaults:
   env-vars: &env-vars
     GOPATH: /home/circleci/.go_workspace
     GOLANG_SNAP_VERSION: "1.17/stable"
-  merge-junit-reports: &merge-junit-reports
-    name: "Merges ginkgo junit test results"
-    command: |
-      sudo npm install -g junit-report-merger
-      mkdir -p ./test-results/
-      jrm ./test-results/junit-report-combined.xml $(find . -type f -name ginkgo-test-results.xml)
   docker:
     - image: &golang-img cimg/go:1.17.3-node
   skip-for-non-code-changes: &skip-for-non-code-changes
@@ -78,11 +72,8 @@ jobs:
       - run:
           name: "Run the build"
           command: make
-      - run:
-          when: always
-          <<: *merge-junit-reports
       - store_test_results:
-          path: ./test-results
+          path: ./ginkgo-test-results.xml
       - save_cache:
           key: golang-deps-{{ .Environment.CIRCLE_JOB }}-cache-{{ checksum "go.sum" }}
           paths:

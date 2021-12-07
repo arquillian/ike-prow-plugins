@@ -2,8 +2,7 @@ package wip_test
 
 import (
 	wip "github.com/arquillian/ike-prow-plugins/pkg/plugin/work-in-progress"
-	. "github.com/onsi/ginkgo"
-	. "github.com/onsi/ginkgo/extensions/table"
+	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 )
 

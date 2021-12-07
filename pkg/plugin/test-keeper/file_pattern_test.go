@@ -4,8 +4,7 @@ import (
 	"fmt"
 
 	testkeeper "github.com/arquillian/ike-prow-plugins/pkg/plugin/test-keeper"
-	. "github.com/onsi/ginkgo"
-	"github.com/onsi/ginkgo/extensions/table"
+	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 )
 
@@ -32,7 +31,7 @@ var _ = Describe("File pattern features", func() {
 			Expect(parsed.Matches(file)).To(BeTrue())
 		}
 
-		table.DescribeTable(
+		DescribeTable(
 			"should parse file patterns to regexp",
 			assertThat,
 			file("src/main/resources/Anyfile").matches("**/Anyfile"),
@@ -61,6 +60,6 @@ func file(fileName string) filePatternProvider {
 	})
 }
 
-func (f filePatternProvider) matches(simplifiedRegExp string) table.TableEntry {
-	return table.Entry(fmt.Sprintf(patternAssertionMsg, f(), simplifiedRegExp), f(), simplifiedRegExp)
+func (f filePatternProvider) matches(simplifiedRegExp string) TableEntry {
+	return Entry(fmt.Sprintf(patternAssertionMsg, f(), simplifiedRegExp), f(), simplifiedRegExp)
 }

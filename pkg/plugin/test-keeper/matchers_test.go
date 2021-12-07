@@ -4,8 +4,7 @@ import (
 	"fmt"
 
 	. "github.com/arquillian/ike-prow-plugins/pkg/plugin/test-keeper"
-	. "github.com/onsi/ginkgo"
-	"github.com/onsi/ginkgo/extensions/table"
+	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 )
 
@@ -122,47 +121,47 @@ var _ = Describe("Test Matcher features", func() {
 
 	Context("Predefined exclusion regexp check (DefaultMatchers)", func() {
 
-		table.DescribeTable("should exclude common build tools",
+		DescribeTable("should exclude common build tools",
 			expectThatFile,
-			from(buildAssets).matches(DefaultMatchers.Exclusion)...,
+			from(buildAssets).matches(DefaultMatchers.Exclusion),
 		)
 
-		table.DescribeTable("should exclude common config files",
+		DescribeTable("should exclude common config files",
 			expectThatFile,
-			from(configFiles).matches(DefaultMatchers.Exclusion)...,
+			from(configFiles).matches(DefaultMatchers.Exclusion),
 		)
 
-		table.DescribeTable("should exclude common .ignore files",
+		DescribeTable("should exclude common .ignore files",
 			expectThatFile,
-			from(ignoreFiles).matches(DefaultMatchers.Exclusion)...,
+			from(ignoreFiles).matches(DefaultMatchers.Exclusion),
 		)
 
-		table.DescribeTable("should exclude common documentation files",
+		DescribeTable("should exclude common documentation files",
 			expectThatFile,
-			from(textFiles).matches(DefaultMatchers.Exclusion)...,
+			from(textFiles).matches(DefaultMatchers.Exclusion),
 		)
 
-		table.DescribeTable("should exclude ui assets",
+		DescribeTable("should exclude ui assets",
 			expectThatFile,
-			from(visualAssets).matches(DefaultMatchers.Exclusion)...,
+			from(visualAssets).matches(DefaultMatchers.Exclusion),
 		)
 
-		table.DescribeTable("should exclude shell scripts",
+		DescribeTable("should exclude shell scripts",
 			expectThatFile,
-			from(shellScripts).matches(DefaultMatchers.Exclusion)...,
+			from(shellScripts).matches(DefaultMatchers.Exclusion),
 		)
 	})
 
 	Context("Predefined inclusion regexp check (DefaultMatchers)", func() {
 
-		table.DescribeTable("should include common test naming conventions",
+		DescribeTable("should include common test naming conventions",
 			expectThatFile,
-			from(testSourceCode).matches(DefaultMatchers.Inclusion)...,
+			from(testSourceCode).matches(DefaultMatchers.Inclusion),
 		)
 
-		table.DescribeTable("should not include other source files",
+		DescribeTable("should not include other source files",
 			expectThatFile,
-			from(allNoTestFiles).doesNotMatch(DefaultMatchers.Inclusion)...,
+			from(allNoTestFiles).doesNotMatch(DefaultMatchers.Inclusion),
 		)
 	})
 })
@@ -175,16 +174,16 @@ func from(files []string) filesProvider {
 
 type filesProvider func() []string
 
-func (f filesProvider) matches(patterns []FilePattern) []table.TableEntry {
+func (f filesProvider) matches(patterns []FilePattern) []TableEntry {
 	return entries(patterns, f(), true)
 }
 
-func (f filesProvider) doesNotMatch(patterns []FilePattern) []table.TableEntry {
+func (f filesProvider) doesNotMatch(patterns []FilePattern) []TableEntry {
 	return entries(patterns, f(), false)
 }
 
-func entries(patterns []FilePattern, files []string, shouldMatch bool) []table.TableEntry {
-	entries := make([]table.TableEntry, len(files))
+func entries(patterns []FilePattern, files []string, shouldMatch bool) []TableEntry {
+	entries := make([]TableEntry, len(files))
 
 	for i, file := range files {
 		entries[i] = createEntry(patterns, file, shouldMatch)
@@ -195,10 +194,10 @@ func entries(patterns []FilePattern, files []string, shouldMatch bool) []table.T
 
 const msg = "Test matcher should%s match the file %s, but it did%s."
 
-func createEntry(matchers []FilePattern, file string, shouldMatch bool) table.TableEntry {
+func createEntry(matchers []FilePattern, file string, shouldMatch bool) TableEntry {
 	if shouldMatch {
-		return table.Entry(fmt.Sprintf(msg, "", file, " NOT"), matchers, file, shouldMatch)
+		return Entry(fmt.Sprintf(msg, "", file, " NOT"), matchers, file, shouldMatch)
 	}
 
-	return table.Entry(fmt.Sprintf(msg, " NOT", file, ""), matchers, file, shouldMatch)
+	return Entry(fmt.Sprintf(msg, " NOT", file, ""), matchers, file, shouldMatch)
 }

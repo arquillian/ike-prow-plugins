@@ -4,7 +4,7 @@ import (
 	"errors"
 
 	"github.com/arquillian/ike-prow-plugins/pkg/retry"
-	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 )
 

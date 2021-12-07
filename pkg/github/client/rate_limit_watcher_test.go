@@ -4,7 +4,7 @@ import (
 	ghclient "github.com/arquillian/ike-prow-plugins/pkg/github/client"
 	. "github.com/arquillian/ike-prow-plugins/pkg/internal/test"
 	gogh "github.com/google/go-github/v41/github"
-	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	"github.com/sirupsen/logrus/hooks/test" //nolint:depguard
 	gock "gopkg.in/h2non/gock.v1"

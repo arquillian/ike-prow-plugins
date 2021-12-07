@@ -8,29 +8,11 @@ import (
 
 	"github.com/arquillian/ike-prow-plugins/pkg/log"
 	probeshandler "github.com/arquillian/ike-prow-plugins/pkg/probes-handler"
-	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 )
 
 var _ = Describe("Test liveliness and readiness probes.", func() {
-
-	const (
-		probesEndpoint = "/version"
-		defaultVersion = "xxxxxxxx-xxxxxxxxxx"
-	)
-
-	var versionEnv string
-
-	var _ = BeforeSuite(func() {
-		var found bool
-		if versionEnv, found = os.LookupEnv("VERSION"); !found {
-			_ = os.Setenv("VERSION", defaultVersion)
-		}
-	})
-
-	var _ = AfterSuite(func() {
-		_ = os.Setenv("VERSION", versionEnv)
-	})
 
 	Context("When in healthy state", func() {
 		It("should return plugin version in response body", func() {

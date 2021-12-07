@@ -3,7 +3,7 @@ package config_test
 import (
 	"github.com/arquillian/ike-prow-plugins/pkg/config"
 	. "github.com/arquillian/ike-prow-plugins/pkg/internal/test"
-	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	"github.com/pkg/errors"
 )

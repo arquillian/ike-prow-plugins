@@ -7,7 +7,7 @@ import (
 	"github.com/arquillian/ike-prow-plugins/pkg/plugin"
 	"github.com/arquillian/ike-prow-plugins/pkg/scm"
 	"github.com/arquillian/ike-prow-plugins/pkg/status"
-	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	gock "gopkg.in/h2non/gock.v1"
 )
@@ -43,7 +43,7 @@ var _ = Describe("GitHub Status Service", func() {
 			gock.New("https://api.github.com").
 				Post("/repos/alien-ike/test-repo/statuses/1232asdasd").
 				SetMatcher(ExpectPayload(
-						toBe(github.StatusSuccess, "All good, we have tests", "alien-ike/test-keeper", dummySuccessURL))).
+					toBe(github.StatusSuccess, "All good, we have tests", "alien-ike/test-keeper", dummySuccessURL))).
 				Reply(201) // This way we implicitly verify that call happened after `HandleEvent` call
 
 			// when
@@ -60,7 +60,7 @@ var _ = Describe("GitHub Status Service", func() {
 			gock.New("https://api.github.com").
 				Post("/repos/alien-ike/test-repo/statuses/1232asdasd").
 				SetMatcher(ExpectPayload(
-						toBe(github.StatusFailure, "We don't have tests", "alien-ike/test-keeper", dummyFailureURL))).
+					toBe(github.StatusFailure, "We don't have tests", "alien-ike/test-keeper", dummyFailureURL))).
 				Reply(201) // This way we implicitly verify that call happened after `HandleEvent` call
 
 			// when
@@ -75,7 +75,7 @@ var _ = Describe("GitHub Status Service", func() {
 			gock.New("https://api.github.com").
 				Post("/repos/alien-ike/test-repo/statuses/1232asdasd").
 				SetMatcher(ExpectPayload(
-						toBe(github.StatusPending, "", "alien-ike/test-keeper", ""))).
+					toBe(github.StatusPending, "", "alien-ike/test-keeper", ""))).
 				Reply(201) // This way we implicitly verify that call happened after `HandleEvent` call
 
 			// when

@@ -4,7 +4,7 @@ import (
 	is "github.com/arquillian/ike-prow-plugins/pkg/command"
 	ghservice "github.com/arquillian/ike-prow-plugins/pkg/github/service"
 	. "github.com/arquillian/ike-prow-plugins/pkg/internal/test"
-	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	gock "gopkg.in/h2non/gock.v1"
 )

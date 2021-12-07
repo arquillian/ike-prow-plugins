@@ -4,7 +4,7 @@ import (
 	. "github.com/arquillian/ike-prow-plugins/pkg/internal/test"
 	"github.com/arquillian/ike-prow-plugins/pkg/log"
 	wip "github.com/arquillian/ike-prow-plugins/pkg/plugin/work-in-progress"
-	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	gock "gopkg.in/h2non/gock.v1"
 

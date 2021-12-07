@@ -11,15 +11,15 @@ tools: $(PROJECT_DIR)/bin/goimports $(PROJECT_DIR)/bin/golangci-lint
 
 $(PROJECT_DIR)/bin/go-bindata:
 	$(call header,"Installing go-bindata")
-	GOBIN=$(PROJECT_DIR)/bin go install -mod=readonly github.com/go-bindata/go-bindata/v3/...@latest
+	GOBIN=$(PROJECT_DIR)/bin go install -mod=readonly github.com/go-bindata/go-bindata/v3/...
 
 $(PROJECT_DIR)/bin/ginkgo:
 	$(call header,"Installing ginkgo")
-	GOBIN=$(PROJECT_DIR)/bin go install -mod=readonly github.com/onsi/ginkgo/ginkgo@v1.16.4
+	GOBIN=$(PROJECT_DIR)/bin go install -mod=readonly github.com/onsi/ginkgo/v2/ginkgo
 
 $(PROJECT_DIR)/bin/goimports:
 	$(call header,"Installing goimports")
-	GOBIN=$(PROJECT_DIR)/bin go install -mod=readonly golang.org/x/tools/cmd/goimports@latest
+	GOBIN=$(PROJECT_DIR)/bin go install -mod=readonly golang.org/x/tools/cmd/goimports
 
 $(PROJECT_DIR)/bin/golangci-lint:
 	$(call header,"Installing golangci-lint")
@@ -43,7 +43,7 @@ generate: ## Generates any necessary assets using go-bindata library
 .PHONY: test
 test:
 	$(call header,"Running tests")
-	ginkgo -r -v -progress -vet=off -trace ${args}
+	ginkgo -r -v -progress -vet=off -trace --junit-report=ginkgo-test-results.xml ${args}
 
 .PHONY: build
 build: test compile

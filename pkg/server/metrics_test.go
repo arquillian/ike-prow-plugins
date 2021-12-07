@@ -12,7 +12,7 @@ import (
 	"github.com/arquillian/ike-prow-plugins/pkg/server"
 	"github.com/arquillian/ike-prow-plugins/pkg/utils"
 	gogh "github.com/google/go-github/v41/github"
-	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	"github.com/prometheus/client_golang/prometheus"
 	gock "gopkg.in/h2non/gock.v1"
